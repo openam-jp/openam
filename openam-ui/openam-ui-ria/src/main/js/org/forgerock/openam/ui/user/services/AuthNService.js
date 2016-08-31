@@ -16,47 +16,41 @@
 define([
     "jquery",
     "lodash",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/common/util/Constants",
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken",
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
-    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
-], ($, _, AbstractDelegate, Configuration, Constants, EventManager, Messages, RealmHelper, URIUtils,
-    SessionToken, AuthenticationToken) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
+    "store/actions/creators",
+    "store/index",
+    "org/forgerock/openam/ui/common/util/uri/query"
+
+], ($, _, Messages, AbstractDelegate, Configuration, EventManager, URIUtils, fetchUrl, Constants, AuthenticationToken,
+    SessionToken, creators, store, query) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
     let requirementList = [];
     // to be used to keep track of the attributes associated with whatever requirementList contains
     let knownAuth = {};
-    function getURLParameters () {
-        const query = URIUtils.getCurrentCompositeQueryString();
-        const urlParams = _.object(_.map(query.split("&"), (pair) => pair.split("=", 2)));
+
+    function handleFragmentParameters (params) {
 
         if (Configuration.globalData.auth.urlParams) {
-            _.extend(urlParams, Configuration.globalData.auth.urlParams);
-        }
-
-        if (RealmHelper.getOverrideRealm()) {
-            urlParams.realm = RealmHelper.getOverrideRealm();
+            _.extend(params, Configuration.globalData.auth.urlParams);
         }
 
         // In case user has logged in already update session
         const sessionToken = SessionToken.get();
         if (sessionToken) {
-            urlParams.sessionUpgradeSSOTokenId = sessionToken;
+            params.sessionUpgradeSSOTokenId = sessionToken;
         }
 
-        return urlParams;
+        return params;
     }
-    function urlParamsFromObject (params) {
-        if (_.isEmpty(params)) {
-            return "";
-        }
-        return _.map(params, (value, key) => `${key}=${value}`).join("&");
-    }
+
     function addQueryStringToUrl (url, queryString) {
         if (_.isEmpty(queryString)) {
             return url;
@@ -65,15 +59,21 @@ define([
         const delimiter = url.indexOf("?") === -1 ? "?" : "&";
         return `${url}${delimiter}${queryString}`;
     }
+
+    function addRealmToStore (realm) {
+        store.default.dispatch(creators.sessionAddInfo({ realm }));
+    }
+
     obj.begin = function (options) {
         knownAuth = _.clone(Configuration.globalData.auth);
+        const fragmentParams = URIUtils.getCurrentFragmentQueryString();
         const urlAndParams = addQueryStringToUrl(
-            RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate"),
-            urlParamsFromObject(getURLParameters()
-        ));
+            fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
+            query.urlParamsFromObject(handleFragmentParameters(query.parseParameters(fragmentParams)))
+        );
         const serviceCall = {
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
             data: "",
             url: urlAndParams,
             errorsHandlers: {
@@ -112,14 +112,18 @@ define([
                 value: true
             });
         }
+
+        const isAuthenticated = requirements.hasOwnProperty("tokenId");
+
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
             Configuration.globalData.auth.currentStage = requirementList.length;
             if (!AuthenticationToken.get() && _.find(requirements.callbacks, callbackTracking)) {
                 AuthenticationToken.set(requirements.authId);
             }
-        } else if (requirements.hasOwnProperty("tokenId")) {
+        } else if (isAuthenticated) {
             SessionToken.set(requirements.tokenId);
+            addRealmToStore(requirements.realm);
         }
     };
     obj.submitRequirements = function (requirements, options) {
@@ -138,13 +142,14 @@ define([
                 window.location.href = errorBody.detail.failureUrl;
             }
         };
+        const fragmentParams = URIUtils.getCurrentFragmentQueryString();
         const urlAndParams = addQueryStringToUrl(
-            RealmHelper.decorateURIWithRealm("__subrealm__/authenticate"),
-            urlParamsFromObject(getURLParameters()
-        ));
+            fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
+            query.urlParamsFromObject(handleFragmentParameters(query.parseParameters(fragmentParams)))
+        );
         const serviceCall = {
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
             data: JSON.stringify(requirements),
             url: urlAndParams,
             errorsHandlers: {
@@ -245,11 +250,12 @@ define([
             return $.Deferred().resolve(requirementList[requirementList.length - 1]);
         }
     };
-    obj.setGoToUrl = function (tokenId, urlGoTo) {
+    obj.validateGotoUrl = function (goto) {
+        goto = decodeURIComponent(goto);
         return obj.serviceCall({
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-            data: JSON.stringify({ "goto": urlGoTo }),
+            data: JSON.stringify({ goto }),
             url: "",
             serviceUrl: `${Constants.host}/${Constants.context}/json/users?_action=validateGoto`,
             errorsHandlers: { "Bad Request": { status: "400" } }

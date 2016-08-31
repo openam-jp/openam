@@ -18,18 +18,19 @@
 define([
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], function ($, AbstractView, RESTLoginHelper, URIUtils) {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
+], ($, AbstractView, URIUtils, SessionToken, AuthenticationToken) => {
 
     var LoginFailureView = AbstractView.extend({
         template: "templates/openam/ReturnToLoginTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
         render () {
-            RESTLoginHelper.removeSessionCookie();
-            RESTLoginHelper.removeAuthCookie();
-            const params = URIUtils.getCurrentCompositeQueryString();
+            SessionToken.remove();
+            AuthenticationToken.remove();
+            const params = URIUtils.getCurrentFragmentQueryString();
             this.data.params = params ? `&${params}` : "";
             this.data.title = $.t("openam.authentication.unavailable");
             this.parentRender();

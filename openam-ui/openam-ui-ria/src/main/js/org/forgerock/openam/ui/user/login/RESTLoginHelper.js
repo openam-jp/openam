@@ -18,16 +18,21 @@ define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
-    "org/forgerock/openam/ui/user/services/AuthNService",
-    "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/ServiceInvoker",
+    "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/services/fetchUrl",
+    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
+    "org/forgerock/openam/ui/user/services/AuthNService",
+    "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel",
-    "org/forgerock/commons/ui/common/main/ViewManager"
-], function ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, Constants, SessionService,
-             URIUtils, UserModel, ViewManager) {
+    "org/forgerock/openam/ui/user/login/logout",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/login/gotoUrl"
+], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
+    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout, query, gotoUrl) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -76,51 +81,73 @@ define([
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        return UserModel.getProfile().then(successCallback, function (xhr) {
+        const sessionToken = SessionToken.get();
+        const noSessionHandler = (xhr) => {
             // Try to remove any cookie that is lingering, as it is apparently no longer valid
-            obj.removeSessionCookie();
+            SessionToken.remove();
 
             if (xhr && xhr.responseJSON && xhr.responseJSON.code === 404) {
                 errorCallback("loggedIn");
             } else {
                 errorCallback();
             }
+        };
+        // TODO AME-11593 Call to idFromSession is required to populate the fullLoginURL, which we use later to
+        // determine the parameters you logged in with. We should remove the support of fragment parameters and use
+        // persistent url query parameters instead.
+        ServiceInvoker.restCall({
+            url: `${Constants.host}/${Constants.context}/json${
+                fetchUrl.default("/users?_action=idFromSession")}`,
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
+            type: "POST",
+            errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
+        }).then((data) => {
+            Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
         });
+
+        if (sessionToken) {
+            return SessionService.updateSessionInfo(sessionToken).then((data) => {
+                return UserModel.fetchById(data.uid).then(successCallback);
+            }, noSessionHandler);
+        } else {
+            noSessionHandler();
+        }
     };
 
     obj.getSuccessfulLoginUrlParams = function () {
-        // The successfulLoginURL is populated by the server (not from window.location of the browser), upon successful
-        // authentication.
-        var successfulLoginURL = Configuration.globalData.auth.fullLoginURL,
-            successfulLoginURLParams = successfulLoginURL
-                ? successfulLoginURL.substring(successfulLoginURL.indexOf("?") + 1) : "";
-
-        return URIUtils.parseQueryString(successfulLoginURLParams);
+        // The successfulLoginURL is populated by the server upon successful authentication,
+        // not from window.location of the browser.
+        const fullLoginURL = Configuration.globalData.auth.fullLoginURL;
+        const paramString = fullLoginURL ? fullLoginURL.substring(fullLoginURL.indexOf("?") + 1) : "";
+        return query.parseParameters(paramString);
     };
 
-    obj.setSuccessURL = function (tokenId, newSuccessUrl) {
-        var promise = $.Deferred(),
-            urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString()),
-            url = newSuccessUrl ? newSuccessUrl : Configuration.globalData.auth.successURL,
-            context = "";
-        if (urlParams && urlParams.goto) {
-            AuthNService.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
+
+    obj.setSuccessURL = function (tokenId, successUrl) {
+        const promise = $.Deferred();
+        let context = "";
+
+        const goto = query.parseParameters().goto;
+
+        if (goto) {
+            AuthNService.validateGotoUrl(goto).then((data) => {
                 if (data.successURL.indexOf("/") === 0 &&
                     data.successURL.indexOf(`/${Constants.context}`) !== 0) {
                     context = `/${Constants.context}`;
                 }
-                Configuration.globalData.auth.urlParams.goto = context + data.successURL;
+                gotoUrl.set(encodeURIComponent(context + data.successURL));
                 promise.resolve();
-            }, function () {
+            }, () => {
                 promise.reject();
             });
         } else {
-            if (url !== Constants.CONSOLE_PATH) {
+            if (successUrl !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }
-                if (!Configuration.globalData.auth.urlParams.goto) {
-                    Configuration.globalData.auth.urlParams.goto = url;
+
+                if (!gotoUrl.exists()) {
+                    gotoUrl.set(successUrl);
                 }
             }
             promise.resolve();
@@ -133,46 +160,9 @@ define([
         return _.reduce(_.pick(params, filtered), (result, value, key) => `${result}&${key}=${value}`, "");
     };
 
+    // called by commons
     obj.logout = function (successCallback, errorCallback) {
-        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionService.isSessionValid(tokenCookie).then(function (result) {
-            if (result.valid) {
-                SessionService.logout(tokenCookie).then(function (response) {
-                    obj.removeSessionCookie();
-
-                    successCallback(response);
-                    return true;
-
-                }, obj.removeSessionCookie);
-            } else {
-                obj.removeSessionCookie();
-                successCallback();
-            }
-        }, function () {
-            if (errorCallback) {
-                errorCallback();
-            }
-        });
-    };
-
-    obj.removeSession = function () {
-        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
-        SessionService.isSessionValid(tokenCookie).then(function (result) {
-            if (result.valid) {
-                SessionService.logout(tokenCookie).then(function () {
-                    obj.removeSessionCookie();
-                });
-            }
-        });
-    };
-
-    obj.removeSessionCookie = function () {
-        CookieHelper.deleteCookie(Configuration.globalData.auth.cookieName, "/",
-            Configuration.globalData.auth.cookieDomains);
-    };
-
-    obj.removeAuthCookie = function () {
-        CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
+        logout.default().then(successCallback, errorCallback);
     };
 
     return obj;
