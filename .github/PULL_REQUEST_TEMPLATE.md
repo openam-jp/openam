@@ -31,8 +31,8 @@ When it can not be applied by simple module replacement such as modification of 
 
 ## Compatibility
 <!--
-Describe the effect on performance.
-Such as when there is concern about performance degradation.
+Describe changes in external specifications.
+For example, if the HTTP status code has been changed.
 
 外部仕様に変更がある場合に記載してください。
 HTTP ステータスコードが変更される場合などが該当します。
