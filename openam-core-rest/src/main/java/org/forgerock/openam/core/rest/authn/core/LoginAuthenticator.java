@@ -16,6 +16,7 @@
 
 /*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2018 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.core.rest.authn.core;
 
@@ -187,11 +188,12 @@ public class LoginAuthenticator {
         HttpServletResponse response = loginConfiguration.getHttpResponse();
         SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
         boolean isSessionUpgrade = false;
-        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull() || loginConfiguration.isForceAuth()) {
+        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull()) {
             sessionID = new SessionID(loginConfiguration.getSSOTokenId());
             SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(sessionID);
             isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
-                    loginConfiguration.getIndexValue()) || loginConfiguration.isForceAuth();
+                    loginConfiguration.getIndexValue())
+                    || (loginConfiguration.isForceAuth() && (ssoToken != null));
         }
         boolean isBackPost = false;
         return coreServicesWrapper.getAuthContext(request, response, sessionID, isSessionUpgrade, isBackPost);
