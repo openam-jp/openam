@@ -50,8 +50,8 @@ Copyright: Copyright 2002-2013 The Apache Software Foundation,
 Version: commons-collections-3.2.2.jar
 Copyright: Copyright 2001-2015 The Apache Software Foundation
 
-Version: commons-fileupload-1.3.1.jar
-Copyright: Copyright 2002-2014 The Apache Software Foundation
+Version: commons-fileupload-1.3.3.jar
+Copyright: Copyright 2002-2017 The Apache Software Foundation
 
 Version: commons-io-2.3.jar
 Copyright: Copyright 2002-2012 The Apache Software Foundation
@@ -215,16 +215,16 @@ Copyright: Copyright 2005-2015 The Apache Software Foundation
 Version: httpcore-nio-4.4.1.jar
 Copyright: 2005-2015 The Apache Software Foundation
 
-Version: jackson-annotations-2.4.2.jar
+Version: jackson-annotations-2.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-core-2.4.2.jar
+Version: jackson-core-2.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-core-asl-1.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
-Version: jackson-databind-2.4.2.jar
+Version: jackson-databind-2.9.7.jar
 Copyright: Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
 
 Version: jackson-dataformat-csv-2.6.3.jar
@@ -233,7 +233,7 @@ Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless othe
 Version: jackson-dataformat-smile-2.4.4.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
-Version: jackson-dataformat-xml-2.4.2.jar
+Version: jackson-dataformat-xml-2.9.7.jar
 Copyright: Copyright ©2009-2011 FasterXML, LLC. All rights reserved unless otherwise indicated.
 
 Version: jackson-dataformat-yaml-2.4.4.jar

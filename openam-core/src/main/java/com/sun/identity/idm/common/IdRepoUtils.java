@@ -25,6 +25,7 @@
  * $Id: IdRepoUtils.java,v 1.3 2010/01/06 22:31:55 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2018 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.common;
@@ -330,7 +331,7 @@ public class IdRepoUtils {
     private static ConnectionFactory getLDAPConnection(Map attrValues)
         throws Exception {
         Options options = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.MILLISECONDS));
+                .set(CONNECT_TIMEOUT, new Duration((long) 300, TimeUnit.SECONDS));
         String connectionMode = CollectionHelper.getMapAttr(attrValues, LDAP_CONNECTION_MODE);
         if (LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) ||
                 LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode)){

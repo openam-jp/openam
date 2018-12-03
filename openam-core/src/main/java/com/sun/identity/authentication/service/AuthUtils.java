@@ -277,12 +277,12 @@ public class AuthUtils extends AuthClientUtils {
                     if (isSessionUpgrade) {
                         loginState.setOldSession(oldSession);
                         loginState.setSessionUpgrade(isSessionUpgrade);
+                        loginState.setForceAuth(Boolean.parseBoolean(request.getParameter(FORCE_AUTH)));
                     } else if (isBackPost) {
                         loginState.setOldSession(oldSession);
                     }
                     authContext =
                     loginState.createAuthContext(request,response,sid,dataHash);
-                    loginState.setForceAuth(Boolean.parseBoolean(request.getParameter(FORCE_AUTH)));
                     authContext.setLoginState(loginState);
                     String queryOrg =
                     getQueryOrgName(request,getOrgParam(dataHash));
