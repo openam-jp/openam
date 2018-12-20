@@ -21,7 +21,12 @@
         <script type="text/javascript">
             var require = {
                 urlArgs : "v=${version}",
-                deps : ['main']
+                deps : ['main'],
+                config : {
+                    'org/forgerock/commons/ui/common/main/i18nManager': {
+                        i18nLoad: 'all'
+                    }
+                }
             };
         </script>
         <script src="libs/requirejs-2.1.14-min.js"></script>

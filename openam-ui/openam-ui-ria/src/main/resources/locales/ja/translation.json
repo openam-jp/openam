@@ -17,12 +17,12 @@
             },
             "CommonMessages" : {
                 "authenticationFailed" : "ユーザー名/パスワードの組み合わせが不正です。",
-                "serviceUnavailable" : "サービスが利用できません。",
+                "serviceUnavailable" : "サービスが使用できません。",
                 "unknown" : "不明なエラー。システム管理者にお問い合わせください。",
                 "loggedIn" : "正常にログインしました。",
                 "errorFetchingData" : "ユーザーデータフェッチ中のエラー。",
                 "loggedOut" : "ログアウトしました。",
-                "loginTimeout" : "ログインセッションがタイムアウトになりました。再起動しています...",
+                "loginTimeout" : "ログインセッションがタイムアウトになりました。最初からやり直してください。",
                 "unauthorized" : "不正なアクセスまたはセッションタイムアウトです。",
                 "internalError" : "内部サーバーエラー",
                 "forbiddenError" : "閲覧禁止エラー。",
@@ -78,7 +78,7 @@
                     "error": {
                         "cantStartWithHash": "LDAP エンティティは # で始めることはできません。",
                         "noName": "名前は必須です。",
-                        "noId": "IDは必須です。",
+                        "noId": "ID は必須です。",
                         "noResourceTypes": "1つ以上のリソースタイプを選択してください。",
                         "noResources": "1つ以上のリソースを選択してください。",
                         "noActions": "1つ以上のアクションを追加してください。",
@@ -142,13 +142,12 @@
                 "refreshOnLogin" : "ログイン時にリフレッシュする必要があります" 
             },
             "LoginTemplate" : {
-                "logintextconter" : "",
                 "loginRemember" : "ユーザー名を記憶する。",
-                "noAccountQuestion" : "アカウントを持っていないですか？",
+                "noAccountQuestion" : "アカウントを持っていないですか?",
                 "registerAccount" : "アカウントを登録してください。",
-                "problemLoggingQuestion" : "ログインのトラブルがありますか？",
+                "problemLoggingQuestion" : "ログインのトラブルがありますか?",
                 "socialAuthentication" : "または次でログイン:",
-                "resetPassword" : "パスワードをリセットしますか？",
+                "resetPassword" : "パスワードをリセットしますか?",
                 "forgotUsername" : "ユーザー名を忘れましたか?",
                 "onMobileDevice": "スマートデバイスはこちら",
                 "waitingForResponse": "応答を待っています...",
@@ -189,7 +188,7 @@
                 "enterYourOldPassword" : "古いパスワードを入力してください。"
             },
             "TermsOfUseTemplate" : {
-                "termsOfUse" : "利用規約",
+                "termsOfUse" : "使用規約",
                 "termsOfUseContent" : "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p>"
             },
             "UserProfileTemplate" : {
@@ -246,7 +245,7 @@
             "tokenInfo": "トークン情報"
         },
         "login" : {
-            "newHere": "ここで新規作成しますか？",
+            "newHere": "ここで新規作成しますか?",
             "createAccount": "アカウントの作成"
         }
     },
@@ -329,7 +328,7 @@
             "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
             "build": "ビルド",
             "sessionExpired" : "セッションが有効期限切れ",
-            "enableCookies" : "ログインするためには、cookie を有効にする必要があります",
+            "enableCookies" : "ログインするためには、 cookie を有効にする必要があります",
             "deleteSelected" : "選択したものを削除します",
             "startTypingToSearch": "検索する入力を開始",
             "passwordPlaceholder": "••••••••••••",
@@ -343,10 +342,10 @@
                 "VALID_PHONE_FORMAT": "無効な文字が含まれています。",
                 "VALID_NAME_FORMAT": "無効な文字が含まれています。",
                 "VALID_EMAIL_ADDRESS_FORMAT": "電子メールアドレスが無効です。",
-                "AT_LEAST_X_CAPITAL_LETTERS" : "最低 __numCaps__ capital 文字以上は必要です。",
-                "AT_LEAST_X_NUMBERS" : "少なくとも __numNums__ 個以上の数字が必要です。",
+                "AT_LEAST_X_CAPITAL_LETTERS" : "最低 __numCaps__ 文字以上の大文字が必要です。",
+                "AT_LEAST_X_NUMBERS" : "最低 __numNums__ 個以上の数字が必要です。",
                 "CANNOT_CONTAIN_OTHERS" : "値を含めることはできません: __disallowedFields__",
-                "MIN_LENGTH" : "最低 __minLength__ 文字です。",
+                "MIN_LENGTH" : "最低 __minLength__ 文字以上は必要です。",
                 "REQUIRED" : "空白にすることはできません。",
                 "UNIQUE" : "すでに存在します。",
                 "REAUTH_REQUIRED" : "",
@@ -354,8 +353,8 @@
                 "atLeastOneCapitalLetter" : "少なくとも大文字が 1 文字以上必要です。",
                 "atLeastOneNumber" : "少なくとも数字が 1 つ以上必要です。",
                 "atLeast8Characters" : "少なくとも 8 文字以上必要です。",
-                "cannotMatchLogin" : "ログインが一致しません。",
-                "confirmationMatchesPassword" : "新規パスワードとパスワード(確認)が一致。",
+                "cannotMatchLogin" : "ログインが一致する必要があります。",
+                "confirmationMatchesPassword" : "新規パスワードとパスワード(確認)が一致する必要があります。",
                 "usernameExists" : "ユーザー名がすでに存在します。",
                 "emailAddressAlreadyExists" : "電子メールアドレスがすでに存在します。",
                 "onlyAlphabeticCharacters" : "英字のみです。",
@@ -364,7 +363,7 @@
                 "minimum4Characters" : "最小 4 文字です。",
                 "acceptanceRequiredForRegistration" : "登録には受理が必要です。",
                 "incorrectPassword" : "パスワードが正しくありません。",
-                "incorrectSecurityAnswer" : "応答が無効です。",
+                "incorrectSecurityAnswer" : "回答が正しくありません。",
                 "required" : "必須",
                 "emailNotValid" : "電子メールアドレスが無効です。",
                 "emailExists" : "電子メールアドレスがすでに存在します。",
@@ -427,7 +426,7 @@
             "validateCode" : "入力したアドレスに電子メールが送信されました。続行するためには、そのメール内のリンクをクリックしてください。",
             "user" : "ユーザー",
             "login" : "ログイン",
-            "loginConfirm" : "すでにログインしています。ログアウトし、別の組織にログインしますか？",
+            "loginConfirm" : "すでにログインしています。ログアウトし、別の組織にログインしますか?",
             "selfService" : "セルフサービス",
             "administration": "管理",
             "basicInfo" : "基本情報",
@@ -605,7 +604,7 @@
                     "button": "すべてのリソースの共有を解除",
                     "dialog": {
                         "title": "すべてのリソースの共有を解除しますか?",
-                        "message": "すべてのリソースの共有を解除してもよろしいですか？ OK を選択するとリソースを削除しませんが、リソース内の全共有を削除します。"
+                        "message": "すべてのリソースの共有を解除してもよろしいですか? OK を選択するとリソースを削除しませんが、リソース内の全共有を削除します。"
                     },
                     "messages": {
                         "success" : "すべてのリソースの共有を正常に解除しました。",
@@ -628,7 +627,7 @@
                     "button": "ラベルの削除",
                     "dialog": {
                         "title": "ラベルを削除しますか",
-                        "message": "このラベルを削除してもよろしいですか？リソースのラベルを削除してもリソース自体は削除されません。"
+                        "message": "このラベルを削除してもよろしいですか? リソースのラベルを削除してもリソース自体は削除されません。"
                     },
                     "messages": {
                         "success" : "ラベルが正常に削除されました。",
@@ -652,7 +651,7 @@
                 "revokeAllPoliciesFail" : "リソースに対するすべてのアクセスを取り消すことができませんでした。管理者に連絡してください。",
                 "revokePolicySuccess" : "リソースに対するアクセスは正常に失効しました。",
                 "revokePolicyFail" : "リソースに対するアクセスを失効できませんでした。管理者に連絡してください。",
-                "revokeAllResourcesMessage": "すべてのアクセスを無効にしてもよろしいですか？OKを選択してもリソースは削除されませんが、リソース内のすべての共有が削除されます。"
+                "revokeAllResourcesMessage": "すべてのアクセスを無効にしてもよろしいですか? OK を選択してもリソースは削除されませんが、リソース内のすべての共有が削除されます。"
             }
         },
         "history": {
@@ -753,7 +752,7 @@
             "list" :{
                 "title" : "サイト",
                 "new" : "サイトの追加",
-                "table" : ["サイト名", "URL", "セカンダリURL", "割り当てられたサーバー"],
+                "table" : ["サイト名", "URL", "セカンダリ URL", "割り当てられたサーバー"],
                 "empty" : "サイトが見つかりません。",
                 "description": "複数で構成された冗長な OpenAM サーバーを論理的にグループ化し、サイトとして定義します。"
             },
@@ -769,18 +768,18 @@
             "list" : {
                 "title" : "サーバー",
                 "new" : "サーバーの追加",
-                "table" : ["サイトURL", "サイト名"],
+                "table" : ["サイト URL", "サイト名"],
                 "empty" : "サーバーが見つかりません。",
                 "clone" : "コピー",
                 "description": "OpenAM インスタンス内のサーバー固有のプロパティを設定します。"
             },
             "new": {
                 "title" : "サーバーの追加",
-                "serverUrl": "サーバーURL"
+                "serverUrl": "サーバー URL"
             },
             "clone": {
                 "title" : "サーバーのコピー",
-                "serverUrl": "サーバーURL"
+                "serverUrl": "サーバー URL"
             }
         },
         "authentication": {
@@ -793,7 +792,7 @@
             },
             "modules": {
                 "title" : "認証モジュール",
-                "description" : "OpenAM は、ユーザーを識別するために認証モジュールを使用します。通常、認証モジュールは認証連鎖と関連付けられています。各レルムには、ユーザーを認証するために使用されるデフォルトの認証連鎖があります。このセクションは、レルムへの認証に利用可能な認証モジュールを追加、設定、削除するために使用されます。",
+                "description" : "OpenAM は、ユーザーを識別するために認証モジュールを使用します。通常、認証モジュールは認証連鎖と関連付けられています。各レルムには、ユーザーを認証するために使用されるデフォルトの認証連鎖があります。このセクションは、レルムへの認証に使用可能な認証モジュールを追加、設定、削除するために使用されます。",
                 "newModule": "モジュールの追加",
                 "addModuleTitle" : "新規モジュールの作成",
                 "addModuleError": "認証インスタンスがすでに存在しています。",
@@ -901,8 +900,8 @@
                 "chooseServiceType": "サービスタイプを選択",
                 "serviceTypes": "サービスタイプ...",
                 "settings": "設定",
-                "unavaliable": "加えることが可能なサービスではありません。",
-                "unavaliableAlert": "加えることが可能なサービスではありません。既存サービスの一覧を確認するため、キャンセルをクリックしてください。"
+                "unavaliable": "追加できるサービスはありません。",
+                "unavaliableAlert": "追加できるサービスはありません。既存サービスの一覧を確認するため、キャンセルをクリックしてください。"
             },
             "list": {
                 "service": "サービス",
@@ -948,7 +947,7 @@
             },
             "realmAliasesPopover": {
                 "title": "レルム / DNS エイリアス",
-                "content": "認証ユーザーインターフェースがリクエストが受信すると、ユーザーが認証されるべきレルムを見つけるため、 OpenAM はすべてのレルムに対してこの属性を検索します。 OpenAM は一致するレルムを1つだけを見つける必要しかないので、複数のレルムに重複したエントリを入れてはいけません。さらに OpenAM が一致するレルムを見つけられない場合、ユーザーにはエラー画面が表示されます。"
+                "content": "認証ユーザーインターフェースがリクエストが受信すると、ユーザーが認証されるべきレルムを見つけるため、 OpenAM はすべてのレルムに対してこの属性を検索します。 OpenAM は一致するレルムを1つに特定する必要があるため、複数のレルムに重複したエントリを入れてはいけません。さらに OpenAM が一致するレルムを見つけられない場合、ユーザーにはエラー画面が表示されます。"
             },
             "realmNameValidationError" : "レルム名に文字 $, &, +, \\, \", カンマ, /, :, ;, =, ?, @, スペース, #, %, <, > は許可されていません。"
         },
@@ -963,10 +962,10 @@
                     "column": "列",
                     "message": "メッセージ",
                     "errors": "このスクリプトにはエラーがあります:",
-                    "noErrors": "エラーは見つかりませんでした."
+                    "noErrors": "エラーは見つかりませんでした。"
                 },
                 "dialog": {
-                    "title":  "スクリプトタイムの変更",
+                    "title":  "スクリプトタイプの変更",
                     "warning": "スクリプトタイプを変更すると、未保存のデータが失われます。"
                 }
             },
@@ -982,11 +981,11 @@
                 "description": "グローバルな認証機能のデフォルトプロパティを設定します。",
                 "core": {
                     "coreAttributes": "コア属性",
-                    "title": "デフォルト認証レルム",
+                    "title": "レルムのデフォルト設定",
                     "description": "新しいレルムを作成するときに適用するデフォルトの認証プロパティを設定します。"
                 },
                 "modules": {
-                    "title": "デフォルト認証モジュール",
+                    "title": "認証モジュールのデフォルト設定",
                     "description": "新しい認証モジュールを作成するときに適用するデフォルトのプロパティを設定します。"
                 }
             },
@@ -1006,7 +1005,7 @@
                 "responseAttributes": "レスポンス属性",
                 "subjectAttributes": "対象属性",
                 "customAttributes": "カスタム属性",
-                "availablePatterns": "利用可能なパターン",
+                "availablePatterns": "使用可能なパターン",
                 "staticAttributes": "静的属性",
                 "action": "アクション",
                 "actions": "アクション",
@@ -1026,7 +1025,7 @@
                 "noSubjectAttributes": "サブジェクト属性がありません...",
                 "noApplications": "選択したポリシーセットがありません...",
                 "noPatterns": "パターンがありません...",
-                "noResourceTypesAvailable": "利用可能なリソースタイプがありません...",
+                "noResourceTypesAvailable": "使用可能なリソースタイプがありません...",
                 "noApplicationsAvailable": "使用可能なポリシーセットがありません...",
                 "noItems": "アイテムがありません...",
 
@@ -1069,13 +1068,13 @@
                     "addResourceTypes": "リソースタイプの追加...",
                     "selectResourceTypes": "このポリシーセット内で使用可能にするリソースタイプを選択します。",
                     "resourceTypes": {
-                        "availableResourceTypes": "利用可能なリソースタイプ",
+                        "availableResourceTypes": "使用可能なリソースタイプ",
                         "selectedResourceTypes": "選択されたリソースタイプ"
                     }
                 },
                 "list": {
                     "addNew": "新規ポリシーセット",
-                    "description": "Webサイト、Webアプリケーション、またはその他のリソースを保護するためのポリシーのセットを定義します。",
+                    "description": "Web サイト、 Web アプリケーション、またはその他のリソースを保護するためのポリシーのセットを定義します。",
                     "importPolicySets": "ポリシーのインポート",
                     "exportPolicySets": "ポリシーのエクスポート",
                     "grid": ["名前"],
@@ -1098,7 +1097,7 @@
                     "selectResourceType": "リソースタイプの選択...",
                     "selectResourcePattern": "リソースパターンの選択...",
                     "addAction": "アクションの追加",
-                    "availableActions": "利用可能なリソースタイプのアクション",
+                    "availableActions": "使用可能なリソースタイプのアクション",
                     "selectedActions": "選択されたアクション",
                     "subjectAttributesPlaceholder": "対象の属性を選択または検索する",
                     "addEnvironmentCondition": "環境条件の追加",
@@ -1250,7 +1249,7 @@
                             "placeholder": "スクリプトから選択"
                         },
                         "ipHelperTitle": "IP 条件",
-                        "ipHelperContent": "開始 IP、終了 IP またはDNS名の少なくとも一つを入力してください。単一の IP アドレスと一致させるには、開始 IP または終了 IP のどちらかに入力します。開始 IP は、終了 IP 以下の値でなければなりません。DNS名は、明示的な一致かまたは最も低いサブドメインのワイルドカードを使用することができます。",
+                        "ipHelperContent": "開始 IP 、終了 IP または DNS 名の少なくとも一つを入力してください。単一の IP アドレスと一致させるには、開始 IP または終了 IP のどちらかに入力します。開始 IP は、終了 IP 以下の値でなければなりません。 DNS 名は、明示的な一致かまたは最も低いサブドメインのワイルドカードを使用することができます。",
                         "legacyFormat": "この条件は従来の形式であり、置換する必要があります。",
                         "nothingSelected": "何も選択されていません",
                         "attributes": {
@@ -1270,7 +1269,7 @@
                 "list": {
                     "add": "新規リソースタイプ",
                     "title": "リソースタイプ",
-                    "description": "適用されるポリシーリソースとそれらのリソースで実行できるアクション用のテンプレートを定義します。",
+                    "description": "ポリシーが適用されるリソースとそれらのリソースで実行できるアクション用のテンプレートを定義します。",
                     "grid": ["名前"],
                     "noResourceTypes" : "リソースタイプが見つかりません。",
                     "addNewResourceType" : "リソースタイプの追加"
