@@ -1018,9 +1018,9 @@
 
                 "noRealms": "選択したレルムがありません...",
                 "noActions": "アクションがありません...",
-                "noActionsSelected": "選択されたアクションがありません...",
+                "noActionsSelected": "選択したアクションがありません...",
                 "noResources": "選択したリソースがありません...",
-                "noResourceTypes": "選択されたリソースタイプがありません...",
+                "noResourceTypes": "選択したリソースタイプがありません...",
                 "noStaticAttributes": "静的な属性がありません...",
                 "noSubjectAttributes": "サブジェクト属性がありません...",
                 "noApplications": "選択したポリシーセットがありません...",
@@ -1069,7 +1069,7 @@
                     "selectResourceTypes": "このポリシーセット内で使用可能にするリソースタイプを選択します。",
                     "resourceTypes": {
                         "availableResourceTypes": "使用可能なリソースタイプ",
-                        "selectedResourceTypes": "選択されたリソースタイプ"
+                        "selectedResourceTypes": "選択したリソースタイプ"
                     }
                 },
                 "list": {
@@ -1098,7 +1098,7 @@
                     "selectResourcePattern": "リソースパターンの選択...",
                     "addAction": "アクションの追加",
                     "availableActions": "使用可能なリソースタイプのアクション",
-                    "selectedActions": "選択されたアクション",
+                    "selectedActions": "選択したアクション",
                     "subjectAttributesPlaceholder": "対象の属性を選択または検索する",
                     "addEnvironmentCondition": "環境条件の追加",
                     "addSubjectCondition": "対象条件の追加",
