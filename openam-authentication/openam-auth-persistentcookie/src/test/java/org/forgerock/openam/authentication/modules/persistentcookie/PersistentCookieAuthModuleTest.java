@@ -13,6 +13,7 @@
  *
  * Copyright 2013-2015 ForgeRock AS.
  * 
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
@@ -606,6 +607,13 @@ public class PersistentCookieAuthModuleTest {
 
     @Test
     public void shouldStoreClientIPOnLoginSuccess() throws AuthenticationException, SSOException {
+        persistentCookieAuthModule = new PersistentCookieAuthModule(new ServletJwtSessionModule(), amKeyProvider, coreWrapper) {
+            @Override
+            protected String getKeyAlias(String orgName) throws SSOException, SMSException {
+                return "KEY_ALIAS";
+            }
+        };
+
         MessageInfo messageInfo = mock(MessageInfo.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
