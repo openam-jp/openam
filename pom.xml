@@ -52,7 +52,7 @@
     <parent>
         <groupId>jp.openam</groupId>
         <artifactId>forgerock-parent</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -115,16 +115,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>3.0.0</opendj.server.version>
-        <opendj.sdk.version>3.0.0</opendj.sdk.version>
-        <opendj.server.legacy>3.0.0</opendj.server.legacy>
+        <opendj.server.version>3.0.1-SNAPSHOT</opendj.server.version>
+        <opendj.sdk.version>3.0.1-SNAPSHOT</opendj.sdk.version>
+        <opendj.server.legacy>3.0.1-SNAPSHOT</opendj.server.legacy>
 
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
 
-        <forgerock.bloomfilter.version>1.0.1</forgerock.bloomfilter.version>
-        <forgerock.ui.version>13.0.4</forgerock.ui.version>
-        <forgerock.guice.version>1.1.0</forgerock.guice.version>
+        <forgerock.bloomfilter.version>1.0.2-SNAPSHOT</forgerock.bloomfilter.version>
+        <forgerock.ui.version>13.0.5-SNAPSHOT</forgerock.ui.version>
+        <forgerock.guice.version>1.1.1-SNAPSHOT</forgerock.guice.version>
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
@@ -453,8 +453,8 @@
         <dependencies>
             <dependency>
                 <groupId>jp.openam.commons</groupId>
-                <artifactId>commons-bom</artifactId>
-                <version>20.1.0</version>
+                <artifactId>forgerock-bom</artifactId>
+                <version>4.1.2-SNAPSHOT</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
