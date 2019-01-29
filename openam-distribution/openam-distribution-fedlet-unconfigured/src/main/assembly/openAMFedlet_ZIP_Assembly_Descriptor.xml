@@ -22,6 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -35,7 +36,7 @@
     <dependencySets>
         <dependencySet>
             <includes>
-                <include>org.forgerock.openam:openam-fedlet-unconfigured-war:war</include>
+                <include>jp.openam:openam-fedlet-unconfigured-war:war</include>
             </includes>
             <outputFileNameMapping>fedlet.war</outputFileNameMapping>
             <useProjectArtifact>false</useProjectArtifact>
