@@ -22,6 +22,8 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2019 Open Source Solution Technology Corporation
+*
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -64,14 +66,14 @@
     <inceptionYear>2010</inceptionYear>
 
     <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.org</url>
+        <name>OpenAM Consortium</name>
+        <url>https://www.openam.jp/</url>
     </organization>
-    <url>http://www.forgerock.org</url>
+    <url>https://www.openam.jp/</url>
 
     <issueManagement>
-        <system>Jira</system>
-        <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+        <system>GitHub</system>
+        <url>https://github.com/openam-jp/openam/issues</url>
     </issueManagement>
 
     <licenses>
@@ -184,7 +186,9 @@
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
+        <!--
         <siteDistributionURL>scp://community.internal.forgerock.com/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+        -->
         <!-- Latest policy agent community versions -->
         <webAgentsDocCommunityVersion>4.0.0-SNAPSHOT</webAgentsDocCommunityVersion>
         <javaEEAgentsDocCommunityVersion>3.5.0-SNAPSHOT</javaEEAgentsDocCommunityVersion>
@@ -233,13 +237,6 @@
             <properties>
                 <generate.clientsdk.sources>true</generate.clientsdk.sources>
             </properties>
-            <repositories>
-                <repository>
-                    <id>forgerock-internal</id>
-                    <name>Forgerock Internal Repository</name>
-                    <url>http://maven.forgerock.org/repo/internal</url>
-                </repository>
-            </repositories>
             <dependencyManagement>
                 <dependencies>
                     <!-- Don't include the authapi*.jar in the war for a release build -->
@@ -257,13 +254,6 @@
         <profile>
             <!-- Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
             <id>binary-licensing</id>
-            <repositories>
-                <repository>
-                    <id>forgerock-internal</id>
-                    <name>Forgerock Internal Repository</name>
-                    <url>http://maven.forgerock.org/repo/internal</url>
-                </repository>
-            </repositories>
             <properties>
                 <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
                 <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
@@ -273,13 +263,6 @@
 
         <profile>
             <id>development</id>
-            <repositories>
-                <repository>
-                    <id>forgerock-internal</id>
-                    <name>Forgerock Internal Repository</name>
-                    <url>http://maven.forgerock.org/repo/internal</url>
-                </repository>
-            </repositories>
         </profile>
 
         <profile>
@@ -446,80 +429,8 @@
         <module>openam-push-notification</module>
     </modules>
 
-    <!-- Mailing Lists -->
-    <mailingLists>
-        <mailingList>
-            <name>OpenAM Users List</name>
-            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
-            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
-            <post>openam@forgerock.org</post>
-            <archive>http://lists.forgerock.org/pipermail/openam/</archive>
-        </mailingList>
-        <mailingList>
-            <name>OpenAM Developers List</name>
-            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
-            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
-            <post>openam-dev@forgerock.org</post>
-            <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
-        </mailingList>
-        <mailingList>
-            <name>OpenAM Commit Notifications</name>
-            <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
-            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
-            <post>commitopenam@forgerock.org</post>
-            <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
-        </mailingList>
-    </mailingLists>
-
     <!-- Maven Repositories -->
     <repositories>
-        <!-- ForgeRock Common Internal Project Repositories -->
-        <repository>
-            <id>forgerock-staging-repository</id>
-            <name>ForgeRock Release Repository</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>forgerock-snapshots-repository</id>
-            <name>ForgeRock Snapshot Repository</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <!-- ForgeRock Internal Project Repository -->
-        <repository>
-            <id>maven.forgerock.org</id>
-            <name>maven.forgerock.org-openam-dependencies</name>
-            <url>http://maven.forgerock.org/repo/openam-dependencies</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>restlet-cache</id>
-            <name>Restlet Cache Repository</name>
-            <url>http://maven.forgerock.org/repo/maven.restlet.org</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
         <repository>
             <id>oracle-repository</id>
             <name>Oracle Repository</name>
@@ -530,32 +441,12 @@
         </repository>
     </repositories>
 
-    <!-- For Deployment to ForgeRock Maven Repository -->
-    <distributionManagement>
-        <repository>
-            <id>maven.forgerock.org</id>
-            <name>maven.forgerock.org-releases</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.forgerock.org</id>
-            <name>maven.forgerock.org-snapshots</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
-        </snapshotRepository>
-        <site>
-            <id>forgerock.org</id>
-            <name>OpenAM Project</name>
-            <url>${siteDistributionURL}</url>
-        </site>
-    </distributionManagement>
-
     <!-- Source Control -->
     <scm>
-        <connection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</connection>
-        <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/openam/openam.git</developerConnection>
-        <url>https://stash.forgerock.org/projects/OPENAM/repos/openam/browse</url>
-      <tag>release/13.0.0</tag>
-  </scm>
+        <connection>scm:git:https://github.com/openam-jp/openam.git</connection>
+        <developerConnection>scm:git:git@github.com:openam-jp/openam.git</developerConnection>
+        <url>https://github.com/openam-jp/openam</url>
+    </scm>
 
     <!-- Dependency Management -->
     <dependencyManagement>
