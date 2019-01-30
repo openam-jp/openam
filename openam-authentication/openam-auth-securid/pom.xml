@@ -76,7 +76,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>external</groupId>
+            <groupId>jp.openam.external</groupId>
             <artifactId>authapi</artifactId>
         </dependency>
     </dependencies>

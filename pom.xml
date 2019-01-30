@@ -151,7 +151,7 @@
         <jaxb.version>1.0.6</jaxb.version>
         <jaxb1.version>2.0.2</jaxb1.version>
         <jaxrpc-api.version>1.1</jaxrpc-api.version>
-        <jaxrpc-impl.version>1.1.3_01-041406</jaxrpc-impl.version>
+        <jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>
         <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
         <jdom.version>2.0.1</jdom.version>
         <je.version>5.0.104</je.version>
@@ -170,9 +170,7 @@
         <jsp-api.version>2.1</jsp-api.version>
         <xsdlib.version>20060615</xsdlib.version>
         <authapi.version>2005-08-12</authapi.version>
-        <FastInfoset.version>2006-26-09</FastInfoset.version>
         <jdmk.version>2007-01-10</jdmk.version>
-        <jsr173_api.version>2004-30-01</jsr173_api.version>
         <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
         <freemarker.version>2.3.19</freemarker.version>
         <java-ipv6.version>0.14</java-ipv6.version>
@@ -241,7 +239,7 @@
                 <dependencies>
                     <!-- Don't include the authapi*.jar in the war for a release build -->
                     <dependency>
-                        <groupId>external</groupId>
+                        <groupId>jp.openam.external</groupId>
                         <artifactId>authapi</artifactId>
                         <version>${authapi.version}</version>
                         <scope>provided</scope>
@@ -427,6 +425,8 @@
 
         <!-- (Mobile) Push Notification Service -->
         <module>openam-push-notification</module>
+
+        <module>openam-external-libs</module>
     </modules>
 
     <!-- Maven Repositories -->
@@ -510,6 +510,12 @@
             <dependency>
                 <groupId>jp.openam</groupId>
                 <artifactId>openam-push-notification</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jp.openam</groupId>
+                <artifactId>openam-external-libs</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -1131,18 +1137,10 @@
             </dependency>
 
             <dependency>
-                <groupId>external</groupId>
-                <artifactId>esapiport</artifactId>
-                <version>${esapiport.version}</version>
-            </dependency>
-
-            <!--
-            <dependency>
                 <groupId>org.owasp.esapi</groupId>
                 <artifactId>esapi</artifactId>
-                <version>2.0.1</version>
+                <version>2.1.0.1</version>
             </dependency>
-            -->
 
             <dependency>
                 <groupId>com.maxmind.geoip2</groupId>
@@ -1189,7 +1187,7 @@
             </dependency>
 
             <dependency>
-                <groupId>external</groupId>
+                <groupId>com.sun.xml.rpc</groupId>
                 <artifactId>jaxrpc-impl</artifactId>
                 <version>${jaxrpc-impl.version}</version>
             </dependency>
@@ -1473,30 +1471,20 @@
             </dependency>
 
             <dependency>
-                <groupId>external</groupId>
+                <groupId>jp.openam.external</groupId>
                 <artifactId>authapi</artifactId>
                 <version>${authapi.version}</version>
             </dependency>
             <dependency>
-                <groupId>external</groupId>
-                <artifactId>FastInfoset</artifactId>
-                <version>${FastInfoset.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
+                <groupId>jp.openam.external</groupId>
                 <artifactId>jdmkrt</artifactId>
                 <version>${jdmk.version}</version>
             </dependency>
             <dependency>
-                <groupId>external</groupId>
+                <groupId>jp.openam.external</groupId>
                 <artifactId>jdmktk</artifactId>
                 <version>${jdmk.version}</version>
                 <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>jsr173_api</artifactId>
-                <version>${jsr173_api.version}</version>
             </dependency>
 
             <!-- Preferred JSON Data Binding API -->

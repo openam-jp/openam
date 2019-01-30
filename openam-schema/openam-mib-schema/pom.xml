@@ -127,7 +127,7 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>external</groupId>
+                        <groupId>jp.openam.external</groupId>
                         <artifactId>jdmktk</artifactId>
                         <version>2007-01-10</version>
                     </dependency>
@@ -181,9 +181,14 @@
             <groupId>jp.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-external-libs</artifactId>
+            <type>pom</type>
+        </dependency>
 
         <dependency>
-            <groupId>external</groupId>
+            <groupId>jp.openam.external</groupId>
             <artifactId>jdmkrt</artifactId>
         </dependency>
     </dependencies>

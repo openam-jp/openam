@@ -219,12 +219,12 @@
         </dependency>
         
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>external</groupId>
+            <groupId>com.sun.xml.rpc</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
         
