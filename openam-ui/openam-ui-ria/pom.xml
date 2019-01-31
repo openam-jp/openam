@@ -29,7 +29,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <codemirror.version>4.10</codemirror.version>
+        <codemirror.version>4.10.0</codemirror.version>
         <handlebars.version>3.0.3</handlebars.version>
         <node.install.directory>${project.basedir}</node.install.directory>
     </properties>
@@ -40,6 +40,11 @@
             <artifactId>forgerock-ui-user</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-external-libs</artifactId>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.mozilla</groupId>

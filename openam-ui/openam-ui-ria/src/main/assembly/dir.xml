@@ -26,7 +26,7 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${project.build.directory}/codemirror-${codemirror.version}</directory>
+            <directory>${project.build.directory}/CodeMirror-${codemirror.version}</directory>
             <outputDirectory>/libs/codemirror</outputDirectory>
             <includes>
                 <include>lib/codemirror.js</include>
@@ -36,7 +36,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.build.directory}/codemirror-${codemirror.version}</directory>
+            <directory>${project.build.directory}/CodeMirror-${codemirror.version}</directory>
             <outputDirectory>/css/codemirror</outputDirectory>
             <includes>
                 <include>lib/codemirror.css</include>
