@@ -57,4 +57,15 @@ Portions Copyrighted 2019 Open Source Solution Technology Corporation
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>restlet-repository</id>
+            <name>Restlet Repository</name>
+            <url>http://maven.restlet.com</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 </project>

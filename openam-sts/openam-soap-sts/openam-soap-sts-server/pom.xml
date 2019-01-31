@@ -161,6 +161,17 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>restlet-repository</id>
+            <name>Restlet Repository</name>
+            <url>http://maven.restlet.com</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <profiles>
         <profile>
             <id>precommit</id>
