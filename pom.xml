@@ -413,16 +413,6 @@
     </modules>
 
     <!-- Maven Repositories -->
-    <repositories>
-        <repository>
-            <id>oracle-repository</id>
-            <name>Oracle Repository</name>
-            <url>http://download.oracle.com/maven</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <!-- Source Control -->
     <scm>

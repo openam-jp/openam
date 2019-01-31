@@ -423,5 +423,16 @@
             <artifactId>forgerock-guice-test</artifactId>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>oracle-repository</id>
+            <name>Oracle Repository</name>
+            <url>http://download.oracle.com/maven</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
 
