@@ -1,0 +1,15 @@
+{
+    "common": {
+        "form": {
+            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "thankYou": "完了!",
+            "build": "ビルド"
+        }
+    },
+    "form": {
+        "code": "ここにコードを入力してください",
+        "description": "コードを入力してください:",
+        "submit": "送信する"
+    },
+    "not_found": "入力したコードが見つかりません"
+}
