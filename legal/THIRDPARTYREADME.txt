@@ -822,7 +822,7 @@ Copyright: Copyright (C) 2014 by Marijn Haverbeke
 Version: form2js-2.0.js
 Copyright: Copyright (c) 2010 Maxim Vasiliev
 
-Version: handlebars-3.0.3-min.js
+Version: handlebars-4.0.5.js
 Copyright: Copyright (C) 2011-2015 by Yehuda Katz
 
 Version: grid.locale-en.js
