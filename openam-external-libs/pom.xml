@@ -86,7 +86,7 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.0.0/qrcode.min.js</url>
+                            <url>https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.3/qrcode.min.js</url>
                             <outputDirectory>${project.basedir}/target/external</outputDirectory>
                         </configuration>
                     </execution>
@@ -481,7 +481,7 @@
                             <file>${project.basedir}/target/external/qrcode.min.js</file>
                             <groupId>jp.openam.commons.ui.libs</groupId>
                             <artifactId>qrcode</artifactId>
-                            <version>1.0.0</version>
+                            <version>1.4.3</version>
                             <packaging>js</packaging>
                             <generatePom>true</generatePom>
                             <classifier>min</classifier>
