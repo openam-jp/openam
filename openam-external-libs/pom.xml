@@ -91,7 +91,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>download-jquery-nestingSortable</id>
+                        <id>download-jquery-sortable</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>wget</goal>
@@ -488,7 +488,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>install-jquery-nestingSortable</id>
+                        <id>install-jquery-sortable</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>install-file</goal>
@@ -496,7 +496,7 @@
                         <configuration>
                             <file>${project.basedir}/target/external/jquery-sortable.js</file>
                             <groupId>jp.openam.commons.ui.libs</groupId>
-                            <artifactId>jquery-nestingSortable</artifactId>
+                            <artifactId>jquery-sortable</artifactId>
                             <version>0.9.12</version>
                             <packaging>js</packaging>
                             <generatePom>true</generatePom>

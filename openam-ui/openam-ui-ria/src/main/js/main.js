@@ -60,7 +60,7 @@ require.config({
         "lodash"      : "libs/lodash-3.10.1-min",
         "moment"      : "libs/moment-2.8.1-min",
         "qrcode"      : "libs/qrcode-1.4.3-min",
-        "sortable"    : "libs/jquery-nestingSortable-0.9.12",
+        "sortable"    : "libs/jquery-sortable-0.9.12",
         "spin"        : "libs/spin-2.0.1-min",
         "xdate"       : "libs/xdate-0.8-min",
         "selectize"   : "libs/selectize-non-standalone-0.12.1-min",

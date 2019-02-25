@@ -484,7 +484,7 @@ Copyright: Copyright 2014 ForgeRock AS.,
            Copyright (c) 2004, Mikael Grev, MiG InfoCom AB.,
            Copyright (c) 2006-2008 Sun Microsystems Inc. All Rights Reserved
 
-Version: jquery-nestingSortable-0.9.12.js
+Version: jquery-sortable-0.9.12.js
 Copyright: Copyright (c) 2012 Jonas von Andrian
 
 Version: jsslutils-1.0.5.jar
