@@ -798,7 +798,7 @@ Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
 Version: bootstrap-3.3.5-custom.js
 Copyright: Copyright (c) 2011-2015 Twitter, Inc
 
-Version: bootstrap-clockpicker-0.0.7-min.js
+Version: bootstrap-clockpicker-0.0.7-0915edd-min.js
 CopyrightL Copyright (c) 2014 Wang Shenwei
 
 Version: bootstrap-datetimepicker-4.14.30-min.js
@@ -839,9 +839,6 @@ Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.
 
 Version: jquery-2.1.1-min.js
 Copyright: Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
-
-Version: bootstrap-clockpicker-0.0.7-min.js
-Copyright: Copyright 2014 Wang Shenwei.
 
 Version: jquery-ui-1.11.1-min.js
 Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.

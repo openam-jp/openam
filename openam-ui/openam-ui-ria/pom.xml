@@ -111,14 +111,14 @@
         <dependency>
             <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>bootstrap-clockpicker</artifactId>
-            <version>0.0.7</version>
+            <version>0.0.7-0915edd</version>
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
         <dependency>
             <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>bootstrap-clockpicker</artifactId>
-            <version>0.0.7</version>
+            <version>0.0.7-0915edd</version>
             <classifier>min</classifier>
             <type>css</type>
         </dependency>

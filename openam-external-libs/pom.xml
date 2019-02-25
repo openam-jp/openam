@@ -119,7 +119,7 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.min.js</url>
+                            <url>https://raw.githubusercontent.com/weareoutman/clockpicker/0915edd91109a475621c8a222123af6c7533fa5d/dist/bootstrap-clockpicker.min.js</url>
                             <outputDirectory>${project.basedir}/target/external</outputDirectory>
                         </configuration>
                     </execution>
@@ -130,7 +130,7 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.min.css</url>
+                            <url>https://raw.githubusercontent.com/weareoutman/clockpicker/0915edd91109a475621c8a222123af6c7533fa5d/dist/bootstrap-clockpicker.min.css</url>
                             <outputDirectory>${project.basedir}/target/external</outputDirectory>
                         </configuration>
                     </execution>
@@ -543,7 +543,7 @@
                             <file>${project.basedir}/target/external/bootstrap-clockpicker.min.js</file>
                             <groupId>jp.openam.commons.ui.libs</groupId>
                             <artifactId>bootstrap-clockpicker</artifactId>
-                            <version>0.0.7</version>
+                            <version>0.0.7-0915edd</version>
                             <packaging>js</packaging>
                             <generatePom>true</generatePom>
                             <classifier>min</classifier>
@@ -559,7 +559,7 @@
                             <file>${project.basedir}/target/external/bootstrap-clockpicker.min.css</file>
                             <groupId>jp.openam.commons.ui.libs</groupId>
                             <artifactId>bootstrap-clockpicker</artifactId>
-                            <version>0.0.7</version>
+                            <version>0.0.7-0915edd</version>
                             <packaging>css</packaging>
                             <generatePom>true</generatePom>
                             <classifier>min</classifier>

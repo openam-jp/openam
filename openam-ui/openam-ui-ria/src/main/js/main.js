@@ -49,7 +49,7 @@ require.config({
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
 
-        "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-min",
+        "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-0915edd-min",
         "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"     : "libs/form2js-2.0-769718a",
         "handlebars"  : "libs/handlebars-4.0.5",
