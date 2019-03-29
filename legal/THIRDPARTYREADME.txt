@@ -496,7 +496,7 @@ Copyright: Copyright 2014 ForgeRock AS.,
            Copyright (c) 2004, Mikael Grev, MiG InfoCom AB.,
            Copyright (c) 2006-2008 Sun Microsystems Inc. All Rights Reserved
 
-Version: jquery-nestingSortable-0.9.12.js
+Version: jquery-sortable-0.9.12.js
 Copyright: Copyright (c) 2012 Jonas von Andrian
 
 Version: jsslutils-1.0.5.jar
@@ -798,7 +798,7 @@ Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
 Version: bootstrap-3.3.5-custom.js
 Copyright: Copyright (c) 2011-2015 Twitter, Inc
 
-Version: bootstrap-clockpicker-0.0.7-min.js
+Version: bootstrap-clockpicker-0.0.7-0915edd-min.js
 CopyrightL Copyright (c) 2014 Wang Shenwei
 
 Version: bootstrap-datetimepicker-4.14.30-min.js
@@ -822,7 +822,7 @@ Copyright: Copyright (C) 2014 by Marijn Haverbeke
 Version: form2js-2.0.js
 Copyright: Copyright (c) 2010 Maxim Vasiliev
 
-Version: handlebars-3.0.3-min.js
+Version: handlebars-4.0.5.js
 Copyright: Copyright (C) 2011-2015 by Yehuda Katz
 
 Version: grid.locale-en.js
@@ -839,9 +839,6 @@ Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.
 
 Version: jquery-2.1.1-min.js
 Copyright: Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
-
-Version: bootstrap-clockpicker-0.0.7-min.js
-Copyright: Copyright 2014 Wang Shenwei.
 
 Version: jquery-ui-1.11.1-min.js
 Copyright: Copyright (c) 2005, 2014 jQuery Foundation, Inc.

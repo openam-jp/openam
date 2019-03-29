@@ -13,19 +13,19 @@ Header, with the fields enclosed by brackets [] replaced by your own identifying
 information: "Portions Copyrighted [year] [name of copyright owner]".
 
 Copyright 2014-2015 ForgeRock AS.
+Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>jp.openam</groupId>
         <artifactId>openam</artifactId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM HTTP client</name>
     <description>Common HTTP client implementation used by ForgeRock OpenAM custom scripting modules</description>
-    <url>https://svn.forgerock.org/openam/branches/sprint_57_script_auth_module/openam/openam-http-client</url>
     <artifactId>openam-http-client</artifactId>
 
     <licenses>
@@ -38,44 +38,13 @@ Copyright 2014-2015 ForgeRock AS.
         </license>
     </licenses>
 
-    <issueManagement>
-        <system>Jira</system>
-        <url>https://bugster.forgerock.org/jira/browse/COMMONS</url>
-    </issueManagement>
-
-    <scm>
-        <url>https://svn.forgerock.org/commons/forgerock-http-client/trunk</url>
-        <connection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/commons/forgerock-http-client/trunk</developerConnection>
-      <tag>release/13.0.0</tag>
-  </scm>
-
-    <repositories>
-        <repository>
-            <id>forgerock-staging-repository</id>
-            <name>ForgeRock Release Repository</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>forgerock-snapshots-repository</id>
-            <name>ForgeRock Snapshot Repository</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.http</groupId>
+            <groupId>jp.openam.http</groupId>
             <artifactId>chf-http-core</artifactId>
         </dependency>
         <dependency>
@@ -83,9 +52,20 @@ Copyright 2014-2015 ForgeRock AS.
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-util</artifactId>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>restlet-repository</id>
+            <name>Restlet Repository</name>
+            <url>http://maven.restlet.com</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

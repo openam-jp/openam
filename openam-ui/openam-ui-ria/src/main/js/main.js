@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 require.config({
@@ -48,7 +49,7 @@ require.config({
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
 
-        "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-min",
+        "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-0915edd-min",
         "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"     : "libs/form2js-2.0-769718a",
         "handlebars"  : "libs/handlebars-4.0.5",
@@ -58,8 +59,8 @@ require.config({
         "jsonEditor"  : "libs/jsoneditor-0.7.23-custom",
         "lodash"      : "libs/lodash-3.10.1-min",
         "moment"      : "libs/moment-2.8.1-min",
-        "qrcode"      : "libs/qrcode-1.0.0-min",
-        "sortable"    : "libs/jquery-nestingSortable-0.9.12",
+        "qrcode"      : "libs/qrcode-1.4.3-min",
+        "sortable"    : "libs/jquery-sortable-0.9.12",
         "spin"        : "libs/spin-2.0.1-min",
         "xdate"       : "libs/xdate-0.8-min",
         "selectize"   : "libs/selectize-non-standalone-0.12.1-min",

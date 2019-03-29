@@ -22,6 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -37,30 +38,30 @@
             <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>org.forgerock.openam:openam-shared</include>
-                <include>org.forgerock.openam:openam-core</include>
-                <include>org.forgerock.openam:openam-cli-definitions</include>
-                <include>org.forgerock.openam:openam-cli-impl</include>
-                <include>org.forgerock.openam:openam-entitlements</include>
-                <include>org.forgerock.openam:openam-federation-library</include>
-                <include>org.forgerock.openam:OpenFM</include>
-                <include>org.forgerock.openam:openam-dtd-schema</include>
-                <include>org.forgerock.openam:openam-jaxrpc-schema</include>
-                <include>org.forgerock.openam:openam-idsvcs-schema</include>
-                <include>org.forgerock.openam:openam-liberty-schema</include>
-                <include>org.forgerock.openam:openam-saml2-schema</include>
-                <include>org.forgerock.openam:openam-xacml3-schema</include>
-                <include>org.forgerock.openam:openam-wsfederation-schema</include>
-                <include>org.forgerock.opendj:opendj-server</include>
-                <include>org.forgerock.commons:forgerock-util</include>
-                <include>org.forgerock.openam:openam-license-manager-cli</include>
-                <include>org.forgerock.commons:forgerock-guice-core</include>
-                <include>org.forgerock.openam:openam-license-core</include>
-                <include>org.forgerock.openam:openam-auth-scripted</include>
-                <include>org.forgerock.openam:openam-scripting</include>
-                <include>org.forgerock.openam:openam-ldap-utils</include>
-                <include>org.forgerock.openam:openam-audit-context</include>
-                <include>org.forgerock.commons:json-resource</include>
+                <include>jp.openam:openam-shared</include>
+                <include>jp.openam:openam-core</include>
+                <include>jp.openam:openam-cli-definitions</include>
+                <include>jp.openam:openam-cli-impl</include>
+                <include>jp.openam:openam-entitlements</include>
+                <include>jp.openam:openam-federation-library</include>
+                <include>jp.openam:OpenFM</include>
+                <include>jp.openam:openam-dtd-schema</include>
+                <include>jp.openam:openam-jaxrpc-schema</include>
+                <include>jp.openam:openam-idsvcs-schema</include>
+                <include>jp.openam:openam-liberty-schema</include>
+                <include>jp.openam:openam-saml2-schema</include>
+                <include>jp.openam:openam-xacml3-schema</include>
+                <include>jp.openam:openam-wsfederation-schema</include>
+                <include>jp.openam.opendj:opendj-server</include>
+                <include>jp.openam.commons:forgerock-util</include>
+                <include>jp.openam:openam-license-manager-cli</include>
+                <include>jp.openam.commons:forgerock-guice-core</include>
+                <include>jp.openam:openam-license-core</include>
+                <include>jp.openam:openam-auth-scripted</include>
+                <include>jp.openam:openam-scripting</include>
+                <include>jp.openam:openam-ldap-utils</include>
+                <include>jp.openam:openam-audit-context</include>
+                <include>jp.openam.commons:json-resource</include>
                 <include>javax.inject:javax.inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
                 <include>com.google.inject.extensions:guice-assistedinject</include>
@@ -86,11 +87,11 @@
                 <include>org.codehaus.groovy:groovy</include>
                 <include>org.kohsuke:groovy-sandbox</include>
                 <include>org.codehaus.groovy:groovy-jsr223:jar</include>
-                <include>org.forgerock.opendj:opendj-core</include>
-                <include>org.forgerock.commons:i18n-core</include>
-                <include>org.forgerock.commons:forgerock-audit-core</include>
+                <include>jp.openam.opendj:opendj-core</include>
+                <include>jp.openam.commons:i18n-core</include>
+                <include>jp.openam.commons:forgerock-audit-core</include>
                 <include>org.glassfish.grizzly:grizzly-framework</include>
-                <include>org.forgerock.openam:openam-auth-fr-oath</include>
+                <include>jp.openam:openam-auth-fr-oath</include>
             </includes>
         </dependencySet>
         <dependencySet>

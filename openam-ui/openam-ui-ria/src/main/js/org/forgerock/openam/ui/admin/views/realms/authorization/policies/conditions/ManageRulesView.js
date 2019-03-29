@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 
@@ -146,7 +147,7 @@ define([
 
             this.groupCounter++;
 
-            this.$el.find("ol#dropbox").nestingSortable({
+            this.$el.find("ol#dropbox").sortable({
                 group: `${self.element}rule-creation-group${self.groupCounter}`,
                 exclude: ".item-button-panel, li.editing",
                 delay: 100,
@@ -244,7 +245,7 @@ define([
                     }
 
                     delete result.subContainers;
-                    delete result.nestingSortable;
+                    delete result.sortable;
                     return result;
                 }
             });
@@ -323,7 +324,7 @@ define([
             editRuleView.render(this.getProperties(), this.droppableParent, this.idCount, null,
                 function onRuleRender () {
                     self.editStart(editRuleView.$el);
-                    self.$el.find("ol#dropbox").nestingSortable("refresh");
+                    self.$el.find("ol#dropbox").sortable("refresh");
                 });
 
             this.idCount++;
@@ -404,7 +405,7 @@ define([
                 return;
             }
 
-            var rules = this.$el.find("ol#dropbox").nestingSortable("serialize").get(),
+            var rules = this.$el.find("ol#dropbox").sortable("serialize").get(),
                 operatorData = this.$el.find(`#operator${this.idPrefix}0`).data().itemData;
 
             // Removing any obsolete root logicals.
