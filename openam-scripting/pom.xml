@@ -13,6 +13,7 @@
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
   ~ Copyright 2014-2016 ForgeRock AS.
+  ~ Portions Copyrighted 2019 Open Source Solution Technology Corporation
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -25,39 +26,39 @@
 
     <parent>
         <artifactId>openam</artifactId>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>jp.openam</groupId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-util</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-http-client</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
 
@@ -86,7 +87,7 @@
             <artifactId>guice-assistedinject</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.http</groupId>
+            <groupId>jp.openam.http</groupId>
             <artifactId>chf-client-apache-sync</artifactId>
         </dependency>
 
@@ -113,7 +114,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-guice-test</artifactId>
             <scope>test</scope>
         </dependency>
@@ -179,7 +180,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.forgerock.maven.plugins</groupId>
+                <groupId>jp.openam.maven.plugins</groupId>
                 <artifactId>build-helper-plugin</artifactId>
                 <executions>
                     <execution>

@@ -19,13 +19,15 @@
    with the fields enclosed by brackets [] replaced by
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
+
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.forgerock.openam.examples</groupId>
+    <groupId>jp.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
     <version>14.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -35,25 +37,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-     <repositories>
-        <repository>
-            <id>forgerock-releases</id>
-            <url>http://maven.forgerock.org/repo/releases</url>
-        </repository>
-        <repository>
-            <id>forgerock-snapshots</id>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-core</artifactId>
             <version>${openam.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-shared</artifactId>
             <version>${openam.version}</version>
         </dependency>

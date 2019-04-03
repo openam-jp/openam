@@ -22,13 +22,14 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>jp.openam</groupId>
         <artifactId>openam</artifactId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
@@ -104,35 +105,35 @@
                     -->
                     <artifactSet>
                         <includes>
-                            <include>org.forgerock.commons:forgerock-util</include>
-                            <include>org.forgerock.openam:openam-core</include>
-                            <include>org.forgerock.openam:openam-entitlements</include>
-                            <include>org.forgerock.openam:openam-audit-context</include>
-                            <include>org.forgerock.openam:openam-shared</include>
-                            <include>org.forgerock.openam:openam-dtd-schema</include>
-                            <include>org.forgerock.openam:openam-jaxrpc-schema</include>
-                            <include>org.forgerock.openam:openam-ldap-utils</include>
-                            <include>org.forgerock.openam:openam-liberty-schema</include>
-                            <include>org.forgerock.openam:openam-saml2-schema</include>
-                            <include>org.forgerock.openam:openam-xacml3-schema</include>
-                            <include>org.forgerock.openam:openam-federation-library</include>
-                            <include>org.forgerock.openam:OpenFM</include>
-                            <include>org.forgerock.openam:openam-client-sts</include>
+                            <include>jp.openam.commons:forgerock-util</include>
+                            <include>jp.openam:openam-core</include>
+                            <include>jp.openam:openam-entitlements</include>
+                            <include>jp.openam:openam-audit-context</include>
+                            <include>jp.openam:openam-shared</include>
+                            <include>jp.openam:openam-dtd-schema</include>
+                            <include>jp.openam:openam-jaxrpc-schema</include>
+                            <include>jp.openam:openam-ldap-utils</include>
+                            <include>jp.openam:openam-liberty-schema</include>
+                            <include>jp.openam:openam-saml2-schema</include>
+                            <include>jp.openam:openam-xacml3-schema</include>
+                            <include>jp.openam:openam-federation-library</include>
+                            <include>jp.openam:OpenFM</include>
+                            <include>jp.openam:openam-client-sts</include>
                             <include>org.json:json</include>
-                            <include>org.forgerock.opendj:opendj-core</include>
-                            <include>org.forgerock.opendj:opendj-grizzly</include>
-                            <include>org.forgerock.commons:i18n-core</include>
-                            <include>org.forgerock.commons:i18n-slf4j</include>
-                            <include>org.forgerock.commons.guava:forgerock-guava-base</include>
-                            <include>org.forgerock.commons.guava:forgerock-guava-collect</include>
-                            <include>org.forgerock.http:chf-http-core</include>
+                            <include>jp.openam.opendj:opendj-core</include>
+                            <include>jp.openam.opendj:opendj-grizzly</include>
+                            <include>jp.openam.commons:i18n-core</include>
+                            <include>jp.openam.commons:i18n-slf4j</include>
+                            <include>jp.openam.commons.guava:forgerock-guava-base</include>
+                            <include>jp.openam.commons.guava:forgerock-guava-collect</include>
+                            <include>jp.openam.http:chf-http-core</include>
                             <include>joda-time:joda-time</include>
                             <include>org.slf4j:slf4j-api</include>
                         </includes>
                     </artifactSet>
                     <filters>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-core</artifact>
+                            <artifact>jp.openam:openam-core</artifact>
                             <includes>
                                 <include>amAuth.properties</include>
                                 <include>amAuthContext.properties</include>
@@ -347,7 +348,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-shared</artifact>
+                            <artifact>jp.openam:openam-shared</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -356,7 +357,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-audit-context</artifact>
+                            <artifact>jp.openam:openam-audit-context</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -365,7 +366,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-jaxrpc-schema</artifact>
+                            <artifact>jp.openam:openam-jaxrpc-schema</artifact>
                             <includes>
                                 <include>com/iplanet/sso/**</include>
                                 <include>com/sun/identity/liberty/ws/security/**</include>
@@ -377,7 +378,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:OpenFM</artifact>
+                            <artifact>jp.openam:OpenFM</artifact>
                             <includes>
                                 <include>fmConfigurationService.properties</include>
                                 <include>fmLibertySecurity.properties</include>
@@ -399,7 +400,7 @@
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-federation-library</artifact>
+                            <artifact>jp.openam:openam-federation-library</artifact>
                             <includes>
                                 <include>libAuthnSvc.properties</include>
                                 <include>libBinarySecurityToken.properties</include>
@@ -488,7 +489,7 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-liberty-schema</artifact>
+                            <artifact>jp.openam:openam-liberty-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -497,31 +498,31 @@
                             </excludes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-saml2-schema</artifact>
+                            <artifact>jp.openam:openam-saml2-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-xacml3-schema</artifact>
+                            <artifact>jp.openam:openam-xacml3-schema</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-dtd-schema</artifact>
+                            <artifact>jp.openam:openam-dtd-schema</artifact>
                             <includes>
                                 <include>com/sun/identity/log/messageid/amLogMessage.dtd</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-entitlements</artifact>
+                            <artifact>jp.openam:openam-entitlements</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-client-sts</artifact>
+                            <artifact>jp.openam:openam-client-sts</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -533,19 +534,19 @@
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.opendj:opendj-core</artifact>
+                            <artifact>jp.openam.opendj:opendj-core</artifact>
                             <includes>
                                 <include>**/*</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.opendj:opendj-grizzly</artifact>
+                            <artifact>jp.openam.opendj:opendj-grizzly</artifact>
                             <includes>
                                 <include>**/*</include>
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.commons:i18n-core</artifact>
+                            <artifact>jp.openam.commons:i18n-core</artifact>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -588,43 +589,43 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-jaxrpc-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-dtd-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-client-sts</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.opendj</groupId>
+            <groupId>jp.openam.opendj</groupId>
             <artifactId>opendj-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.opendj</groupId>
+            <groupId>jp.openam.opendj</groupId>
             <artifactId>opendj-grizzly</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
+            <groupId>jp.openam.commons.guava</groupId>
             <artifactId>forgerock-guava-collect</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
+            <groupId>jp.openam.commons.guava</groupId>
             <artifactId>forgerock-guava-base</artifactId>
         </dependency>
         <dependency>
@@ -632,7 +633,7 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.http</groupId>
+            <groupId>jp.openam.http</groupId>
             <artifactId>chf-http-core</artifactId>
         </dependency>
         <dependency>

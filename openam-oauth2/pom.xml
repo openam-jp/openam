@@ -22,13 +22,15 @@
   ~ with the fields enclosed by brackets [] replaced by
   ~ your own identifying information:
   ~ "Portions Copyrighted [year] [name of copyright owner]"
+  ~
+  ~ Portions Copyrighted 2019 Open Source Solution Technology Corporation
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>jp.openam</groupId>
         <artifactId>openam</artifactId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
@@ -40,19 +42,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-scripting</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.http</groupId>
+            <groupId>jp.openam.http</groupId>
             <artifactId>chf-http-core</artifactId>
         </dependency>
 
@@ -63,7 +65,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
         </dependency>
 
@@ -81,19 +83,19 @@
             <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
+            <groupId>jp.openam.commons.guava</groupId>
             <artifactId>forgerock-guava-collect</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-tokens</artifactId>
         </dependency>
         <dependency>
@@ -101,12 +103,24 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache-extras.beanshell</groupId>
+            <artifactId>bsh</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.io7m.xom</groupId>
+            <artifactId>xom</artifactId>
         </dependency>
 
         <dependency>
@@ -139,7 +153,7 @@
             <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-restlet</artifactId>
         </dependency>
 
@@ -155,12 +169,12 @@
             <artifactId>mockito-all</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-slf4j</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
@@ -191,4 +205,16 @@
             <artifactId>javassist</artifactId>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>restlet-repository</id>
+            <name>Restlet Repository</name>
+            <url>http://maven.restlet.com</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 </project>

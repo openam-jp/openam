@@ -22,13 +22,14 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>jp.openam</groupId>
         <artifactId>openam-schema</artifactId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
@@ -126,7 +127,7 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>external</groupId>
+                        <groupId>jp.openam.external</groupId>
                         <artifactId>jdmktk</artifactId>
                         <version>2007-01-10</version>
                     </dependency>
@@ -177,12 +178,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-external-libs</artifactId>
+            <type>pom</type>
         </dependency>
 
         <dependency>
-            <groupId>external</groupId>
+            <groupId>jp.openam.external</groupId>
             <artifactId>jdmkrt</artifactId>
         </dependency>
     </dependencies>

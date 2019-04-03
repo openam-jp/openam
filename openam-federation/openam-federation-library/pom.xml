@@ -22,13 +22,14 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock.openam</groupId>
+        <groupId>jp.openam</groupId>
         <artifactId>openam-federation</artifactId>
         <version>14.0.0-SNAPSHOT</version>
     </parent>
@@ -152,37 +153,37 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
+            <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-saml2-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-wsfederation-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-liberty-schema</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-ldap-utils</artifactId>
         </dependency>
 
@@ -218,17 +219,32 @@
         </dependency>
         
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>esapiport</artifactId>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>external</groupId>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache-extras.beanshell</groupId>
+            <artifactId>bsh</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.io7m.xom</groupId>
+            <artifactId>xom</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.rpc</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
         
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-idpdiscovery</artifactId>
         </dependency>
 
@@ -244,12 +260,12 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-certs</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
+            <groupId>jp.openam.commons.guava</groupId>
             <artifactId>forgerock-guava-cache</artifactId>
         </dependency>
 

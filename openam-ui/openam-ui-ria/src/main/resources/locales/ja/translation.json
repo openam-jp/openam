@@ -1,0 +1,1291 @@
+{
+    "config" : {
+        "dates" : {
+            "monthNames" : "1月, 2月, 3月, 4月, 5月, 6月, 7月, 8月, 9月, 10月, 11月, 12月",
+            "monthNamesShort" : "1月, 2月, 3月, 4月, 5月, 6月, 7月, 8月, 9月, 10月, 11月, 12月",
+            "dayNames" : "日曜日, 月曜日, 火曜日, 水曜日, 木曜日, 金曜日, 土曜日",
+            "dayNamesShort" : "日, 月, 火, 水, 木, 金, 土"
+        },
+        "messages" : {
+            "AppMessages" : {
+                "invalidRealm": "レルムが存在しません。",
+                "duplicateRealm": "重複するレルムです。",
+                "deleteFail": "削除に失敗しました。",
+                "duplicateItem": "重複するアイテムです。",
+                "invalidItem": "不正なアイテムです。",
+                "changesSaved": "変更を保存しました。"
+            },
+            "CommonMessages" : {
+                "authenticationFailed" : "ユーザー名/パスワードの組み合わせが不正です。",
+                "serviceUnavailable" : "サービスが使用できません。",
+                "unknown" : "不明なエラー。システム管理者にお問い合わせください。",
+                "loggedIn" : "正常にログインしました。",
+                "errorFetchingData" : "ユーザーデータフェッチ中のエラー。",
+                "loggedOut" : "ログアウトしました。",
+                "loginTimeout" : "ログインセッションがタイムアウトになりました。最初からやり直してください。",
+                "unauthorized" : "不正なアクセスまたはセッションタイムアウトです。",
+                "internalError" : "内部サーバーエラー",
+                "forbiddenError" : "閲覧禁止エラー。",
+                "notFoundError" : "未検出エラー。",
+                "badRequestError" : "不正リクエストエラー。",
+                "conflictError" : "リクエストに競合を検出しました。",
+                "incorrectRevisionError" : "バージョンが最新ではないため、レコードを更新できません。",
+                "tokenNotFound" : "トークンが見つかりません。",
+                "securityDataChanged" : "パスワードが変更されました。"
+            },
+            "UserMessages" : {
+                "invalidOldPassword" : "旧パスワードが無効です。",
+                "usernameNotFound" : "ユーザー名が見つかりません。",
+                "noEmailProvided" : "プロファイルに電子メールが設定されていません。",
+                "emailNotSent" : "電子メールが送信されませんでした",
+                "unableToRegister" : "登録できませんでした。システム管理者にお問い合わせください。",
+                "changedPassword" : "パスワードが変更されました。",
+                "profileUpdateFailed" : "プロファイル更新中に問題が発生しました。",
+                "profileUpdateSuccessful" : "プロファイルが更新されました。",
+                "userNameUpdated" : "ユーザー名が正常に更新されました。",
+                "afterRegistration" : "アカウントが正常に登録されました。",
+                "siteIdentificationChanged" : "サイトの識別画像が変更されました。",
+                "userAlreadyExists" : "ユーザーがすでに存在します。",
+                "errorDeletingNotification" : "通知の削除エラー。",
+                "errorFetchingNotifications" : "通知の検索エラー。",
+                "identityNoSpace" : "アイデンティティ名の先頭または末尾に<br>空白を含めることはできません。",
+                "selfRegistrationDisabled"  : "自己登録は無効になっています。"
+            },
+            "AdminMessages" : {
+                "cannotDeleteYourself" : "自身を削除することはできません。",
+                "userDeleted" : "ユーザーが削除されました。",
+                "userDeleteError" : "ユーザーを削除する際にエラーが発生しました。",
+                "userApplicationsUpdate" : "アプリケーションの設定が変更されました。",
+                "completedTask" : "タスクが完了しました。",
+                "claimedTask" : "タスクが請求されています。",
+                "unclaimedTask" : "タスクが請求されていません。",
+                "startedProcess" : "プロセスが開始されました。",
+                "scripts": {
+                    "error": {
+                        "noName": "名前は必須です。",
+                        "noLanguage": "言語は必須です。"
+                    }
+                },
+                "policies": {
+                    "unableToRetrievePolicy": "ポリシーを取得できません。",
+                    "invalidResource": "無効なリソースです。",
+                    "duplicateResource": "重複するリソースです。",
+                    "duplicateAttribute": "重複する属性です。",
+                    "unableToPersistPolicy": "ポリシーをデータストアに永続化することができません。",
+                    "policiesUploaded": "ポリシーを正常にアップロードしました。",
+                    "policiesUploadFailed": "ポリシーのアップロードに失敗しました。",
+                    "importFailed": "インポートに失敗しました: __applicationName__ レルム内にポリシーセットが見つかりません。",
+                    "error": {
+                        "cantStartWithHash": "LDAP エンティティは # で始めることはできません。",
+                        "noName": "名前は必須です。",
+                        "noId": "ID は必須です。",
+                        "noResourceTypes": "1つ以上のリソースタイプを選択してください。",
+                        "noResources": "1つ以上のリソースを選択してください。",
+                        "noActions": "1つ以上のアクションを追加してください。",
+                        "noPatterns": "1つ以上のパターンを追加してください。"
+                    }
+                }
+            }
+        },
+        "AppConfiguration" : {
+            "Navigation" : {
+                "links" : {
+                    "commonTasks": "共通タスク",
+                    "realms": {
+                        "title": "レルム",
+                        "showAll": "すべて表示",
+                        "newRealm": "新規レルム",
+                        "viewAll": "すべて表示..."
+                    },
+                    "configure": {
+                        "title": "設定",
+                        "authentication": "認証",
+                        "server-defaults": "デフォルトサーバー",
+                        "global-services": "グローバルサービス"
+                    },
+                    "deployment": {
+                        "title" : "デプロイメント",
+                        "servers" : "サーバー",
+                        "sites" : "サイト"
+                    },
+                    "federation": "連携",
+                    "configuration": "設定",
+                    "sessions": "セッション",
+                    "dashboard" : "ダッシュボード",
+                    "users" : "ユーザー",
+                    "apps" : "アプリケーション",
+                    "allApps" : "全てのアプリケーション",
+                    "addMore" : "アプリケーションの追加",
+                    "groups" : "グループ",
+                    "tasksMenu" : "タスク",
+                    "allTasks" : "グループのキューにあるタスク",
+                    "myTasks" : "マイタスク",
+                    "startProcess" : "処理を開始",
+                    "oauthtokens" : "OAuth 2 トークンマネージャー",
+                    "uma" : "共有",
+                    "umaLinks": {
+                        "history" : "履歴",
+                        "resources" : "リソース",
+                        "requests" : "リクエスト"
+                    },
+                    "console": "コンソール"
+                },
+                "username" : {
+                    "label" : "サインイン"
+                }
+            }
+        }
+    },
+    "templates" : {
+        "user" : {
+            "LoginDialog" : {
+                "refreshOnLogin" : "ログイン時にリフレッシュする必要があります" 
+            },
+            "LoginTemplate" : {
+                "loginRemember" : "ユーザー名を記憶する。",
+                "noAccountQuestion" : "アカウントを持っていないですか?",
+                "registerAccount" : "アカウントを登録してください。",
+                "problemLoggingQuestion" : "ログインのトラブルがありますか?",
+                "socialAuthentication" : "または次でログイン:",
+                "resetPassword" : "パスワードをリセットしますか?",
+                "forgotUsername" : "ユーザー名を忘れましたか?",
+                "onMobileDevice": "スマートデバイスはこちら",
+                "waitingForResponse": "応答を待っています...",
+                "havingTrouble": "問題がありますか?",
+                "getTheAppFromThe": "アプリを取得します。",
+                "orOn": "または",
+                "appStore": "App Store",
+                "googlePlay": "Google Play",
+                "useRecoveryCode": "リカバリーコードを使用します。"
+            },
+            "404" : {
+                "pageNotFound" : "ページが見つかりません。",
+                "requestedPageCouldNotBeFound" : "要求されたページが見つかりませんでした。"
+            },
+            "403" : {
+                "title" : "閲覧禁止",
+                "description" : "このページを表示する権限がありません。"
+            },
+            "DefaultBaseTemplate" : {
+                "orPhone" : "、または電話"
+            },
+            "ChangeSecurityDataDialogTemplate" : {
+                "securityDataChange" : "セキュリティデータの変更",
+                "enterNewPasswordToChange" : "パスワードを変更するには、以下のフィールドに新しいパスワードを入力してください。",
+                "selectQuestionAndAnserIfYouWant" : "設定する場合は、質問を選択しその答えを入力してください。",
+                "securityQuestionAndAnserExplanation" : "選択したセキュリティの質問とそれに対して設定した答えは、パスワードを忘れた場合にあなたを特定するために使用されます。"
+            },
+            "ConfirmPasswordDialogTemplate" : {
+                "title" : "現在のパスワード",
+                "explanation1" : "次の属性を変更すると、再認証が必要になります: ",
+                "explanation2" : "継続するために現在のパスワードを確認してください。"
+            },
+            "ChangeSiteIdentificationDialogTemplate" : {
+                "siteImageAndPhaseExplanation" : "選択したサイトのイメージとフレーズは、正当なサイトにログインすることを確認するためにログイン時に表示されます。"
+            },
+            "EnterOldPasswordDialog" : {
+                "passwordAndSecurityQuestionChange" : "パスワードとセキュリティの質問の変更",
+                "enterYourOldPassword" : "古いパスワードを入力してください。"
+            },
+            "TermsOfUseTemplate" : {
+                "termsOfUse" : "使用規約",
+                "termsOfUseContent" : "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris idvulputate urna. Quisque tristique dictum sodales. Nullam tempus eleifend erat,vel facilisis nibh euismod non. Phasellus vitae elit velit, in sollicitudindiam. Maecenas ornare nunc non ipsum ornare vehicula id sed dolor. Duispellentesque congue sapien, dictum adipiscing est posuere sit amet. Suspendissein lectus lorem. Suspendisse vitae metus sapien, sit amet luctus libero.Integer nec nunc sed massa pellentesque pulvinar. Integer vulputate nunc atnunc lacinia eu luctus neque elementum. Aenean ultricies arcu sed enimultricies blandit placerat ut massa. Donec at dolor sit amet magna vulputateelementum sit amet in sapien. Donec sit amet erat neque.</p>"
+            },
+            "UserProfileTemplate" : {
+                "changeEmailAddress" : "電子メールアドレスの変更",
+                "changeSecurityData" : "パスワードの変更",
+                "changeSiteIdentification" : "サイト ID の変更"
+            },
+            "RestLogoutTemplate" : {
+                "loggedOut" : "ログアウトしました。"
+            },
+            "SessionExpiredTemplate" : {
+                "sessionExpired" : "セッションの有効期限が切れました。"
+            },
+            "ChangesPendingTemplate": {
+                "undo": "変更を元に戻します",
+                "changesPending": "変更の保留"
+            }
+        },
+        "admin" : {
+            "tasks" : {
+                "ShowUserProfile" : {
+                    "requestInitiator" : "で開始された要求"
+                },
+                "TasksDashboardTemplate" : {
+                    "tasksFromGroupsQueue" : "マイグループのキューにあるタスク。"
+                },
+                "ProcessUserTaskTableTemplate" : {
+                    "requestCount" : "__count__  要求",
+                    "requestCount_plural" : "__count__  要求"
+                }
+            },
+            "ChangeUserPasswordDialogTemplate" : {
+                "securityDataChange" : "セキュリティデータの変更",
+                "enterNewPasswordToChange" : "パスワードを変更するには、以下のフィールドに新しいパスワードを入力してください。"
+            },
+            "UsersTemplate" : {
+                "remainingUsers" : "残りのユーザー"
+            }
+        },
+        "oauth": {
+            "clientID" : "クライアント ID",
+            "tokenList" : "認可済みのアプリケーション",
+            "remainingTokens" : "残りのトークン",
+            "tokenID" : "トークン ID",
+            "expireDate" : "有効期限",
+            "scope" : "スコープ",
+            "tokenType" : "トークンタイプ",
+            "parent" : "親",
+            "username" : "ユーザー名",
+            "redirecturi" : "リダイレクト URI",
+            "refreshToken" : "リフレッシュトークン",
+            "issued" : "発行済み",
+            "realm" : "レルム",
+            "tokenInfo": "トークン情報"
+        },
+        "login" : {
+            "newHere": "ここで新規作成しますか?",
+            "createAccount": "アカウントの作成"
+        }
+    },
+    "common" : {
+        "form" : {
+            "yes" : "はい",
+            "no" : "いいえ",
+            "true" : "真",
+            "false" : "偽",
+            "add": "追加",
+            "type": "種類",
+            "update" : "更新",
+            "save" : "保存",
+            "create" : "作成",
+            "cancel" : "キャンセル",
+            "clone" : "コピー",
+            "reset" : "リセット",
+            "close" : "閉じる",
+            "clear": "クリア",
+            "logout" : "ログアウト",
+            "register" : "登録",
+            "home" : "ホーム",
+            "start" : "開始",
+            "name" : "名前",
+            "continue" : "継続",
+            "next" : "次へ",
+            "back" : "戻る",
+            "delete" : "削除",
+            "details" : "詳細",
+            "pleaseSelect" : "選択してください",
+            "select" : "選択",
+            "addUser" : "ユーザーの追加",
+            "decision" : "決定",
+            "accept" : "許可",
+            "reject" : "却下",
+            "createdAt" : "に作成されました",
+            "createNew": "新規作成",
+            "search" : "検索",
+            "submit" : "サブミット",
+            "actions" : "アクション",
+            "complete" : "完了",
+            "revoke" : "取り消し",
+            "done" : "終了",
+            "ok" : "OK",
+            "moveUp" : "上に移動",
+            "moveDown" : "下に移動",
+            "standard": "標準",
+            "advanced": "詳細設定",
+            "revert": "元に戻す",
+            "saveChanges": "変更の保存",
+            "edit": "編集",
+            "key":"キー",
+            "value": "値",
+            "addKey" : "キーの追加",
+            "addValue" : "値の追加",
+            "settings" : "設定",
+            "working" : "処理中...",
+            "more" : "more...",
+            "empty" : "空",
+            "help" : "ヘルプ",
+            "change": "変更",
+            "upload": "アップロード",
+            "download": "ダウンロード",
+            "validate": "検証",
+            "filter": "フィルタ...",
+            "pass" : "成功",
+            "fail" : "失敗",
+            "success" : "成功",
+            "allow": "許可",
+            "deny": "拒否",
+            "notApplicable": "n/a",
+            "enable": "有効",
+            "disable": "無効",
+            "enabled": "有効",
+            "disabled": "無効",
+            "activate": "アクティブ",
+            "deactivate": "非アクティブ",
+            "active": "アクティブ",
+            "inactive": "非アクティブ",
+            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "build": "ビルド",
+            "sessionExpired" : "セッションが有効期限切れ",
+            "enableCookies" : "ログインするためには、 cookie を有効にする必要があります",
+            "deleteSelected" : "選択したものを削除します",
+            "startTypingToSearch": "検索する入力を開始",
+            "passwordPlaceholder": "••••••••••••",
+            "redirecting": "リダイレクトします...",
+            "propertyName": "プロパティ名",
+            "propertyValue": "プロパティ値",
+            "addName": "名の追加",
+            "addValue": "値の追加",
+            "validation" : {
+                "errorsNotSaved" : "フォームに検証エラーが存在します。変更は保存できません。",
+                "VALID_PHONE_FORMAT": "無効な文字が含まれています。",
+                "VALID_NAME_FORMAT": "無効な文字が含まれています。",
+                "VALID_EMAIL_ADDRESS_FORMAT": "電子メールアドレスが無効です。",
+                "AT_LEAST_X_CAPITAL_LETTERS" : "最低 __numCaps__ 文字以上の大文字が必要です。",
+                "AT_LEAST_X_NUMBERS" : "最低 __numNums__ 個以上の数字が必要です。",
+                "CANNOT_CONTAIN_OTHERS" : "値を含めることはできません: __disallowedFields__",
+                "MIN_LENGTH" : "最低 __minLength__ 文字以上は必要です。",
+                "REQUIRED" : "空白にすることはできません。",
+                "UNIQUE" : "すでに存在します。",
+                "REAUTH_REQUIRED" : "",
+                "formContainsErrors" : "フォームには検証エラーが含まれています。",
+                "atLeastOneCapitalLetter" : "少なくとも大文字が 1 文字以上必要です。",
+                "atLeastOneNumber" : "少なくとも数字が 1 つ以上必要です。",
+                "atLeast8Characters" : "少なくとも 8 文字以上必要です。",
+                "cannotMatchLogin" : "ログインが一致する必要があります。",
+                "confirmationMatchesPassword" : "新規パスワードとパスワード(確認)が一致する必要があります。",
+                "usernameExists" : "ユーザー名がすでに存在します。",
+                "emailAddressAlreadyExists" : "電子メールアドレスがすでに存在します。",
+                "onlyAlphabeticCharacters" : "英字のみです。",
+                "onlyNumbersAndSpecialCharacters" : "数字と特殊文字のみです。",
+                "cannotMatchOldPassword" : "古いパスワードと一致しません。",
+                "minimum4Characters" : "最小 4 文字です。",
+                "acceptanceRequiredForRegistration" : "登録には受理が必要です。",
+                "incorrectPassword" : "パスワードが正しくありません。",
+                "incorrectSecurityAnswer" : "回答が正しくありません。",
+                "required" : "必須",
+                "emailNotValid" : "電子メールアドレスが無効です。",
+                "emailExists" : "電子メールアドレスがすでに存在します。",
+                "shouldBeLong" : "long 値である必要があります。",
+                "wrongDateFormat" : "フォーマットが不正です。"
+            },
+            "inheritValue": "継承値"
+        },
+        "grid": {
+            "pagination": {
+                "first": "最初へ",
+                "previous": "前へ",
+                "next": "次へ",
+                "last": "最後へ"
+            }
+        },
+        "user" : {
+            "userQuery" : {
+                "mainEnterPromptUsername": "$t(common.user.username)を入力してください。",
+                "mainEnterPromptEmailAddress": "$t(common.user.emailAddress)を入力してください。",
+                "optionalEnterPromptEmail": "または$t(common.user.emailAddress)",
+                "orAllEnterPrompt" : "または以下の情報のすべて",
+                "title" : "あなたのアカウントを検索するため、詳細を入力してください",
+                "any" : "これらのいずれか:"
+            },
+            "passwordReset" : {
+                "title": "パスワードのリセット",
+                "completed": "パスワードが正常にリセットされました。",
+                "failed": "パスワードをリセットすることができません。",
+                "tryAgain": "もう一度パスワードをリセットしてください",
+                "answerQuestions": "パスワードをリセットするには、以下のセキュリティに関する質問に回答してください。"
+            },
+            "selfRegistration" : {
+                "title": "アカウントの登録",
+                "completed": "アカウントが正常に登録されました。",
+                "failed": "アカウントを登録することができません。",
+                "tryAgain": "再度登録してください。"
+            },
+            "forgotUsername" : {
+                "title" : "ユーザー名の取得",
+                "checkEmail" : "ユーザー名を含む電子メールがあなたのアカウントに送信されました。",
+                "failed": "ユーザー名を取得できません。",
+                "found": "ユーザー名が見つかりました:",
+                "tryAgain": "再度ユーザー名を検索してみてください",
+                "answerQuestions": "ユーザー名を取得するには、以下のセキュリティの質問に答えてください。"
+            },
+            "kba" : {
+                "description": "次の __numberOfQuestions__ 以上のセキュリティの質問を選択します。パスワードを忘れてしまった場合、これらの質問はあなたの身元を確認するのに役立ちます。",
+                "provideAnother": "質問を追加",
+                "selectQuestion": "セキュリティの質問を選択",
+                "provideYourOwn": "あなた自身の提供",
+                "customQuestion": "カスタムのセキュリティの質問",
+                "answer": "セキュリティの回答",
+                "securityQuestions": "セキュリティの質問"
+            },
+            "returnToLoginPage": "ログインページに戻ります",
+            "userIdValidation" : "アカウントに関連付けられているユーザー名または電子メールアドレスを入力してください。パスワードをリセットすることができるリンクを記載したメールを送信します。",
+            "emailValidation" : "続行するには、メールアドレスを入力します。登録を継続するためのリンクを記載したメールを送信します。",
+            "send": "送信",
+            "validateCode" : "入力したアドレスに電子メールが送信されました。続行するためには、そのメール内のリンクをクリックしてください。",
+            "user" : "ユーザー",
+            "login" : "ログイン",
+            "loginConfirm" : "すでにログインしています。ログアウトし、別の組織にログインしますか?",
+            "selfService" : "セルフサービス",
+            "administration": "管理",
+            "basicInfo" : "基本情報",
+            "myProfile" : "マイプロファイル",
+            "userProfile" : "ユーザープロファイル",
+            "profile" : "プロファイル",
+            "username" : "ユーザー名",
+            "emailAddress" : "電子メールアドレス",
+            "givenName" : "名",
+            "sn" : "姓",
+            "changePassword" : "パスワード変更",
+            "forgotPassword" : "パスワードを忘れた場合",
+            "accountStatus" : "アカウントステータス",
+            "active" : "アクティブ",
+            "inactive" : "非アクティブ",
+            "address" : "アドレス",
+            "address1" : "アドレス 1",
+            "address2" : "アドレス 2",
+            "country" : "国",
+            "city" : "市",
+            "role" : "管理者権限",
+            "stateProvince" : "州/郡",
+            "phoneNumber" : "携帯電話",
+            "postalCode" : "郵便番号",
+            "lastPasswordSet" : "最終パスワード更新",
+            "siteImage" : "サイトイメージ",
+            "sitePhrase" : "サイトフレーズ",
+            "securityQuestion" : "秘密の質問",
+            "securityAnswer" : "秘密の質問の回答",
+            "adaptiveAuthMethod" : "アダプティブ認証メソッド",
+            "SMS" : "SMS",
+            "OAuth" : "OAuth",
+            "createNewAccount" : "新規アカウント作成",
+            "password" : "パスワード",
+            "confirmPassword" : "パスワード(確認)",
+            "newPassword" : "新規パスワード",
+            "oldPassword" : "旧パスワード",
+            "currentPassword" : "現在のパスワード",
+            "confirmNewPassword" : "新規パスワード(確認)",
+            "usersList" : "ユーザー一覧",
+            "addUsers" : "ユーザー追加",
+            "name" : "名前",
+            "status" : "ステータス",
+            "email" : "電子メール",
+            "system" : "システム",
+            "changePhoto" : "写真を変更",
+            "SKYPE" : "SKYPE",
+            "googlePlus" : "Google+"
+         }, 
+         "task" : {
+            "unassigned" : "未アサイン",
+            "assignToMe" : "私にアサイン",
+            "claim" : "請求",
+            "unclaim" : "未請求",
+            "approve" : "承認",
+            "deny" : "拒否",
+            "requeue" : "再キューイング",
+            "taskName" : "タスク名",
+            "processName" : "プロセス名",
+            "startProcess" : "プロセスの開始",
+            "assignee" : "アサイナー",
+            "taskDetails" : "タスクの詳細",
+            "myTasks" : "マイタスク",
+            "tasksList" : "タスクリスト",
+            "processes" : "プロセス"
+         },
+         "application" : {
+            "applicationName" : "アプリケーション名",
+            "requestedBy" : "による要求",
+            "yourFrequentlyUsedApplications" : "頻繁に使用するアプリケーション",
+            "applicationsYouHaveAdded" : "追加したアプリケーション",
+            "defaultApplications" : "デフォルトアプリケーション",
+            "addMoreApplications" : "さらにアプリケーションを追加",
+            "allAvailableApps" : "使用可能なすべてのアプリケーション",
+            "dropApplicationsHere" : "ここにアプリケーションをドロップ"
+         },
+         "notification" : {
+            "notifications" : "通知",
+            "deleteThisMessage" : "このメッセージを削除",
+            "type" : "通知タイプ",
+            "message" : "メッセージ",
+            "types" : {
+                "info" : "情報",
+                "warning" : "警告",
+                "error" : "エラー"
+            }
+        },
+        "select": {
+            "allSelected": "すべて選択",
+            "noneSelected": "選択されていません",
+            "nSelected": "選択されています",
+            "selectAll": "すべて選択"
+        }
+    },
+    "openam" : {
+        "dashboard": {
+            "title": "ダッシュボード"
+        },
+        "apps" : {
+            "header" : "マイアプリケーション",
+            "noneFound": "あなたに割り当てられたアプリケーションがありません。"
+        },
+        "trusted" : {
+            "devices" : {
+                "header" : "信頼済みのデバイス",
+                "deviceName" : "名前",
+                "lastUsed" : "最終使用",
+                "deleteDevice" : "デバイスの削除"
+            }
+        },
+        "oAuth2" : {
+            "tokens" : {
+                "appName" : "アプリケーション",
+                "scopes" : "スコープ",
+                "expires" : "Expires",
+                "deleteToken" : "アクセスの取り消し",
+                "neverExpires": "Never"
+            }
+        },
+        "authentication": {
+            "input": {
+                "name": "ユーザー名",
+                "password": "パスワード"
+            },
+            "unavailable": "OpenAM にログインできません。"
+        },
+        "authDevices": {
+            "header": "認証デバイス",
+            "noneFound": "デバイスが登録されていません。",
+            "menu": {
+                "recoveryCodes": "リカバリーコード",
+                "delete": "削除"
+            },
+            "devicesSettingDialog": {
+                "title": "デバイス設定",
+                "description": "すべてのデバイスに対するグローバル設定を設定してください。",
+                "authentication": "二段階認証",
+                "help": "登録済みのデバイスのいずれかによって生成されたワンタイムパスワードを使用して認証します。"
+            },
+            "deviceDetailsDialog": {
+                "recoveryCodes": "リカバリーコード",
+                "deviceName": "デバイス名",
+                "copyRecoveryCodes": "安全な場所にこれらのコードのコピーを保管してください。デバイスを紛失した場合 OpenAM に認証するためにあなたのリカバリーコードのいずれかを使用する必要があります。"
+            }
+        }
+    },
+    "uma": {
+        "common": {
+            "shares" : "共有"
+        },
+        "share": {
+            "shareResource": "リソースを共有",
+            "people": "あなたのリソースを共有する人を追加または選択",
+            "permission": "パーミッションの選択",
+            "labels": "ラベル",
+            "share": "共有",
+            "info": "__count__ person と共有",
+            "info_plural": "__count__ people と共有",
+            "info_none": "共有しない",
+            "messages": {
+                "success": "リソースを正常に共有しました。",
+                "fail": "リソースを共有することができませんでした。"
+            },
+            "notSpecifiedResource": "共有するリソースを指定していません。"
+        },
+        "resources": {
+            "title": "リソース",
+            "grid": {
+                "header": ["Name", "Host", "Type", ""]
+            },
+            "myresources": {
+                "title": "マイリソース",
+                "description": "あなたが所有するリソース。",
+                "unshareAllResources": {
+                    "button": "すべてのリソースの共有を解除",
+                    "dialog": {
+                        "title": "すべてのリソースの共有を解除しますか?",
+                        "message": "すべてのリソースの共有を解除してもよろしいですか? OK を選択するとリソースを削除しませんが、リソース内の全共有を削除します。"
+                    },
+                    "messages": {
+                        "success" : "すべてのリソースの共有を正常に解除しました。",
+                        "fail" : "すべてのリソースの共有を解除することができませんでした。管理者に連絡してください。"
+                    }
+                }
+            },
+            "sharedWithMe": {
+                "title": "私との共有",
+                "description": "あなたと共有しているリソース。"
+            },
+            "starred": {
+                "title": "お気に入り",
+                "description": "お気に入りのリソース。"
+            },
+            "myLabels": {
+                "title": "私のラベル",
+                "description": "このラベルが付いたリソースは、それらに適用されます。",
+                "deleteLabel": {
+                    "button": "ラベルの削除",
+                    "dialog": {
+                        "title": "ラベルを削除しますか",
+                        "message": "このラベルを削除してもよろしいですか? リソースのラベルを削除してもリソース自体は削除されません。"
+                    },
+                    "messages": {
+                        "success" : "ラベルが正常に削除されました。",
+                        "fail" : "ラベルを削除することができませんでした。管理者に連絡してください。"
+                    }
+                },
+                "noResources": {
+                    "headline": "リソースがありません!",
+                    "text": "このラベルに関連付けられているリソースがありません。"
+                }
+            },
+            "show": {
+                "subtitle": "このリソースとその権限へのアクセスを許可されているユーザー",
+                "grid": ["ユーザー", "最後にアクセス", "パーミッション"],
+                "share": "共有",
+                "editLabels" : "ラベルの編集",
+                "revoke": "リソースの共有を解除",
+                "revokeAllMessage": "すべてのアクセスを無効にしてもよろしいですか?",
+                "resource" : "リソース",
+                "revokeAllPoliciesSuccess" : "リソースに対するすべてのアクセスは正常に失効しました。",
+                "revokeAllPoliciesFail" : "リソースに対するすべてのアクセスを取り消すことができませんでした。管理者に連絡してください。",
+                "revokePolicySuccess" : "リソースに対するアクセスは正常に失効しました。",
+                "revokePolicyFail" : "リソースに対するアクセスを失効できませんでした。管理者に連絡してください。",
+                "revokeAllResourcesMessage": "すべてのアクセスを無効にしてもよろしいですか? OK を選択してもリソースは削除されませんが、リソース内のすべての共有が削除されます。"
+            }
+        },
+        "history": {
+            "title": "履歴",
+            "subtitle": "リソースのイベントの履歴",
+            "grid": {
+                "header": ["ユーザー", "リソース", "アクション", "いつ"],
+                "types": {
+                    "authorisation_requested": "要求された認可",
+                    "authorisation_request_approved": "付与された認可",
+                    "authorisation_request_denied": "拒否された認可",
+                    "authorisation_granted": "付与された認可",
+                    "authorisation_denied": "拒否された認可",
+                    "policy_created": "共有",
+                    "policy_updated": "更新された共有"
+                }
+            }
+        },
+        "requests": {
+            "list": {
+                "title": "リクエスト",
+                "description": "リソースへのアクセスに対するペンディングリクエスト。"
+            },
+            "show": {
+                "title": "リクエスト",
+                "description": "リソースへのアクセスに対するペンディングリクエスト。"
+            },
+            "grid": {
+                "header": ["ユーザー", "リソース", "いつ", "パーミッション", "アクション"]
+            }
+        }
+    },
+    "console": {
+        "common": {
+            "id": "Id",
+            "topLevelRealm": "最上位のレルム",
+            "realmStatus": "状態",
+            "realmDnsAliases": "エイリアス / DNS エイリアス",
+            "noResults": "表示する結果がありません。",
+            "name": "名前",
+            "navigation": {
+                "dashboard": "ダッシュボード",
+                "authentication": "認証",
+                "settings": "設定",
+                "chains": "認証連鎖",
+                "modules": "モジュール",
+                "services": "サービス",
+                "dataStores": "データストア",
+                "privileges": "権限",
+                "authorization": "認可",
+                "policySets": "ポリシーセット",
+                "resourceTypes": "リソースタイプ",
+                "subjects": "対象",
+                "agents": "エージェント",
+                "sts": "STS",
+                "scripts": "スクリプト",
+                "policies": "ポリシーセット",
+                "new" : "追加",
+                "edit" : "編集",
+                "server-settings" : "サーバー設定",
+                "global-services" : "グローバル設定",
+                "authentication-settings": "認証 - 設定",
+                "authentication-chains": "認証 - 認証連鎖",
+                "authentication-modules": "認証 - モジュール",
+                "authorization-policySets": "認可 - ポリシーセット",
+                "authorization-resourceTypes": "認可 - リソースタイプ",
+                "general": "一般",
+                "security": "セキュリティ",
+                "session": "セッション",
+                "sdk": "SDK",
+                "cts": "CTS",
+                "uma": "UMA",
+                "advanced": "詳細設定",
+                "serverDefaults": "デフォルトサーバー",
+                "directoryConfiguration": "ディレクトリ設定",
+                "realms": "レルム",
+                "sites": "サイト",
+                "servers": "サーバー"
+            },
+            "description": "説明",
+            "type": "タイプ",
+            "editFullScreen": "フルスクリーンで編集",
+            "exitFullScreen": "フルスクリーンを終了",
+            "confirmDelete": "削除の確認",
+            "confirmDeleteText": "この __type__ を削除してよろしいですか?",
+            "confirmDeleteSelected": "この アイテム を削除してよろしいですか?",
+            "configuration": "設定",
+            "secondaryConfigurations": "セカンダリ設定",
+            "global": "グローバル"
+        },
+        "sites" : {
+            "common" : {
+                "confirmType": "サイト"
+            },
+            "edit": {
+                "title" : "サイト設定"
+            },
+            "list" :{
+                "title" : "サイト",
+                "new" : "サイトの追加",
+                "table" : ["サイト名", "URL", "セカンダリ URL", "割り当てられたサーバー"],
+                "empty" : "サイトが見つかりません。",
+                "description": "複数で構成された冗長な OpenAM サーバーを論理的にグループ化し、サイトとして定義します。"
+            },
+            "new": {
+                "title": "サイトの追加",
+                "nameValidationError": "サイトの名前に空白は許可されていません。"
+            }
+        },
+        "servers" : {
+            "common" : {
+                "confirmType": "サーバー"
+            },
+            "list" : {
+                "title" : "サーバー",
+                "new" : "サーバーの追加",
+                "table" : ["サイト URL", "サイト名"],
+                "empty" : "サーバーが見つかりません。",
+                "clone" : "コピー",
+                "description": "OpenAM インスタンス内のサーバー固有のプロパティを設定します。"
+            },
+            "new": {
+                "title" : "サーバーの追加",
+                "serverUrl": "サーバー URL"
+            },
+            "clone": {
+                "title" : "サーバーのコピー",
+                "serverUrl": "サーバー URL"
+            }
+        },
+        "authentication": {
+            "common": {
+                "module": "モジュール",
+                "chain": "認証連鎖"
+            },
+            "settings": {
+                "title": "認証設定"
+            },
+            "modules": {
+                "title" : "認証モジュール",
+                "description" : "OpenAM は、ユーザーを識別するために認証モジュールを使用します。通常、認証モジュールは認証連鎖と関連付けられています。各レルムには、ユーザーを認証するために使用されるデフォルトの認証連鎖があります。このセクションは、レルムへの認証に使用可能な認証モジュールを追加、設定、削除するために使用されます。",
+                "newModule": "モジュールの追加",
+                "addModuleTitle" : "新規モジュールの作成",
+                "addModuleError": "認証インスタンスがすでに存在しています。",
+                "selectModuleType" : "モジュールタイプの選択   ",
+                "addModule" : "モジュールの追加",
+                "moduleName" : "モジュール名",
+                "moduleType" : "タイプ",
+                "chain" : "認証連鎖",
+                "inUse": {
+                    "title": "モジュールの編集",
+                    "message": "<code>__moduleName__</code> モジュールは、認証連鎖 <code>__usedChains__</code> で使用されています。このモジュールを編集すると、その動作が変更することがあります。<br><br>継続してもよろしいですか?"
+                },
+                "moduleNameValidationError" : "モジュールの名前に空白は許可されていません。",
+                "confirmDeleteSelected": "選択したモジュールを削除してもよろしいですか?",
+                "confirmDeleteSelected_plural": "選択したモジュールを削除してもよろしいですか?"
+            },
+            "chains": {
+                "title" : "認証連鎖",
+                "newChain" : "認証連鎖の追加",
+                "chainName" : "認証連鎖名",
+                "description" : "対象を認証する手順を定義するために、認証連鎖を使用してください。認証連鎖は連続する1つ以上の認証モジュールで構成され、資格情報は認証連鎖の次のモジュールインスタンスに受け継がれます。",
+                "defaultAdminAuthConfiguration" : "デフォルトの管理者の認証連鎖",
+                "defaultOrgAuthConfiguration" : "デフォルトの組織の認証連鎖",
+                "duplicateChain" : "同じ名前の認証連鎖がすでに存在します。",
+                "confirmDeleteSelected": "選択した認証連鎖を削除してもよろしいですか?",
+                "confirmDeleteSelected_plural": "選択した認証連鎖を削除してもよろしいですか?"
+            },
+            "editChains": {
+                "options" : "オプション",
+                "noOptions" : "オプション無し",
+                "selectCriteria" : "基準の選択",
+                "addValue" : "値の追加",
+                "selectModule" : "モジュールの選択",
+                "chains" : "認証連鎖",
+                "editChain" : "認証連鎖の編集",
+                "newModule" : "新規モジュール",
+                "addModule": "モジュールの追加",
+                "editModule" : "モジュールの編集",
+                "gotoNextModule" : "次のモジュールへと通過",
+                "gotoSuccessUrl" : "ログイン成功 URL に転送",
+                "gotoFailUrl" : "ログイン失敗 URL に転送",
+                "redirectUrls" : "リダイレクト URL",
+                "redirectUrlsHelp" : "対象がリダイレクトされる URL を指定します。認証失敗時は、認証成功時と異なる URL を指定することができます。",
+                "successUrl" : "ログイン成功 URL",
+                "failUrl" : "ログイン失敗 URL",
+                "addUrl" : "URL の追加",
+                "dropHere" : "ここにドロップ",
+                "moduleHelp" : "すべてのモジュールインスタンスにユーザーの資格情報を渡すプロセスを構築するように、認証モジュールを追加してください。",
+                "processingClass": {
+                    "title": "ポスト認証プロセスクラス",
+                    "className": "クラス名",
+                    "addClassNameDialog": {
+                        "title": "新しいクラス名の追加",
+                        "message": "ポスト認証プロセスの新規クラス <mark>__newClassName__</mark> は、保存されていません。保存しますか?"
+                    },
+                    "duplicateClass" : "同じ名前のクラスがすでに存在します",
+                    "help" : "認証プロセス終了時に実行する Java クラスの名前を指定します。"
+                },
+                "criteria" : [
+                    {
+                        "title": "Required",
+                        "passText" : "このモジュールが成功すると成功フラグが立ち、認証連鎖が継続します。",
+                        "failText" : "このモジュールが失敗すると失敗フラグが立ち、認証連鎖が継続します。"
+                    },
+                    {
+                        "title": "Optional",
+                        "passText" : "このモジュールが成功すると成功フラグが立ち、認証連鎖が継続します。",
+                        "failText" : "このモジュールが失敗すると認証連鎖が継続します。"
+                    },
+                    {
+                        "title": "Requisite",
+                        "passText" : "このモジュールが成功すると成功フラグが立ち、認証連鎖が継続します。",
+                        "failText" : "このモジュールが失敗すると失敗フラグが立ち、認証連鎖が終了します。"
+
+                    },
+                    {
+                        "title": "Sufficient",
+                        "passText" : "このモジュールが成功すると成功フラグが立ち、認証連鎖が終了します。",
+                        "failText" : "このモジュールが失敗すると認証連鎖が継続します。"
+                    }
+                ],
+                "alerts" : {
+                    "reqdFailSuffPass" : "警告：「Required」のモジュールが失敗した後に「Sufficient」のモジュールが成功すると、認証連鎖は継続し、その時点で終了しません。「Required」の代わりに「Requisite」を使用することを検討してください。"
+                },
+                "callToAction" : "少なくとも一つの認証モジュールを追加する必要があります。",
+                "lastCriteria" : "成功または失敗 URL に進みます。",
+                "deletedChain": "認証連鎖は正常に削除されました。",
+                "deleteBtnTooltip": {
+                    "defaultAdminAuthChain": "これは管理者のデフォルトの認証連鎖です。",
+                    "defaultOrgAuthChain": "これは組織のデフォルトの認証連鎖です。",
+                    "defaultAdminOrgAuthChain": "これは管理者および組織のデフォルトの認証連鎖です。"
+                },
+                "legend" : ["認証が成功するには次が必要です:","少なくとも1つの成功フラグがあること。", "失敗フラグがないこと。"]
+            }
+        },
+        "dashboard":{
+            "realmProperties" : "プロパティ",
+            "title" : "レルムの概要",
+            "quickStart" : "共通タスク"
+        },
+        "services": {
+            "edit": {
+                "title": "サービス",
+                "titleNew": "サービスの追加",
+                "chooseServiceType": "サービスタイプを選択",
+                "serviceTypes": "サービスタイプ...",
+                "settings": "設定",
+                "unavaliable": "追加できるサービスはありません。",
+                "unavaliableAlert": "追加できるサービスはありません。既存サービスの一覧を確認するため、キャンセルをクリックしてください。"
+            },
+            "list": {
+                "service": "サービス",
+                "title": "サービス",
+                "description": "OpenAM のレルム固有のプロパティを設定します。",
+                "addService": "サービスの追加",
+                "addServicePrompt": "サービスが見つかりません。",
+                "grid": {
+                    "header": ["サービス名"]
+                },
+                "confirmDeleteSelected": "この サービス を削除してよろしいですか?",
+                "confirmDeleteSelected_plural": "この サービス を削除してよろしいですか?"
+            },
+            "subSchema": {
+                "add": "セカンダリ設定の追加",
+                "title": "__subSchema__ 設定",
+                "new": {
+                    "title": "__subSchema__ の追加"
+                },
+                "confirmDeleteSelected": "この 設定 を削除してよろしいですか?",
+                "callToAction": "セカンダリ設定が見つかりません。"
+            }
+        },
+        "realms": {
+            "title": "レルム",
+            "description" : "対象および設定データを整理するためにレルムを使用します。各レルム内では、データストア、管理権限、認証連鎖、認可ポリシー、およびその他のレルム固有の設定を行うことができます。",
+            "newRealm": "新規レルム",
+            "grid": {
+                "header": ["レルム名", "状態", "パス", "レルム / DNS エイリアス"]
+            },
+            "parentRealmCannotDeleted": "親レルムを削除することはできません。最初にサブレルムを削除してください。",
+            "edit": {
+                "title": "レルム"
+            },
+            "warningDialog": {
+                "title": "\"__realmName__\" を削除しますか?",
+                "activateMessage": "これはアクティブなレルムです。削除した場合は、すべての設定データが失われます。設定データを保持してログインを防ぎたい場合は、レルムを非アクティブに設定することができます。<br>このレルムを削除しますか?",
+                "deactivateMessage": "これは、非アクティブなレルムです。現在誰もログインすることはできません。削除した場合は、すべての設定データが失われます。<br>このレルムを削除してもよろしいですか?"
+            },
+            "realmStatusPopover": {
+                "title": "レルムの状態",
+                "content": "レルムがアクティブではない場合、すべての OpenAM サービスはこのレルム内のすべてのユーザーに対して使用できなくなります。"
+            },
+            "realmAliasesPopover": {
+                "title": "レルム / DNS エイリアス",
+                "content": "認証ユーザーインターフェースがリクエストが受信すると、ユーザーが認証されるべきレルムを見つけるため、 OpenAM はすべてのレルムに対してこの属性を検索します。 OpenAM は一致するレルムを1つに特定する必要があるため、複数のレルムに重複したエントリを入れてはいけません。さらに OpenAM が一致するレルムを見つけられない場合、ユーザーにはエラー画面が表示されます。"
+            },
+            "realmNameValidationError" : "レルム名に文字 $, &, +, \\, \", カンマ, /, :, ;, =, ?, @, スペース, #, %, <, > は許可されていません。"
+        },
+        "scripts": {
+            "edit": {
+                "title": "新規スクリプト",
+                "language": "言語",
+                "script": "スクリプト",
+                "scriptType": "スクリプトタイプ",
+                "validation": {
+                    "line": "行",
+                    "column": "列",
+                    "message": "メッセージ",
+                    "errors": "このスクリプトにはエラーがあります:",
+                    "noErrors": "エラーは見つかりませんでした。"
+                },
+                "dialog": {
+                    "title":  "スクリプトタイプの変更",
+                    "warning": "スクリプトタイプを変更すると、未保存のデータが失われます。"
+                }
+            },
+            "list": {
+                "title": "スクリプト一覧",
+                "addNew": "新規スクリプト",
+                "grid": ["名前", "スクリプトタイプ", "言語", "説明"],
+                "confirmDeleteText": "選択したスクリプトを削除してもよろしいですか?"
+            }
+        },
+        "configuration" : {
+            "authentication" : {
+                "description": "グローバルな認証機能のデフォルトプロパティを設定します。",
+                "core": {
+                    "coreAttributes": "コア属性",
+                    "title": "レルムのデフォルト設定",
+                    "description": "新しいレルムを作成するときに適用するデフォルトの認証プロパティを設定します。"
+                },
+                "modules": {
+                    "title": "認証モジュールのデフォルト設定",
+                    "description": "新しい認証モジュールを作成するときに適用するデフォルトのプロパティを設定します。"
+                }
+            },
+            "globalServices" : {
+                "description": "新しいサービスを作成するときに適用するデフォルトのプロパティを設定します。"
+            }
+        },
+        "authorization": {
+            "common": {
+                "realm": "レルム",
+                "realms": "レルム",
+                "policy": "ポリシー",
+                "policySet": "ポリシーセット",
+                "policySets": "ポリシーセット",
+                "pattern": "パターン",
+                "patterns": "パターン",
+                "responseAttributes": "レスポンス属性",
+                "subjectAttributes": "対象属性",
+                "customAttributes": "カスタム属性",
+                "availablePatterns": "使用可能なパターン",
+                "staticAttributes": "静的属性",
+                "action": "アクション",
+                "actions": "アクション",
+                "resources": "リソース",
+                "subjects": "対象",
+                "environments": "環境",
+                "resourceType": "リソースタイプ",
+                "resourceTypes": "リソースタイプ",
+                "defaultState": "デフォルトの状態",
+
+                "noRealms": "選択したレルムがありません...",
+                "noActions": "アクションがありません...",
+                "noActionsSelected": "選択したアクションがありません...",
+                "noResources": "選択したリソースがありません...",
+                "noResourceTypes": "選択したリソースタイプがありません...",
+                "noStaticAttributes": "静的な属性がありません...",
+                "noSubjectAttributes": "サブジェクト属性がありません...",
+                "noApplications": "選択したポリシーセットがありません...",
+                "noPatterns": "パターンがありません...",
+                "noResourceTypesAvailable": "使用可能なリソースタイプがありません...",
+                "noApplicationsAvailable": "使用可能なポリシーセットがありません...",
+                "noItems": "アイテムがありません...",
+
+                "weekdays": {
+                    "Monday": {
+                        "short": "月",
+                        "full": "月曜日"
+                    },
+                    "Tuesday": {
+                        "short": "火",
+                        "full": "火曜日"
+                    },
+                    "Wednesday": {
+                        "short": "水",
+                        "full": "水曜日"
+                    },
+                    "Thursday": {
+                        "short": "木",
+                        "full": "木曜日"
+                    },
+                    "Friday": {
+                        "short": "金",
+                        "full": "金曜日"
+                    },
+                    "Saturday": {
+                        "short": "土",
+                        "full": "土曜日"
+                    },
+                    "Sunday": {
+                        "short": "日",
+                        "full": "日曜日"
+                    }
+                }
+            },
+
+            "policySets":{
+                "edit": {
+                    "new": "新規ポリシーセット",
+                    "policies": "ポリシー",
+                    "addResourceTypes": "リソースタイプの追加...",
+                    "selectResourceTypes": "このポリシーセット内で使用可能にするリソースタイプを選択します。",
+                    "resourceTypes": {
+                        "availableResourceTypes": "使用可能なリソースタイプ",
+                        "selectedResourceTypes": "選択したリソースタイプ"
+                    }
+                },
+                "list": {
+                    "addNew": "新規ポリシーセット",
+                    "description": "Web サイト、 Web アプリケーション、またはその他のリソースを保護するためのポリシーのセットを定義します。",
+                    "importPolicySets": "ポリシーのインポート",
+                    "exportPolicySets": "ポリシーのエクスポート",
+                    "grid": ["名前"],
+                    "noPolicySets": "ポリシーセットが見つかりません。",
+                    "addPolicySets": "ポリシーセットの追加",
+                    "noResourceTypesMessage" : "ポリシーセットにリソースタイプは必須です。"
+                }
+            },
+
+            "policies": {
+                "edit": {
+                    "createNew": "新規ポリシー",
+                    "resourcesDescription": "このポリシーで管理されるリソースを指定してください。",
+                    "actionsDescription": "ポリシーを適用するアクションを選択します。",
+                    "subjectConditionsDescription": "ポリシーを適用する対象の条件を指定します。",
+                    "environmentConditionsDescription": "ポリシーを適用する環境条件を指定します。",
+                    "deleteLogical": "削除により任意の子オブジェクトも削除されます。",
+                    "addLogical": "論理演算子を追加します。",
+                    "selectResourceTypeHelper": "このポリシーがアクセスを管理する対象のリソースタイプを選択します。",
+                    "selectResourceType": "リソースタイプの選択...",
+                    "selectResourcePattern": "リソースパターンの選択...",
+                    "addAction": "アクションの追加",
+                    "availableActions": "使用可能なリソースタイプのアクション",
+                    "selectedActions": "選択したアクション",
+                    "subjectAttributesPlaceholder": "対象の属性を選択または検索する",
+                    "addEnvironmentCondition": "環境条件の追加",
+                    "addSubjectCondition": "対象条件の追加",
+                    "canAcceptOneChild": "\"Not...\" 論理演算子は、一つの子要素だけを受け入れることができます。",
+
+                    "operators": {
+                        "NOT": "Not...",
+                        "OR": "Any of...",
+                        "AND": "All of..."
+                    },
+
+                    "subjectTypes": {
+                        "AuthenticatedUsers": {
+                            "title": "認証済みユーザー",
+                            "props": {}
+                        },
+                        "Identity": {
+                            "title": "ユーザーとグループ",
+                            "props": {
+                                "subjectValues": "対象の値",
+                                "users": "ユーザー対象",
+                                "groups": "グループ対象"
+                            },
+                            "placeholder": "対象を検索"
+                        },
+                        "JwtClaim": {
+                            "title": "OpenID Connect/JWT クレーム",
+                            "props": {
+                                "claimName": "クレーム名",
+                                "claimValue": "クレーム値"
+                            }
+                        },
+                        "NONE": {
+                            "title": "Never Match",
+                            "props": {}
+                        }
+                    },
+
+                    "conditionTypes": {
+                        "AMIdentityMembership": {
+                            "title": "アイデンティティメンバーシップ",
+                            "props": {
+                                "amIdentityName": "AM アイデンティティ名"
+                            }
+                        },
+                        "AuthLevel": {
+                            "title": "認証レベル (以上)",
+                            "props": {
+                                "authLevel": "認証レベル"
+                            }
+                        },
+                        "AuthScheme": {
+                            "title": "モジュールインスタンスによる認証",
+                            "props": {
+                                "authScheme": "認証スキーム",
+                                "applicationIdleTimeout": "アプリケーションアイドルタイムアウトスキーム",
+                                "applicationName": "アプリケーション名"
+                            }
+                        },
+                        "AuthenticateToRealm": {
+                            "title": "レルムへの認証",
+                            "props": {
+                                "authenticateToRealm": "レルムへの認証"
+                            }
+                        },
+                        "AuthenticateToService": {
+                            "title": "モジュール連鎖による認証",
+                            "props": {
+                                "authenticateToService": "サービスへの認証"
+                            }
+                        },
+                        "IPv4": {
+                            "title": "IPv4 アドレス / DNS 名",
+                            "props": {
+                                "ipRange": "IP レンジ",
+                                "dnsName": "DNS 名",
+                                "startIp": "開始 IP",
+                                "endIp": "終了 IP"
+                            }
+                        },
+                        "IPv6": {
+                            "title": "IPv6 アドレス / DNS ",
+                            "props": {
+                                "ipRange": "IP レンジ",
+                                "dnsName": "DNS 名",
+                                "startIp": "開始 IP",
+                                "endIp": "終了 IP"
+                            }
+                        },
+                        "LDAPFilter": {
+                            "title": "LDAP フィルタ条件",
+                            "props": {
+                                "ldapFilter": "LDAP フィルタ"
+                            }
+                        },
+                        "LEAuthLevel": {
+                            "title": "認証レベル (以下)",
+                            "props": {
+                                "authLevel": "認証レベル"
+                            }
+                        },
+                        "OAuth2Scope": {
+                            "title": "OAuth2 スコープ",
+                            "props": {
+                                "requiredScopes": "スコープ"
+                            }
+                        },
+                        "ResourceEnvIP": {
+                            "title": "リソース / 環境 / IP アドレス",
+                            "props": {
+                                "resourceEnvIPConditionValue": "リソース / 環境 / IP アドレス"
+                            }
+                        },
+                        "Session": {
+                            "title": "アクティブセッション時間",
+                            "props": {
+                                "maxSessionTime": "最大セッション時間",
+                                "terminateSession": "セッションの終了"
+                            }
+                        },
+                        "SessionProperty": {
+                            "title": "現在のセッションプロパティ",
+                            "props": {
+                                "ignoreValueCase": "大文字小文字を区別しない",
+                                "properties": "プロパティ"
+                            }
+                        },
+                        "SimpleTime": {
+                            "title": "時間 (曜日、日付、時刻、タイムゾーン)",
+                            "props": {
+                                "startTime": "開始時刻",
+                                "endTime": "終了時刻",
+                                "startDay": "開始曜日",
+                                "endDay": "終了曜日",
+                                "startDate": "開始日付",
+                                "endDate": "終了日付",
+                                "enforcementTimeZone": "タイムゾーン",
+                                "enterTimeZone": "タイムゾーンの入力"
+                            },
+                            "helperTitle": "時間条件",
+                            "helperContent": "次の1つ以上の値を含める必要があります。: 時刻(開始と終了)、曜日(開始と終了)、日付(開始と終了)、および/またはタイムゾーン。"
+                        },
+                        "Script": {
+                            "title": "スクリプト",
+                            "props": {
+                                "scriptId": "スクリプト名"
+                            },
+                            "placeholder": "スクリプトから選択"
+                        },
+                        "ipHelperTitle": "IP 条件",
+                        "ipHelperContent": "開始 IP 、終了 IP または DNS 名の少なくとも一つを入力してください。単一の IP アドレスと一致させるには、開始 IP または終了 IP のどちらかに入力します。開始 IP は、終了 IP 以下の値でなければなりません。 DNS 名は、明示的な一致かまたは最も低いサブドメインのワイルドカードを使用することができます。",
+                        "legacyFormat": "この条件は従来の形式であり、置換する必要があります。",
+                        "nothingSelected": "何も選択されていません",
+                        "attributes": {
+                            "object": "キー:値[,値2,...]"
+                        }
+                    }
+                },
+                "list": {
+                    "grid": ["名前", "状態"],
+                    "addNew": "新しいポリシーの追加",
+                    "description": "このポリシーセットに適用される認可ポリシーを作成、編集、削除します。",
+                    "noPolicies": "このポリシーセットにポリシーを追加していません。"
+                }
+            },
+
+            "resourceTypes": {
+                "list": {
+                    "add": "新規リソースタイプ",
+                    "title": "リソースタイプ",
+                    "description": "ポリシーが適用されるリソースとそれらのリソースで実行できるアクション用のテンプレートを定義します。",
+                    "grid": ["名前"],
+                    "noResourceTypes" : "リソースタイプが見つかりません。",
+                    "addNewResourceType" : "リソースタイプの追加"
+                },
+                "edit": {
+                    "title" : "新規リソースタイプ",
+                    "actionsDescription" : "このリソースタイプを使用するポリシーが、許可または拒否することができるアクションを定義します。",
+                    "specifyActions" : "アクションの指定",
+                    "addAction": "アクションの追加",
+                    "addNewActionPlaceholder": "新しいアクションの追加...",
+                    "patternsDescription" : "このリソースタイプを使用するポリシー上に展開することができるリソースパターンを定義します。",
+                    "specifyPatterns" : "パターンの指定",
+                    "addPattern": "パターンの追加",
+                    "addNewPatternPlaceholder": "新しいパターンの追加..."
+                }
+            }
+        }
+    }
+}
