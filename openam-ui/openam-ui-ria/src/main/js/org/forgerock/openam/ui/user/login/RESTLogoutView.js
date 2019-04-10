@@ -40,7 +40,11 @@ define([
             cause problems to subsequent failed login requests - i.e ones which do not override the current value.
             FIXME: Remove all session specific properties from the globalData object.
             */
-            this.data.params = RESTLoginHelper.filterUrlParams(RESTLoginHelper.getSuccessfulLoginUrlParams());
+            var queryParam = RESTLoginHelper.getSuccessfulLoginUrlParams();
+            if (queryParam.goto) {
+                queryParam.goto = encodeURIComponent(queryParam.goto);
+            }
+            this.data.params = RESTLoginHelper.filterUrlParams(queryParam);
             delete Configuration.globalData.auth.fullLoginURL;
 
             Configuration.setProperty("loggedUser", null);
