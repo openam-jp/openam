@@ -295,11 +295,13 @@ define([
                  * would normally only be applied when the user has logged in, so they should not contain invalid values
                  */
 
-                var queryParam = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
-                if (queryParam.goto) {
-                    queryParam.goto = encodeURIComponent(queryParam.goto);
-                }
-                routeToLoginUnavailable(RESTLoginHelper.filterUrlParams(queryParam));
+                routeToLoginUnavailable(
+                    RESTLoginHelper.filterUrlParams (
+                        URIUtils.parseQueryString (
+                            URIUtils.getCurrentCompositeQueryString()
+                        )
+                    )
+                );
             }, this));
         },
 
@@ -414,10 +416,6 @@ define([
 
         handleUrlParams () {
             var urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString());
-
-            if (urlParams.goto) {
-                urlParams.goto = encodeURIComponent(urlParams.goto);
-            }
 
             // Rest does not accept the params listed in the array below as is
             // they must be transformed into the "authIndexType" and "authIndexValue" params

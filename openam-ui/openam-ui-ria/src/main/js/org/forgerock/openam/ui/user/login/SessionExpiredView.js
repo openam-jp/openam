@@ -39,11 +39,7 @@ define([
             cause problems to subsequent failed login requests - i.e ones which do not override the current value.
             FIXME: Remove all session specific properties from the globalData object.
             */
-            var queryParam = RESTLoginHelper.getSuccessfulLoginUrlParams();
-            if (queryParam.goto) {
-                queryParam.goto = encodeURIComponent(queryParam.goto);
-            }
-            this.data.params = RESTLoginHelper.filterUrlParams(queryParam);
+            this.data.params = RESTLoginHelper.filterUrlParams(RESTLoginHelper.getSuccessfulLoginUrlParams());
             delete Configuration.globalData.auth.fullLoginURL;
 
             RESTLoginHelper.removeSessionCookie();
