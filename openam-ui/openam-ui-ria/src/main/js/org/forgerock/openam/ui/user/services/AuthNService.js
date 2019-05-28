@@ -16,22 +16,19 @@
 define([
     "jquery",
     "lodash",
-    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/common/services/fetchUrl",
     "org/forgerock/openam/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
-    "store/actions/creators",
-    "store/index",
-    "org/forgerock/openam/ui/common/util/uri/query"
-
-], ($, _, Messages, AbstractDelegate, Configuration, EventManager, URIUtils, fetchUrl, Constants, AuthenticationToken,
-    SessionToken, creators, store, query) => {
-    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
+], ($, _, AbstractDelegate, Configuration, Constants, EventManager, Messages, RealmHelper, URIUtils,
+     SessionToken, query, AuthenticationToken) => {
+    const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
     let requirementList = [];
     // to be used to keep track of the attributes associated with whatever requirementList contains
     let knownAuth = {};
@@ -59,21 +56,16 @@ define([
         const delimiter = url.indexOf("?") === -1 ? "?" : "&";
         return `${url}${delimiter}${queryString}`;
     }
-
-    function addRealmToStore (realm) {
-        store.default.dispatch(creators.sessionAddInfo({ realm }));
-    }
-
     obj.begin = function (options) {
         knownAuth = _.clone(Configuration.globalData.auth);
         const fragmentParams = URIUtils.getCurrentFragmentQueryString();
         const urlAndParams = addQueryStringToUrl(
-            fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
+            RealmHelper.decorateURIWithSubRealm("__subrealm__/authenticate"),
             query.urlParamsFromObject(handleFragmentParameters(query.parseParameters(fragmentParams)))
         );
         const serviceCall = {
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: "",
             url: urlAndParams,
             errorsHandlers: {
@@ -112,18 +104,14 @@ define([
                 value: true
             });
         }
-
-        const isAuthenticated = requirements.hasOwnProperty("tokenId");
-
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
             Configuration.globalData.auth.currentStage = requirementList.length;
             if (!AuthenticationToken.get() && _.find(requirements.callbacks, callbackTracking)) {
                 AuthenticationToken.set(requirements.authId);
             }
-        } else if (isAuthenticated) {
+        } else if (requirements.hasOwnProperty("tokenId")) {
             SessionToken.set(requirements.tokenId);
-            addRealmToStore(requirements.realm);
         }
     };
     obj.submitRequirements = function (requirements, options) {
@@ -144,12 +132,12 @@ define([
         };
         const fragmentParams = URIUtils.getCurrentFragmentQueryString();
         const urlAndParams = addQueryStringToUrl(
-            fetchUrl.default("/authenticate", { realm: store.default.getState().server.realm }),
+            RealmHelper.decorateURIWithRealm("__subrealm__/authenticate"),
             query.urlParamsFromObject(handleFragmentParameters(query.parseParameters(fragmentParams)))
         );
         const serviceCall = {
             type: "POST",
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.1" },
+            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
             data: JSON.stringify(requirements),
             url: urlAndParams,
             errorsHandlers: {

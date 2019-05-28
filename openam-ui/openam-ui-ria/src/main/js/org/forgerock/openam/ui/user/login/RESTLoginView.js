@@ -26,22 +26,18 @@ define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "form2js",
     "handlebars",
-    "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
-    "org/forgerock/openam/ui/common/util/isRealmChanged",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/user/login/logout",
     "org/forgerock/openam/ui/common/util/uri/query",
     "org/forgerock/openam/ui/user/login/gotoUrl",
     "store/index"
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
-    Handlebars, i18nManager, Messages, RESTLoginHelper, isRealmChanged, Router, SessionManager, UIUtils,
-    URIUtils, logout, query, gotoUrl, store) => {
-    isRealmChanged = isRealmChanged.default;
+    Handlebars, Messages, RESTLoginHelper, Router, SessionManager, UIUtils,
+    URIUtils, query, gotoUrl, store) => {
 
     function hasSsoRedirectOrPost (goto) {
         let decodedGoto;
@@ -130,12 +126,16 @@ define([
         },
 
         handleExistingSession (requirements) {
+
+            const auth = Configuration.globalData.auth;
+
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
-                if (isRealmChanged()) {
-                    location.href = "#confirmLogin/";
-                } else {
+
+                if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
                     Configuration.setProperty("loggedUser", user);
+                    delete auth.passedInRealm;
+
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
 
                         if (gotoUrl.exists()) {
@@ -143,7 +143,6 @@ define([
                             $("body").empty();
                             return false;
                         }
-
                         EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
                             anonymousMode: false
                         });
@@ -158,9 +157,13 @@ define([
                             Router.navigate("", { trigger: true });
                         }
                     });
+                } else {
+                    location.href = "#confirmLogin/";
                 }
             }, () => {
-                logout.default();
+                // There is a tokenId but it is invalid so kill it
+                RESTLoginHelper.removeSession();
+                Configuration.setProperty("loggedUser", null);
             });
         },
 
@@ -257,7 +260,8 @@ define([
 
                 // Clear out existing session if instructed
                 if (reqs.hasOwnProperty("tokenId") && params.arg === "newsession") {
-                    logout.default();
+                    RESTLoginHelper.removeSession();
+                    Configuration.setProperty("loggedUser", null);
                 }
 
                 // If simply by asking for the requirements, we end up with a token,

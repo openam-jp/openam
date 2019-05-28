@@ -18,21 +18,17 @@ define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
+    "org/forgerock/openam/ui/user/services/AuthNService",
+    "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/common/services/fetchUrl",
-    "org/forgerock/openam/ui/user/login/tokens/SessionToken",
-    "org/forgerock/openam/ui/user/services/AuthNService",
+    "org/forgerock/openam/ui/common/util/uri/query",
     "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel",
-    "org/forgerock/openam/ui/user/login/logout",
-    "org/forgerock/openam/ui/common/util/uri/query",
     "org/forgerock/openam/ui/user/login/gotoUrl"
-], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
-    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout, query, gotoUrl) => {
+], ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, ViewManager,
+    Constants, query, SessionService, UserModel, gotoUrl) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -81,37 +77,16 @@ define([
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        const sessionToken = SessionToken.get();
-        const noSessionHandler = (xhr) => {
+        return UserModel.getProfile().then(successCallback, function (xhr) {
             // Try to remove any cookie that is lingering, as it is apparently no longer valid
-            SessionToken.remove();
+            obj.removeSessionCookie();
 
             if (xhr && xhr.responseJSON && xhr.responseJSON.code === 404) {
                 errorCallback("loggedIn");
             } else {
                 errorCallback();
             }
-        };
-        // TODO AME-11593 Call to idFromSession is required to populate the fullLoginURL, which we use later to
-        // determine the parameters you logged in with. We should remove the support of fragment parameters and use
-        // persistent url query parameters instead.
-        ServiceInvoker.restCall({
-            url: `${Constants.host}/${Constants.context}/json${
-                fetchUrl.default("/users?_action=idFromSession")}`,
-            headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-            type: "POST",
-            errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
-        }).then((data) => {
-            Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
         });
-
-        if (sessionToken) {
-            return SessionService.updateSessionInfo(sessionToken).then((data) => {
-                return UserModel.fetchById(data.uid).then(successCallback);
-            }, noSessionHandler);
-        } else {
-            noSessionHandler();
-        }
     };
 
     obj.getSuccessfulLoginUrlParams = function () {
@@ -160,9 +135,46 @@ define([
         return _.reduce(_.pick(params, filtered), (result, value, key) => `${result}&${key}=${value}`, "");
     };
 
-    // called by commons
     obj.logout = function (successCallback, errorCallback) {
-        logout.default().then(successCallback, errorCallback);
+        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        SessionService.isSessionValid(tokenCookie).then(function (result) {
+            if (result.valid) {
+                SessionService.logout(tokenCookie).then(function (response) {
+                    obj.removeSessionCookie();
+
+                    successCallback(response);
+                    return true;
+
+                }, obj.removeSessionCookie);
+            } else {
+                obj.removeSessionCookie();
+                successCallback();
+            }
+        }, function () {
+            if (errorCallback) {
+                errorCallback();
+            }
+        });
+    };
+
+    obj.removeSession = function () {
+        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        SessionService.isSessionValid(tokenCookie).then(function (result) {
+            if (result.valid) {
+                SessionService.logout(tokenCookie).then(function () {
+                    obj.removeSessionCookie();
+                });
+            }
+        });
+    };
+
+    obj.removeSessionCookie = function () {
+        CookieHelper.deleteCookie(Configuration.globalData.auth.cookieName, "/",
+            Configuration.globalData.auth.cookieDomains);
+    };
+
+    obj.removeAuthCookie = function () {
+        CookieHelper.deleteCookie("authId", "/", Configuration.globalData.auth.cookieDomains);
     };
 
     return obj;
