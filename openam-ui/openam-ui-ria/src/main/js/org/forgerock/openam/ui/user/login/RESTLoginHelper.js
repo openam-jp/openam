@@ -23,12 +23,13 @@ define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/util/uri/query",
     "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel",
     "org/forgerock/openam/ui/user/login/gotoUrl"
 ], ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, ViewManager,
-    Constants, query, SessionService, UserModel, gotoUrl) => {
+    Constants, URIUtils, query, SessionService, UserModel, gotoUrl) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -100,11 +101,10 @@ define([
 
     obj.setSuccessURL = function (tokenId, successUrl) {
         const promise = $.Deferred();
-        let context = "";
-
-        const goto = query.parseParameters().goto;
-
+        const paramString = URIUtils.getCurrentCompositeQueryString();
+        const goto = query.parseParameters(paramString).goto;
         if (goto) {
+            let context = "";
             AuthNService.validateGotoUrl(goto).then((data) => {
                 if (data.successURL.indexOf("/") === 0 &&
                     data.successURL.indexOf(`/${Constants.context}`) !== 0) {

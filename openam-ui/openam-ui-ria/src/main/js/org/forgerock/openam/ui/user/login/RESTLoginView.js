@@ -28,16 +28,17 @@ define([
     "handlebars",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/util/uri/query",
-    "org/forgerock/openam/ui/user/login/gotoUrl",
-    "store/index"
+    "org/forgerock/openam/ui/user/login/gotoUrl"
+
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
-    Handlebars, Messages, RESTLoginHelper, Router, SessionManager, UIUtils,
-    URIUtils, query, gotoUrl, store) => {
+    Handlebars, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
+    URIUtils, query, gotoUrl) => {
 
     function hasSsoRedirectOrPost (goto) {
         let decodedGoto;
@@ -128,7 +129,7 @@ define([
         handleExistingSession (requirements) {
 
             const auth = Configuration.globalData.auth;
-
+            auth.passedInRealm = RealmHelper.getRealm();
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
 
@@ -527,9 +528,12 @@ define([
         return new Handlebars.SafeString(result);
     });
 
-    Handlebars.registerHelper("intendedRealmParameter", () => {
-        const sessionInfoIntendedRealm = store.default.getState().server.realm;
-        return sessionInfoIntendedRealm ? `&realm=${sessionInfoIntendedRealm}` : "";
+    Handlebars.registerHelper("decorateWithRealm", function (uri) {
+        uri = RealmHelper.decorateURLWithOverrideRealm(uri);
+        if (uri.slice(-1) !== "/") {
+            uri += "/";
+        }
+        return uri + RealmHelper.getSubRealm();
     });
 
     Handlebars.registerHelper("gotoParameter", () => {

@@ -145,13 +145,6 @@
         </dependency>
         <dependency>
             <groupId>jp.openam.commons.ui.libs</groupId>
-            <artifactId>redux</artifactId>
-            <version>3.5.2</version>
-            <classifier>min</classifier>
-            <type>js</type>
-        </dependency>
-        <dependency>
-            <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>sinon</artifactId>
             <version>1.15.4</version>
             <type>js</type>
@@ -271,7 +264,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/test-classes/libs</outputDirectory>
-                            <includeArtifactIds>sinon,qunit,squire,redux</includeArtifactIds>
+                            <includeArtifactIds>sinon,qunit,squire</includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>

@@ -67,8 +67,7 @@ require.config({
         "sifter"      : "libs/sifter-0.4.1-min",
         "microplugin" : "libs/microplugin-0.0.3",
         "popoverclickaway" : "libs/popover-clickaway",
-        "text"        : "libs/text-2.0.15",
-        "redux"       : "libs/redux-3.5.2-min"
+        "text": "libs/text-2.0.15"
     },
     shim: {
         "autosizeInput": {
