@@ -21,13 +21,15 @@ define([
     "org/forgerock/openam/ui/user/services/AuthNService",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/user/services/SessionService",
     "org/forgerock/openam/ui/user/UserModel",
-    "org/forgerock/commons/ui/common/main/ViewManager"
-], function ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, Constants, SessionService,
-             URIUtils, UserModel, ViewManager) {
+    "org/forgerock/openam/ui/user/login/gotoUrl"
+], ($, _, AbstractConfigurationAware, AuthNService, CookieHelper, Configuration, ViewManager,
+    Constants, URIUtils, query, SessionService, UserModel, gotoUrl) => {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -89,38 +91,38 @@ define([
     };
 
     obj.getSuccessfulLoginUrlParams = function () {
-        // The successfulLoginURL is populated by the server (not from window.location of the browser), upon successful
-        // authentication.
-        var successfulLoginURL = Configuration.globalData.auth.fullLoginURL,
-            successfulLoginURLParams = successfulLoginURL
-                ? successfulLoginURL.substring(successfulLoginURL.indexOf("?") + 1) : "";
-
-        return URIUtils.parseQueryString(successfulLoginURLParams);
+        // The successfulLoginURL is populated by the server upon successful authentication,
+        // not from window.location of the browser.
+        const fullLoginURL = Configuration.globalData.auth.fullLoginURL;
+        const paramString = fullLoginURL ? fullLoginURL.substring(fullLoginURL.indexOf("?") + 1) : "";
+        return query.parseParameters(paramString);
     };
 
-    obj.setSuccessURL = function (tokenId, newSuccessUrl) {
-        var promise = $.Deferred(),
-            urlParams = URIUtils.parseQueryString(URIUtils.getCurrentCompositeQueryString()),
-            url = newSuccessUrl ? newSuccessUrl : Configuration.globalData.auth.successURL,
-            context = "";
-        if (urlParams && urlParams.goto) {
-            AuthNService.setGoToUrl(tokenId, urlParams.goto).then(function (data) {
+
+    obj.setSuccessURL = function (tokenId, successUrl) {
+        const promise = $.Deferred();
+        const paramString = URIUtils.getCurrentCompositeQueryString();
+        const goto = query.parseParameters(paramString).goto;
+        if (goto) {
+            let context = "";
+            AuthNService.validateGotoUrl(goto).then((data) => {
                 if (data.successURL.indexOf("/") === 0 &&
                     data.successURL.indexOf(`/${Constants.context}`) !== 0) {
                     context = `/${Constants.context}`;
                 }
-                Configuration.globalData.auth.urlParams.goto = context + data.successURL;
+                gotoUrl.set(encodeURIComponent(context + data.successURL));
                 promise.resolve();
-            }, function () {
+            }, () => {
                 promise.reject();
             });
         } else {
-            if (url !== Constants.CONSOLE_PATH) {
+            if (successUrl !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
                 }
-                if (!Configuration.globalData.auth.urlParams.goto) {
-                    Configuration.globalData.auth.urlParams.goto = url;
+
+                if (!gotoUrl.exists()) {
+                    gotoUrl.set(successUrl);
                 }
             }
             promise.resolve();

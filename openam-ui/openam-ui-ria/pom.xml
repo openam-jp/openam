@@ -143,7 +143,6 @@
             <version>${handlebars.version}</version>
             <type>js</type>
         </dependency>
-
         <dependency>
             <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>sinon</artifactId>
