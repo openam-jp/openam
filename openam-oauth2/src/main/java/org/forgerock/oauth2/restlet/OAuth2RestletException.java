@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation;
+import org.owasp.esapi.ESAPI;
 import org.restlet.data.Status;
 
 import java.util.HashMap;
@@ -174,4 +176,18 @@ public class OAuth2RestletException extends Exception {
         }
         return map;
     }
+    
+    /**
+     * Gets the data model to use when rendering the error page.
+     *
+     * @return The data model.
+     */
+    public final Map<String, String> getDataModel() {
+        final Map<String, String> map = asMap();
+        if (map.containsKey("error_description")) {
+            map.put("error_description", 
+                    ESAPI.encoder().encodeForHTML(map.get("error_description")));
+        }
+        return map;
+    }    
 }
