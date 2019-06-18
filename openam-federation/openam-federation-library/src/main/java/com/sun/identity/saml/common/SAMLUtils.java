@@ -25,6 +25,7 @@
  * $Id: SAMLUtils.java,v 1.16 2010/01/09 19:41:06 qcheng Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package com.sun.identity.saml.common;
@@ -99,6 +100,8 @@ import com.sun.identity.federation.common.FSUtils;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.xml.security.c14n.Canonicalizer;
+
+import org.owasp.esapi.ESAPI;
 
 /**
  * This class contains some utility methods for processing SAML protocols.
@@ -744,7 +747,8 @@ public class SAMLUtils  extends SAMLUtilsCommon {
             }
             out.println("</P>\n");
         }
-        out.println("<FORM METHOD=\"POST\" ACTION=\"" + targeturl + "\">");
+        out.println("<FORM METHOD=\"POST\" ACTION=\"" 
+                + ESAPI.encoder().encodeForHTMLAttribute(targeturl) + "\">");
         if (assertion != null) {
             it = assertion.iterator();
             while (it.hasNext()) {
