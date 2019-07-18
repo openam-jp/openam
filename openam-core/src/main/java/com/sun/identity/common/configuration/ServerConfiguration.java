@@ -25,6 +25,7 @@
  * $Id: ServerConfiguration.java,v 1.16 2010/01/15 18:10:55 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package com.sun.identity.common.configuration;
@@ -625,9 +626,7 @@ public class ServerConfiguration extends ConfigurationBase {
                 try {
                     new URL(instanceName);
                 } catch (MalformedURLException ex) {
-                    String[] param = {instanceName};
-                    throw new ConfigurationException("invalid.server.name", 
-                        param);
+                    throw new ConfigurationException("invalid.server.name", null);
                 }
             }
             
@@ -972,8 +971,7 @@ public class ServerConfiguration extends ConfigurationBase {
         try {
             url = new URL(cloneName);
         } catch (MalformedURLException ex) {
-            String[] param = {cloneName};
-            throw new ConfigurationException("invalid.server.name", param);
+            throw new ConfigurationException("invalid.server.name", null);
         }
 
         ServiceConfig cfg = getServerConfig(ssoToken, serverName);
@@ -1031,8 +1029,7 @@ public class ServerConfiguration extends ConfigurationBase {
                 getSet(url.getPath()));
             map.put(ATTR_SERVER_CONFIG, getPropertiesSet(propMap));
         } catch (MalformedURLException ex) {
-            String[] param = {serverName};
-            throw new ConfigurationException("invalid.server.name", param);
+            throw new ConfigurationException("invalid.server.name", null);
         } catch (IOException ie) {
             // ignore because the values should be well formated.
         }
@@ -1099,8 +1096,7 @@ public class ServerConfiguration extends ConfigurationBase {
         try {
             new URL(serverName);
         } catch (MalformedURLException ex) {
-            String[] param = {serverName};
-            throw new ConfigurationException("invalid.server.name", param);
+            throw new ConfigurationException("invalid.server.name", null);
         }
         ServiceConfig cfg = getServerConfig(ssoToken, serverName);
         if (cfg == null) {
