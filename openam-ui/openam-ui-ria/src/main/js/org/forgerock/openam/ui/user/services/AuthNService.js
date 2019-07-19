@@ -260,5 +260,15 @@ define([
             errorsHandlers: { "Bad Request": { status: "400" } }
         });
     };
+    obj.validateLogoutGotoUrl = function (urlGoTo) {
+        return obj.serviceCall({
+            type: "POST",
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
+            data: JSON.stringify({ "goto": urlGoTo }),
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo?_action=validateGoto"),
+            errorsHandlers: { "Bad Request": { status: "400" } }
+        });
+    };
+
     return obj;
 });
