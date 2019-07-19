@@ -128,7 +128,10 @@ define([
         const goToFailureUrl = (errorBody) => {
             if (errorBody.detail && errorBody.detail.failureUrl) {
                 console.log(errorBody.detail.failureUrl);
-                window.location.href = errorBody.detail.failureUrl;
+                Configuration.globalData.auth.urlParams.gotoOnFail =
+                    encodeURIComponent(errorBody.detail.failureUrl);
+            } else {
+                delete Configuration.globalData.auth.urlParams.gotoOnFail;
             }
         };
         const fragmentParams = URIUtils.getCurrentFragmentQueryString();
