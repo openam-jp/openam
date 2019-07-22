@@ -13,6 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -160,7 +161,15 @@ public class SmsCollectionProvider extends SmsResourceProvider {
             ServiceConfig config = parentSubConfigFor(context, scm);
             checkedInstanceSubConfig(context, resourceId, config);
             if (isDefaultCreatedAuthModule(context, resourceId)) {
-                scm.removeOrganizationConfiguration(realmFor(context), null);
+                Set<String> subConfigNames = config.getSubConfigNames();
+                if (subConfigNames == null || subConfigNames.size() == 0) {
+                    scm.removeOrganizationConfiguration(realmFor(context), null);
+                } else {
+                    Map attrs = config.getAttributesWithoutDefaults();
+                    if (attrs != null) {
+                        config.removeAttributes(attrs.keySet());
+                    }
+                }
             } else {
                 config.removeSubConfig(resourceId);
             }
