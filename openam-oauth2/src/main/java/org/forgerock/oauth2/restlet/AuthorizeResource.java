@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2018 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -29,6 +30,7 @@ import org.forgerock.oauth2.core.exceptions.CsrfException;
 import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.OAuth2ProviderNotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
@@ -134,6 +136,9 @@ public class AuthorizeResource extends ConsentRequiredResource {
         } catch (DuplicateRequestParameterException e) {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
                     request.<String>getParameter("state"));
+        } catch (OAuth2ProviderNotFoundException e) {
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
+                    request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
@@ -190,6 +195,9 @@ public class AuthorizeResource extends ConsentRequiredResource {
                     request.<String>getParameter("state"));
         } catch (CsrfException e) {
             throw new OAuth2RestletException(400, "bad_request", e.getMessage(),
+                    request.<String>getParameter("state"));
+        } catch (OAuth2ProviderNotFoundException e) {
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
