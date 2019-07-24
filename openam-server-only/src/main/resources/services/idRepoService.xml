@@ -79,61 +79,75 @@
                         i18nKey="user">
                         <AttributeSchema name="userPassword"
                             type="single" syntax="password"
-                            i18nKey="password" />
+                            i18nKey="password"
+                            order="9900" />
                         <AttributeSchema name="inetUserStatus"
                             type="single" syntax="string"
-                            i18nKey="staturs">
+                            i18nKey="staturs"
+                            order="10300">
                             <DefaultValues><Value>Active</Value></DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="dn"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="dn" />
+                            i18nKey="dn"
+                            order="9200" />
                         <AttributeSchema name="sn"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="sn" />
+                            i18nKey="sn"
+                            order="10200" />
                         <AttributeSchema name="cn"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="cn" />
+                            i18nKey="cn"
+                            order="9100" />
                         <AttributeSchema name="employeeNumber"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="employeeNumber" />
+                            i18nKey="employeeNumber"
+                            order="9300" />
                         <AttributeSchema name="givenName"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="givenName" />
+                            i18nKey="givenName"
+                            order="9400" />
                         <AttributeSchema name="iplanet-am-user-alias-list"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="iplanet-am-user-alias-list" />
+                            i18nKey="iplanet-am-user-alias-list"
+                            order="9500" />
                         <AttributeSchema name="iplanet-am-user-success-url"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="iplanet-am-user-success-url" />
+                            i18nKey="iplanet-am-user-success-url"
+                            order="9700" />
                         <AttributeSchema name="iplanet-am-user-failure-url"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="iplanet-am-user-failure-url" />
+                            i18nKey="iplanet-am-user-failure-url"
+                            order="9600" />
                         <AttributeSchema name="mail"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="mail" />
+                            i18nKey="mail"
+                            order="9800" />
                         <AttributeSchema name="postalAddress"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="postalAddress" />
+                            i18nKey="postalAddress"
+                            order="10000" />
                         <AttributeSchema name="sunIdentityMSISDNNumber"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="sunIdentityMSISDNNumber" />
+                            i18nKey="sunIdentityMSISDNNumber"
+                            order="10400" />
                         <AttributeSchema name="telephoneNumber"
                             type="single"
                             isSearchable="yes"
-                            i18nKey="telephoneNumber" />
-                        <AttributeSchema name="roles" i18nKey="roles" />
+                            i18nKey="telephoneNumber"
+                            order="10500" />
+                        <AttributeSchema name="roles" i18nKey="roles" order="10100" />
                     </SubSchema>
                 </SubSchema>
             </Global>
@@ -141,7 +155,8 @@
                 <AttributeSchema name="sunIdRepoAttributeCombiner"
                     type = "single"
                     syntax = "string"
-                    i18nKey = "a100">
+                    i18nKey = "a100"
+                    order="100">
                     <DefaultValues>
                         <!-- The plugin class will combine the
                              attributes from different identity
@@ -156,7 +171,8 @@
                 <AttributeSchema name="sunCoexistenceAttributeMapping"
                     type = "list"
                     syntax = "string"
-                    i18nKey = "a1001">
+                    i18nKey = "a1001"
+                    order="200">
                     <DefaultValues>
                         <Value>sunOrganizationStatus=inetDomainStatus</Value>
                         <Value>sunOrganizationAliases=sunOrganizationAlias</Value>
@@ -167,7 +183,8 @@
                 <AttributeSchema name="sunIdRepoAttributeValidator"
                     type = "list"
                     syntax = "string"
-                    i18nKey = "a1002">
+                    i18nKey = "a1002"
+                    order="300">
                     <DefaultValues>
                        <Value>class=com.sun.identity.idm.server.IdRepoAttributeValidatorImpl</Value>
                        <Value>minimumPasswordLength=8</Value>
@@ -197,7 +214,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2013">
+                        i18nKey = "a2013"
+                        order="1700">
                         <DefaultValues>
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
@@ -206,14 +224,16 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                     </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a2014">
+                        i18nKey="a2014"
+                        order="1900">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -244,7 +264,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a2000">
+                        i18nKey="a2000"
+                        order="600">
                         <DefaultValues>
                             <Value>@DIRECTORY_SERVER@:@DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -253,19 +274,22 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
                         type="single"
                         syntax="string"
-                        i18nKey="a2003">
+                        i18nKey="a2003"
+                        order="700">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
-                        i18nKey="a2004">
+                        i18nKey="a2004"
+                        order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a20091">
+                        i18nKey="a20091"
+                        order="1300">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -273,7 +297,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20092">
+                        i18nKey="a20092"
+                        order="1400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a200921">SECONDS</ChoiceValue>
                             <ChoiceValue i18nKey="a200922">MINUTES</ChoiceValue>
@@ -289,7 +314,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2006">
+                        i18nKey = "a2006"
+                        order="900">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -298,7 +324,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20071">
+                        i18nKey="a20071"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
@@ -312,7 +339,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a200731">
+                                     i18nKey="a200731"
+                                     order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
                             <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
@@ -335,7 +363,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2009">
+                        i18nKey="a2009"
+                        order="1200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -344,7 +373,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a2010">
+                        i18nKey="a2010"
+                        order="1500">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -353,7 +383,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
                         type="single"
                         syntax="number"
-                        i18nKey="a2011">
+                        i18nKey="a2011"
+                        order="1600">
                             <DefaultValues>
                         <Value>10</Value>
                         </DefaultValues>
@@ -362,7 +393,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a2014a">
+                        i18nKey="a2014a"
+                        order="2000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -376,7 +408,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2015">
+                        i18nKey="a2015"
+                        order="2100">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -385,7 +418,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2016">
+                        i18nKey="a2016"
+                        order="2200">
                         <DefaultValues>
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
@@ -394,7 +428,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2017">
+                        i18nKey="a2017"
+                        order="2300">
                         <DefaultValues>
                             <Value>organizationalPerson</Value>
                             <Value>inetorgperson</Value>
@@ -407,7 +442,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20171">
+                        i18nKey="a20171"
+                        order="2400">
                         <DefaultValues>
                             <Value>adminRole</Value>
                             <Value>authorityRevocationList</Value>
@@ -435,7 +471,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a201711">
+                        i18nKey="a201711"
+                        order="2500">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>sn</Value>
@@ -445,7 +482,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
                         type="single"
                         syntax="string"
-                        i18nKey="a20172">
+                        i18nKey="a20172"
+                        order="2600">
                         <DefaultValues>
                             <Value>inetuserstatus</Value>
                         </DefaultValues>
@@ -454,7 +492,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-active"
                        type="single"
                        syntax="string"
-                       i18nKey="a20173">
+                       i18nKey="a20173"
+                       order="2700">
                        <DefaultValues>
                            <Value>Active</Value>
                        </DefaultValues>
@@ -463,7 +502,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
                        type="single"
                        syntax="string"
-                       i18nKey="a20174">
+                       i18nKey="a20174"
+                       order="2800">
                        <DefaultValues>
                            <Value>Inactive</Value>
                        </DefaultValues>
@@ -472,7 +512,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2018">
+                        i18nKey="a2018"
+                        order="2900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -481,7 +522,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2019">
+                        i18nKey="a2019"
+                        order="3000">
                         <DefaultValues>
                             <Value>(objectclass=groupOfUniqueNames)</Value>
                         </DefaultValues>
@@ -490,7 +532,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2020">
+                        i18nKey="a2020"
+                        order="3100">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -499,7 +542,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2021">
+                        i18nKey="a2021"
+                        order="3200">
                         <DefaultValues>
                             <Value>groups</Value>
                         </DefaultValues>
@@ -508,7 +552,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2022">
+                        i18nKey="a2022"
+                        order="3300">
                         <DefaultValues>
                             <Value>groupofuniquenames</Value>
                             <Value>top</Value>
@@ -518,7 +563,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20221">
+                        i18nKey="a20221"
+                        order="3400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>description</Value>
@@ -532,13 +578,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
                         type="single"
                         syntax="string"
-                        i18nKey="a2023">
+                        i18nKey="a2023"
+                        order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
                         type="single"
                         syntax="string"
-                        i18nKey="a2024">
+                        i18nKey="a2024"
+                        order="3600">
                         <DefaultValues>
                             <Value>uniqueMember</Value>
                         </DefaultValues>
@@ -547,7 +595,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberurl"
                         type="single"
                         syntax="string"
-                        i18nKey="a2025">
+                        i18nKey="a2025"
+                        order="3700">
                         <DefaultValues>
                             <Value>memberUrl</Value>
                         </DefaultValues>
@@ -556,7 +605,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-dftgroupmember"
                         type="single"
                         syntax="string"
-                        i18nKey="a20251">
+                        i18nKey="a20251"
+                        order="3800">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-roles-search-attribute"
@@ -655,19 +705,22 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2034">
+                        i18nKey="a2034"
+                        order="5000">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2035">
+                        i18nKey="a2035"
+                        order="5100">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20386">
+                        i18nKey="a20386"
+                        order="5200">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -676,7 +729,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
                         type="single"
                         syntax="string"
-                        i18nKey="a2043">
+                        i18nKey="a2043"
+                        order="5500">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -685,7 +739,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a20431">
+                        i18nKey="a20431"
+                        order="5600">
                         <DefaultValues>
                             <Value>(objectclass=*)</Value>
                         </DefaultValues>
@@ -694,7 +749,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20432">
+                        i18nKey="a20432"
+                        order="5700">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -708,7 +764,8 @@
                     <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
                         type="single"
                         syntax="number"
-                        i18nKey="a2046">
+                        i18nKey="a2046"
+                        order="5800">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -723,7 +780,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a2062">
+                        i18nKey="a2062"
+                        order="5900">
                         <DefaultValues>
                             <Value>false</Value>
                         </DefaultValues>
@@ -732,7 +790,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2063">
+                        i18nKey="a2063"
+                        order="6000">
                         <DefaultValues>
                             <Value>1500</Value>
                         </DefaultValues>
@@ -761,7 +820,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2013">
+                        i18nKey = "a2013"
+                        order="1700">
                         <DefaultValues>
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
@@ -770,14 +830,16 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                     </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a2014">
+                        i18nKey="a2014"
+                        order="1900">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -811,7 +873,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a2000">
+                        i18nKey="a2000"
+                        order="600">
                         <DefaultValues>
                             <Value>@DIRECTORY_SERVER@:@DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -820,7 +883,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
                         type="single"
                         syntax="string"
-                        i18nKey="a2003">
+                        i18nKey="a2003"
+                        order="700">
                         <DefaultValues>
                             <Value>cn=dsameuser,ou=DSAME Users,@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -829,13 +893,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
-                        i18nKey="a2004">
+                        i18nKey="a2004"
+                        order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a20091">
+                        i18nKey="a20091"
+                        order="1300">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -843,7 +909,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20092">
+                        i18nKey="a20092"
+                        order="1400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a200921">SECONDS</ChoiceValue>
                             <ChoiceValue i18nKey="a200922">MINUTES</ChoiceValue>
@@ -858,7 +925,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2006">
+                        i18nKey = "a2006"
+                        order="900">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -867,7 +935,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20071">
+                        i18nKey="a20071"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
@@ -881,7 +950,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a200731">
+                                     i18nKey="a200731"
+                                     order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
                             <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
@@ -904,7 +974,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2009">
+                        i18nKey="a2009"
+                        order="1200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -913,7 +984,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a2010">
+                        i18nKey="a2010"
+                        order="1500">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -922,7 +994,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
                         type="single"
                         syntax="number"
-                        i18nKey="a2011">
+                        i18nKey="a2011"
+                        order="1600">
                             <DefaultValues>
                         <Value>10</Value>
                         </DefaultValues>
@@ -931,7 +1004,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a2014a">
+                        i18nKey="a2014a"
+                        order="2000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -945,7 +1019,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2015">
+                        i18nKey="a2015"
+                        order="2100">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -954,7 +1029,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2016">
+                        i18nKey="a2016"
+                        order="2200">
                         <DefaultValues>
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
@@ -963,7 +1039,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2017">
+                        i18nKey="a2017"
+                        order="2300">
                         <DefaultValues>
                             <Value>inetadmin</Value>
                             <Value>inetorgperson</Value>
@@ -990,7 +1067,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20171">
+                        i18nKey="a20171"
+                        order="2400">
                         <DefaultValues>
                             <Value>adminRole</Value>
                             <Value>authorityRevocationList</Value>
@@ -1091,7 +1169,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a201711">
+                        i18nKey="a201711"
+                        order="2500">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>sn</Value>
@@ -1101,7 +1180,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
                         type="single"
                         syntax="string"
-                        i18nKey="a20172">
+                        i18nKey="a20172"
+                        order="2600">
                         <DefaultValues>
                             <Value>inetuserstatus</Value>
                         </DefaultValues>
@@ -1110,7 +1190,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-active"
                        type="single"
                        syntax="string"
-                       i18nKey="a20173">
+                       i18nKey="a20173"
+                       order="2700">
                        <DefaultValues>
                            <Value>Active</Value>
                        </DefaultValues>
@@ -1119,7 +1200,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
                        type="single"
                        syntax="string"
-                       i18nKey="a20174">
+                       i18nKey="a20174"
+                       order="2800">
                        <DefaultValues>
                            <Value>Inactive</Value>
                        </DefaultValues>
@@ -1128,7 +1210,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2018">
+                        i18nKey="a2018"
+                        order="2900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -1137,7 +1220,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2019">
+                        i18nKey="a2019"
+                        order="3000">
                         <DefaultValues>
                             <Value>(objectclass=groupOfUniqueNames)</Value>
                         </DefaultValues>
@@ -1146,7 +1230,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2020">
+                        i18nKey="a2020"
+                        order="3100">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -1155,7 +1240,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2021">
+                        i18nKey="a2021"
+                        order="3200">
                         <DefaultValues>
                             <Value>groups</Value>
                         </DefaultValues>
@@ -1164,7 +1250,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2022">
+                        i18nKey="a2022"
+                        order="3300">
                         <DefaultValues>
                             <Value>groupofuniquenames</Value>
                             <Value>groupofurls</Value>
@@ -1177,7 +1264,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20221">
+                        i18nKey="a20221"
+                        order="3400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>dn</Value>
@@ -1190,13 +1278,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
                         type="single"
                         syntax="string"
-                        i18nKey="a2023">
+                        i18nKey="a2023"
+                        order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
                         type="single"
                         syntax="string"
-                        i18nKey="a2024">
+                        i18nKey="a2024"
+                        order="3600">
                         <DefaultValues>
                             <Value>uniqueMember</Value>
                         </DefaultValues>
@@ -1205,7 +1295,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberurl"
                         type="single"
                         syntax="string"
-                        i18nKey="a2025">
+                        i18nKey="a2025"
+                        order="3700">
                         <DefaultValues>
                             <Value>memberUrl</Value>
                         </DefaultValues>
@@ -1214,7 +1305,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-roles-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2026">
+                        i18nKey="a2026"
+                        order="3900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -1223,7 +1315,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-roles-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2027">
+                        i18nKey="a2027"
+                        order="4000">
                         <DefaultValues>
                             <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsmanagedroledefinition))</Value>
                         </DefaultValues>
@@ -1246,7 +1339,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-role-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2029">
+                        i18nKey="a2029"
+                        order="4100">
                         <DefaultValues>
                             <Value>ldapsubentry</Value>
                             <Value>nsmanagedroledefinition</Value>
@@ -1259,7 +1353,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-role-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a202902">
+                        i18nKey="a202902"
+                        order="4200">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -1268,7 +1363,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-filterroles-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a202904">
+                        i18nKey="a202904"
+                        order="4300">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -1277,7 +1373,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-filterroles-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a202905">
+                        i18nKey="a202905"
+                        order="4400">
                         <DefaultValues>
                             <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsfilteredroledefinition))</Value>
                         </DefaultValues>
@@ -1286,7 +1383,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-filterrole-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a20291">
+                        i18nKey="a20291"
+                        order="4500">
                         <DefaultValues>
                             <Value>ldapsubentry</Value>
                             <Value>nscomplexroledefinition</Value>
@@ -1298,7 +1396,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-filterrole-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20292">
+                        i18nKey="a20292"
+                        order="4600">
                         <DefaultValues>
                             <Value>nsRoleFilter</Value>
                         </DefaultValues>
@@ -1307,7 +1406,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-nsrole"
                         type="single"
                         syntax="string"
-                        i18nKey="a2030">
+                        i18nKey="a2030"
+                        order="4700">
                         <DefaultValues>
                             <Value>nsrole</Value>
                         </DefaultValues>
@@ -1316,7 +1416,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-nsroledn"
                         type="single"
                         syntax="string"
-                        i18nKey="a2031">
+                        i18nKey="a2031"
+                        order="4800">
                         <DefaultValues>
                             <Value>nsRoleDN</Value>
                         </DefaultValues>
@@ -1325,7 +1426,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-nsrolefilter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2032">
+                        i18nKey="a2032"
+                        order="4900">
                         <DefaultValues>
                             <Value>nsRoleFilter</Value>
                         </DefaultValues>
@@ -1334,7 +1436,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2034">
+                        i18nKey="a2034"
+                        order="5000">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -1343,7 +1446,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2035">
+                        i18nKey="a2035"
+                        order="5100">
                         <DefaultValues>
                             <Value>people</Value>
                         </DefaultValues>
@@ -1352,7 +1456,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20386">
+                        i18nKey="a20386"
+                        order="5200">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -1361,7 +1466,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-attr"
                         type="list"
                         syntax="string"
-                        i18nKey="a20387">
+                        i18nKey="a20387"
+                        order="5300">
                         <DefaultValues>
                             <Value>kbaInfo</Value>
                         </DefaultValues>
@@ -1370,7 +1476,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-index-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20388">
+                        i18nKey="a20388"
+                        order="5400">
                         <DefaultValues>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
@@ -1379,7 +1486,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
                         type="single"
                         syntax="string"
-                        i18nKey="a2043">
+                        i18nKey="a2043"
+                        order="5500">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -1388,7 +1496,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a20431">
+                        i18nKey="a20431"
+                        order="5600">
                         <DefaultValues>
                             <Value>(objectclass=*)</Value>
                         </DefaultValues>
@@ -1397,7 +1506,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20432">
+                        i18nKey="a20432"
+                        order="5700">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -1411,7 +1521,8 @@
                     <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
                         type="single"
                         syntax="number"
-                        i18nKey="a2046">
+                        i18nKey="a2046"
+                        order="5800">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -1426,7 +1537,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a2062">
+                        i18nKey="a2062"
+                        order="5900">
                         <DefaultValues>
                             <Value>true</Value>
                         </DefaultValues>
@@ -1434,7 +1546,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2063">
+                        i18nKey="a2063"
+                        order="6000">
                         <DefaultValues>
                             <Value>1500</Value>
                         </DefaultValues>
@@ -1463,7 +1576,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2013">
+                        i18nKey = "a2013"
+                        order="1700">
                         <DefaultValues>
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
@@ -1472,14 +1586,16 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                     </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a2014">
+                        i18nKey="a2014"
+                        order="1900">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -1511,7 +1627,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a2000">
+                        i18nKey="a2000"
+                        order="600">
                         <DefaultValues>
                             <Value>@DIRECTORY_SERVER@:@DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -1520,19 +1637,22 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
                         type="single"
                         syntax="string"
-                        i18nKey="a2003">
+                        i18nKey="a2003"
+                        order="700">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
-                        i18nKey="a2004">
+                        i18nKey="a2004"
+                        order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a20091">
+                        i18nKey="a20091"
+                        order="1300">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -1540,7 +1660,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20092">
+                        i18nKey="a20092"
+                        order="1400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a200921">SECONDS</ChoiceValue>
                             <ChoiceValue i18nKey="a200922">MINUTES</ChoiceValue>
@@ -1556,7 +1677,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2006">
+                        i18nKey = "a2006"
+                        order="900">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -1565,7 +1687,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20071">
+                        i18nKey="a20071"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
@@ -1579,7 +1702,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a200731">
+                                     i18nKey="a200731"
+                                     order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
                             <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
@@ -1602,7 +1726,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2009">
+                        i18nKey="a2009"
+                        order="1200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -1611,7 +1736,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a2010">
+                        i18nKey="a2010"
+                        order="1500">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -1620,7 +1746,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
                         type="single"
                         syntax="number"
-                        i18nKey="a2011">
+                        i18nKey="a2011"
+                        order="1600">
                             <DefaultValues>
                         <Value>10</Value>
                         </DefaultValues>
@@ -1629,7 +1756,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a2014a">
+                        i18nKey="a2014a"
+                        order="2000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -1643,7 +1771,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2015">
+                        i18nKey="a2015"
+                        order="2100">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -1652,7 +1781,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2016">
+                        i18nKey="a2016"
+                        order="2200">
                         <DefaultValues>
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
@@ -1661,7 +1791,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2017">
+                        i18nKey="a2017"
+                        order="2300">
                         <DefaultValues>
                             <Value>inetorgperson</Value>
                             <Value>inetuser</Value>
@@ -1687,7 +1818,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20171">
+                        i18nKey="a20171"
+                        order="2400">
                         <DefaultValues>
                             <Value>adminRole</Value>
                             <Value>authorityRevocationList</Value>
@@ -1787,7 +1919,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a201711">
+                        i18nKey="a201711"
+                        order="2500">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>sn</Value>
@@ -1797,7 +1930,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
                         type="single"
                         syntax="string"
-                        i18nKey="a20172">
+                        i18nKey="a20172"
+                        order="2600">
                         <DefaultValues>
                             <Value>inetuserstatus</Value>
                         </DefaultValues>
@@ -1806,7 +1940,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-active"
                        type="single"
                        syntax="string"
-                       i18nKey="a20173">
+                       i18nKey="a20173"
+                       order="2700">
                        <DefaultValues>
                            <Value>Active</Value>
                        </DefaultValues>
@@ -1815,7 +1950,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
                        type="single"
                        syntax="string"
-                       i18nKey="a20174">
+                       i18nKey="a20174"
+                       order="2800">
                        <DefaultValues>
                            <Value>Inactive</Value>
                        </DefaultValues>
@@ -1824,7 +1960,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2018">
+                        i18nKey="a2018"
+                        order="2900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -1833,7 +1970,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2019">
+                        i18nKey="a2019"
+                        order="3000">
                         <DefaultValues>
                             <Value>(objectclass=groupOfUniqueNames)</Value>
                         </DefaultValues>
@@ -1842,7 +1980,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2020">
+                        i18nKey="a2020"
+                        order="3100">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -1851,7 +1990,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2021">
+                        i18nKey="a2021"
+                        order="3200">
                         <DefaultValues>
                             <Value>groups</Value>
                         </DefaultValues>
@@ -1860,7 +2000,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2022">
+                        i18nKey="a2022"
+                        order="3300">
                         <DefaultValues>
                             <Value>groupofuniquenames</Value>
                             <Value>top</Value>
@@ -1870,7 +2011,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20221">
+                        i18nKey="a20221"
+                        order="3400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>dn</Value>
@@ -1882,13 +2024,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
                         type="single"
                         syntax="string"
-                        i18nKey="a2023">
+                        i18nKey="a2023"
+                        order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
                         type="single"
                         syntax="string"
-                        i18nKey="a2024">
+                        i18nKey="a2024"
+                        order="3600">
                         <DefaultValues>
                             <Value>uniqueMember</Value>
                         </DefaultValues>
@@ -1897,7 +2041,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberurl"
                         type="single"
                         syntax="string"
-                        i18nKey="a2025">
+                        i18nKey="a2025"
+                        order="3700">
                         <DefaultValues>
                             <Value>memberUrl</Value>
                         </DefaultValues>
@@ -1906,7 +2051,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2034">
+                        i18nKey="a2034"
+                        order="5000">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -1915,7 +2061,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2035">
+                        i18nKey="a2035"
+                        order="5100">
                         <DefaultValues>
                             <Value>people</Value>
                         </DefaultValues>
@@ -1924,7 +2071,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20386">
+                        i18nKey="a20386"
+                        order="5200">
                         <DefaultValues>
                             <Value>@USER_NAMING_ATTR@</Value>
                         </DefaultValues>
@@ -1933,7 +2081,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-attr"
                         type="list"
                         syntax="string"
-                        i18nKey="a20387">
+                        i18nKey="a20387"
+                        order="5300">
                         <DefaultValues>
                             <Value>kbaInfo</Value>
                         </DefaultValues>
@@ -1942,7 +2091,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-index-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20388">
+                        i18nKey="a20388"
+                        order="5400">
                         <DefaultValues>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
@@ -1951,7 +2101,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
                         type="single"
                         syntax="string"
-                        i18nKey="a2043">
+                        i18nKey="a2043"
+                        order="5500">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -1960,7 +2111,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a20431">
+                        i18nKey="a20431"
+                        order="5600">
                         <DefaultValues>
                             <Value>(objectclass=*)</Value>
                         </DefaultValues>
@@ -1969,7 +2121,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20432">
+                        i18nKey="a20432"
+                        order="5700">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -1983,7 +2136,8 @@
                     <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
                         type="single"
                         syntax="number"
-                        i18nKey="a2046">
+                        i18nKey="a2046"
+                        order="5800">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -1998,7 +2152,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a2062">
+                        i18nKey="a2062"
+                        order="5900">
                         <DefaultValues>
                             <Value>true</Value>
                         </DefaultValues>
@@ -2006,7 +2161,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2063">
+                        i18nKey="a2063"
+                        order="6000">
                         <DefaultValues>
                             <Value>1500</Value>
                         </DefaultValues>
@@ -2036,7 +2192,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2013">
+                        i18nKey = "a2013"
+                        order="1700">
                         <DefaultValues>
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
@@ -2045,14 +2202,16 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                     </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a2014">
+                        i18nKey="a2014"
+                        order="1900">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -2084,7 +2243,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a2000">
+                        i18nKey="a2000"
+                        order="600">
                         <DefaultValues>
                             <Value>@DIRECTORY_SERVER@:@DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -2093,19 +2253,22 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
                         type="single"
                         syntax="string"
-                        i18nKey="a2003">
+                        i18nKey="a2003"
+                        order="700">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
-                        i18nKey="a2004">
+                        i18nKey="a2004"
+                        order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a20091">
+                        i18nKey="a20091"
+                        order="1300">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -2113,7 +2276,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20092">
+                        i18nKey="a20092"
+                        order="1400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a200921">SECONDS</ChoiceValue>
                             <ChoiceValue i18nKey="a200922">MINUTES</ChoiceValue>
@@ -2129,7 +2293,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2006">
+                        i18nKey = "a2006"
+                        order="900">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -2138,7 +2303,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20071">
+                        i18nKey="a20071"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
@@ -2152,7 +2318,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a200731">
+                                     i18nKey="a200731"
+                                     order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
                             <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
@@ -2175,7 +2342,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2009">
+                        i18nKey="a2009"
+                        order="1200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -2184,7 +2352,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a2010">
+                        i18nKey="a2010"
+                        order="1500">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -2193,7 +2362,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
                         type="single"
                         syntax="number"
-                        i18nKey="a2011">
+                        i18nKey="a2011"
+                        order="1600">
                             <DefaultValues>
                         <Value>10</Value>
                         </DefaultValues>
@@ -2202,7 +2372,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a2014a">
+                        i18nKey="a2014a"
+                        order="2000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -2216,7 +2387,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2015">
+                        i18nKey="a2015"
+                        order="2100">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -2225,7 +2397,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2016">
+                        i18nKey="a2016"
+                        order="2200">
                         <DefaultValues>
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
@@ -2234,7 +2407,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2017">
+                        i18nKey="a2017"
+                        order="2300">
                         <DefaultValues>
                             <Value>inetorgperson</Value>
                             <Value>inetuser</Value>
@@ -2260,7 +2434,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20171">
+                        i18nKey="a20171"
+                        order="2400">
                         <DefaultValues>
                             <Value>adminRole</Value>
                             <Value>authorityRevocationList</Value>
@@ -2360,7 +2535,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a201711">
+                        i18nKey="a201711"
+                        order="2500">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>sn</Value>
@@ -2370,7 +2546,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
                         type="single"
                         syntax="string"
-                        i18nKey="a20172">
+                        i18nKey="a20172"
+                        order="2600">
                         <DefaultValues>
                             <Value>inetuserstatus</Value>
                         </DefaultValues>
@@ -2379,7 +2556,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-active"
                        type="single"
                        syntax="string"
-                       i18nKey="a20173">
+                       i18nKey="a20173"
+                       order="2700">
                        <DefaultValues>
                            <Value>Active</Value>
                        </DefaultValues>
@@ -2388,7 +2566,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
                        type="single"
                        syntax="string"
-                       i18nKey="a20174">
+                       i18nKey="a20174"
+                       order="2800">
                        <DefaultValues>
                            <Value>Inactive</Value>
                        </DefaultValues>
@@ -2397,7 +2576,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2018">
+                        i18nKey="a2018"
+                        order="2900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -2406,7 +2586,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2019">
+                        i18nKey="a2019"
+                        order="3000">
                         <DefaultValues>
                             <Value>(objectclass=groupOfNames)</Value>
                         </DefaultValues>
@@ -2415,7 +2596,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2020">
+                        i18nKey="a2020"
+                        order="3100">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -2424,13 +2606,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2021">
+                        i18nKey="a2021"
+                        order="3200">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2022">
+                        i18nKey="a2022"
+                        order="3300">
                         <DefaultValues>
                             <Value>groupofnames</Value>
                             <Value>top</Value>
@@ -2440,7 +2624,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20221">
+                        i18nKey="a20221"
+                        order="3400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>description</Value>
@@ -2454,13 +2639,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
                         type="single"
                         syntax="string"
-                        i18nKey="a2023">
+                        i18nKey="a2023"
+                        order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
                         type="single"
                         syntax="string"
-                        i18nKey="a2024">
+                        i18nKey="a2024"
+                        order="3600">
                         <DefaultValues>
                             <Value>member</Value>
                         </DefaultValues>
@@ -2469,13 +2656,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-dftgroupmember"
                         type="single"
                         syntax="string"
-                        i18nKey="a20251">
+                        i18nKey="a20251"
+                        order="3800">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2034">
+                        i18nKey="a2034"
+                        order="5000">
                         <DefaultValues>
                             <Value>ou</Value>
                         </DefaultValues>
@@ -2484,13 +2673,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2035">
+                        i18nKey="a2035"
+                        order="5100">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20386">
+                        i18nKey="a20386"
+                        order="5200">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -2499,7 +2690,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-attr"
                         type="list"
                         syntax="string"
-                        i18nKey="a20387">
+                        i18nKey="a20387"
+                        order="5300">
                         <DefaultValues>
                             <Value>kbaInfo</Value>
                         </DefaultValues>
@@ -2508,7 +2700,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-index-attr"
                         type="list"
                         syntax="string"
-                        i18nKey="a20388">
+                        i18nKey="a20388"
+                        order="5400">
                         <DefaultValues>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
@@ -2517,7 +2710,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
                         type="single"
                         syntax="string"
-                        i18nKey="a2043">
+                        i18nKey="a2043"
+                        order="5500">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -2526,7 +2720,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a20431">
+                        i18nKey="a20431"
+                        order="5600">
                         <DefaultValues>
                             <Value>(objectclass=*)</Value>
                         </DefaultValues>
@@ -2535,7 +2730,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20432">
+                        i18nKey="a20432"
+                        order="5700">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -2549,7 +2745,8 @@
                     <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
                         type="single"
                         syntax="number"
-                        i18nKey="a2046">
+                        i18nKey="a2046"
+                        order="5800">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -2564,7 +2761,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a2062">
+                        i18nKey="a2062"
+                        order="5900">
                         <DefaultValues>
                             <Value>true</Value>
                         </DefaultValues>
@@ -2572,7 +2770,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2063">
+                        i18nKey="a2063"
+                        order="6000">
                         <DefaultValues>
                             <Value>1500</Value>
                         </DefaultValues>
@@ -2602,7 +2801,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2013">
+                        i18nKey = "a2013"
+                        order="1700">
                         <DefaultValues>
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
@@ -2611,7 +2811,8 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                         <DefaultValues>
                             <Value>userPassword=unicodePwd</Value>
                         </DefaultValues>
@@ -2621,7 +2822,8 @@
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a2014">
+                        i18nKey="a2014"
+                        order="1900">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -2653,7 +2855,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a2000">
+                        i18nKey="a2000"
+                        order="600">
                         <DefaultValues>
                             <Value>@DIRECTORY_SERVER@:@DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -2662,7 +2865,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
                         type="single"
                         syntax="string"
-                        i18nKey="a2003">
+                        i18nKey="a2003"
+                        order="700">
                         <DefaultValues>
                             <Value>CN=Administrator,CN=Users,@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -2671,13 +2875,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
-                        i18nKey="a2004">
+                        i18nKey="a2004"
+                        order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a20091">
+                        i18nKey="a20091"
+                        order="1300">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -2685,7 +2891,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20092">
+                        i18nKey="a20092"
+                        order="1400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a200921">SECONDS</ChoiceValue>
                             <ChoiceValue i18nKey="a200922">MINUTES</ChoiceValue>
@@ -2701,7 +2908,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2006">
+                        i18nKey = "a2006"
+                        order="900">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -2710,7 +2918,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20071">
+                        i18nKey="a20071"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
@@ -2724,7 +2933,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a200731">
+                                     i18nKey="a200731"
+                                     order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
                             <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
@@ -2747,7 +2957,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2009">
+                        i18nKey="a2009"
+                        order="1200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -2756,7 +2967,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a2010">
+                        i18nKey="a2010"
+                        order="1500">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -2765,7 +2977,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
                         type="single"
                         syntax="number"
-                        i18nKey="a2011">
+                        i18nKey="a2011"
+                        order="1600">
                             <DefaultValues>
                         <Value>10</Value>
                         </DefaultValues>
@@ -2774,7 +2987,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a2014a">
+                        i18nKey="a2014a"
+                        order="2000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -2788,7 +3002,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2015">
+                        i18nKey="a2015"
+                        order="2100">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -2797,7 +3012,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2016">
+                        i18nKey="a2016"
+                        order="2200">
                         <DefaultValues>
                             <Value>(objectclass=person)</Value>
                         </DefaultValues>
@@ -2806,7 +3022,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2017">
+                        i18nKey="a2017"
+                        order="2300">
                         <DefaultValues>
                             <Value>organizationalPerson</Value>
                             <Value>person</Value>
@@ -2818,7 +3035,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20171">
+                        i18nKey="a20171"
+                        order="2400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>dn</Value>
@@ -2916,7 +3134,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a201711">
+                        i18nKey="a201711"
+                        order="2500">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>sn</Value>
@@ -2926,7 +3145,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
                         type="single"
                         syntax="string"
-                        i18nKey="a20172">
+                        i18nKey="a20172"
+                        order="2600">
                         <DefaultValues>
                             <Value>userAccountControl</Value>
                         </DefaultValues>
@@ -2935,7 +3155,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-active"
                        type="single"
                        syntax="string"
-                       i18nKey="a20173">
+                       i18nKey="a20173"
+                       order="2700">
                        <DefaultValues>
                            <Value>544</Value>
                        </DefaultValues>
@@ -2944,7 +3165,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
                        type="single"
                        syntax="string"
-                       i18nKey="a20174">
+                       i18nKey="a20174"
+                       order="2800">
                        <DefaultValues>
                            <Value>546</Value>
                        </DefaultValues>
@@ -2953,7 +3175,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2018">
+                        i18nKey="a2018"
+                        order="2900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -2962,7 +3185,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2019">
+                        i18nKey="a2019"
+                        order="3000">
                         <DefaultValues>
                             <Value>(objectclass=group)</Value>
                         </DefaultValues>
@@ -2971,7 +3195,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2020">
+                        i18nKey="a2020"
+                        order="3100">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -2980,7 +3205,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2021">
+                        i18nKey="a2021"
+                        order="3200">
                         <DefaultValues>
                             <Value>users</Value>
                         </DefaultValues>
@@ -2989,7 +3215,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2022">
+                        i18nKey="a2022"
+                        order="3300">
                         <DefaultValues>
                             <Value>group</Value>
                             <Value>top</Value>
@@ -2999,7 +3226,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20221">
+                        i18nKey="a20221"
+                        order="3400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>dn</Value>
@@ -3016,13 +3244,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
                         type="single"
                         syntax="string"
-                        i18nKey="a2023">
+                        i18nKey="a2023"
+                        order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
                         type="single"
                         syntax="string"
-                        i18nKey="a2024">
+                        i18nKey="a2024"
+                        order="3600">
                         <DefaultValues>
                             <Value>member</Value>
                         </DefaultValues>
@@ -3031,7 +3261,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2034">
+                        i18nKey="a2034"
+                        order="5000">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -3040,7 +3271,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2035">
+                        i18nKey="a2035"
+                        order="5100">
                         <DefaultValues>
                             <Value>users</Value>
                         </DefaultValues>
@@ -3049,7 +3281,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20386">
+                        i18nKey="a20386"
+                        order="5200">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -3058,7 +3291,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-attr"
                         type="list"
                         syntax="string"
-                        i18nKey="a20387">
+                        i18nKey="a20387"
+                        order="5300">
                         <DefaultValues>
                             <Value>kbaInfo</Value>
                         </DefaultValues>
@@ -3067,7 +3301,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-index-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20388">
+                        i18nKey="a20388"
+                        order="5400">
                         <DefaultValues>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
@@ -3076,7 +3311,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
                         type="single"
                         syntax="string"
-                        i18nKey="a2043">
+                        i18nKey="a2043"
+                        order="5500">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -3085,7 +3321,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20432">
+                        i18nKey="a20432"
+                        order="5700">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -3099,7 +3336,8 @@
                     <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
                         type="single"
                         syntax="number"
-                        i18nKey="a2046">
+                        i18nKey="a2046"
+                        order="5800">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -3114,7 +3352,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a2062">
+                        i18nKey="a2062"
+                        order="5900">
                         <DefaultValues>
                             <Value>false</Value>
                         </DefaultValues>
@@ -3122,7 +3361,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2063">
+                        i18nKey="a2063"
+                        order="6000">
                         <DefaultValues>
                             <Value>1500</Value>
                         </DefaultValues>
@@ -3151,7 +3391,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2013">
+                        i18nKey = "a2013"
+                        order="1700">
                         <DefaultValues>
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
@@ -3160,7 +3401,8 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                         <DefaultValues>
                             <Value>userPassword=unicodePwd</Value>
                         </DefaultValues>
@@ -3170,7 +3412,8 @@
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a2014">
+                        i18nKey="a2014"
+                        order="1900">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -3202,7 +3445,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a2000">
+                        i18nKey="a2000"
+                        order="600">
                         <DefaultValues>
                             <Value>@DIRECTORY_SERVER@:@DIRECTORY_PORT@</Value>
                         </DefaultValues>
@@ -3211,7 +3455,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
                         type="single"
                         syntax="string"
-                        i18nKey="a2003">
+                        i18nKey="a2003"
+                        order="700">
                         <DefaultValues>
                             <Value>CN=Administrator,CN=Users,@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -3220,13 +3465,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
-                        i18nKey="a2004">
+                        i18nKey="a2004"
+                        order="800">
                     </AttributeSchema>
 
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-interval"
                         type="single"
                         syntax="number"
-                        i18nKey="a20091">
+                        i18nKey="a20091"
+                        order="1300">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -3234,7 +3481,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20092">
+                        i18nKey="a20092"
+                        order="1400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a200921">SECONDS</ChoiceValue>
                             <ChoiceValue i18nKey="a200922">MINUTES</ChoiceValue>
@@ -3250,7 +3498,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a2006">
+                        i18nKey = "a2006"
+                        order="900">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -3259,7 +3508,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection-mode"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20071">
+                        i18nKey="a20071"
+                        order="1000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a20072">LDAP</ChoiceValue>
                             <ChoiceValue i18nKey="a20073">LDAPS</ChoiceValue>
@@ -3273,7 +3523,8 @@
                     <AttributeSchema name="openam-idrepo-ldapv3-config-secure-protocol-version"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a200731">
+                                     i18nKey="a200731"
+                                     order="1100">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2007311">TLSv1</ChoiceValue>
                             <ChoiceValue i18nKey="a2007312">TLSv1.1</ChoiceValue>
@@ -3296,7 +3547,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2009">
+                        i18nKey="a2009"
+                        order="1200">
                         <DefaultValues>
                             <Value>10</Value>
                         </DefaultValues>
@@ -3305,7 +3557,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a2010">
+                        i18nKey="a2010"
+                        order="1500">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -3314,7 +3567,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
                         type="single"
                         syntax="number"
-                        i18nKey="a2011">
+                        i18nKey="a2011"
+                        order="1600">
                             <DefaultValues>
                         <Value>10</Value>
                         </DefaultValues>
@@ -3323,7 +3577,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a2014a">
+                        i18nKey="a2014a"
+                        order="2000">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -3337,7 +3592,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2015">
+                        i18nKey="a2015"
+                        order="2100">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -3346,7 +3602,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2016">
+                        i18nKey="a2016"
+                        order="2200">
                         <DefaultValues>
                             <Value>(objectclass=person)</Value>
                         </DefaultValues>
@@ -3355,7 +3612,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2017">
+                        i18nKey="a2017"
+                        order="2300">
                         <DefaultValues>
                             <Value>iplanet-am-auth-configuration-service</Value>
                             <Value>iplanet-am-managed-person</Value>
@@ -3380,7 +3638,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20171">
+                        i18nKey="a20171"
+                        order="2400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>dn</Value>
@@ -3477,7 +3736,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a201711">
+                        i18nKey="a201711"
+                        order="2500">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>sn</Value>
@@ -3487,7 +3747,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
                         type="single"
                         syntax="string"
-                        i18nKey="a20172">
+                        i18nKey="a20172"
+                        order="2600">
                         <DefaultValues>
                             <Value>msDS-UserAccountDisabled</Value>
                         </DefaultValues>
@@ -3496,7 +3757,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-active"
                        type="single"
                        syntax="string"
-                       i18nKey="a20173">
+                       i18nKey="a20173"
+                       order="2700">
                        <DefaultValues>
                            <Value>FALSE</Value>
                        </DefaultValues>
@@ -3505,7 +3767,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
                        type="single"
                        syntax="string"
-                       i18nKey="a20174">
+                       i18nKey="a20174"
+                       order="2800">
                        <DefaultValues>
                            <Value>TRUE</Value>
                        </DefaultValues>
@@ -3514,7 +3777,8 @@
                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a2018">
+                        i18nKey="a2018"
+                        order="2900">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -3523,7 +3787,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
                         type="single"
                         syntax="string"
-                        i18nKey="a2019">
+                        i18nKey="a2019"
+                        order="3000">
                         <DefaultValues>
                             <Value>(objectclass=group)</Value>
                         </DefaultValues>
@@ -3532,19 +3797,22 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2020">
+                        i18nKey="a2020"
+                        order="3100">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2021">
+                        i18nKey="a2021"
+                        order="3200">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
                         type="list"
                         syntax="string"
-                        i18nKey="a2022">
+                        i18nKey="a2022"
+                        order="3300">
                         <DefaultValues>
                             <Value>group</Value>
                             <Value>top</Value>
@@ -3554,7 +3822,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a20221">
+                        i18nKey="a20221"
+                        order="3400">
                         <DefaultValues>
                             <Value>cn</Value>
                             <Value>dn</Value>
@@ -3571,13 +3840,15 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
                         type="single"
                         syntax="string"
-                        i18nKey="a2023">
+                        i18nKey="a2023"
+                        order="3500">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
                         type="single"
                         syntax="string"
-                        i18nKey="a2024">
+                        i18nKey="a2024"
+                        order="3600">
                         <DefaultValues>
                             <Value>member</Value>
                         </DefaultValues>
@@ -3586,19 +3857,22 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
-                        i18nKey="a2034">
+                        i18nKey="a2034"
+                        order="5000">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
                         type="single"
                         syntax="string"
-                        i18nKey="a2035">
+                        i18nKey="a2035"
+                        order="5100">
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20386">
+                        i18nKey="a20386"
+                        order="5200">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -3607,7 +3881,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-attr"
                         type="list"
                         syntax="string"
-                        i18nKey="a20387">
+                        i18nKey="a20387"
+                        order="5300">
                         <DefaultValues>
                             <Value>kbaInfo</Value>
                         </DefaultValues>
@@ -3616,7 +3891,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-auth-kba-index-attr"
                         type="single"
                         syntax="string"
-                        i18nKey="a20388">
+                        i18nKey="a20388"
+                        order="5400">
                         <DefaultValues>
                             <Value>kbaActiveIndex</Value>
                         </DefaultValues>
@@ -3625,7 +3901,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
                         type="single"
                         syntax="string"
-                        i18nKey="a2043">
+                        i18nKey="a2043"
+                        order="5500">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
@@ -3634,7 +3911,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a20432">
+                        i18nKey="a20432"
+                        order="5700">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
                             <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
@@ -3648,7 +3926,8 @@
                     <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
                         type="single"
                         syntax="number"
-                        i18nKey="a2046">
+                        i18nKey="a2046"
+                        order="5800">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -3663,7 +3942,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a2062">
+                        i18nKey="a2062"
+                        order="5900">
                         <DefaultValues>
                             <Value>false</Value>
                         </DefaultValues>
@@ -3671,7 +3951,8 @@
                     <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
                         type="single"
                         syntax="number"
-                        i18nKey="a2063">
+                        i18nKey="a2063"
+                        order="6000">
                         <DefaultValues>
                             <Value>1500</Value>
                         </DefaultValues>
@@ -3693,7 +3974,8 @@
                         syntax = "string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey = "a3010">
+                        i18nKey = "a3010"
+                        order="6100">
                         <DefaultValues>
                             <Value>com.sun.identity.idm.plugins.files.FilesRepo</Value>
                         </DefaultValues>
@@ -3702,7 +3984,8 @@
                         type="single"
                         syntax="string"
                         validator="RequiredValueValidator"
-                        i18nKey="a3020">
+                        i18nKey="a3020"
+                        order="6200">
                         <DefaultValues>
                             <Value>@BASE_DIR@/@SERVER_URI@/idRepo/flatfiles</Value>
                         </DefaultValues>
@@ -3710,7 +3993,8 @@
                     <AttributeSchema name="sunFilesMonitorForChanges"
                         type="single"
                         syntax="boolean"
-                        i18nKey="a3022">
+                        i18nKey="a3022"
+                        order="6300">
                         <DefaultValues>
                             <Value>true</Value>
                         </DefaultValues>
@@ -3718,7 +4002,8 @@
                     <AttributeSchema name="sunFilesMonitoringTime"
                         type="single"
                         syntax="string"
-                        i18nKey="a3024">
+                        i18nKey="a3024"
+                        order="6400">
                         <DefaultValues>
                             <Value>1</Value>
                         </DefaultValues>
@@ -3726,7 +4011,8 @@
                     <AttributeSchema name="sunFilesObjectClasses"
                         type="list"
                         syntax="string"
-                        i18nKey="a3026">
+                        i18nKey="a3026"
+                        order="6500">
                         <DefaultValues>
                             <Value>inetorgperson</Value>
                             <Value>inetUser</Value>
@@ -3738,7 +4024,8 @@
                     <AttributeSchema name="sunFilesPasswordAttr"
                         type="single"
                         syntax="string"
-                        i18nKey="a3030">
+                        i18nKey="a3030"
+                        order="6600">
                         <DefaultValues>
                             <Value>userPassword</Value>
                         </DefaultValues>
@@ -3746,7 +4033,8 @@
                     <AttributeSchema name="sunFilesStatusAttr"
                         type="single"
                         syntax="string"
-                        i18nKey="a3040">
+                        i18nKey="a3040"
+                        order="6700">
                         <DefaultValues>
                             <Value>inetUserStatus</Value>
                         </DefaultValues>
@@ -3754,7 +4042,8 @@
                     <AttributeSchema name="sunFilesHashAttrs"
                         type="list"
                         syntax="string"
-                        i18nKey="a3050">
+                        i18nKey="a3050"
+                        order="6800">
                         <DefaultValues>
                             <Value>userPassword</Value>
                         </DefaultValues>
@@ -3762,7 +4051,8 @@
                     <AttributeSchema name="sunFilesEncryptAttrs"
                         type="list"
                         syntax="string"
-                        i18nKey="a3060">
+                        i18nKey="a3060"
+                        order="6900">
                     </AttributeSchema>
                 </SubSchema>
 
@@ -3787,7 +4077,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4010">
+                        i18nKey="a4010"
+                        order="7000">
                         <DefaultValues>
                             <Value>com.sun.identity.idm.plugins.database.DatabaseRepo</Value>
                         </DefaultValues>
@@ -3795,7 +4086,8 @@
                     <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
-                        i18nKey="a20131">
+                        i18nKey="a20131"
+                        order="1800">
                             <DefaultValues>
                               <Value>iplanet-am-user-account-life=iplanet_am_user_account_life</Value>
                               <Value>iplanet-am-user-auth-config=iplanet_am_user_auth_config</Value>
@@ -3811,7 +4103,8 @@
                         type="list"
                         syntax="string"
                         validator="validatatorClass for verifying this list against supported list"
-                        i18nKey="a4014">
+                        i18nKey="a4014"
+                        order="7100">
                         <DefaultValues>
                             <!-- IdRepos can provide the object types
                                it can manage and the operations that can
@@ -3837,7 +4130,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4016">
+                        i18nKey="a4016"
+                        order="7200">
                         <DefaultValues>
                             <Value>com.sun.identity.idm.plugins.database.JdbcSimpleUserDao</Value>
                         </DefaultValues>
@@ -3845,7 +4139,8 @@
                     <AttributeSchema name="sun-opensso-database-dao-JDBCConnectionType"
                         type="single_choice"
                         syntax="string"
-                        i18nKey="a4018">
+                        i18nKey="a4018"
+                        order="7300">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="a4018choiceJNDI">JNDI</ChoiceValue>
                             <ChoiceValue i18nKey="a4018choiceURL">JDBC</ChoiceValue>
@@ -3859,7 +4154,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4020">
+                        i18nKey="a4020"
+                        order="7400">
                         <DefaultValues>
                             <Value>java:comp/env/jdbc/openssousersdb</Value>
                         </DefaultValues>
@@ -3867,7 +4163,8 @@
                     <AttributeSchema name="sun-opensso-database-JDBCDriver"
                         type="single"
                         syntax="string"
-                        i18nKey="a4022">
+                        i18nKey="a4022"
+                        order="7500">
                         <DefaultValues>
                             <Value>com.mysql.jdbc.Driver</Value>
                         </DefaultValues>
@@ -3875,7 +4172,8 @@
                     <AttributeSchema name="sun-opensso-database-JDBCUrl"
                         type="single"
                         syntax="string"
-                        i18nKey="a4022JdbcURL">
+                        i18nKey="a4022JdbcURL"
+                        order="7700">
                         <DefaultValues>
                             <Value>jdbc:mysql://127.0.0.1:3306/test</Value>
                         </DefaultValues>
@@ -3883,7 +4181,8 @@
                     <AttributeSchema name="sun-opensso-database-JDBCDbuser"
                         type="single"
                         syntax="string"
-                        i18nKey="a4022JdbcUserName">
+                        i18nKey="a4022JdbcUserName"
+                        order="7800">
                         <DefaultValues>
                             <Value>root</Value>
                         </DefaultValues>
@@ -3891,13 +4190,15 @@
                     <AttributeSchema name="sun-opensso-database-JDBCDbpassword"
                         type="single"
                         syntax="password"
-                        i18nKey="a4022JdbcPassword" />
+                        i18nKey="a4022JdbcPassword"
+                        order="7600" />
                     <AttributeSchema name="sun-opensso-database-UserTableName"
                         type="single"
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4025">
+                        i18nKey="a4025"
+                        order="7900">
                         <DefaultValues>
                             <Value>opensso_users</Value>
                         </DefaultValues>
@@ -3907,7 +4208,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4100">
+                        i18nKey="a4100"
+                        order="8000">
                         <DefaultValues>
                             <Value>uid</Value>
                             <Value>givenname</Value>
@@ -3940,7 +4242,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4105">
+                        i18nKey="a4105"
+                        order="8100">
                         <DefaultValues>
                             <Value>userpassword</Value>
                         </DefaultValues>
@@ -3950,7 +4253,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4107">
+                        i18nKey="a4107"
+                        order="8200">
                         <DefaultValues>
                             <Value>uid</Value>
                         </DefaultValues>
@@ -3960,7 +4264,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4110">
+                        i18nKey="a4110"
+                        order="8300">
                         <DefaultValues>
                             <Value>inetuserstatus</Value>
                         </DefaultValues>
@@ -3970,7 +4275,8 @@
                        syntax="string"
                        any="required"
                        validator="RequiredValueValidator"
-                       i18nKey="a4115">
+                       i18nKey="a4115"
+                       order="8400">
                        <DefaultValues>
                            <Value>Active</Value>
                        </DefaultValues>
@@ -3980,7 +4286,8 @@
                        syntax="string"
                        any="required"
                        validator="RequiredValueValidator"
-                       i18nKey="a4120">
+                       i18nKey="a4120"
+                       order="8500">
                        <DefaultValues>
                            <Value>Inactive</Value>
                        </DefaultValues>
@@ -3988,7 +4295,8 @@
                    <AttributeSchema name="sun-opensso-database-config-max-result"
                         type="single"
                         syntax="number"
-                        i18nKey="a4130">
+                        i18nKey="a4130"
+                        order="8600">
                         <DefaultValues>
                             <Value>1000</Value>
                         </DefaultValues>
@@ -3996,7 +4304,8 @@
                     <AttributeSchema name="sun-opensso-database-config-users-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a4134">
+                        i18nKey="a4134"
+                        order="8700">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -4004,7 +4313,8 @@
                     <AttributeSchema name="sun-opensso-database-MembershipTableName"
                         type="single"
                         syntax="string"
-                        i18nKey="a4150">
+                        i18nKey="a4150"
+                        order="8800">
                         <DefaultValues>
                             <Value>groups</Value>
                         </DefaultValues>
@@ -4014,7 +4324,8 @@
                         syntax="string"
                         any="required"
                         validator="RequiredValueValidator"
-                        i18nKey="a4154">
+                        i18nKey="a4154"
+                        order="8900">
                         <DefaultValues>
                             <Value>group_name</Value>
                         </DefaultValues>
@@ -4022,7 +4333,8 @@
                     <AttributeSchema name="sun-opensso-database-membership-search-attribute"
                         type="single"
                         syntax="string"
-                        i18nKey="a4156">
+                        i18nKey="a4156"
+                        order="9000">
                         <DefaultValues>
                             <Value>cn</Value>
                         </DefaultValues>
@@ -4033,7 +4345,8 @@
                     <AttributeSchema name="sunOrganizationStatus"
                         type = "single_choice"
                         syntax = "string"
-                        i18nKey = "a108">
+                        i18nKey = "a108"
+                        order="400">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
                             <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
@@ -4046,7 +4359,8 @@
                         type = "list"
                         syntax = "string"
                         isSearchable="yes"
-                        i18nKey = "a109">
+                        i18nKey = "a109"
+                        order="500">
                     </AttributeSchema>
                 </OrganizationAttributeSchema>
             </Organization>
