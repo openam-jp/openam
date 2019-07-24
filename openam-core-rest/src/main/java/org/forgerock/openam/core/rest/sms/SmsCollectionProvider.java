@@ -160,18 +160,20 @@ public class SmsCollectionProvider extends SmsResourceProvider {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             checkedInstanceSubConfig(context, resourceId, config);
-            if (isDefaultCreatedAuthModule(context, resourceId)) {
+
+            try{
                 Set<String> subConfigNames = config.getSubConfigNames();
-                if (subConfigNames == null || subConfigNames.size() == 0) {
-                    scm.removeOrganizationConfiguration(realmFor(context), null);
-                } else {
-                    Map attrs = config.getAttributesWithoutDefaults();
-                    if (attrs != null) {
-                        config.removeAttributes(attrs.keySet());
+                if(subConfigNames.contains(resourceId)){
+                    config.removeSubConfig(resourceId);
+                }else if (isDefaultCreatedAuthModule(context, resourceId)) {
+                    if (subConfigNames.size() == 0) {
+                        scm.removeOrganizationConfiguration(realmFor(context), null);
+                    }else{
+                        config.removeAttributes(config.getAttributesWithoutDefaults().keySet());
                     }
                 }
-            } else {
-                config.removeSubConfig(resourceId);
+            } catch (NullPointerException e) {
+                debug.warning("::SmsCollectionProvider:: ServerConfig return null object", e);
             }
 
             return awaitDeletion(context, resourceId)
