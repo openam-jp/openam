@@ -64,6 +64,15 @@
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="timestamp" type="single" syntax="boolean" i18nKey="audit.handlers.all.timestamp">
+                        <BooleanValues>
+                            <BooleanTrueValue>true</BooleanTrueValue>
+                            <BooleanFalseValue>false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory">
                         <DefaultValues>
                             <Value>%BASE_DIR%/%SERVER_URI%/@LOG_DIR@/</Value>
