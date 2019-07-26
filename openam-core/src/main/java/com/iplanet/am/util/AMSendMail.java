@@ -190,7 +190,7 @@ public class AMSendMail {
         Properties moduleProps = new Properties();
 
         moduleProps.put("mail.smtp.host", host);
-        moduleProps.put("mail.debug", "true");
+        moduleProps.put("mail.debug", "false");
         moduleProps.put("mail.smtp.port", port);
         moduleProps.put("mail.smtp.socketFactory.port", port);
         if (ssl) {
