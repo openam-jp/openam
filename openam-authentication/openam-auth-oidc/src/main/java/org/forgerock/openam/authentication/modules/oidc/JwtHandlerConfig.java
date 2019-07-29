@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.oidc;
@@ -27,14 +28,14 @@ import java.util.Map;
 public class JwtHandlerConfig {
     private static Debug logger = Debug.getInstance("amAuth");
 
-    static final String ISSUER_NAME_KEY = "openam-auth-openidconnect-issuer-name";
-    static final String CRYPTO_CONTEXT_TYPE_KEY = "openam-auth-openidconnect-crypto-context-type";
-    static final String CRYPTO_CONTEXT_VALUE_KEY = "openam-auth-openidconnect-crypto-context-value";
-    static final String KEY_CLIENT_SECRET = "iplanet-am-auth-oauth-client-secret";
+    public static final String ISSUER_NAME_KEY = "openam-auth-openidconnect-issuer-name";
+    public static final String CRYPTO_CONTEXT_TYPE_KEY = "openam-auth-openidconnect-crypto-context-type";
+    public static final String CRYPTO_CONTEXT_VALUE_KEY = "openam-auth-openidconnect-crypto-context-value";
+    public static final String KEY_CLIENT_SECRET = "iplanet-am-auth-oauth-client-secret";
 
-    static final String CRYPTO_CONTEXT_TYPE_CONFIG_URL = ".well-known/openid-configuration_url";
-    static final String CRYPTO_CONTEXT_TYPE_JWK_URL = "jwk_url";
-    static final String CRYPTO_CONTEXT_TYPE_CLIENT_SECRET = "client_secret";
+    public static final String CRYPTO_CONTEXT_TYPE_CONFIG_URL = ".well-known/openid-configuration_url";
+    public static final String CRYPTO_CONTEXT_TYPE_JWK_URL = "jwk_url";
+    public static final String CRYPTO_CONTEXT_TYPE_CLIENT_SECRET = "client_secret";
 
     protected final String configuredIssuer;
     protected final String cryptoContextType;
