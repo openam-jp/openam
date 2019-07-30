@@ -86,7 +86,7 @@ public class PLLAuditor {
 
             AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
-                    .timestamp(startTime)
+                    .timestamp(startTime,auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
@@ -115,7 +115,7 @@ public class PLLAuditor {
             final long elapsedTime = endTime - startTime;
             AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
-                    .timestamp(endTime)
+                    .timestamp(endTime,auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
@@ -162,7 +162,7 @@ public class PLLAuditor {
             final JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AuditEvent auditEvent = auditEventFactory.accessEvent(realm)
                     .forHttpServletRequest(httpServletRequest)
-                    .timestamp(endTime)
+                    .timestamp(endTime,auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)

@@ -88,7 +88,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         if (auditEventPublisher.isAuditing(realm, AuditConstants.ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .timestamp(context.asContext(RequestAuditContext.class).getRequestReceivedTime())
+                    .timestamp(context.asContext(RequestAuditContext.class).getRequestReceivedTime(), auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
@@ -108,7 +108,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
             long elapsedTime = endTime - context.asContext(RequestAuditContext.class).getRequestReceivedTime();
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .timestamp(endTime)
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
@@ -132,7 +132,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                     field(ACCESS_RESPONSE_DETAIL_REASON, response.getStatus().getReasonPhrase())));
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .timestamp(endTime)
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
