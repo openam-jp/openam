@@ -79,6 +79,7 @@ public final class SessionAuditor {
         if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC, eventName)) {
 
             AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent(realm)
+            		.timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(eventName)
                     .component(Component.SESSION)
