@@ -118,4 +118,8 @@ public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
         return amSessionCookieName + AMSTSConstants.EQUALS + sessionId;
     }
 
+    @Override
+    public boolean isLtzEnabled() {
+        return true;
+    }
 }
