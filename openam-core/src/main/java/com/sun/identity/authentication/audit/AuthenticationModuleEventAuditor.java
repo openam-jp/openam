@@ -111,6 +111,7 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
         }
 
         AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
+        		.timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
                 .transactionId(getTransactionIdValue())
                 .component(AUTHENTICATION)
                 .eventName(AM_LOGIN_MODULE_COMPLETED)
