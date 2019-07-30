@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -36,9 +37,12 @@ import java.util.Set;
 
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.openam.oauth2.IdentityManager;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.sun.identity.idm.AMIdentity;
 
 /**
  * @since 12.0.0
@@ -52,6 +56,8 @@ public class AccessTokenServiceTest {
     private TokenStore tokenStore;
     private OAuth2ProviderSettings providerSettings;
     private OAuth2Uris uris;
+    private IdentityManager identityManager;
+    private AMIdentity resourceOwner;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -61,11 +67,13 @@ public class AccessTokenServiceTest {
         grantTypeHandlers.put("GRANT_TYPE", grantTypeHandler);
         clientAuthenticator = mock(ClientAuthenticator.class);
         tokenStore = mock(TokenStore.class);
+        identityManager = mock(IdentityManager.class);
+        resourceOwner = mock(AMIdentity.class);
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2UrisFactory urisFactory = mock(OAuth2UrisFactory.class);
 
         accessTokenService = new AccessTokenService(grantTypeHandlers, clientAuthenticator, tokenStore,
-                providerSettingsFactory, urisFactory);
+                providerSettingsFactory, urisFactory, identityManager);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
@@ -151,7 +159,7 @@ public class AccessTokenServiceTest {
         //Then
         // Expect InvalidRequestException
     }
-
+    
     @Test (expectedExceptions = InvalidRequestException.class)
     public void refreshTokenShouldThrowInvalidRequestExceptionWhenClientIdsDontMatch() throws Exception {
 
@@ -196,6 +204,31 @@ public class AccessTokenServiceTest {
         //Then
         // Expect InvalidGrantException
     }
+    
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void refreshTokenShouldThrowInvalidRequestExceptionWhenResourceOwnerIsInActive() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        RefreshToken refreshToken = mock(RefreshToken.class);
+
+        given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
+        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(refreshToken.getClientId()).willReturn("CLIENT_ID");
+        given(refreshToken.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
+        given(refreshToken.getRealm()).willReturn("REALM");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(null);
+
+        //When
+        accessTokenService.refreshToken(request);
+
+        //Then
+        // Expect InvalidRequestException
+    }
 
     @Test
     public void shouldRefreshToken() throws Exception {
@@ -212,7 +245,10 @@ public class AccessTokenServiceTest {
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
+        given(refreshToken.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
+        given(refreshToken.getRealm()).willReturn("REALM");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(resourceOwner);
         given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
@@ -244,7 +280,10 @@ public class AccessTokenServiceTest {
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
+        given(refreshToken.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
+        given(refreshToken.getRealm()).willReturn("REALM");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(resourceOwner);
         given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
@@ -281,7 +320,10 @@ public class AccessTokenServiceTest {
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
+        given(refreshToken.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
+        given(refreshToken.getRealm()).willReturn("REALM");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(resourceOwner);
         given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);

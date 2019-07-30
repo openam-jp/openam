@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -44,10 +45,13 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.oauth2.IdentityManager;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.identity.idm.AMIdentity;
 
 /**
  * Handles access token requests from OAuth2 clients to the OAuth2 provider to grant access tokens for the requested
@@ -63,6 +67,7 @@ public class AccessTokenService {
     private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OAuth2UrisFactory urisFactory;
+    private final IdentityManager identityManager;
 
     /**
      * Constructs a new AccessTokenServiceImpl.
@@ -71,16 +76,19 @@ public class AccessTokenService {
      * @param tokenStore An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param urisFactory An instance of the OAuth2UrisFactory.
+     * @param identityManager An instance of the IdentityManager.
      */
     @Inject
     public AccessTokenService(Map<String, GrantTypeHandler> grantTypeHandlers,
             final ClientAuthenticator clientAuthenticator, final TokenStore tokenStore,
-            final OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory) {
+            final OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory urisFactory,
+            IdentityManager identityManager) {
         this.grantTypeHandlers = grantTypeHandlers;
         this.clientAuthenticator = clientAuthenticator;
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.urisFactory = urisFactory;
+        this.identityManager = identityManager;
     }
 
     /**
@@ -160,6 +168,20 @@ public class AccessTokenService {
         if (refreshToken.isExpired()) {
             logger.warn("Refresh Token is expired for id: " + refreshToken.getTokenId());
             throw new InvalidGrantException("grant is invalid");
+        }
+
+        AMIdentity id = null;
+        try {
+            id = identityManager.getResourceOwnerIdentity(refreshToken.getResourceOwnerId(),
+                    refreshToken.getRealm());
+        } catch (UnauthorizedClientException ex) {
+            // The detailed debug log has been output in IdentityManager.
+            logger.debug("Error in validating the resource owner of this refresh token.", ex);
+        }
+        if (id == null) { // it includes the case that the resource owner is inactive.
+            logger.warn("Resource owner({}) of this refresh token is not valid any more",
+                    refreshToken.getResourceOwnerId());
+            throw new InvalidRequestException("Resource owner of this refresh token is not valid any more.");
         }
 
         final Set<String> scope = splitScope(request.<String>getParameter(SCOPE));
