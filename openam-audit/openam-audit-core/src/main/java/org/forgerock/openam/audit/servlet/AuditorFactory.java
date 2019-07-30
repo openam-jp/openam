@@ -33,7 +33,8 @@ public interface AuditorFactory {
      * @param request HttpServletRequest.
      * @param response Queryable decorator over the HttpServletResponse.
      * @param component The component.
+     * @param ltzEanbled Local Time Zone is enabled
      * @return new Auditor instance.
      */
-    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response, Component component);
+    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response, Component component, Boolean ltzEnabled);
 }
