@@ -222,7 +222,7 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
         }
 
         AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(
-                getBooleanMapAttr(attributes, "auditEnabled", false), blacklistedEventNames);
+                getBooleanMapAttr(attributes, "auditEnabled", false), blacklistedEventNames, getBooleanMapAttr(attributes, "ltzEnabled", false));
 
         Set<String> filterPolicies = new HashSet<>();
         for (String policy : attributes.get("fieldFilterPolicy")) {

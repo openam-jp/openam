@@ -110,4 +110,10 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
         }
         return !auditServiceConfiguration.isBlacklisted(eventNameJson.asString());
     }
+
+    @Override
+    public boolean isLtzEnabled() {
+       return auditServiceConfiguration.isLtzEnabled();
+    }
+
 }

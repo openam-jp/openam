@@ -43,6 +43,15 @@
                         </DefaultValuesClassName>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="ltzEnabled" type="single" syntax="boolean" i18nKey="a005">
+                    <BooleanValues>
+                        <BooleanTrueValue>true</BooleanTrueValue>
+                        <BooleanFalseValue>false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="CSV" inheritance="multiple" i18nKey="handler.name.csv" i18nFileName="audit">
                     <AttributeSchema name="enabled" type="single" syntax="boolean" i18nKey="audit.handlers.all.enabled">
@@ -62,15 +71,6 @@
                         <DefaultValues>
                             <DefaultValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="timestamp" type="single" syntax="boolean" i18nKey="audit.handlers.all.timestamp">
-                        <BooleanValues>
-                            <BooleanTrueValue>true</BooleanTrueValue>
-                            <BooleanFalseValue>false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory">
@@ -724,15 +724,6 @@
                         <DefaultValues>
                             <DefaultValuesClassName
                                     className="org.forgerock.openam.audit.configuration.AuditTopicDefaultValues"/>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="timestamp" type="single" syntax="boolean" i18nKey="audit.handlers.all.timestamp">
-                        <BooleanValues>
-                            <BooleanTrueValue>true</BooleanTrueValue>
-                            <BooleanFalseValue>false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="location" type="single" i18nKey="audit.handlers.csv.logDirectory">

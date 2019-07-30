@@ -115,4 +115,10 @@ public class AuditEventPublisherImpl implements AuditEventPublisher {
     private String getValue(JsonValue jsonValue, String key, String defaultValue) {
         return jsonValue.isDefined(key) ? jsonValue.get(key).asString() : defaultValue;
     }
+
+    @Override
+    public boolean isLtzEnabled() {
+        return auditServiceProvider.getDefaultAuditService().isLtzEnabled();
+    }
+
 }

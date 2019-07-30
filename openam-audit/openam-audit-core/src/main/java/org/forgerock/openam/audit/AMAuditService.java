@@ -50,4 +50,11 @@ public interface AMAuditService extends AuditService {
      */
     boolean isAuditEnabled(String topic, EventName eventName);
 
+    /**
+     * Determines whether to use the local time zone for audit log
+     *
+     * @return {@code true} to use the local time zone or not.
+     */
+    boolean isLtzEnabled();
+
 }

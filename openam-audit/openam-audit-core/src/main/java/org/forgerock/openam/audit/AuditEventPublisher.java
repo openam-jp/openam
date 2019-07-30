@@ -49,4 +49,12 @@ public interface AuditEventPublisher {
      * @return {@code true} if the topic should be audited.
      */
     boolean isAuditing(String realm, String topic, AuditConstants.EventName eventName);
+
+    /**
+     * Determines whether to use the local time zone for audit log
+     *
+     * @return {@code true} to use the local time zone or not.
+     */
+    boolean isLtzEnabled();
+
 }
