@@ -33,4 +33,10 @@ public class FedletAuditEventPublisherImpl implements AuditEventPublisher {
     public boolean isAuditing(String realm, String topic, AuditConstants.EventName eventName) {
         return false;
     }
+
+    @Override
+    public boolean isLtzEnabled() {
+        return true;
+    }
+
 }
