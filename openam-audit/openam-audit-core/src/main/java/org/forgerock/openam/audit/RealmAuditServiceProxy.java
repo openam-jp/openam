@@ -86,4 +86,8 @@ public class RealmAuditServiceProxy extends AuditServiceProxy implements AMAudit
         }
     }
 
+    @Override
+    public boolean isLtzEnabled() {
+       return auditServiceConfiguration.isLtzEnabled();
+    }
 }

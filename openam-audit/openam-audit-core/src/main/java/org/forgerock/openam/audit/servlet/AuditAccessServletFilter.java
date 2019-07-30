@@ -55,7 +55,7 @@ public class AuditAccessServletFilter implements Filter {
         AuditableHttpServletResponse auditableResponse =
                 new AuditableHttpServletResponse((HttpServletResponse) response);
         Auditor auditor = Singleton.getAuditorFactory().create((HttpServletRequest) request, auditableResponse,
-                component, Singleton.getAuditEventPublisher().isLtzEnabled());
+                component);
 
         Singleton.getAuditEventPublisher().tryPublish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
         try {
