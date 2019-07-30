@@ -58,7 +58,7 @@ public final class AuditAccessFilter implements Filter {
 
         AuditableHttpServletResponse auditableResponse =
                 new AuditableHttpServletResponse((HttpServletResponse) response);
-        Auditor auditor = auditorFactory.create((HttpServletRequest) request, auditableResponse, STS);
+        Auditor auditor = auditorFactory.create((HttpServletRequest) request, auditableResponse, STS, Boolean.valueOf(auditEventPublisher.isLtzEnabled()));
 
         auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
         try {
