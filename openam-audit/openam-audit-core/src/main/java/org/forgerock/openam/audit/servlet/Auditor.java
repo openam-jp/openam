@@ -61,7 +61,7 @@ public class Auditor {
      */
     @Inject
     public Auditor(TimeService timeService, @Assisted HttpServletRequest request,
-            @Assisted AuditableHttpServletResponse response, @Assisted Component component, boolean ltzEnabled) {
+            @Assisted AuditableHttpServletResponse response, @Assisted Component component, @Assisted boolean ltzEnabled) {
         this.timeService = timeService;
         this.request = request;
         this.response = response;
