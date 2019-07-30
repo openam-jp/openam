@@ -82,7 +82,8 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             }
 
             AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
-                    .transactionId(getTransactionIdValue())
+            		.timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
+            		.transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGIN_COMPLETED)
                     .result(SUCCESSFUL)
@@ -125,7 +126,8 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             entryDetail.addInfo(FAILURE_REASON, failureReason.name());
 
             AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
-                    .transactionId(getTransactionIdValue())
+            		.timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
+            		.transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGIN_COMPLETED)
                     .result(FAILED)
@@ -167,7 +169,8 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             String userId = AMAuditEventBuilderUtils.getUserId(token);
 
             AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
-                    .transactionId(getTransactionIdValue())
+            		.timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
+            		.transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGOUT)
                     .result(SUCCESSFUL)

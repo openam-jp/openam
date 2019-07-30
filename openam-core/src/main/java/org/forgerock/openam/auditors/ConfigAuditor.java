@@ -176,7 +176,7 @@ public abstract class ConfigAuditor {
      */
     protected AMConfigAuditEventBuilder getBaseBuilder() {
         return auditEventFactory.configEvent(realm)
-                .timestamp(startTime)
+                .timestamp(startTime, auditEventPublisher.isLtzEnabled())
                 .objectId(objectId)
                 .runAs(runAsName)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
