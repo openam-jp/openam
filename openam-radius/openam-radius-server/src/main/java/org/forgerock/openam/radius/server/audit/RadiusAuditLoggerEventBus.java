@@ -142,7 +142,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
         AuditRequestContext.set(new AuditRequestContext(new TransactionId(accessRequestEvent.getRequestId())));
 
         AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(accessRequestEvent.getRealm())
-                .timestamp(accessRequestEvent.getTimeOfEvent(),this.auditEventPublisher.isLtzEnabled())
+                .timestamp(accessRequestEvent.getTimeOfEvent(), this.auditEventPublisher.isLtzEnabled())
                 .transactionId(accessRequestEvent.getRequestId())
                 .eventName(eventName)
                 .component(Component.RADIUS)
