@@ -13,6 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2017 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
