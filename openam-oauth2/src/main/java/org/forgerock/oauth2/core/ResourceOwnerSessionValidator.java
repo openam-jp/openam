@@ -56,6 +56,7 @@ import java.util.StringTokenizer;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
@@ -314,53 +315,24 @@ public class ResourceOwnerSessionValidator {
     private void setCurrentAcr(SSOToken token, OAuth2Request request, String acrValuesStr)
             throws NotFoundException, ServerException, SSOException, AccessDeniedException,
             UnsupportedEncodingException, URISyntaxException, ResourceOwnerAuthenticationRequired {
-    	 Set<String> serviceUsedSet = parseServiceProperty(token.getProperty(ISAuthConstants.SERVICE));
+        Set<String> serviceUsedSet = AMAuthUtils.getAuthenticatedServices(token);
         Set<String> acrValues = new HashSet<>(Arrays.asList(acrValuesStr.split("\\s+")));
         OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
         Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
         final Request req = request.getRequest();
-        boolean matched = false;
-        boolean containsValidAcr = false;
-        String matchedAcr = "0";
+        String matchedAcr = UNMATCHED_ACR_VALUE;
         for (String serviceUsed : serviceUsedSet) {
-        	for (String acr : acrValues) {
-        		if (acrMap.containsKey(acr)) {
-        			containsValidAcr = true;
-        			if (serviceUsed.equals(acrMap.get(acr).getName())) {
-        				matchedAcr = acr;
-        				matched = true;
-        				break;
-        			}
-        		}
-        	}
+            for (String acr : acrValues) {
+                if (acrMap.containsKey(acr)) {
+                    if (serviceUsed.equals(acrMap.get(acr).getName())) {
+                        matchedAcr = acr;
+                        break;
+                    }
+                }
+            }
         }
-        if (matched) {
-        	req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, matchedAcr);
-        } else {
-        	req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, UNMATCHED_ACR_VALUE);
-        }
+        req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, matchedAcr);
     }
-    
-    private Set<String> parseServiceProperty(String data) {
-    	Set<String> returnData = Collections.emptySet();
-    	if (data != null && data.length() != 0) {
-    		StringTokenizer stz = new StringTokenizer(data,
-    				ISAuthConstants.PIPE_SEPARATOR);
-    		returnData = new HashSet<String>();
-    		while (stz.hasMoreTokens()) {
-    			String nameValue = stz.nextToken();
-    			int index = nameValue.indexOf(ISAuthConstants.COLON);
-    			if (index == -1) {
-    				returnData.add(nameValue);
-    				continue;
-    			}
-    			String value = nameValue.substring(index + 1).trim();
-    			returnData.add(value);
-    		}
-    	}
-    	return returnData;
-    }
-
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request, SSOToken token)
             throws URISyntaxException, AccessDeniedException, ServerException, NotFoundException,
