@@ -27,7 +27,6 @@ define([
         baseTemplate: "templates/common/LoginBaseTemplate.html",
         data: {},
         render () {
-            RESTLoginHelper.removeSessionCookie();
             RESTLoginHelper.removeAuthCookie();
             const params = URIUtils.getCurrentFragmentQueryString();
             this.data.params = params ? `&${params}` : "";
