@@ -30,7 +30,7 @@ public class AMActivityAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContexts() throws Exception {
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
-                .timestamp(1436389263629L)
+                .timestamp(1436389263629L,false)
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -47,7 +47,7 @@ public class AMActivityAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContext() throws Exception {
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
-                .timestamp(1436389263629L)
+                .timestamp(1436389263629L,false)
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")

@@ -38,7 +38,7 @@ public class AMAccessAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContexts() throws Exception {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
-                .timestamp(1436389263629L)
+                .timestamp(1436389263629L,false)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.AUDIT)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -57,7 +57,7 @@ public class AMAccessAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContext() throws Exception {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
-                .timestamp(1436389263629L)
+                .timestamp(1436389263629L,false)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.AUDIT)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -76,7 +76,7 @@ public class AMAccessAuditEventBuilderTest {
     @Test
     public void canHandleNullComponent() {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
-                .timestamp(1436389263629L)
+                .timestamp(1436389263629L,false)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .realm(null)
