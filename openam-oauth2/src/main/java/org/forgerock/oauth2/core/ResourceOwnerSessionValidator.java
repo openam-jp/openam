@@ -46,12 +46,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
