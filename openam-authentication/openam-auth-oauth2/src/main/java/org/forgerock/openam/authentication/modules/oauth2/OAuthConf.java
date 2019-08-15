@@ -21,13 +21,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.encode.Base64;
 
 import org.forgerock.openam.oauth2.OAuth2Constants;
 
@@ -62,6 +63,7 @@ public class OAuthConf {
     private String scope = null;
     private String authServiceUrl = null;
     private String tokenServiceUrl = null;
+    private String tokenServiceAuthMethod = null;
     private String profileServiceUrl = null;
     private String profileServiceParam = null;
     private String ssoProxyUrl = null;
@@ -100,6 +102,7 @@ public class OAuthConf {
         }
         authServiceUrl = CollectionHelper.getMapAttr(config, KEY_AUTH_SERVICE);
         tokenServiceUrl = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE);
+        tokenServiceAuthMethod = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE_AUTH_METHOD);
         profileServiceUrl = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE);
         profileServiceParam = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE_PARAM, "access_token");
         // ssoLoginUrl = CollectionHelper.getMapAttr(config, KEY_SSO_LOGIN_URL);
@@ -267,6 +270,29 @@ public class OAuthConf {
         return tokenServiceUrl;
     }
 
+    public Map<String, String> getTokenServicePOSTparametersForBasic(String code, String authServiceURL)
+            throws AuthLoginException {
+
+        Map<String, String> getParameters = new HashMap<String, String>();
+        if (code == null) {
+            OAuthUtil.debugError("process: code == null");
+            throw new AuthLoginException(BUNDLE_NAME, "authCode == null", null);
+        }
+        OAuthUtil.debugMessage("authentication code: " + code);
+
+        try {
+            getParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
+            getParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
+            getParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
+
+        } catch (UnsupportedEncodingException ex) {
+            OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
+                    + "and building the Token Service URL", ex);
+            throw new AuthLoginException("Problem to build the Token Service URL", ex);
+        }
+        return getParameters;
+    }
+
     public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL)
             throws AuthLoginException {
 
@@ -290,6 +316,10 @@ public class OAuthConf {
             throw new AuthLoginException("Problem to build the Token Service URL", ex);
         }
         return postParameters;
+    }
+
+    String getTokenServiceAuthMethod() {
+        return tokenServiceAuthMethod;
     }
 
     public String getProfileServiceUrl() {
@@ -347,6 +377,11 @@ public class OAuthConf {
 
     public boolean isOpenIDConnect() {
         return openIDConnect;
+    }
+
+    public String getBasicAuthorizaionHeader() {
+        String plain = clientId + ":" + clientSecret;
+        return "Basic " + Base64.encode(plain.getBytes());
     }
 
 }

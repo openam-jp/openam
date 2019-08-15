@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -285,8 +286,17 @@ public class OAuth extends AMLoginModule {
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
-                    String tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
+                    String tokenSvcResponse;
+                    if("client_secret_basic".equals(config.getTokenServiceAuthMethod())) {
+                        tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), config.getBasicAuthorizaionHeader(),
+                            null, config.getTokenServicePOSTparametersForBasic(code, proxyURL));
+                    } else if("client_secret_post".equals(config.getTokenServiceAuthMethod())) {
+                        tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
                             config.getTokenServicePOSTparameters(code, proxyURL));
+                    } else {
+                        tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
+                            config.getTokenServicePOSTparameters(code, proxyURL));
+                    }
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     JwtClaimsSet jwtClaims = null;
