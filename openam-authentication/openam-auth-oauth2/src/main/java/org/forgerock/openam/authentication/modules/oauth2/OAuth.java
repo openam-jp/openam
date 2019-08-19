@@ -289,7 +289,7 @@ public class OAuth extends AMLoginModule {
                     String tokenSvcResponse;
                     if("client_secret_basic".equals(config.getTokenServiceAuthMethod())) {
                         tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), config.getBasicAuthorizaionHeader(),
-                            null, config.getTokenServicePOSTparametersForBasic(code, proxyURL));
+                            null, config.getTokenServicePOSTparameters(code, proxyURL));
                     } else if("client_secret_post".equals(config.getTokenServiceAuthMethod())) {
                         tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
                             config.getTokenServicePOSTparameters(code, proxyURL));

@@ -270,29 +270,6 @@ public class OAuthConf {
         return tokenServiceUrl;
     }
 
-    public Map<String, String> getTokenServicePOSTparametersForBasic(String code, String authServiceURL)
-            throws AuthLoginException {
-
-        Map<String, String> getParameters = new HashMap<String, String>();
-        if (code == null) {
-            OAuthUtil.debugError("process: code == null");
-            throw new AuthLoginException(BUNDLE_NAME, "authCode == null", null);
-        }
-        OAuthUtil.debugMessage("authentication code: " + code);
-
-        try {
-            getParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
-            getParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
-            getParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
-
-        } catch (UnsupportedEncodingException ex) {
-            OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
-                    + "and building the Token Service URL", ex);
-            throw new AuthLoginException("Problem to build the Token Service URL", ex);
-        }
-        return getParameters;
-    }
-
     public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL)
             throws AuthLoginException {
 
@@ -304,9 +281,11 @@ public class OAuthConf {
         OAuthUtil.debugMessage("authentication code: " + code);
 
         try {
-            postParameters.put(PARAM_CLIENT_ID, clientId);
+            if ("client_secret_post".equals(getTokenServiceAuthMethod())) {
+                postParameters.put(PARAM_CLIENT_ID, clientId);
+                postParameters.put(PARAM_CLIENT_SECRET, clientSecret);
+            }
             postParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
-            postParameters.put(PARAM_CLIENT_SECRET, clientSecret);
             postParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
             postParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
 
