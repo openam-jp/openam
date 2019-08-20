@@ -14,18 +14,22 @@
  * Copyright 2016 ForgeRock AS.
  */
 
- define([
-     "lodash"
- ], (_) => {
+package org.forgerock.oauth2.core.exceptions;
 
-     /**
-      * Transforms propertyOrder attribute to integer
-      * @param {Object} property Property to transform
-      */
-     return function transformPropertyOrderAttributeToInt (property) {
-         if (property.hasOwnProperty("propertyOrder") && !_.isNumber(property.propertyOrder)) {
-             const orderWithoutPrefixedCharacter = property.propertyOrder.slice(1);
-             property.propertyOrder = parseInt(orderWithoutPrefixedCharacter, 10);
-         }
-     };
- });
+/**
+ * Thrown when the oauth2 provider is not found.
+ *
+ * @since 14.0.0
+ */
+public class OAuth2ProviderNotFoundException extends NotFoundException {
+
+
+    /**
+     * Constructs a new OAuth2ProviderNotFoundException with the specified message.
+     *
+     * @param message The reason for the exception.
+     */
+    public OAuth2ProviderNotFoundException(final String message) {
+        super(message);
+    }
+}
