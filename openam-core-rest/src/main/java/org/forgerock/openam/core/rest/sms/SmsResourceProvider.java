@@ -83,6 +83,18 @@ public abstract class SmsResourceProvider {
      * requests to the authentication module endpoint can check if they need to check the
      * special place that these auto created modules are stored.
      */
+    static final BiMap<String, String> AUTO_CREATED_AUTHENTICATION_MODULES = HashBiMap.create(7);
+
+    static {
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("hotp", "hotp");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("sae", "sae");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("oath", "oath");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("ldap", "ldap");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("datastore", "datastore");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("federation", "federation");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauth");
+    }
+
     public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
     protected final String serviceName;
     protected final String serviceVersion;
