@@ -1,0 +1,45 @@
+{
+  "timestamp": "2015-07-08T21:01:03.629Z",
+  "eventName": "AM-ACCESS-ATTEMPT",
+  "component": "Audit",
+  "transactionId": "ad1f26e3-1ced-418d-b6ec-c8488411a625",
+  "userId": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "client": {
+    "ip": "172.16.101.7",
+    "port": 62375
+  },
+  "server": {
+    "ip": "216.58.208.36",
+    "port": 80
+  },
+  "request": {
+    "protocol": "CREST",
+    "operation": "READ"
+  },
+  "http": {
+    "request": {
+      "secure": false,
+      "method": "GET",
+      "path": "/some/path",
+      "queryParameters": {
+        "p1": ["v1"],
+        "p2": ["v2"]
+      },
+      "headers": {
+        "h1": ["v1"],
+        "h2": ["v2"]
+      },
+      "cookies": {
+        "JSESSIONID": "92F2583684E45A3612AAC1743FE70362",
+        "amlbcookie": "01"
+      }
+    }
+  },
+  "response": {
+    "status": "SUCCESSFUL",
+    "statusCode": "200",
+    "elapsedTime": 42,
+    "elapsedTimeUnits": "MILLISECONDS"
+  },
+  "trackingIds": ["12345"]
+}

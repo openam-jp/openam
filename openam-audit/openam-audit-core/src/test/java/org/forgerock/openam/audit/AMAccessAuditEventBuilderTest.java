@@ -38,7 +38,7 @@ public class AMAccessAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContexts() throws Exception {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
-                .timestamp(1436389263629L,false)
+                .timestamp(1436389263629L)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.AUDIT)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -57,7 +57,7 @@ public class AMAccessAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContext() throws Exception {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
-                .timestamp(1436389263629L,false)
+                .timestamp(1436389263629L)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .component(Component.AUDIT)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -74,9 +74,28 @@ public class AMAccessAuditEventBuilderTest {
     }
 
     @Test
+    public void canBuildAccessAuditEventWithContextLtz() throws Exception {
+        AuditEvent accessEvent = new AMAccessAuditEventBuilder()
+                .timestamp(1436389263629L, true)
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
+                .component(Component.AUDIT)
+                .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
+                .userId("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .trackingId("12345")
+                .client("172.16.101.7", 62375)
+                .server("216.58.208.36", 80)
+                .request("CREST", "READ")
+                .httpRequest(false, "GET", "/some/path", getQueryParameters(), getHeaders())
+                .response(SUCCESSFUL, "200", 42, MILLISECONDS)
+                .toEvent();
+
+        assertJsonValue(accessEvent.getValue(), "/access-event-ltz.json");
+    }
+
+    @Test
     public void canHandleNullComponent() {
         AuditEvent accessEvent = new AMAccessAuditEventBuilder()
-                .timestamp(1436389263629L,false)
+                .timestamp(1436389263629L)
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .realm(null)

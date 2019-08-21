@@ -30,7 +30,7 @@ public class AMActivityAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContexts() throws Exception {
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
-                .timestamp(1436389263629L,false)
+                .timestamp(1436389263629L)
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -47,7 +47,7 @@ public class AMActivityAuditEventBuilderTest {
     @Test
     public void canBuildAccessAuditEventWithContext() throws Exception {
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
-                .timestamp(1436389263629L,false)
+                .timestamp(1436389263629L)
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
@@ -59,6 +59,23 @@ public class AMActivityAuditEventBuilderTest {
                 .toEvent();
 
         assertJsonValue(activityEvent.getValue(), "/activity-event.json");
+    }
+
+    @Test
+    public void canBuildAccessAuditEventWithContextLtz() throws Exception {
+        AuditEvent activityEvent = new AMActivityAuditEventBuilder()
+                .timestamp(1436389263629L,true)
+                .eventName(AM_SESSION_CREATED)
+                .component(SESSION)
+                .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
+                .userId("id=demo,ou=user,dc=openam,dc=forgerock,dc=org")
+                .trackingId("12345")
+                .runAs("cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org")
+                .objectId("/sessions/uniqueSessionAlias")
+                .operation("CREATE")
+                .toEvent();
+
+        assertJsonValue(activityEvent.getValue(), "/activity-event-ltz.json");
     }
 
 }
