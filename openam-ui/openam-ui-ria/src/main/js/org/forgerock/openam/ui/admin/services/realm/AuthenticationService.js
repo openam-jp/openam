@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 /**
@@ -173,8 +174,11 @@ define([
             },
             exists (realm, name) {
                 var promise = $.Deferred(),
+                    queryFilter = encodeURIComponent(`_id eq "${name}"`),
                     request = obj.serviceCall({
-                        url: scopedByRealm(realm, `authentication/modules?_queryFilter=_id eq "${name}"&_fields=_id`),
+                        url: scopedByRealm(
+                            realm,
+                            `authentication/modules?_queryFilter=${queryFilter}&_fields=_id`),
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     });
 

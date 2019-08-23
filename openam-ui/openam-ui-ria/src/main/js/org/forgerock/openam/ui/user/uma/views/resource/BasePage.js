@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define([
@@ -53,10 +54,10 @@ define([
             });
         },
         createLabelCollection (labelId) {
-            var filters = [`resourceOwnerId eq \"${Configuration.loggedUser.get("username")}\"`];
+            var filters = [encodeURIComponent(`resourceOwnerId eq "${Configuration.loggedUser.get("username")}"`)];
 
             if (labelId) {
-                filters.push(`labels eq \"${labelId}\"`);
+                filters.push(encodeURIComponent(`labels eq "${labelId}"`));
             }
 
             return this.createCollection(
@@ -72,6 +73,8 @@ define([
             if (notResourceOwner) {
                 filters[0] = `! ${filters[0]}`;
             }
+
+            filters[0] = encodeURIComponent(filters[0]);
 
             return this.createCollection(
                 RealmHelper.decorateURIWithRealm(`/${Constants.context}/json/__subrealm__/users/${

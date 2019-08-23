@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 
@@ -59,7 +60,7 @@ define([
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     filterName: "eq",
-                    _queryFilter: [`applicationName+eq+"${encodeURIComponent(this.data.policySetModel.id)}"`]
+                    _queryFilter: [encodeURIComponent(`applicationName eq "${this.data.policySetModel.id}"`)]
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
