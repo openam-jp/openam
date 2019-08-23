@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright 2018 Open Source Solution Technology,Corp.
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="WebauthnRegister" version="1.0" >
+
+    <Callbacks length="1" order="1" timeout="300" header="Key Registration">
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Register</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>Cancel</Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="4" order="2" timeout="120" header="Key Registration">
+        <TextOutputCallback>
+            Key Registration
+        </TextOutputCallback>
+        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
+        <HiddenValueCallback>
+           <Id>PublicKeyCredential</Id>
+        </HiddenValueCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Next</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="3" order="3" timeout="120" header="Key Registration Complete">
+        <TextOutputCallback>
+           Key Registration Complete
+        </TextOutputCallback>
+        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Next</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+
+</ModuleProperties>

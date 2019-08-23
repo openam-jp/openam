@@ -895,6 +895,11 @@
         </dependency>
 
         <dependency>
+            <artifactId>openam-auth-webauthn</artifactId>
+            <groupId>jp.openam</groupId>
+        </dependency>
+
+        <dependency>
             <artifactId>json-resource</artifactId>
             <groupId>jp.openam.commons</groupId>
         </dependency>

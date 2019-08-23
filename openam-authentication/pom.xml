@@ -67,6 +67,7 @@
         <module>openam-auth-scripted</module>
         <module>openam-auth-device-id</module>
         <module>openam-auth-saml2</module>
+        <module>openam-auth-webauthn</module>
     </modules>
 
     <profiles>

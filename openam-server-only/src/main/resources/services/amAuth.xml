@@ -27,6 +27,7 @@
     $Id: amAuth.xml,v 1.16 2009/11/25 12:06:32 manish_rustagi Exp $
 
     Portions Copyrighted 2011-2016 ForgeRock AS.
+    Portions Copyrighted 2019 Open Source Solution Technology Corporation
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -75,6 +76,8 @@
                         <Value>org.forgerock.openam.authentication.modules.saml2.SAML2</Value>
                         <Value>org.forgerock.openam.authentication.modules.push.AuthenticatorPush</Value>
                         <Value>org.forgerock.openam.authentication.modules.push.registration.AuthenticatorPushRegistration</Value>
+                        <Value>jp.co.osstech.openam.authentication.modules.webauthn.WebauthnRegister</Value>
+                        <Value>jp.co.osstech.openam.authentication.modules.webauthn.WebauthnAuthenticate</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"
