@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.audit;
 
@@ -22,6 +23,7 @@ import static org.forgerock.openam.audit.JsonUtils.assertJsonValue;
 
 import org.forgerock.audit.events.AuditEvent;
 import org.testng.annotations.Test;
+import org.joda.time.DateTimeZone;
 
 /**
  * @since 13.0.0
@@ -64,6 +66,11 @@ public class AMActivityAuditEventBuilderTest {
 
     @Test
     public void canBuildAccessAuditEventWithContextLtz() throws Exception {
+        // Given
+        DateTimeZone originalTimeZone = DateTimeZone.getDefault();
+        DateTimeZone.setDefault(DateTimeZone.forID("Asia/Tokyo"));
+
+        // When
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
                 .timestamp(1436389263629L,true)
                 .eventName(AM_SESSION_CREATED)
@@ -76,7 +83,11 @@ public class AMActivityAuditEventBuilderTest {
                 .operation("CREATE")
                 .toEvent();
 
+        // Then
         assertJsonValue(activityEvent.getValue(), "/activity-event-ltz.json");
+
+        // End
+        DateTimeZone.setDefault(originalTimeZone);
     }
 
 }
