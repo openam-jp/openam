@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.oauth2.guice;
 
@@ -199,7 +200,8 @@ public class OAuth2GuiceModule extends AbstractModule {
         grantTypeHandlers.addBinding(PASSWORD).to(PasswordCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding(AUTHORIZATION_CODE).to(AuthorizationCodeGrantTypeHandler.class);
         grantTypeHandlers.addBinding(DEVICE_CODE).to(DeviceCodeGrantTypeHandler.class);
-        grantTypeHandlers.addBinding(JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
+        // Disable JWT Bearer Token Authorization Grant
+        //grantTypeHandlers.addBinding(JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
 
         final Multibinder<AuthorizeRequestHook> authorizeRequestHooks = Multibinder.newSetBinder(
                 binder(), AuthorizeRequestHook.class);

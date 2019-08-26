@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.restlet;
@@ -41,7 +42,8 @@ public class AccessTokenFlowFinder extends OAuth2FlowFinder {
         endpointClasses.put(CLIENT_CREDENTIALS, wrap(TokenEndpointResource.class));
         endpointClasses.put(PASSWORD, wrap(TokenEndpointResource.class));
         endpointClasses.put(DEVICE_CODE, wrap(TokenEndpointResource.class));
-        endpointClasses.put(JWT_BEARER, wrap(TokenEndpointResource.class));
+        // Disable JWT Bearer Token Authorization Grant
+        //endpointClasses.put(JWT_BEARER, wrap(TokenEndpointResource.class));
         endpointClasses.put(SAML2_BEARER, wrap(TokenEndpointResource.class));
         return endpointClasses;
     }
