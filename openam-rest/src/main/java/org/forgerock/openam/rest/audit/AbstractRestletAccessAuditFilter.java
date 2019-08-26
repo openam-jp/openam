@@ -116,7 +116,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .timestamp(request.getDate().getTime(),auditEventPublisher.isLtzEnabled())
+                    .timestamp(request.getDate().getTime(), auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
@@ -142,7 +142,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
             final Representation entity = response.getEntity();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .timestamp(endTime,auditEventPublisher.isLtzEnabled())
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)
@@ -180,7 +180,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     field(ACCESS_RESPONSE_DETAIL_REASON, response.getStatus().getDescription())));
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
-                    .timestamp(endTime,auditEventPublisher.isLtzEnabled())
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)

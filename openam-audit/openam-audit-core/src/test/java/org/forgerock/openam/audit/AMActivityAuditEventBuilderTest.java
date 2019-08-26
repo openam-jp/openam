@@ -72,7 +72,7 @@ public class AMActivityAuditEventBuilderTest {
 
         // When
         AuditEvent activityEvent = new AMActivityAuditEventBuilder()
-                .timestamp(1436389263629L,true)
+                .timestamp(1436389263629L, true)
                 .eventName(AM_SESSION_CREATED)
                 .component(SESSION)
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")

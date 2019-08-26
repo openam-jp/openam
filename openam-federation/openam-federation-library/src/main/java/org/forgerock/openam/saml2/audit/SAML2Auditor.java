@@ -84,7 +84,7 @@ public class SAML2Auditor implements SAML2EventLogger {
                 realm, AuditConstants.ACCESS_TOPIC, AuditConstants.EventName.AM_ACCESS_ATTEMPT)) {
 
             AuditEvent auditEvent = getDefaultSAML2AccessAuditEventBuilder()
-                    .timestamp(startTime,auditEventPublisher.isLtzEnabled())
+                    .timestamp(startTime, auditEventPublisher.isLtzEnabled())
                     .eventName(AuditConstants.EventName.AM_ACCESS_ATTEMPT)
                     .toEvent();
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, auditEvent);
@@ -122,7 +122,7 @@ public class SAML2Auditor implements SAML2EventLogger {
             final long elapsedTime = endTime - startTime;
 
             AuditEvent auditEvent = getDefaultSAML2AccessAuditEventBuilder()
-                    .timestamp(endTime,auditEventPublisher.isLtzEnabled())
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .eventName(AuditConstants.EventName.AM_ACCESS_OUTCOME)
                     .response(SUCCESSFUL, message, elapsedTime, MILLISECONDS)
                     .toEvent();
@@ -142,7 +142,7 @@ public class SAML2Auditor implements SAML2EventLogger {
             final long elapsedTime = endTime - startTime;
             final JsonValue detail = json(object(field(AuditConstants.ACCESS_RESPONSE_DETAIL_REASON, message)));
             AuditEvent auditEvent = getDefaultSAML2AccessAuditEventBuilder()
-                    .timestamp(endTime,auditEventPublisher.isLtzEnabled())
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .eventName(AuditConstants.EventName.AM_ACCESS_OUTCOME)
                     .responseWithDetail(FAILED, errorCode, elapsedTime, MILLISECONDS, detail)
                     .toEvent();
