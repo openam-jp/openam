@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.audit;
 
@@ -82,6 +83,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             }
 
             AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
+                    .timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
                     .transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGIN_COMPLETED)
@@ -125,6 +127,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             entryDetail.addInfo(FAILURE_REASON, failureReason.name());
 
             AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
+                    .timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
                     .transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGIN_COMPLETED)
@@ -167,6 +170,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
             String userId = AMAuditEventBuilderUtils.getUserId(token);
 
             AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
+                    .timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
                     .transactionId(getTransactionIdValue())
                     .component(AUTHENTICATION)
                     .eventName(AM_LOGOUT)

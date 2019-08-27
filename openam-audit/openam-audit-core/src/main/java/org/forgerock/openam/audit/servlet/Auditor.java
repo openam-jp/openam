@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.audit.servlet;
@@ -48,6 +49,7 @@ public class Auditor {
     private final AuditableHttpServletResponse response;
     private final Component component;
     private final long startTime;
+    private final boolean ltzEnabled;
 
     /**
      * Constructs a new Auditor instance.
@@ -56,15 +58,17 @@ public class Auditor {
      * @param request The {@code HttpServletRequest}.
      * @param response The {@code HttpServletResponse}.
      * @param component The component.
+     * @param ltzEnabled The Local Time Zone.
      */
     @Inject
     public Auditor(TimeService timeService, @Assisted HttpServletRequest request,
-            @Assisted AuditableHttpServletResponse response, @Assisted Component component) {
+            @Assisted AuditableHttpServletResponse response, @Assisted Component component, @Assisted Boolean ltzEnabled) {
         this.timeService = timeService;
         this.request = request;
         this.response = response;
         this.component = component;
         this.startTime = timeService.now();
+        this.ltzEnabled = ltzEnabled.booleanValue();
     }
 
     /**
@@ -75,7 +79,7 @@ public class Auditor {
     public AuditEvent auditAccessAttempt() {
         return accessEvent()
                 .forHttpServletRequest(request)
-                .timestamp(startTime)
+                .timestamp(startTime, this.ltzEnabled)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_ATTEMPT)
                 .component(component)
@@ -105,7 +109,7 @@ public class Auditor {
         long elapsedTime = endTime - startTime;
         return accessEvent()
                 .forHttpServletRequest(request)
-                .timestamp(endTime)
+                .timestamp(endTime, this.ltzEnabled)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
                 .component(component)
@@ -126,7 +130,7 @@ public class Auditor {
                 field(ACCESS_RESPONSE_DETAIL_REASON, response.getMessage())));
         return accessEvent()
                 .forHttpServletRequest(request)
-                .timestamp(endTime)
+                .timestamp(endTime, this.ltzEnabled)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(AM_ACCESS_OUTCOME)
                 .component(component)

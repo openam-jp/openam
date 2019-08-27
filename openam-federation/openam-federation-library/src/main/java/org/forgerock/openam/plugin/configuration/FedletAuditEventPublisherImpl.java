@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.plugin.configuration;
 
@@ -33,4 +34,10 @@ public class FedletAuditEventPublisherImpl implements AuditEventPublisher {
     public boolean isAuditing(String realm, String topic, AuditConstants.EventName eventName) {
         return false;
     }
+
+    @Override
+    public boolean isLtzEnabled() {
+        return true;
+    }
+
 }

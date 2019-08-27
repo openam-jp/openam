@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -36,6 +37,7 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
 
     private final Set<String> blacklistedEventNames;
     private final boolean auditEnabled;
+    private final boolean ltzEnabled;
 
     /**
      * Create an instance of {@code AMAuditServiceConfiguration} with the specified values.
@@ -45,6 +47,7 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
     public AMAuditServiceConfiguration(boolean auditEnabled) {
         this.auditEnabled = auditEnabled;
         this.blacklistedEventNames = new HashSet<>();
+        this.ltzEnabled = true;
     }
 
     /**
@@ -52,11 +55,13 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
      *
      * @param auditEnabled Is audit logging enabled.
      * @param blacklistedEventNames A set of event names which we DO NOT want to audit.
+     * @param ltzEnabled Is the local time zone og audit logging timestamp enabled.
      */
-    public AMAuditServiceConfiguration(boolean auditEnabled, Set<String> blacklistedEventNames) {
+    public AMAuditServiceConfiguration(boolean auditEnabled, Set<String> blacklistedEventNames, boolean ltzEnabled) {
 
         this.auditEnabled = auditEnabled;
         this.blacklistedEventNames = blacklistedEventNames;
+        this.ltzEnabled = ltzEnabled;
     }
 
     /**
@@ -80,4 +85,13 @@ public class AMAuditServiceConfiguration extends AuditServiceConfiguration {
         }
         return blacklistedEventNames.contains(eventName.toString());
     }
+
+    /**
+     * Is audit logging enabled.
+     * @return true if audit logging is enabled.
+     */
+    public boolean isLtzEnabled() {
+        return ltzEnabled;
+    }
+
 }

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.radius.server.audit;
 
@@ -142,7 +143,7 @@ public class RadiusAuditLoggerEventBus implements RadiusAuditor {
         AuditRequestContext.set(new AuditRequestContext(new TransactionId(accessRequestEvent.getRequestId())));
 
         AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(accessRequestEvent.getRealm())
-                .timestamp(accessRequestEvent.getTimeOfEvent())
+                .timestamp(accessRequestEvent.getTimeOfEvent(), this.auditEventPublisher.isLtzEnabled())
                 .transactionId(accessRequestEvent.getRequestId())
                 .eventName(eventName)
                 .component(Component.RADIUS)

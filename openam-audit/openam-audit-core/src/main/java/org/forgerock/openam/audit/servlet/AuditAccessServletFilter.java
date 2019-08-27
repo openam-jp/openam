@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.audit.servlet;
 
@@ -55,7 +56,7 @@ public class AuditAccessServletFilter implements Filter {
         AuditableHttpServletResponse auditableResponse =
                 new AuditableHttpServletResponse((HttpServletResponse) response);
         Auditor auditor = Singleton.getAuditorFactory().create((HttpServletRequest) request, auditableResponse,
-                component);
+                component, Boolean.valueOf(Singleton.getAuditEventPublisher().isLtzEnabled()));
 
         Singleton.getAuditEventPublisher().tryPublish(AuditConstants.ACCESS_TOPIC, auditor.auditAccessAttempt());
         try {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package com.iplanet.dpro.session.service;
 
@@ -79,6 +80,7 @@ public final class SessionAuditor {
         if (auditEventPublisher.isAuditing(realm, ACTIVITY_TOPIC, eventName)) {
 
             AMActivityAuditEventBuilder builder = auditEventFactory.activityEvent(realm)
+                    .timestamp(System.currentTimeMillis(), auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(eventName)
                     .component(Component.SESSION)

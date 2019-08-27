@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.audit;
 
@@ -49,5 +50,12 @@ public interface AMAuditService extends AuditService {
      * @return {@code true} if Auditing is switched on and if the topic and eventName should be audited.
      */
     boolean isAuditEnabled(String topic, EventName eventName);
+
+    /**
+     * Determines whether to use the local time zone for audit log
+     *
+     * @return {@code true} to use the local time zone or not.
+     */
+    boolean isLtzEnabled();
 
 }
