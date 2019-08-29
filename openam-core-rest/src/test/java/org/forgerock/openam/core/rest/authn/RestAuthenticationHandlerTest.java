@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -346,6 +347,7 @@ public class RestAuthenticationHandlerTest {
                     authIndexType, indexValue, sessionUpgradeSSOTokenId);
         } catch (RestAuthException e) {
             assertEquals(e.getStatusCode(), 400);
+            assertEquals(e.getMessage(), "Unknown Authentication Index Type");
             return;
         }
 
