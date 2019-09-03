@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2022 OSSTech Corporation
  * Portions Copyrighted 2020 i7a7467
  */
 package org.forgerock.openam.authentication.modules.oauth2;
@@ -226,16 +226,29 @@ public class OAuth extends AMLoginModule {
                 // be used because the framework changes the order of the 
                 // parameters in the query. OAuth2 requires an identical URL 
                 // when retrieving the token
-                for (String domain : domains) {
+                if (domains.isEmpty()) {
                     CookieUtils.addCookieToResponse(request, response,
-                            CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
+                            CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", null));
                     CookieUtils.addCookieToResponse(request, response,
-                            CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", domain));
+                            CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", null));
                     CookieUtils.addCookieToResponse(request, response,
-                            CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
+                            CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", null));
                     if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
                         CookieUtils.addCookieToResponse(request, response,
-                                CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
+                                CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", null));
+                    }
+                } else {
+                    for (String domain : domains) {
+                        CookieUtils.addCookieToResponse(request, response,
+                                CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
+                        CookieUtils.addCookieToResponse(request, response,
+                                CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", domain));
+                        CookieUtils.addCookieToResponse(request, response,
+                                CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
+                        if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
+                            CookieUtils.addCookieToResponse(request, response,
+                                    CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
+                        }
                     }
                 }
 

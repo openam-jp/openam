@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019-2020 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2022 OSSTech Corporation
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -443,9 +443,14 @@ public class SAML2 extends AMLoginModule {
         }
 
         // Set the return URL Cookie
-        for (String domain : domains) {
+        if (domains.isEmpty()) {
             CookieUtils.addCookieToResponse(request, response,
-                    CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, originalUrl.toString(), "/", domain));
+                    CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, originalUrl.toString(), "/", null));
+        } else {
+            for (String domain : domains) {
+                CookieUtils.addCookieToResponse(request, response,
+                        CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, originalUrl.toString(), "/", domain));
+            }
         }
     }
 
@@ -456,9 +461,14 @@ public class SAML2 extends AMLoginModule {
         final Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
 
         // Set the return URL Cookie
-        for (String domain : domains) {
+        if (domains.isEmpty()) {
             CookieUtils.addCookieToResponse(request, response,
-                    CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, "", 0, "/", domain));
+                    CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, "", 0, "/", null));
+        } else {
+            for (String domain : domains) {
+                CookieUtils.addCookieToResponse(request, response,
+                        CookieUtils.newCookie(Constants.AM_LOCATION_COOKIE, "", 0, "/", domain));
+            }
         }
     }
 
