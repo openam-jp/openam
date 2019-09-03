@@ -14,7 +14,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
 
   Copyright 2012-2015 ForgeRock AS.
-  Portions Copyrighted 2019 Open Source Solution Technology Corporation
+  ortions Copyrighted 2019 Open Source Solution Technology Corporation
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -29,10 +29,10 @@
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Register device</Value>
+                    <Value>デバイスの登録</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value>Skip this step</Value>
+                    <Value>登録しないでログインする</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -42,7 +42,7 @@
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Register device</Value>
+                    <Value>デバイスの登録</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -50,41 +50,40 @@
     <!-- For when we're not optional and a device is registered -->
     <Callbacks length="2" order="4" timeout="120" header="#REPLACE#">
         <NameCallback>
-            <Prompt>Enter verification code:</Prompt>
+            <Prompt>ワンタイムパスワードの入力:</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Submit</Value>
+                    <Value>送信</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
     <!-- For registration -->
-    <Callbacks length="3" order="5" timeout="120" header="Register your device with OpenAM">
+    <Callbacks length="3" order="5" timeout="120" header="デバイスの登録">
         <TextOutputCallback>
-            Scan the barcode image below with the ForgeRock Authenticator App. Once registered click the button to
-            enter your verification code and login.
+             お手持ちのスマートフォン等の端末でアプリを起動し、バーコードをスキャンしてください。スキャンしてアカウントが登録されたら「次へ進む」を押してください。
+             現在アプリがインストールされている端末でアクセスしている場合はスキャンせずに「スマートデバイスはこちら」を押すとアカウントを登録することが出来ます。
         </TextOutputCallback>
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Login using verification code</Value>
+                    <Value>次へ進む</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
     <!-- For recovery code use -->
-    <Callbacks length="2" order="6" timeout="120" header="OATH Authenticator Emergency Code Used">
+    <Callbacks length="2" order="6" timeout="120" header="リカバリーコードの使用">
         <TextOutputCallback>
-            You have used one of your Emergency OATH Authenticator Codes. Please make sure you have a note of
-            any remaining OATH Authenticator Codes.
+            リカバリーコードを使ってログインを行いました。今回入力したコードはもう使用できません。
         </TextOutputCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Continue</Value>
+                    <Value>次へ進む</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -92,15 +91,15 @@
     <!-- For when we're optional, but we just generated a device -->
     <Callbacks length="2" order="7" timeout="120" header="#REPLACE#">
         <NameCallback>
-            <Prompt>Enter verification code:</Prompt>
+            <Prompt>ワンタイムパスワードの入力:</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Submit</Value>
+                    <Value>送信</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value>Skip this step</Value>
+                    <Value>登録しないでログインする</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
