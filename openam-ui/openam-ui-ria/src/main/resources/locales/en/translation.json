@@ -1158,7 +1158,9 @@
                         "AMIdentityMembership": {
                             "title": "Identity Membership",
                             "props": {
-                                "amIdentityName": "AM Identity Name"
+                                "amIdentityName": "AM Identity Name",
+                                "users" : "Users",
+                                "groups": "Groups"
                             }
                         },
                         "AuthLevel": {

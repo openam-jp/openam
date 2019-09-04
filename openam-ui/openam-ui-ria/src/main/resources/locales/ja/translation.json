@@ -1158,7 +1158,9 @@
                         "AMIdentityMembership": {
                             "title": "アイデンティティメンバーシップ",
                             "props": {
-                                "amIdentityName": "AM アイデンティティ名"
+                                "amIdentityName": "AM アイデンティティ名",
+                                "users" : "ユーザー対象",
+                                "groups": "グループ対象"
                             }
                         },
                         "AuthLevel": {
