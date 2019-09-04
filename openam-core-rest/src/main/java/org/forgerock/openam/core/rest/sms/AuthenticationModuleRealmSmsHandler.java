@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -63,16 +64,13 @@ public class AuthenticationModuleRealmSmsHandler {
     private final SSOToken adminToken;
     private final Debug debug;
     private final AMResourceBundleCache resourceBundleCache;
-    private final java.util.Locale defaultLocale;
 
     @Inject
     public AuthenticationModuleRealmSmsHandler(@Named("frRest") Debug debug, @Named("adminToken") SSOToken adminToken,
-            @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache,
-            @Named("DefaultLocale") Locale defaultLocale) {
+            @Named("AMResourceBundleCache") AMResourceBundleCache resourceBundleCache) {
         this.debug = debug;
         this.adminToken = adminToken;
         this.resourceBundleCache = resourceBundleCache;
-        this.defaultLocale = defaultLocale;
     }
 
     /**
@@ -102,6 +100,8 @@ public class AuthenticationModuleRealmSmsHandler {
             Set<AMAuthenticationInstance> moduleInstances = mgr.getAuthenticationInstances();
 
             List<ResourceResponse> resourceResponses = new ArrayList<>();
+            
+            Locale requestLocale = request.getPreferredLocales().getPreferredLocale();
 
             for (AMAuthenticationInstance instance : moduleInstances) {
                 String name = instance.getName();
@@ -109,7 +109,7 @@ public class AuthenticationModuleRealmSmsHandler {
                     try {
                         ServiceSchemaManager schemaManager = getSchemaManager(instance.getType());
                         String type = schemaManager.getResourceName();
-                        String typeDescription = getI18NValue(schemaManager, instance.getType(), debug);
+                        String typeDescription = getI18NValue(schemaManager, instance.getType(), debug, requestLocale);
                         JsonValue result = json(object(
                                 field(ResourceResponse.FIELD_CONTENT_ID, name),
                                 field("typeDescription", typeDescription),
@@ -149,10 +149,11 @@ public class AuthenticationModuleRealmSmsHandler {
         return new ServiceSchemaManager(schema.getServiceName(), adminToken);
     }
 
-    protected String getI18NValue(ServiceSchemaManager schemaManager, String authType, Debug debug) {
+    protected String getI18NValue(ServiceSchemaManager schemaManager, String authType,
+            Debug debug, Locale locale) {
         String i18nKey = schemaManager.getI18NKey();
         String i18nName = authType;
-        ResourceBundle rb = getBundle(schemaManager.getI18NFileName(), defaultLocale);
+        ResourceBundle rb = getBundle(schemaManager.getI18NFileName(), locale);
         if (rb != null && i18nKey != null && !i18nKey.isEmpty()) {
             i18nName = com.sun.identity.shared.locale.Locale.getString(rb, i18nKey, debug);
         }

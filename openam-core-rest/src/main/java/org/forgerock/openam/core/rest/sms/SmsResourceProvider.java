@@ -49,6 +49,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.annotations.Action;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -284,19 +285,30 @@ public abstract class SmsResourceProvider {
             SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
                 resourceId = new ServiceSchemaManager(ssoToken, serviceName, serviceVersion).getResourceName();
         }
+        HttpContext httpContext = context.asContext(HttpContext.class);
         return json(object(
                 field(ResourceResponse.FIELD_CONTENT_ID, resourceId),
-                field(NAME, getI18NName()),
+                field(NAME, getI18NName(getLocale(httpContext))),
                 field(COLLECTION, schema.supportsMultipleConfigurations())));
     }
 
-    private String getI18NName() {
+    private Locale getLocale(HttpContext context) {
+        final String acceptLangHeader = context.getHeaderAsString("accept-language");
+        if (acceptLangHeader != null && !acceptLangHeader.isEmpty()) {
+            String acclocale = 
+                    com.sun.identity.shared.locale.Locale.getLocaleStringFromAcceptLangHeader(acceptLangHeader);
+            return com.sun.identity.shared.locale.Locale.getLocale(acclocale);
+        }
+        return defaultLocale;
+    }
+    
+    private String getI18NName(Locale locale) {
         String i18nKey = schema.getI18NKey();
         String i18nName = schema.getName();
         if (StringUtils.isEmpty(i18nName)) {
             i18nName = schema.getServiceName();
         }
-        ResourceBundle rb = resourceBundleCache.getResBundle(schema.getI18NFileName(), defaultLocale);
+        ResourceBundle rb = resourceBundleCache.getResBundle(schema.getI18NFileName(), locale);
         if (rb != null && StringUtils.isNotEmpty(i18nKey)) {
             i18nName = com.sun.identity.shared.locale.Locale.getString(rb, i18nKey, debug);
         }

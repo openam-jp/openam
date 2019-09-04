@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -134,7 +135,7 @@ public class SmsResourceProviderTest {
                 uriPath, true, jsonConverter, debug);
 
         // When
-        JsonValue returnedJV = resourceProvider.getType(mock(Context.class)).getOrThrow().getJsonContent();
+        JsonValue returnedJV = resourceProvider.getType(context).getOrThrow().getJsonContent();
 
         // Then
         AssertJJsonValueAssert.assertThat(returnedJV)
