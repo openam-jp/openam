@@ -366,9 +366,9 @@ public class LDAP extends AMLoginModule {
                         replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), invalidMsg);
                         currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                         passwordValidationSuccessFlag = false;
-                        if (overrideSharedstateUsernameEnabled) {
-                            storeUsernamePasswd(ldapUtil.getUserId(), userPassword);
-                        }
+                    }
+                    if (overrideSharedstateUsernameEnabled) {
+                        storeUsernamePasswd(ldapUtil.getUserId(), userPassword);
                     }
                 }
 
