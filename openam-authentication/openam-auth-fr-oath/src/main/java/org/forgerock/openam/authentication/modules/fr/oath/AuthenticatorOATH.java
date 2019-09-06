@@ -105,8 +105,6 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final String ISSUER_NAME = "openam-auth-fr-oath-issuer-name";
     private static final int TOTAL_ATTEMPTS = 3;
 
-    private static final String MODULE_NAME = "ForgeRock Authenticator (OATH)";
-
     //module attribute holders
     private String issuerName;
     private int userConfiguredSkippable = 0;
