@@ -358,7 +358,7 @@ public class SAML2 extends AMLoginModule {
         /* TODO: Some auth methods such as DeskTop SSO require information stored in
            request/response objects. The last two parameters should be request and response
            insted of null and null.
-        */  
+        */
         authenticationContext.login(AuthContext.IndexType.SERVICE, localChain, null, null, null, null);
 
         return injectCallbacks(null, state);
@@ -621,7 +621,6 @@ public class SAML2 extends AMLoginModule {
         }
 
         //we need the following for idp initiated slo as well as sp, so always include it
-        setUserSessionProperty(SAML2Constants.SESSION_INDEX, sessionIndex);
         setUserSessionProperty(SAML2Constants.IDPENTITYID, entityName);
         setUserSessionProperty(SAML2Constants.SPENTITYID, SPSSOFederate.getSPEntityId(metaAlias));
         setUserSessionProperty(SAML2Constants.METAALIAS, metaAlias);
@@ -631,6 +630,13 @@ public class SAML2 extends AMLoginModule {
         setUserSessionProperty(Constants.REQUEST_ID, respInfo.getResponse().getInResponseTo());
         setUserSessionProperty(SAML2Constants.BINDING, binding);
         setUserSessionProperty(Constants.CACHE_KEY, storageKey);
+
+        // SessionIndex is optional
+        // if idp support single logout, idp must include SessionIndex attribute
+        if (sessionIndex != null) {
+            setUserSessionProperty(SAML2Constants.SESSION_INDEX, sessionIndex);
+        }
+
     }
 
     /**
