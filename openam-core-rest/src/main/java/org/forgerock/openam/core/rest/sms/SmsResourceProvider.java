@@ -49,7 +49,6 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.annotations.Action;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -285,21 +284,10 @@ public abstract class SmsResourceProvider {
             SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
                 resourceId = new ServiceSchemaManager(ssoToken, serviceName, serviceVersion).getResourceName();
         }
-        HttpContext httpContext = context.asContext(HttpContext.class);
         return json(object(
                 field(ResourceResponse.FIELD_CONTENT_ID, resourceId),
-                field(NAME, getI18NName(getLocale(httpContext))),
+                field(NAME, getI18NName(getLocale(context))),
                 field(COLLECTION, schema.supportsMultipleConfigurations())));
-    }
-
-    private Locale getLocale(HttpContext context) {
-        final String acceptLangHeader = context.getHeaderAsString("accept-language");
-        if (acceptLangHeader != null && !acceptLangHeader.isEmpty()) {
-            String acclocale = 
-                    com.sun.identity.shared.locale.Locale.getLocaleStringFromAcceptLangHeader(acceptLangHeader);
-            return com.sun.identity.shared.locale.Locale.getLocale(acclocale);
-        }
-        return defaultLocale;
     }
     
     private String getI18NName(Locale locale) {
@@ -439,11 +427,12 @@ public abstract class SmsResourceProvider {
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
-        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
+        Locale requestLocale = getLocale(context);
+        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole", requestLocale);
         String serviceType = schemas.getServiceType().getType();
         List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
 
-        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), getLocale(context));
+        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), requestLocale);
 
         for (AttributeSchema attribute : schemas.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
