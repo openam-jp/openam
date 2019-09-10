@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2018-2019 Open Source Solution Technology Corporation
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
@@ -59,6 +59,7 @@ public class OAuth2Request {
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
     private JsonValue body;
     private String validRedirectUri = null;
+    private Set<String> validatedScopes = Collections.emptySet();
 
     /**
      * Constructs a new RestletOAuth2Request.
@@ -252,6 +253,22 @@ public class OAuth2Request {
      */
     public Locale getLocale() {
         return ServletUtils.getRequest(request).getLocale();
+    }
+
+    /**
+     * Set scopes in the current request as valid.
+     * @param validatedScopes The validated scopes
+     */
+    public void setValidatedScopes(Set<String> validatedScopes) {
+        this.validatedScopes = validatedScopes;
+    }
+    
+    /**
+     * Get validated scopes in the current request.
+     * @return The validated scopes, If validation fails, it returns empty Set.
+     */
+    public Set<String> getValidatedScopes() {
+        return validatedScopes;
     }
 
     /**

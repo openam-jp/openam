@@ -18,7 +18,6 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.Utils.splitScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.OPENID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
@@ -185,6 +184,9 @@ public class OpenAMScopeValidator implements ScopeValidator {
             throw InvalidScopeException.create("No scope requested and no default scope configured", request);
         }
 
+        // Store scopes to use validated values instead of raw request parameters for later use.
+        request.setValidatedScopes(scopes);
+        
         return scopes;
     }
 
@@ -228,8 +230,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 //otherwise we're simply reading claims into the id_token, so grab it from the request/ssoToken
                 realm = DNMapper.orgNameToRealmName(ssoToken.getProperty(ISAuthConstants.ORGANIZATION));
                 id = identityManager.getResourceOwnerIdentity(ssoToken.getProperty(ISAuthConstants.USER_ID), realm);
-                String scopeStr = request.getParameter(OAuth2Constants.Params.SCOPE);
-                scopes = splitScope(scopeStr);
+                scopes = request.getValidatedScopes();
             }
 
             scriptVariables.put(OAuth2Constants.ScriptParams.SCOPES, getScriptFriendlyScopes(scopes));
