@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -203,6 +204,8 @@ public class OpenAMScopeValidator implements ScopeValidator {
         Map<String, Set<String>> requestedClaimsValues = gatherRequestedClaims(providerSettings, request, token);
 
         try {
+            requestedClaimsValues = filterClaims(providerSettings.getSupportedClaims(), requestedClaimsValues);
+
             if (token != null) {
 
                 OpenIdConnectClientRegistration clientRegistration;
@@ -324,6 +327,19 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
         return requestedClaims;
 
+    }
+    
+    private Map<String, Set<String>> filterClaims(Set<String> supportedClaims, Map<String, Set<String>> requestedClaimsValues) {
+        final Map<String, Set<String>> filteredClaims = new HashMap<String, Set<String>>();
+        if (requestedClaimsValues.isEmpty()) {
+            return filteredClaims;
+        }
+        for (String supportedClaim : supportedClaims) {
+            if (requestedClaimsValues.containsKey(supportedClaim)) {
+                filteredClaims.put(supportedClaim, requestedClaimsValues.get(supportedClaim));
+            }
+        }
+        return filteredClaims;
     }
 
     /**
