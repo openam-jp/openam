@@ -1333,6 +1333,13 @@ public class LDAPAuthUtils {
     /**
      * TODO-JAVADOC
      */
+    public String getUserNamingAttribute() {
+        return userNamingAttr;
+    }
+
+    /**
+     * TODO-JAVADOC
+     */
     public  void setUserSearchAttribute(Set<String> attr) throws LDAPUtilException {
         if (attr == null || attr.isEmpty()) {
             throw new LDAPUtilException("USchAttr", (Object[])null);
