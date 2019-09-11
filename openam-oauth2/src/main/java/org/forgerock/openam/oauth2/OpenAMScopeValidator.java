@@ -330,6 +330,13 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
     }
     
+    /**
+     * Filter request claims by supported claims. And members with JSON Object are not included.
+     * 
+     * @param supportedClaims The supported claims
+     * @param requestedClaimsValues The request claims
+     * @return The filtered claims
+     */
     private Map<String, Set<String>> filterClaims(Set<String> supportedClaims, Map<String, Set<String>> requestedClaimsValues) {
         final Map<String, Set<String>> filteredClaims = new HashMap<String, Set<String>>();
         if (requestedClaimsValues.isEmpty()) {
@@ -337,7 +344,10 @@ public class OpenAMScopeValidator implements ScopeValidator {
         }
         for (String supportedClaim : supportedClaims) {
             if (requestedClaimsValues.containsKey(supportedClaim)) {
-                filteredClaims.put(supportedClaim, requestedClaimsValues.get(supportedClaim));
+                // Currently only null is allowed as the value for the claims parameter member.
+                if (requestedClaimsValues.get(supportedClaim).isEmpty()) {
+                    filteredClaims.put(supportedClaim, requestedClaimsValues.get(supportedClaim));
+                }
             }
         }
         return filteredClaims;
