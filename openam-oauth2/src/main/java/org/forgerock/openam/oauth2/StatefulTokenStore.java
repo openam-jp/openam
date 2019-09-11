@@ -16,15 +16,13 @@
  */
 package org.forgerock.openam.oauth2;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
-import static org.forgerock.openam.utils.Time.currentTimeMillis;
-import static org.forgerock.util.query.QueryFilter.equalTo;
+import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+import static org.forgerock.openam.utils.Time.*;
+import static org.forgerock.util.query.QueryFilter.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -39,12 +37,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
@@ -71,6 +67,8 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.core.RealmInfo;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.Alphabet;
+import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
@@ -85,6 +83,13 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
@@ -110,6 +115,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     private final CookieExtractor cookieExtractor;
     private final SecureRandom secureRandom;
     private final ClientAuthenticationFailureFactory failureFactory;
+    private final RecoveryCodeGenerator recoveryCodeGenerator;
 
     /**
      * Constructs a new OpenAMTokenStore.
@@ -121,6 +127,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
      * @param cookieExtractor An instance of the CookieExtractor
      * @param auditLogger An instance of OAuth2AuditLogger
      * @param failureFactory
+     * @param recoveryCodeGenerator An instance of RecoveryCodeGenerator
      */
     @Inject
     public StatefulTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
@@ -128,7 +135,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
             @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger, SecureRandom secureRandom,
-            ClientAuthenticationFailureFactory failureFactory) {
+            ClientAuthenticationFailureFactory failureFactory, RecoveryCodeGenerator recoveryCodeGenerator) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.oauth2UrisFactory = oauth2UrisFactory;
@@ -140,6 +147,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         this.logger = logger;
         this.secureRandom = secureRandom;
         this.failureFactory = failureFactory;
+        this.recoveryCodeGenerator = recoveryCodeGenerator;
     }
 
     /**
@@ -858,22 +866,19 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String deviceCode = UUID.randomUUID().toString();
         final String auditId = IdGenerator.DEFAULT.generate();
-        final StringBuilder codeBuilder = new StringBuilder(CODE_LENGTH);
 
         String userCode = null;
 
         int i;
         for (i = 0; i < NUM_RETRIES; i++) {
-            for (int k = 0; k < CODE_LENGTH; k++) {
-                codeBuilder.append(ALPHABET.charAt(secureRandom.nextInt(ALPHABET.length())));
-            }
+
+            String result = recoveryCodeGenerator.generateCode(Alphabet.BASE58, CODE_LENGTH);
+
             try {
-                readDeviceCode(codeBuilder.toString(), request);
-                codeBuilder.delete(0, codeBuilder.length());
-                // code can be found - try again
+                readDeviceCode(result, request);
             } catch (InvalidGrantException e) {
                 // Good, it doesn't exist yet.
-                userCode = codeBuilder.toString();
+                userCode = result;
                 break;
             } catch (ServerException e) {
                 logger.message("Could not query CTS, assume duplicate to be safe", e);
