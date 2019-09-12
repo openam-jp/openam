@@ -195,10 +195,10 @@ public class AuthenticatorOATH extends AMLoginModule {
             debug.message("OATH::init");
         }
         Locale locale = getLoginLocale();
-        bundle = amCache.getResBundle(amAuthOATH, locale);
         if (debug.messageEnabled()) {
             debug.message("ForgeRock Authenticator locale=" + locale);
         }
+        bundle = amCache.getResBundle(amAuthOATH, locale);
         login_header = bundle.getString("login_header");
 
         userName = (String) sharedState.get(getUserKey());
