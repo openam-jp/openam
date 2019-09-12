@@ -1323,18 +1323,18 @@ public class LDAPAuthUtils {
     /**
      * TODO-JAVADOC
      */
-    public void setUserNamingAttribute(String s) throws LDAPUtilException{
-        if (s == null || s.length() < 1) {
-            throw new LDAPUtilException("UNAttr", (Object[])null);
-        }
-        userNamingAttr = s;
+    public String getUserNamingValue() {
+            return userNamingValue;
     }
 
     /**
      * TODO-JAVADOC
      */
-    public String getUserNamingAttribute() {
-        return userNamingAttr;
+    public void setUserNamingAttribute(String s) throws LDAPUtilException{
+        if (s == null || s.length() < 1) {
+            throw new LDAPUtilException("UNAttr", (Object[])null);
+        }
+        userNamingAttr = s;
     }
 
     /**

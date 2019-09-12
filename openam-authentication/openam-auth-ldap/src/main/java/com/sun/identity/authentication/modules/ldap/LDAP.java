@@ -368,12 +368,9 @@ public class LDAP extends AMLoginModule {
                         passwordValidationSuccessFlag = false;
                     }
                     if (overrideSharedstateUsernameEnabled) {
-                        Map<String, Set<String>> userAttributeValues = ldapUtil.getUserAttributeValues();
-                        Set<String> userNameValues = userAttributeValues.get(ldapUtil.getUserNamingAttribute());
-                        String userName = (String)userNameValues.iterator().next();
-                        storeUsernamePasswd(userName, userPassword);
+                        storeUsernamePasswd(ldapUtil.getUserNamingValue(), userPassword);
                         if (debug.messageEnabled()) {
-                            debug.message("ldapUtil.getUserNamingAttribute(): " + userName);
+                            debug.message("Override SharedState UserName -> ldapUtil.getUserNamingValue(): " + ldapUtil.getUserNamingValue());
                         }
                     }
                 }
