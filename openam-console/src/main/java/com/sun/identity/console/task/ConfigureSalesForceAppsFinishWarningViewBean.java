@@ -25,6 +25,7 @@
  * $Id: ConfigureSalesForceAppsFinishWarningViewBean.java,v 1.1 2009/07/28 17:45:20 babysunil Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.console.task;
@@ -80,7 +81,7 @@ public class ConfigureSalesForceAppsFinishWarningViewBean
         int idx = html.lastIndexOf("</div>");
         String redirectUrl;
         if (XuiRedirectHelper.isXuiAdminConsoleEnabled()) {
-            String realm = RequestManager.getRequestContext().getRequest().getParameter("realm");
+            String realm = XuiRedirectHelper.getRedirectRealm(this);
             redirectUrl = "../XUI#realms/" + Uris.urlEncodePathElement(realm) + "/dashboard";
         } else {
             redirectUrl = "../task/Home";

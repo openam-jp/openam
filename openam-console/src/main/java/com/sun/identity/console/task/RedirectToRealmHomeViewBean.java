@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.console.task;
@@ -34,7 +35,8 @@ public abstract class RedirectToRealmHomeViewBean extends AMPrimaryMastHeadViewB
         if (XuiRedirectHelper.isXuiAdminConsoleEnabled()) {
             RequestContext rc = RequestManager.getRequestContext();
             try {
-                String realm = URLEncoder.encode(rc.getRequest().getParameter("realm"), "UTF-8");
+                String redirectRealm = XuiRedirectHelper.getRedirectRealm(this);
+                String realm = URLEncoder.encode(redirectRealm, "UTF-8");
                 rc.getResponse().sendRedirect("../XUI#realms/" + realm + "/dashboard");
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException("UTF-8 not supported", e);
