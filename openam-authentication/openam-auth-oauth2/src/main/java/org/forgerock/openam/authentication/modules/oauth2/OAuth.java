@@ -227,28 +227,10 @@ public class OAuth extends AMLoginModule {
                 // parameters in the query. OAuth2 requires an identical URL 
                 // when retrieving the token
                 if (domains.isEmpty()) {
-                    CookieUtils.addCookieToResponse(request, response,
-                            CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", null));
-                    CookieUtils.addCookieToResponse(request, response,
-                            CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", null));
-                    CookieUtils.addCookieToResponse(request, response,
-                            CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", null));
-                    if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
-                        CookieUtils.addCookieToResponse(request, response,
-                                CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", null));
-                    }
+                    addCookiesToResponse(request, response, originalUrl, csrfStateTokenId, ProviderLogoutURL, null);
                 } else {
                     for (String domain : domains) {
-                        CookieUtils.addCookieToResponse(request, response,
-                                CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
-                        CookieUtils.addCookieToResponse(request, response,
-                                CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", domain));
-                        CookieUtils.addCookieToResponse(request, response,
-                                CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
-                        if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
-                            CookieUtils.addCookieToResponse(request, response,
-                                    CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
-                        }
+                        addCookiesToResponse(request, response, originalUrl, csrfStateTokenId, ProviderLogoutURL, domain);
                     }
                 }
 
@@ -527,6 +509,21 @@ public class OAuth extends AMLoginModule {
         }
         
         throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
+    }
+
+    private void addCookiesToResponse(HttpServletRequest request, HttpServletResponse response,
+            StringBuilder originalUrl, String csrfStateTokenId, String ProviderLogoutURL, String domain) {
+
+        CookieUtils.addCookieToResponse(request, response,
+                CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
+        CookieUtils.addCookieToResponse(request, response,
+                CookieUtils.newCookie(COOKIE_ORIG_URL, originalUrl.toString(), "/", domain));
+        CookieUtils.addCookieToResponse(request, response,
+                CookieUtils.newCookie(NONCE_TOKEN_ID, csrfStateTokenId, "/", domain));
+        if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
+            CookieUtils.addCookieToResponse(request, response,
+                    CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
+        }
     }
 
     private String createAuthorizationState() {
