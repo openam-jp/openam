@@ -25,6 +25,7 @@
    $Id: PWResetUncaughtException.jsp,v 1.5 2008/08/28 06:41:11 mahesh_prasad_r Exp $
 
    Portions Copyrighted 2012-2016 ForgeRock AS.
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -65,8 +66,7 @@
         </div>
         <div class="footer alt-color">
             <div class="grid_6 suffix_3">
-                <p>Copyright &copy; 2010-2016, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
-                    terms and conditions of the ForgeRock&trade; License and Subscription Agreement.</p>
+                <p>Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.</p>
             </div>
         </div>
     </div>

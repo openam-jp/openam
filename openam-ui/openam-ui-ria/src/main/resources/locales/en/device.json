@@ -1,7 +1,7 @@
 {
     "common": {
         "form": {
-            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "copyright" : "Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.",
             "thankYou": "Done!",
             "build": "Build"
         }

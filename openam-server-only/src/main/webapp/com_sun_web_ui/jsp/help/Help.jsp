@@ -7,6 +7,7 @@
  */
 
    Portions Copyrighted 2013-2016 ForgeRock AS.
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation
 --%>
 
 <%@page language="java" %>
@@ -82,7 +83,7 @@
 <title><%=windowTitle %></title>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="Copyright" content="Copyright &copy; 2010-2016, ForgeRock AS. All Rights Reserved.">
+  <meta name="Copyright" content="Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.">
   <cc:stylesheet />
 </head>
 

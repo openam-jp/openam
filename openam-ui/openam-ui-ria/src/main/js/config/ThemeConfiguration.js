@@ -32,9 +32,9 @@ define({
                     // The URL of the image.
                     src: "images/logo-horizontal.png",
                     // The title attribute used on <img> tags.
-                    title: "ForgeRock",
+                    title: "OpenAM",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock",
+                    alt: "OpenAM",
                     // The width of the logo as a CSS length.
                     width: "202px"
                 },
@@ -43,9 +43,9 @@ define({
                     // The URL of the image.
                     src: "images/login-logo.png",
                     // The title attribute used on <img> tags.
-                    title: "ForgeRock",
+                    title: "OpenAM",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock",
+                    alt: "OpenAM",
                     // The height of the logo as a CSS length.
                     height: "104px",
                     // The width of the logo as a CSS length.
@@ -54,7 +54,7 @@ define({
                 // The footer is displayed on every page.
                 footer: {
                     // A contact email address.
-                    mailto: "info@forgerock.com",
+                    mailto: "openam-dev@OpenAM.jp",
                     // A contact phone number. If empty, it will not be displayed.
                     phone: ""
                 }
@@ -70,8 +70,8 @@ define({
             settings: {
                 loginLogo: {
                     src: "themes/dark/images/login-logo-white.png",
-                    title: "ForgeRock",
-                    alt: "ForgeRock",
+                    title: "OpenAM",
+                    alt: "OpenAM",
                     height: "228px",
                     width: "220px"
                 }
