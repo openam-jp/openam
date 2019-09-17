@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define([
@@ -20,14 +21,14 @@ define([
     const routes = {
         listAuthenticationSettings: {
             view: "org/forgerock/openam/ui/admin/views/configuration/authentication/ListAuthenticationView",
-            url: /configure\/authentication$/,
+            url: /^configure\/authentication$/,
             pattern: "configure/authentication",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         editAuthenticationSettings: {
             view: "org/forgerock/openam/ui/admin/views/configuration/authentication/EditGlobalAuthenticationView",
-            url: /configure\/authentication\/([^\/]+)/,
+            url: /^configure\/authentication\/([^\/]+)/,
             pattern: "configure/authentication/?",
             role: "ui-global-admin",
             navGroup: "admin"
@@ -65,42 +66,42 @@ define([
         },*/
         listSites: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/ListSitesView",
-            url: /deployment\/sites$/,
+            url: /^deployment\/sites$/,
             pattern: "deployment/sites",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         editSite: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/EditSiteView",
-            url: /deployment\/sites\/edit\/([^\/]+)/,
+            url: /^deployment\/sites\/edit\/([^\/]+)/,
             pattern: "deployment/sites/edit/?",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         newSite: {
             view: "org/forgerock/openam/ui/admin/views/deployment/sites/NewSiteView",
-            url: /deployment\/sites\/new/,
+            url: /^deployment\/sites\/new/,
             pattern: "deployment/sites/new",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         listServers: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/ListServersView",
-            url: /deployment\/servers$/,
+            url: /^deployment\/servers$/,
             pattern: "deployment/servers",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         newServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
-            url: /deployment\/servers\/new$/,
+            url: /^deployment\/servers\/new$/,
             pattern: "deployment/servers/new",
             role: "ui-global-admin",
             navGroup: "admin"
         },
         cloneServer: {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/NewServerView",
-            url: /deployment\/servers\/clone\/([^\/]+)/,
+            url: /^deployment\/servers\/clone\/([^\/]+)/,
             pattern: "deployment/servers/clone/?",
             role: "ui-global-admin",
             navGroup: "admin"
