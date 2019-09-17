@@ -24,6 +24,7 @@
  *
  * $Id: TaskModel.java,v 1.8 2009/07/28 17:46:24 babysunil Exp $
  *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.console.task.model;
@@ -145,4 +146,11 @@ public interface TaskModel
     void setAcsUrl(String realm, String entityId, String acsUrl)
             throws AMConsoleException;
     
+    /**
+     * Returns whether any circle of trust contains idp related to the realm.
+     * 
+     * @param realm Realm
+     * @return whether any circle of trust contains idp related to the realm.
+     */
+    boolean hasIdp(String realm);
 }

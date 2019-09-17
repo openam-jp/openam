@@ -24,6 +24,7 @@
  *
  * $Id: ConfigureSalesForceAppsViewBean.java,v 1.1 2009/07/01 23:27:21 babysunil Exp $
  *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.console.task;
 
@@ -45,7 +46,6 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCDropDownMenu;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -68,26 +68,10 @@ public class ConfigureSalesForceAppsViewBean
     private CCActionTableModel tableModel;
 
     public void forwardTo(RequestContext rc) {
-        boolean hasIdp = false;
+        TaskModel model = (TaskModel) getModel();
+        String realm = rc.getRequest().getParameter("realm");
 
-        try {
-            TaskModel model = (TaskModel) getModel();
-            Set realms = model.getRealms();
-            for (Iterator i = realms.iterator(); i.hasNext() && !hasIdp;) {
-                String realm = (String) i.next();
-                Set cots = model.getCircleOfTrusts(realm);
-
-                for (Iterator j = cots.iterator(); j.hasNext() && !hasIdp;) {
-                    String cot = (String) j.next();
-                    Set idps = model.getHostedIDP(realm, cot);
-                    hasIdp = !idps.isEmpty();
-                }
-            }
-        } catch (AMConsoleException ex) {
-            hasIdp = false;
-        }
-
-        if (hasIdp) {
+        if (model.hasIdp(realm)) {
             super.forwardTo(rc);
         } else {
             ConfigureSalesForceAppsWarningViewBean vb =

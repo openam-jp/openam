@@ -24,6 +24,7 @@
  *
  * $Id: TaskModelImpl.java,v 1.15 2009/07/28 17:46:24 babysunil Exp $
  *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 /*
@@ -474,6 +475,21 @@ public class TaskModelImpl
             set.add(l.get(i));
         }
         return set;
+    }
+
+    public boolean hasIdp(String realm) {
+        boolean hasIdp = false;
+        try {
+            Set cots = getCircleOfTrusts(realm);
+            for (Iterator j = cots.iterator(); j.hasNext() && !hasIdp;) {
+                String cot = (String) j.next();
+                Set idps = getHostedIDP(realm, cot);
+                hasIdp = !idps.isEmpty();
+            }
+        } catch (AMConsoleException ex) {
+            hasIdp = false;
+        }
+        return hasIdp;
     }
 }
 
