@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define([
@@ -68,10 +69,6 @@ define([
                     }
                 }
             }, function (failedStage, errorMsg) {
-                if (failedStage > 1) {
-                    // re-render login form, sending back to the start of the process.
-                    ViewManager.refresh();
-                }
                 errorCallback(errorMsg);
             });
         });
