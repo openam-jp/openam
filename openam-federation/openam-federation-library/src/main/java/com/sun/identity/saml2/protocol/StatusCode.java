@@ -24,12 +24,15 @@
  *
  * $Id: StatusCode.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 
 package com.sun.identity.saml2.protocol;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.impl.StatusCodeImpl;
 
 /**
  * This class represents the <code>StatusCodeType</code> complex type in
@@ -53,6 +56,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * @supported.all.api
  */
 
+@JsonDeserialize(as=StatusCodeImpl.class)
 public interface StatusCode {
     
     /**
