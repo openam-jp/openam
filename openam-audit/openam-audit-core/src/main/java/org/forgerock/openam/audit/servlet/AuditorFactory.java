@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.audit.servlet;
@@ -33,7 +34,8 @@ public interface AuditorFactory {
      * @param request HttpServletRequest.
      * @param response Queryable decorator over the HttpServletResponse.
      * @param component The component.
+     * @param ltzEanbled Local Time Zone is enabled
      * @return new Auditor instance.
      */
-    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response, Component component);
+    Auditor create(HttpServletRequest request, AuditableHttpServletResponse response, Component component, Boolean ltzEnabled);
 }

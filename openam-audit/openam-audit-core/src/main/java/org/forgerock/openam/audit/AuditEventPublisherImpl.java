@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.audit;
 
@@ -115,4 +116,10 @@ public class AuditEventPublisherImpl implements AuditEventPublisher {
     private String getValue(JsonValue jsonValue, String key, String defaultValue) {
         return jsonValue.isDefined(key) ? jsonValue.get(key).asString() : defaultValue;
     }
+
+    @Override
+    public boolean isLtzEnabled() {
+        return auditServiceProvider.getDefaultAuditService().isLtzEnabled();
+    }
+
 }

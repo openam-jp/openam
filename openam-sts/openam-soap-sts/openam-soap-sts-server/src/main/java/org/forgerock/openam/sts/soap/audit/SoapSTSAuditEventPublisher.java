@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.sts.soap.audit;
 
@@ -118,4 +119,8 @@ public final class SoapSTSAuditEventPublisher implements AuditEventPublisher {
         return amSessionCookieName + AMSTSConstants.EQUALS + sessionId;
     }
 
+    @Override
+    public boolean isLtzEnabled() {
+        return true;
+    }
 }

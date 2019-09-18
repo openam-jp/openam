@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
 -->
 <!DOCTYPE ServicesConfiguration
         PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
@@ -41,6 +42,15 @@
                         <DefaultValuesClassName
                                 className="org.forgerock.openam.audit.configuration.EventFilterDefaultValues">
                         </DefaultValuesClassName>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ltzEnabled" type="single" syntax="boolean" i18nKey="a005">
+                    <BooleanValues>
+                        <BooleanTrueValue>true</BooleanTrueValue>
+                        <BooleanFalseValue>false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

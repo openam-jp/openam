@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.audit;
 
@@ -110,4 +111,10 @@ public class DefaultAuditServiceProxy extends AuditServiceProxy implements AMAud
         }
         return !auditServiceConfiguration.isBlacklisted(eventNameJson.asString());
     }
+
+    @Override
+    public boolean isLtzEnabled() {
+       return auditServiceConfiguration.isLtzEnabled();
+    }
+
 }

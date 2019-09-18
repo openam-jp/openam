@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -97,7 +98,7 @@ class CrestAuditor {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpRequest(context, request)
-                    .timestamp(startTime)
+                    .timestamp(startTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component);
@@ -131,7 +132,7 @@ class CrestAuditor {
             final long elapsedTime = endTime - startTime;
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpRequest(context, request)
-                    .timestamp(endTime)
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component);
@@ -170,7 +171,7 @@ class CrestAuditor {
             JsonValue detail = json(object(field(ACCESS_RESPONSE_DETAIL_REASON, message)));
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent(realm)
                     .forHttpRequest(context, request)
-                    .timestamp(endTime)
+                    .timestamp(endTime, auditEventPublisher.isLtzEnabled())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
                     .component(component)

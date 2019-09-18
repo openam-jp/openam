@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -222,7 +223,7 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
         }
 
         AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration(
-                getBooleanMapAttr(attributes, "auditEnabled", false), blacklistedEventNames);
+                getBooleanMapAttr(attributes, "auditEnabled", false), blacklistedEventNames, getBooleanMapAttr(attributes, "ltzEnabled", false));
 
         Set<String> filterPolicies = new HashSet<>();
         for (String policy : attributes.get("fieldFilterPolicy")) {

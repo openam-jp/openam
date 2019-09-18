@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.audit;
 
@@ -111,6 +112,7 @@ public class AuthenticationModuleEventAuditor extends AbstractAuthenticationEven
         }
 
         AMAuthenticationAuditEventBuilder builder = eventFactory.authenticationEvent(realm)
+                .timestamp(System.currentTimeMillis(), eventPublisher.isLtzEnabled())
                 .transactionId(getTransactionIdValue())
                 .component(AUTHENTICATION)
                 .eventName(AM_LOGIN_MODULE_COMPLETED)

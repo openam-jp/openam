@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.auditors;
 
@@ -176,7 +177,7 @@ public abstract class ConfigAuditor {
      */
     protected AMConfigAuditEventBuilder getBaseBuilder() {
         return auditEventFactory.configEvent(realm)
-                .timestamp(startTime)
+                .timestamp(startTime, auditEventPublisher.isLtzEnabled())
                 .objectId(objectId)
                 .runAs(runAsName)
                 .transactionId(AuditRequestContext.getTransactionIdValue())
