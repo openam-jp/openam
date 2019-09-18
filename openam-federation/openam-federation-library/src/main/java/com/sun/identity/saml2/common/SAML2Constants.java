@@ -25,6 +25,7 @@
  * $Id: SAML2Constants.java,v 1.44 2009/11/24 21:53:02 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.saml2.common;
 
@@ -953,6 +954,12 @@ public interface SAML2Constants {
          "com.sun.identity.saml.xmlsig.xmlSigAlgorithm";
     public String DIGEST_ALGORITHM =
          "com.sun.identity.saml.xmlsig.digestAlgorithm";
+
+    /**
+     * Property name of XML encryption key transport algorithms.
+     */
+    public String XMLENC_KEY_TRANSPORT_ALGORITHM = "jp.openam.saml.xmlenc.xmlEncKeyTransportAlgorithm";
+
     /**
      * Property name for the global default query signature algorithm for RSA keys.
      */

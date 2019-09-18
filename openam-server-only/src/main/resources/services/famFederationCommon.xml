@@ -27,6 +27,7 @@
    $Id: famFederationCommon.xml,v 1.4 2010/01/08 22:41:43 exu Exp $
                                                                                 
    Portions Copyrighted 2015-2016 ForgeRock AS.
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation
 
 -->
 
@@ -235,6 +236,21 @@
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="EncryptionKeyTransportAlgorithm" 
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a1154"
+                    order="1550"
+                    resourceName="encryptionKeyTransportAlgorithm">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p">http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2009/xmlenc11#rsa-oaep">http://www.w3.org/2009/xmlenc11#rsa-oaep</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmlenc#rsa-1_5">http://www.w3.org/2001/04/xmlenc#rsa-1_5</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="TransformationAlgorithm" 

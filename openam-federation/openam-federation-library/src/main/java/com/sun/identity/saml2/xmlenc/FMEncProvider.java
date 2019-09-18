@@ -25,6 +25,7 @@
  * $Id: FMEncProvider.java,v 1.5 2008/06/25 05:48:03 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.saml2.xmlenc;
 
@@ -50,6 +51,7 @@ import java.util.Hashtable;
 import java.util.Set;
 
 import com.sun.identity.common.SystemConfigurationUtil;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.xmlenc.EncryptionConstants;
 import com.sun.identity.saml2.common.SAML2Exception;
@@ -82,6 +84,11 @@ public final class FMEncProvider implements EncProvider {
      */
     private static boolean encryptedKeyInKeyInfo = true;
 
+    /**
+     * XML encryption key transport algorithm.
+     */ 
+    private static String xmEncKeyTransportAlg = null;
+
     static {
         org.apache.xml.security.Init.init();
         String tmp = SystemConfigurationUtil.getProperty(
@@ -89,6 +96,9 @@ public final class FMEncProvider implements EncProvider {
         if ((tmp != null) && (tmp.equalsIgnoreCase("false"))) {
             encryptedKeyInKeyInfo = false;
         }
+        xmEncKeyTransportAlg = SystemPropertiesManager.get(
+            SAML2Constants.XMLENC_KEY_TRANSPORT_ALGORITHM,
+            XMLCipher.RSA_OAEP);
     }
 
     /**
@@ -249,8 +259,13 @@ public final class FMEncProvider implements EncProvider {
 	 */
 	try {	    
 	    if (publicKeyEncAlg.equals(EncryptionConstants.RSA)) {
-		cipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
-		
+            if (XMLCipher.RSA_v1dot5.equals(xmEncKeyTransportAlg)) {
+                cipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
+            } else if (XMLCipher.RSA_OAEP_11.equals(xmEncKeyTransportAlg)) {
+                cipher = XMLCipher.getInstance(XMLCipher.RSA_OAEP_11);
+            } else {
+                cipher = XMLCipher.getInstance(XMLCipher.RSA_OAEP);
+            }
 	    } else if (publicKeyEncAlg.equals(EncryptionConstants.TRIPLEDES)) {
 		cipher = XMLCipher.getInstance(XMLCipher.TRIPLEDES_KeyWrap);
 		
