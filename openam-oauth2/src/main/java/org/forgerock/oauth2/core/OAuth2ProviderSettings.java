@@ -701,8 +701,9 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
      * @throws ServerException If any internal server error occurs.
      */
     public Set<String> getSupportedScopes() throws ServerException {
-        return supportedScopesWithoutTranslations = getWithoutTranslations(OAuth2Constants.OAuth2ProviderService.SUPPORTED_SCOPES,
-                supportedScopesWithoutTranslations);
+//        return supportedScopesWithoutTranslations = getWithoutTranslations(OAuth2Constants.OAuth2ProviderService.SUPPORTED_SCOPES,
+//                supportedScopesWithoutTranslations);
+        return getWithoutTranslations(OAuth2Constants.OAuth2ProviderService.SUPPORTED_SCOPES, null);
     }
 
     /**
