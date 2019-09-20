@@ -701,9 +701,8 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
      * @throws ServerException If any internal server error occurs.
      */
     public Set<String> getSupportedScopes() throws ServerException {
-//        return supportedScopesWithoutTranslations = getWithoutTranslations(OAuth2Constants.OAuth2ProviderService.SUPPORTED_SCOPES,
-//                supportedScopesWithoutTranslations);
-        return getWithoutTranslations(OAuth2Constants.OAuth2ProviderService.SUPPORTED_SCOPES, null);
+        return supportedScopesWithoutTranslations = getWithoutTranslations(OAuth2Constants.OAuth2ProviderService.SUPPORTED_SCOPES,
+                supportedScopesWithoutTranslations);
     }
 
     /**
@@ -1259,6 +1258,8 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
                     attributeCache.clear();
                     jwks.clear();
                     loginUrlTemplate = null;
+                    supportedScopesWithoutTranslations = null;
+                    supportedClaimsWithoutTranslations = null;
                 }
             } else {
                 if (logger.messageEnabled()) {
