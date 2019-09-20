@@ -120,10 +120,9 @@ define([
             obj.handleRequirements(requirements);
             return requirements;
         };
-        const processFailed = (reason) => {
-            const failedStage = requirementList.length;
+        const processFailed = (failedStage, reason) => {
             obj.resetProcess();
-            return [failedStage, reason];
+            return $.Deferred().reject(failedStage, reason).promise();
         };
         const goToFailureUrl = (errorBody) => {
             if (errorBody.detail && errorBody.detail.failureUrl) {
