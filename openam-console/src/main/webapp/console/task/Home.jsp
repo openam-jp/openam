@@ -27,7 +27,7 @@
 --%>
 <%--
    Portions Copyrighted 2010-2014 ForgeRock AS
-   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyrighted 2012-2019 Open Source Solution Technology Corporation
    Portions Copyrighted 2013 Nomura Research Institute, Ltd
 --%>
 
@@ -83,7 +83,7 @@
 </div>
 
 <div id="info13" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
-    <div><a href="#" id="close13" onclick="closeAll(13); event.cancelBubble = true;return false;"><img alt="close configure google apps" src="../console/images/tasks/close.gif" border="0" /></a></div>
+    <div><a href="#" id="close13" onclick="closeAll(13); event.cancelBubble = true;return false;"><img alt="close configure G Suite" src="../console/images/tasks/close.gif" border="0" /></a></div>
     <p><span class="TskPgeHdr"><cc:text name="txtHelpConfigureGoogleApps" defaultValue="commontask.configure.google.apps" bundleID="amConsole" /></span></p>
 </div>
 
@@ -258,7 +258,7 @@
                             <tr>
                                 <td width="2%" valign="bottom" class="TskPgeTskLftTd"><img alt="spacer" id="gif13" src="../console/images/tasks/spacer.gif" width="12" height="8" /></td>
                                 <td width="100%;" class="TskPgeTskCntrTd"><a href="../task/ConfigureGoogleApps" class="TskPgeTxtBg" onmouseover="this.className='TskPgeTxtBgOvr'" onfocus="this.className='TskPgeTxtBgOvr'" onmouseout="this.className='TskPgeTxtBg'" onblur="this.className='TskPgeTxtBg'"><span class="TskPgeTskLftBtm"></span><span class="TskPgeTskLftTp"></span><span class="TskPgeTskRghtBtm"></span><span class="TskPgeTskRghtTp"></span><span class="TskPgeTskRghtBrdr"></span><span class="TskPgeTskPdng"><cc:text name="txtConfigureGoogleApps" defaultValue="commontask.label.configure.google.apps" bundleID="amConsole" /></span></a></td>
-                                <td width="3%" class="TskPgeTskRghtTd" align="right" valign="top"><a href="#" onclick="test(13); event.cancelBubble = true; return false;"  onmouseover="hoverImg(13); event.cancelBubble = true;" onmouseout="outImg(13); event.cancelBubble = true;" onfocus="hoverImg(13); event.cancelBubble = true;" onblur="outImg(13); event.cancelBubble = true;" id="i13"><img alt="configure google apps" src="../console/images/tasks/rightToggle.gif" width="29" height="21" border="0" id="togImg13" /></a></td>
+                                <td width="3%" class="TskPgeTskRghtTd" align="right" valign="top"><a href="#" onclick="test(13); event.cancelBubble = true; return false;"  onmouseover="hoverImg(13); event.cancelBubble = true;" onmouseout="outImg(13); event.cancelBubble = true;" onfocus="hoverImg(13); event.cancelBubble = true;" onblur="outImg(13); event.cancelBubble = true;" id="i13"><img alt="configure G Suite" src="../console/images/tasks/rightToggle.gif" width="29" height="21" border="0" id="togImg13" /></a></td>
                             </tr>
                         </table>
                     </td></tr>
