@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Iterator;
@@ -102,5 +104,9 @@ public class ReaperImpl<C, F> implements ReaperQuery {
      */
     private boolean isQueryComplete() {
         return !results.hasNext();
+    }
+
+    @Override
+    public void close() throws IOException {
     }
 }
