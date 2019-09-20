@@ -13,6 +13,7 @@
  *
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;
@@ -44,7 +45,9 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.security.auth.Subject;
@@ -79,6 +82,10 @@ public class AuthenticatorOATH extends AMLoginModule {
     private String userId = null;
     private String userName = null;
 
+    private ResourceBundle bundle = null;
+    private String login_header = null;
+
+
     //static attribute names
     private static final int NUM_CODES = 10;
 
@@ -100,8 +107,6 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final String MAXIMUM_CLOCK_DRIFT = "openam-auth-fr-oath-maximum-clock-drift";
     private static final String ISSUER_NAME = "openam-auth-fr-oath-issuer-name";
     private static final int TOTAL_ATTEMPTS = 3;
-
-    private static final String MODULE_NAME = "ForgeRock Authenticator (OATH)";
 
     //module attribute holders
     private String issuerName;
@@ -194,6 +199,12 @@ public class AuthenticatorOATH extends AMLoginModule {
         if (debug.messageEnabled()) {
             debug.message("OATH::init");
         }
+        Locale locale = getLoginLocale();
+        if (debug.messageEnabled()) {
+            debug.message("ForgeRock Authenticator locale=" + locale);
+        }
+        bundle = amCache.getResBundle(amAuthOATH, locale);
+        login_header = bundle.getString("login_header");
 
         userName = (String) sharedState.get(getUserKey());
         try {
@@ -332,10 +343,10 @@ public class AuthenticatorOATH extends AMLoginModule {
 
                 case REGISTER_DEVICE:
                     if (isOptional) {
-                        replaceHeader(LOGIN_OPT_DEVICE, MODULE_NAME);
+                        replaceHeader(LOGIN_OPT_DEVICE, login_header);
                         return LOGIN_OPT_DEVICE;
                     } else {
-                        replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
+                        replaceHeader(LOGIN_SAVED_DEVICE, login_header);
                         return LOGIN_SAVED_DEVICE;
                     }
 
@@ -389,7 +400,7 @@ public class AuthenticatorOATH extends AMLoginModule {
                     return LOGIN_NO_DEVICE;
                 }
             } else {
-                replaceHeader(LOGIN_SAVED_DEVICE, MODULE_NAME);
+                replaceHeader(LOGIN_SAVED_DEVICE, login_header);
                 return LOGIN_SAVED_DEVICE;
             }
         }
@@ -415,7 +426,9 @@ public class AuthenticatorOATH extends AMLoginModule {
                 throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
             }
 
-            replaceHeader(state, MODULE_NAME + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+            String fmtMsg = bundle.getString("otpcodemiss");
+            String msg = com.sun.identity.shared.locale.Locale.formatMessage(fmtMsg, TOTAL_ATTEMPTS - attempt);
+            replaceHeader(state, msg);
             return state;
         }
 
@@ -440,7 +453,9 @@ public class AuthenticatorOATH extends AMLoginModule {
                 throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
             }
 
-            replaceHeader(state, MODULE_NAME + "Attempt " + (attempt + 1) + " of " + TOTAL_ATTEMPTS);
+            String fmtMsg = bundle.getString("otpcodemiss");
+            String msg = com.sun.identity.shared.locale.Locale.formatMessage(fmtMsg, TOTAL_ATTEMPTS - attempt);
+            replaceHeader(state, msg);
             return state;
         }
     }
