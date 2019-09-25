@@ -65,7 +65,6 @@ import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
-import org.forgerock.oauth2.core.RedirectUriResolver;
 import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
@@ -157,7 +156,6 @@ public class OAuth2GuiceModule extends AbstractModule {
      */
     @Override
     protected void configure() {
-        bind(RedirectUriResolver.class);
         bind(ResourceOwnerConsentVerifier.class).to(OpenIdResourceOwnerConsentVerifier.class);
         bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class);

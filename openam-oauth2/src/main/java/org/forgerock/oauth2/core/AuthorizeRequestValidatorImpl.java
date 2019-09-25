@@ -13,11 +13,16 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2018 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.core;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
+
+import java.net.URI;
+import java.util.Set;
+
 import static org.forgerock.oauth2.core.Utils.*;
 
 import javax.inject.Inject;
@@ -72,11 +77,30 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
         Reject.ifTrue(isEmpty(request.<String>getParameter(CLIENT_ID)), "Missing parameter, 'client_id'");
         Reject.ifTrue(isEmpty(request.<String>getParameter(RESPONSE_TYPE)), "Missing parameter, 'response_type'");
 
-        final ClientRegistration clientRegistration = clientRegistrationStore.get(request.<String>getParameter("client_id"),
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID),
                 request);
 
         if (request.getEndpointType() != EndpointType.END_USER_VERIFICATION_URI) {
-            redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
+            if (clientRegistration == null) {
+                throw new InvalidRequestException("Failed to validate the client ID");
+            }
+
+            Set<URI> redirectUris = clientRegistration.getRedirectUris();
+
+            if (isEmpty(redirectUris)) {
+                throw new InvalidRequestException("Failed to resolve the redirect URI, no URI's registered");
+            }
+
+            String redirectUri = request.<String>getParameter(REDIRECT_URI);
+            if (isEmpty(redirectUri) && redirectUris.size() == 1) {
+                redirectUri = redirectUris.iterator().next().toString();
+            }
+            if (isEmpty(redirectUri)) {
+                throw new InvalidRequestException("Failed to resolve the redirect URI");
+            }
+
+            redirectUriValidator.validate(clientRegistration, redirectUri);
+            request.setValidRedirectUri(redirectUri);
         }
 
         responseTypeValidator.validate(clientRegistration,

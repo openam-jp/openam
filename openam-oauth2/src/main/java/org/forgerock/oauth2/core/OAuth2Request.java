@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2018 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -57,6 +58,7 @@ public class OAuth2Request {
     private final Request request;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
     private JsonValue body;
+    private String validRedirectUri = null;
 
     /**
      * Constructs a new RestletOAuth2Request.
@@ -313,5 +315,24 @@ public class OAuth2Request {
             resourcePath = resourceUrl.substring(realmUrl.length());
         }
        return EndpointType.get(resourcePath);
+    }
+
+    /**
+     * Set RedirectUri in the current request as valid.
+     * 
+     * @param validRedirectUri
+     */
+    public void setValidRedirectUri(String validRedirectUri) {
+        this.validRedirectUri = validRedirectUri;
+    }
+
+    /**
+     * Gets RedirectUri that has been successfully verified. If validation fails,
+     * returns null.
+     * 
+     * @return RedirectUri that has been successfully verified
+     */
+    public String getValidRedirectUri() {
+        return this.validRedirectUri;
     }
 }
