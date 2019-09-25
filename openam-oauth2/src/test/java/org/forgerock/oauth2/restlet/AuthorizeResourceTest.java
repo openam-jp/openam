@@ -12,10 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.restlet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -24,7 +27,7 @@ import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.RedirectUriResolver;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.xui.XUIState;
 import org.restlet.Request;
@@ -44,7 +47,6 @@ public class AuthorizeResourceTest {
     private AuthorizeRequestHook hook;
     private AuthorizationToken authToken = new AuthorizationToken(Collections.singletonMap("fred", "fred"), false);
     private XUIState xuiState;
-    private RedirectUriResolver redirectUriResolver;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -56,12 +58,11 @@ public class AuthorizeResourceTest {
         hook = mock(AuthorizeRequestHook.class);
         service = mock(AuthorizationService.class);
         xuiState = mock(XUIState.class);
-        redirectUriResolver = mock(RedirectUriResolver.class);
 
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
         resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
-                CollectionUtils.asSet(hook), xuiState, mock(Router.class), null, redirectUriResolver);
+                CollectionUtils.asSet(hook), xuiState, mock(Router.class), null);
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();
@@ -93,4 +94,54 @@ public class AuthorizeResourceTest {
         verify(hook).afterAuthorizeSuccess(o2request, request, response);
     }
 
+    @Test
+    public void shouldNotRedirectWhenMissingClientIdInGet() throws Exception {
+        // given
+        when(o2request.getParameter("redirect_uri")).thenReturn("https://www.example.com");
+        doThrow(new IllegalArgumentException("Missing parameter, 'client_id'")).when(service).authorize(o2request);
+
+        // Using try~catch block because want to inspect the Exception properties
+        try {
+            // when
+            resource.authorize();
+        } catch (OAuth2RestletException e) {
+            // then
+            assertEquals("invalid_request", e.getError());
+            assertNull(e.getRedirectUri());
+        }
+    }
+
+    @Test
+    public void shouldNotRedirectWhenMissingResponseTypeInGet() throws Exception {
+        // given
+        when(o2request.getParameter("redirect_uri")).thenReturn("https://www.example.com");
+        doThrow(new IllegalArgumentException("Missing parameter, 'response_type'")).when(service).authorize(o2request);
+
+        // Using try~catch block because want to inspect the Exception properties
+        try {
+            // when
+            resource.authorize();
+        } catch (OAuth2RestletException e) {
+            // then
+            assertEquals("invalid_request", e.getError());
+            assertNull(e.getRedirectUri());
+        }
+    }
+
+    @Test
+    public void shouldNotRedirectWhenBadRequestExceptionInPost() throws Exception {
+        // given
+        when(o2request.getParameter("redirect_uri")).thenReturn("https://www.example.com");
+        doThrow(new BadRequestException("Test Exception")).when(service).authorize(o2request, false, false);
+
+        // Using try~catch block because want to inspect the Exception properties
+        try {
+            // when
+            resource.authorize(new EmptyRepresentation());
+        } catch (OAuth2RestletException e) {
+            // then
+            assertEquals("bad_request", e.getError());
+            assertNull(e.getRedirectUri());
+        }
+    }
 }
