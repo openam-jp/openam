@@ -25,6 +25,7 @@
  * $Id: SAMLPOSTProfileServlet.java,v 1.4 2009/06/12 22:21:39 mallas Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 package com.sun.identity.saml.servlet;
 
@@ -130,7 +131,7 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
             SAMLUtils.sendError(request, response,
                 response.SC_BAD_REQUEST,
                 "targetForbidden",
-                SAMLUtils.bundle.getString("targetForbidden") + " " + target);
+                SAMLUtils.bundle.getString("targetForbidden"));
             return;
         }
         
