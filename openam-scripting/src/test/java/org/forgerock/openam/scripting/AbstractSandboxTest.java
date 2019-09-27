@@ -72,7 +72,7 @@ public abstract class AbstractSandboxTest {
         return (T) result;
     }
 
-    private <T> T eval(String...script) throws ScriptException {
+    protected <T> T eval(String...script) throws ScriptException {
         return eval(new SimpleBindings(), script);
     }
 
