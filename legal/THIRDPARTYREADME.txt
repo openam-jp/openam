@@ -186,14 +186,14 @@ Copyright: Copyright 2003-2010 The Apache Software Foundation
 Version: google-http-client-1.19.0.jar
 Copyright: Copyright (c) 2011 Google Inc.
 
-Version: groovy-2.4.6.jar
-Copyright: Copyright 2001-2016 The Apache Software Foundation
+Version: groovy-2.4.17.jar
+Copyright: Copyright 2003-2019 The Apache Software Foundation
 
-Version: groovy-json-2.4.6.jar
-Copyright: Copyright 2001-2016 The Apache Software Foundation
+Version: groovy-json-2.4.17.jar
+Copyright: Copyright 2003-2019 The Apache Software Foundation
 
-Version: groovy-jsr223-2.4.6.jar
-Copyright: Copyright 2001-2016 The Apache Software Foundation
+Version: groovy-jsr223-2.4.17.jar
+Copyright: Copyright 2003-2019 The Apache Software Foundation
 
 Version: guice-3.0-no_aop.jar
 Copyright: Copyright 2009 Google Inc
@@ -828,7 +828,7 @@ Copyright: Copyright (C) 2011-2015 by Yehuda Katz
 Version: grid.locale-en.js
 Copyright: Copyright (c) Tony Tomov tony@trirand.com
 
-Version: groovy-sandbox-1.6.jar
+Version: groovy-sandbox-1.9.jar
 Copyright: Copyright (c) 2012-2014 Kohsuke Kawaguchi, CloudBees, Inc., other contributors
 
 Version: i18next-1.7.3-min.js
