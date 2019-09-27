@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.scripting;
@@ -19,7 +20,7 @@ package org.forgerock.openam.scripting;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-public class JavascriptSandboxTests extends AbstractSandboxTests {
+public class JavascriptSandboxTest extends AbstractSandboxTest {
     @Override
     protected ScriptEngine getEngine(final ScriptEngineManager manager) {
         return manager.getEngineByName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME);
