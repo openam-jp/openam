@@ -286,7 +286,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
     @Override
     public JsonValue read(String tokenId) throws ServerException, NotFoundException {
-        if (statelessCheck.byRequest(request)) {
+        if (statelessCheck.byRealm(realm)) {
             return statelessTokenStore.read(tokenId);
         } else {
             return statefulTokenStore.read(tokenId);

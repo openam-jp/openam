@@ -70,7 +70,6 @@ import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
@@ -95,8 +94,6 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
-import org.forgerock.openam.oauth2.CookieExtractor;
-import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2GlobalSettings;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
@@ -122,7 +119,6 @@ import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.utils.RecoveryCodeGenerator;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
-import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.ClaimsParameterValidator;
 import org.forgerock.openidconnect.CodeVerifierValidator;
 import org.forgerock.openidconnect.OpenIdConnectAuthorizeRequestValidator;
@@ -141,8 +137,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.iplanet.services.naming.WebtopNamingQuery;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
@@ -282,55 +276,6 @@ public class OAuth2GuiceModule extends AbstractModule {
 
     @Inject
     @Provides
-    @Named(REALM_AGNOSTIC_HEADER)
-    @Singleton
-    AccessTokenVerifier getRealmAgnosticHeaderAccessTokenVerifier(
-            @Named(REALM_AGNOSTIC_TOKEN_STORE) TokenStore tokenStore) {
-        return new RestletHeaderAccessTokenVerifier(tokenStore);
-    }
-
-    @Inject
-    @Provides
-    @Named(REALM_AGNOSTIC_FORM_BODY)
-    @Singleton
-    AccessTokenVerifier getRealmAgnosticFormBodyAccessTokenVerifier(
-            @Named(REALM_AGNOSTIC_TOKEN_STORE) TokenStore tokenStore) {
-        return new RestletFormBodyAccessTokenVerifier(tokenStore);
-    }
-
-    @Inject
-    @Provides
-    @Named(REALM_AGNOSTIC_QUERY_PARAM)
-    @Singleton
-    AccessTokenVerifier getRealmAgnosticQueryParamAccessTokenVerifier(
-            @Named(REALM_AGNOSTIC_TOKEN_STORE) TokenStore tokenStore) {
-        return new RestletQueryParameterAccessTokenVerifier(tokenStore);
-    }
-
-    @Inject
-    @Provides
-    @Named(REALM_AGNOSTIC_TOKEN_STORE)
-    @Singleton
-    TokenStore getRealmAgnosticTokenStore(OAuthTokenStore oauthTokenStore,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
-            OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug, SecureRandom secureRandom,
-            ClientAuthenticationFailureFactory failureFactory, JwtBuilderFactory jwtBuilder,
-            Blacklist<Blacklistable> tokenBlacklist, CTSPersistentStore cts,
-            TokenAdapter<StatelessTokenMetadata> tokenAdapter, RecoveryCodeGenerator recoveryCodeGenerator) {
-        StatefulTokenStore realmAgnosticStatefulTokenStore = new RealmAgnosticStatefulTokenStore(oauthTokenStore,
-                providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator);
-        StatelessTokenStore realmAgnosticStatelessTokenStore = new RealmAgnosticStatelessTokenStore(
-                realmAgnosticStatefulTokenStore, jwtBuilder, providerSettingsFactory, debug, clientRegistrationStore,
-                realmNormaliser, oauth2UrisFactory, tokenBlacklist, cts, tokenAdapter);
-        return new OpenAMTokenStore(realmAgnosticStatefulTokenStore,
-                realmAgnosticStatelessTokenStore, new DefaultStatelessCheck(providerSettingsFactory));
-    }
-
-    @Inject
-    @Provides
     @Singleton
     List<AuthorizeRequestValidator> getAuthorizeRequestValidators(
             final Set<AuthorizeRequestValidator> authorizeRequestValidators) {
@@ -370,41 +315,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         return new ResourceSetRegistrationExceptionFilter(
                 new AccessTokenProtectionFilter(null, store, reqFactory, wrap(ResourceSetRegistrationEndpoint.class)),
                 jacksonRepresentationFactory);
-    }
-
-    public static class RealmAgnosticStatefulTokenStore extends StatefulTokenStore {
-
-        public RealmAgnosticStatefulTokenStore(OAuthTokenStore tokenStore,
-                OAuth2ProviderSettingsFactory providerSettingsFactory, OAuth2UrisFactory<RealmInfo> oauth2UrisFactory,
-                OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-                SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
-                Debug debug, SecureRandom secureRandom, ClientAuthenticationFailureFactory failureFactory,
-                RecoveryCodeGenerator recoveryCodeGenerator) {
-            super(tokenStore, providerSettingsFactory, oauth2UrisFactory, clientRegistrationStore, realmNormaliser,
-                    ssoTokenManager, cookieExtractor, auditLogger, debug, secureRandom, failureFactory, recoveryCodeGenerator);
-        }
-
-        @Override
-        protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
-            //No need to validate the realm for the provided token.
-        }
-    }
-
-    public static class RealmAgnosticStatelessTokenStore extends StatelessTokenStore {
-
-        public RealmAgnosticStatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
-                OAuth2ProviderSettingsFactory providerSettingsFactory, Debug logger,
-                OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-                OAuth2UrisFactory<RealmInfo> oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-                CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter) {
-            super(statefulTokenStore, jwtBuilder, providerSettingsFactory, logger, clientRegistrationStore,
-                    realmNormaliser, oAuth2UrisFactory, tokenBlacklist, cts, tokenAdapter);
-        }
-
-        @Override
-        protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
-            //No need to validate the realm for the provided token.
-        }
     }
 
     @Provides

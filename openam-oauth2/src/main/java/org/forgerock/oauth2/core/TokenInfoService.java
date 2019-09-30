@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_HEADER;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.REALM_AGNOSTIC_QUERY_PARAM;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.QUERY_PARAM;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,8 +64,8 @@ public class TokenInfoService {
      */
     @Inject
     public TokenInfoService(OAuth2ProviderSettingsFactory providerSettingsFactory,
-            @Named(REALM_AGNOSTIC_HEADER) AccessTokenVerifier headerTokenVerifier,
-            @Named(REALM_AGNOSTIC_QUERY_PARAM) AccessTokenVerifier queryTokenVerifier,
+            @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
+            @Named(QUERY_PARAM) AccessTokenVerifier queryTokenVerifier,
             ClientRegistrationStore clientRegistrationStore) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.headerTokenVerifier = headerTokenVerifier;
