@@ -321,10 +321,11 @@ public interface TokenStore {
     /**
      * Reads the Token from the OAuth2 Provider's store with the specified identifier.
      *
+     * @param realm The Realm
      * @param tokenId The token ID
      * @return  A JsonValue of the token. May be {@code null} if the token is not found.
      * @throws ServerException If there was an error in reading the token using the id.
      * @throws NotFoundException If the realm does not have an OAuth2Provider configured.
      */
-    JsonValue read(String tokenId) throws ServerException, NotFoundException;
+    JsonValue read(String realm, String tokenId) throws ServerException, NotFoundException;
 }
