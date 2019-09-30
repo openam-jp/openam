@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -129,7 +130,7 @@ public class ExceptionHandler {
             redirector.handle(request, response);
             return;
         }
-        final Map<String, String> data = new HashMap<>(exception.asMap());
+        final Map<String, String> data = new HashMap<>(exception.getDataModel());
         final String realm = requestFactory.create(request).getParameter("realm");
         data.put("realm", realm);
         data.put("baseUrl", baseURLProviderFactory.get(realm).getRootURL(ServletUtils.getRequest(request)));

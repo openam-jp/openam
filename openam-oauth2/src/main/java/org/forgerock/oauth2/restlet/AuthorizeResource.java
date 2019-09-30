@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2018 OGIS-RI Co., Ltd.
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -25,7 +25,6 @@ import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.RedirectUriResolver;
 import org.forgerock.oauth2.core.exceptions.CsrfException;
 import org.forgerock.oauth2.core.exceptions.DuplicateRequestParameterException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -57,7 +56,6 @@ public class AuthorizeResource extends ConsentRequiredResource {
     private final ExceptionHandler exceptionHandler;
     private final OAuth2Representation representation;
     private final Set<AuthorizeRequestHook> hooks;
-    private final RedirectUriResolver redirectUriResolver;
 
 
     /**
@@ -71,15 +69,13 @@ public class AuthorizeResource extends ConsentRequiredResource {
     @Inject
     public AuthorizeResource(OAuth2RequestFactory requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
-            XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory,
-            RedirectUriResolver redirectUriResolver) {
+            XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory) {
         super(router, baseURLProviderFactory, xuiState);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
         this.representation = representation;
         this.hooks = hooks;
-        this.redirectUriResolver = redirectUriResolver;
     }
 
     /**
@@ -103,10 +99,8 @@ public class AuthorizeResource extends ConsentRequiredResource {
         try {
             final AuthorizationToken authorizationToken = authorizationService.authorize(request);
 
-            final String redirectUri = redirectUriResolver.resolve(request);
-
             Representation response = representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
-                    redirectUri);
+                    request.getValidRedirectUri());
 
             for (AuthorizeRequestHook hook : hooks) {
                 hook.afterAuthorizeSuccess(request, getRequest(), getResponse());
@@ -115,12 +109,8 @@ public class AuthorizeResource extends ConsentRequiredResource {
             return response;
 
         } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("client_id")) {
-                throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
-                        request.<String>getParameter("state"));
-            }
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
-                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
+                    request.getValidRedirectUri(), request.<String>getParameter("state"));
         } catch (ResourceOwnerAuthenticationRequired e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     e.getRedirectUri().toString(), null);
@@ -141,7 +131,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
-                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
+                    request.getValidRedirectUri(), request.<String>getParameter("state"),
                     e.getParameterLocation());
         }
     }
@@ -171,9 +161,8 @@ public class AuthorizeResource extends ConsentRequiredResource {
             final AuthorizationToken authorizationToken = authorizationService.authorize(request, consentGiven,
                     saveConsent);
 
-            final String redirectUri = redirectUriResolver.resolve(request);
             Representation response = representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
-                    redirectUri);
+                    request.getValidRedirectUri());
 
             for (AuthorizeRequestHook hook : hooks) {
                 hook.afterAuthorizeSuccess(request, getRequest(), getResponse());
@@ -201,7 +190,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
-                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
+                    request.getValidRedirectUri(), request.<String>getParameter("state"),
                     e.getParameterLocation());
         }
     }

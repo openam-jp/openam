@@ -30,6 +30,7 @@
 
 <%@ page language="java" %>
 <%@page import="com.sun.identity.console.version.VersionViewBean" %>
+<%@ page import="org.owasp.esapi.ESAPI"%>
 
 <%@taglib uri="/WEB-INF/tld/com_iplanet_jato/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/tld/com_sun_web_ui/cc.tld" prefix="cc" %>
@@ -38,11 +39,25 @@
     // obtain the versionFile and productSrc attrs from the request params 
     String versionFile = request.getParameter("versionFile") != null
 	? request.getParameter("versionFile") : "";
+    if (!ESAPI.validator().isValidInput("versionFile: " + versionFile, versionFile,
+            "HTTPParameterValue", 2000, false)) {
+        versionFile = "";
+    }
+
     String productNameHeight =
 	request.getParameter("productNameHeight") != null
         ? request.getParameter("productNameHeight") : "";
+    if (!ESAPI.validator().isValidInput("productNameHeight: " + productNameHeight, productNameHeight,
+            "HTTPParameterValue", 2000, false)) {
+        productNameHeight = "";
+    }
+
     String productNameWidth = request.getParameter("productNameWidth") != null
         ? request.getParameter("productNameWidth") : "";
+    if (!ESAPI.validator().isValidInput("productNameWidth: " + productNameWidth, productNameWidth,
+            "HTTPParameterValue", 2000, false)) {
+        productNameWidth = "";
+    }
 
     versionFile = VersionViewBean.validateVersionFile(
         request, versionFile);

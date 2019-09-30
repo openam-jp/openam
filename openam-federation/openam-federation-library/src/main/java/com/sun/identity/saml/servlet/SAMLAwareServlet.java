@@ -25,6 +25,7 @@
  * $Id: SAMLAwareServlet.java,v 1.5 2009/06/12 22:21:39 mallas Exp $
  *
  * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 package com.sun.identity.saml.servlet;
 
@@ -304,7 +305,7 @@ public class SAMLAwareServlet extends HttpServlet {
             SAMLUtils.sendError(request, response,
                 HttpServletResponse.SC_FORBIDDEN,
                 "targetForbidden",
-                SAMLUtils.bundle.getString("targetForbidden") + " " + target);
+                SAMLUtils.bundle.getString("targetForbidden"));
             return;
         }
     }
