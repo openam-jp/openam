@@ -242,16 +242,6 @@ public class OAuth2GuiceModule extends AbstractModule {
         }
 
         @Override
-        public Boolean byToken(String tokenId) {
-            try {
-                new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
-                return true;
-            } catch (InvalidJwtException e) {
-                return false;
-            }
-        }
-
-        @Override
         public Boolean byRealm(String realm) {
             try {
                 return providerSettings.get(realm).isStatelessTokensEnabled();
