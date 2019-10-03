@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest;
@@ -60,7 +61,8 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .toCollection(DashboardResource.class);
 
         realmRouter.route("serverinfo")
-                .authenticateWith(ssoToken().exceptRead())
+                .authenticateWith(ssoToken().exceptRead()
+                    .exceptActions(ServerInfoResource.VALIDATE_GOTO_ACTION_ID))
                 .auditAs(SERVER_INFO)
                 .forVersion(1, 1)
                 .toCollection(ServerInfoResource.class);

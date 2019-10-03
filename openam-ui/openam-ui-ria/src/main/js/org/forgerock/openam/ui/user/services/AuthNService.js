@@ -128,7 +128,10 @@ define([
         const goToFailureUrl = (errorBody) => {
             if (errorBody.detail && errorBody.detail.failureUrl) {
                 console.log(errorBody.detail.failureUrl);
-                window.location.href = errorBody.detail.failureUrl;
+                Configuration.globalData.auth.urlParams.gotoOnFail =
+                    encodeURIComponent(errorBody.detail.failureUrl);
+            } else {
+                delete Configuration.globalData.auth.urlParams.gotoOnFail;
             }
         };
         const fragmentParams = URIUtils.getCurrentFragmentQueryString();
@@ -257,5 +260,15 @@ define([
             errorsHandlers: { "Bad Request": { status: "400" } }
         });
     };
+    obj.validateLogoutGotoUrl = function (urlGoTo) {
+        return obj.serviceCall({
+            type: "POST",
+            headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
+            data: JSON.stringify({ "goto": urlGoTo }),
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo?_action=validateGoto"),
+            errorsHandlers: { "Bad Request": { status: "400" } }
+        });
+    };
+
     return obj;
 });

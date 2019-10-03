@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.core.rest.server;
 
@@ -26,6 +27,7 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.configuration.MapValueParser;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -49,6 +51,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
+import static org.forgerock.json.resource.Responses.newActionResponse;
 import org.forgerock.openam.rest.RealmAwareResource;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.ServiceConfigUtils;
@@ -72,6 +75,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+
 /**
  * Represents Server Information that can be queried via a REST interface.
  * <p>
@@ -83,15 +88,23 @@ public class ServerInfoResource extends RealmAwareResource {
     private final Map<String, ServiceConfig> realmSocialAuthServiceConfigMap = new ConcurrentHashMap<>();
     private final ConsoleConfigHandler configHandler;
     private final RestSecurityProvider restSecurityProvider;
+    private final RedirectUrlValidator<String> urlValidator;
 
     private final static String COOKIE_DOMAINS = "cookieDomains";
     private final static String ALL_SERVER_INFO = "*";
+    public static final String VALIDATE_GOTO_ACTION_ID = "validateGoto";
+    private final Map<String, ActionHandler> actionHandlers;
 
     @Inject
-    public ServerInfoResource(@Named("frRest") Debug debug, ConsoleConfigHandler configHandler, RestSecurityProvider restSecurityProvider) {
+    public ServerInfoResource(@Named("frRest") Debug debug, ConsoleConfigHandler configHandler, 
+            RestSecurityProvider restSecurityProvider, @Named("CoreRest") RedirectUrlValidator<String> urlValidator) {
         this.debug = debug;
         this.configHandler = configHandler;
         this.restSecurityProvider = restSecurityProvider;
+        this.urlValidator = urlValidator;
+        
+        actionHandlers = new CaseInsensitiveHashMap<>();
+        actionHandlers.put(VALIDATE_GOTO_ACTION_ID, new ValidateGotoActionHandler());
     }
 
     private final MapValueParser nameValueParser = new MapValueParser();
@@ -269,17 +282,35 @@ public class ServerInfoResource extends RealmAwareResource {
     private String getEntryForImplementation(ServiceConfig serviceConfig, String name, String attributeName) {
         return nameValueParser.getValueForName(name, ServiceConfigUtils.getSetAttribute(serviceConfig, attributeName));
     }
-
+    
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
-        return RestUtils.generateUnsupportedOperation();
+
+        return internalHandleAction(context, request);
+    }
+
+    private Promise<ActionResponse, ResourceException> internalHandleAction(Context context, ActionRequest request) {
+
+        final String action = request.getAction();
+        final ActionHandler actionHandler = actionHandlers.get(action);
+
+        if (actionHandler != null) {
+            return actionHandler.handle(context, request);
+
+        } else {
+            String message = String.format("Action %s not implemented for this resource", action);
+            NotSupportedException e = new NotSupportedException(message);
+            return e.asPromise();
+        }
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String s,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
@@ -288,6 +319,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -295,6 +327,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String s,
             DeleteRequest request) {
         return RestUtils.generateUnsupportedOperation();
@@ -303,6 +336,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String s,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
@@ -311,6 +345,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         return RestUtils.generateUnsupportedOperation();
@@ -319,6 +354,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
@@ -343,8 +379,39 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String s,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
+    }
+    
+    /**
+     * Defines a delegate capable of handling a particular action for a collection or instance
+     */
+    private interface ActionHandler {
+        Promise<ActionResponse, ResourceException> handle(Context context, ActionRequest request);
+    }
+    
+    /**
+     * Validates the current goto against the list of allowed gotos, and returns
+     * either the allowed goto as sent in, or null.
+     *
+     * @param context Current Server Context
+     * @param request Request from client to confirm registration
+     */
+    private class ValidateGotoActionHandler implements ActionHandler {
+
+        @Override
+        public Promise<ActionResponse, ResourceException> handle(final Context context, final ActionRequest request) {
+
+            final JsonValue jVal = request.getContent();
+            JsonValue result = new JsonValue(new LinkedHashMap<>(1));
+
+            String gotoURL = urlValidator.getRedirectUrl(getRealm(context),
+                    urlValidator.getValueFromJson(jVal, RedirectUrlValidator.GOTO),
+                    null);
+            result.put("validatedUrl", gotoURL);
+            return newResultPromise(newActionResponse(result));
+        }
     }
 }
