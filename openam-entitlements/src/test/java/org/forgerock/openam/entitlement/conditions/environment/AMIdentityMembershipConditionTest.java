@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -23,7 +24,9 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.rest.AuthSPrincipal;
 import com.sun.identity.shared.debug.Debug;
+import java.security.Principal;
 import org.forgerock.openam.core.CoreWrapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,7 +39,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.INVOCATOR_PRINCIPAL_UUID;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -114,9 +116,9 @@ public class AMIdentityMembershipConditionTest {
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
-        Set<String> invocatorUuids = new HashSet<String>();
+        Set<Principal> principals = new HashSet<>();
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, invocatorUuids);
+        subject.getPrincipals().addAll(principals);
         condition.setState("{\"amIdentityName\": [\"IDENTITY_ONE\", \"IDENTITY_TWO\"]}");
 
         //When
@@ -136,7 +138,6 @@ public class AMIdentityMembershipConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.<String>singleton(null));
         condition.setState("{\"amIdentityName\": [\"IDENTITY_ONE\", \"IDENTITY_TWO\"]}");
 
         //When
@@ -156,7 +157,7 @@ public class AMIdentityMembershipConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
 
         //When
         ConditionDecision decision = condition.evaluate(realm, subject, resourceName, env);
@@ -176,7 +177,7 @@ public class AMIdentityMembershipConditionTest {
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY_ONE\", \"IDENTITY_TWO\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(null);
@@ -200,7 +201,7 @@ public class AMIdentityMembershipConditionTest {
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         AMIdentity invocatorIdentity = mock(AMIdentity.class);
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(invocatorIdentity);
@@ -226,7 +227,7 @@ public class AMIdentityMembershipConditionTest {
         AMIdentity invocatorIdentity = mock(AMIdentity.class);
         AMIdentity identity = invocatorIdentity;
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(invocatorIdentity);
@@ -254,7 +255,7 @@ public class AMIdentityMembershipConditionTest {
         IdType invocatorIdType = mock(IdType.class);
         IdType identityIdType = mock(IdType.class);
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(invocatorIdentity);
@@ -285,7 +286,7 @@ public class AMIdentityMembershipConditionTest {
         IdType invocatorIdType = mock(IdType.class);
         IdType identityIdType = mock(IdType.class);
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(invocatorIdentity);
@@ -316,7 +317,7 @@ public class AMIdentityMembershipConditionTest {
         IdType invocatorIdType = mock(IdType.class);
         IdType identityIdType = mock(IdType.class);
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(invocatorIdentity);
@@ -348,7 +349,7 @@ public class AMIdentityMembershipConditionTest {
         IdType invocatorIdType = mock(IdType.class);
         IdType identityIdType = mock(IdType.class);
 
-        env.put(INVOCATOR_PRINCIPAL_UUID, Collections.singleton("INVOCATOR_UUID"));
+        subject.getPrincipals().add(new AuthSPrincipal("INVOCATOR_UUID"));
         condition.setState("{\"amIdentityName\": [\"IDENTITY\"]}");
 
         given(coreWrapper.getIdentity(adminToken, "INVOCATOR_UUID")).willReturn(invocatorIdentity);

@@ -717,6 +717,7 @@
                 "authentication-chains": "Authentication - Chains",
                 "authentication-modules": "Authentication - Modules",
                 "authorization-policySets": "Authorization - Policy Sets",
+                "authorization-provider-policySets": "Authorization - Provider Policy Sets",
                 "authorization-resourceTypes": "Authorization - Resource Types",
                 "general": "General",
                 "security": "Security",
@@ -1074,6 +1075,7 @@
                 },
                 "list": {
                     "addNew": "New Policy Set",
+                    "addNewPP": "New Provider Policy Set",
                     "description": "Define sets of policies for protecting web sites, web applications, or other resources.",
                     "importPolicySets": "Import Policy Sets",
                     "exportPolicySets": "Export Policy Sets",

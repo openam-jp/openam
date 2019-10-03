@@ -15,6 +15,7 @@
  */
 /*
  * Portions Copyright 2011-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -43,8 +44,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.AM_IDENTITY_NAME;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.INVOCATOR_PRINCIPAL_UUID;
 
 /**
  * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
@@ -106,18 +107,16 @@ public class AMIdentityMembershipCondition extends EntitlementConditionAdaptor {
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
 
+        String subjectPrincipal = SubjectUtils.getPrincipalId(subject);
         if (debug.messageEnabled()) {
-            debug.message("At AMIdentityMembershipCondition.getConditionDecision(): entering, names:" + amIdentityName);
-            debug.message("At AMIdentityMembershipCondition.getConditionDecision(): environment.invocatorPrincipalUud:"
-                    + env.get(INVOCATOR_PRINCIPAL_UUID));
+            debug.message("At AMIdentityMembershipCondition.evaluate(): entering, names:" + amIdentityName);
+            debug.message("At AMIdentityMembershipCondition.evaluate(): subjectPrincipal:" + subjectPrincipal);
         }
         boolean isMember = false;
-        Set<String> invocatorUuidSet = env.get(INVOCATOR_PRINCIPAL_UUID);
-        if (invocatorUuidSet != null && !invocatorUuidSet.isEmpty()) {
-            String invocatorUuid = invocatorUuidSet.iterator().next();
-            isMember = isMember(invocatorUuid);
+        if (subjectPrincipal != null && !subjectPrincipal.isEmpty()) {
+            isMember = isMember(subjectPrincipal);
         } else {
-            debug.message("At AMIdentityMembershipCondition.getConditionDecision(): invocatorUuidSet is null or empty");
+            debug.message("At AMIdentityMembershipCondition.evaluate(): subjectPrincipal is null or empty");
         }
         return new ConditionDecision(isMember, Collections.<String, Set<String>>emptyMap());
     }
