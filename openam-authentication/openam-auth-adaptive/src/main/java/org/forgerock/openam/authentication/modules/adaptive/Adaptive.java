@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2020-2022 OSSTech Corporation
+ * Portions Copyrighted 2020-2023 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -911,12 +911,12 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             debug.message("{}.checkRiskAttribute", ADAPTIVE);
         }
 
-        if (riskAttributeName != null && riskAttributeValue != null) {
+        if (riskAttributeName != null) {
             Set<String> riskAttributeValues = null;
 
             riskAttributeValues = getIdentityAttributeSet(riskAttributeName);
 
-            if (riskAttributeValues != null) {
+            if (riskAttributeValue != null && riskAttributeValues != null) {
                 for (String riskAttr : riskAttributeValues) {
                     if (riskAttributeValue.equalsIgnoreCase(riskAttr)) {
                         if (debug.messageEnabled()) {
@@ -926,6 +926,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                         break;
                     }
                 }
+            } else if (riskAttributeValue == null && riskAttributeValues != null && !riskAttributeValues.isEmpty()) {
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkRiskAttribute: Exist Match", ADAPTIVE);
+                }
+                retVal = riskAttributeScore;
             }
         }
 
