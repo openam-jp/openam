@@ -273,12 +273,26 @@ define([
                 if (reqs.hasOwnProperty("tokenId")) {
                     this.handleExistingSession(reqs);
                 } else { // We aren't logged in yet, so render a form...
-                    this.renderForm(reqs, params);
+                    this.waitForPartials().then(_.bind(function () {
+                        this.renderForm(reqs, params);
+                        if (CookieHelper.getCookie("invalidRealm")) {
+                            CookieHelper.deleteCookie("invalidRealm");
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                        }
+                    }, this), function () {
 
-                    if (CookieHelper.getCookie("invalidRealm")) {
-                        CookieHelper.deleteCookie("invalidRealm");
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
-                    }
+                        // Retry partials registration.
+                        UIUtils.preloadInitialPartials();
+
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "serviceUnavailable");
+
+                        // Go to the Login Unavailable view with all the original url params.
+                        var urlParams = URIUtils.getCurrentFragmentQueryString();
+                        if (urlParams) {
+                            urlParams = `&${urlParams}`;
+                        }
+                        routeToLoginUnavailable(urlParams);
+                    });
                 }
             }, this), _.bind(function (error) {
                 if (error) {
@@ -300,6 +314,42 @@ define([
                 routeToLoginUnavailable(RESTLoginHelper.filterUrlParams(query.parseParameters(paramString)));
 
             }, this));
+        },
+
+        waitForPartials () {
+            var timerId,
+                promise = $.Deferred(),
+                count = 0,
+                retryCount = 10,
+                retryInterval = 1000,
+                partialsLength = _.find(Configuration.appConfiguration.moduleDefinition, function (element) {
+                    return element.moduleClass === "org/forgerock/commons/ui/common/util/UIUtils";
+                }).configuration.partialUrls.length;
+
+            if (Configuration.appConfiguration.partialsTimeout) {
+                if (Configuration.appConfiguration.partialsTimeout.retryCount) {
+                    retryCount = Configuration.appConfiguration.partialsTimeout.retryCount;
+                }
+                if (Configuration.appConfiguration.partialsTimeout.retryInterval) {
+                    retryInterval = Configuration.appConfiguration.partialsTimeout.retryInterval;
+                }
+            }
+
+            if (Object.keys(Handlebars.partials).length >= partialsLength) {
+                promise.resolve();
+            } else {
+                timerId = setInterval(function () {
+                    if (Object.keys(Handlebars.partials).length >= partialsLength) {
+                        clearInterval(timerId);
+                        promise.resolve();
+                    }
+                    if (count++ >= retryCount) {
+                        clearInterval(timerId);
+                        promise.reject();
+                    }
+                }, retryInterval);
+            }
+            return promise;
         },
 
         renderForm (reqs, urlParams) {
