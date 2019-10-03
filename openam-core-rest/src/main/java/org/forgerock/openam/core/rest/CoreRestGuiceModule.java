@@ -12,11 +12,17 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.name.Named;
+
+import javax.inject.Singleton;
+
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.core.rest.authn.CoreRestAuthenticationGuiceModule;
 import org.forgerock.openam.core.rest.cts.CoreRestCtsGuiceModule;
@@ -24,6 +30,8 @@ import org.forgerock.openam.core.rest.devices.CoreRestDevicesGuiceModule;
 import org.forgerock.openam.core.rest.record.CoreRestRecordGuiceModule;
 import org.forgerock.openam.core.rest.session.CoreRestSessionGuiceModule;
 import org.forgerock.openam.core.rest.sms.CoreRestSmsGuiceModule;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 /**
  * Guice module for binding the core REST endpoints.
@@ -43,4 +51,12 @@ public class CoreRestGuiceModule extends AbstractModule {
         install(new CoreRestDevicesGuiceModule());
         install(new CoreRestRecordGuiceModule());
     }
+    
+    @Provides
+    @Singleton
+    @Named("CoreRest")
+    public RedirectUrlValidator<String> getRedirectUrlValidator() {
+        return new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
+    }
+
 }
