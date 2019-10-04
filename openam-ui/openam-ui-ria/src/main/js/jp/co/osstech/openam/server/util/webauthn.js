@@ -6,6 +6,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
     obj.createCredential = function (options) {
         $("#idToken4_0").hide();
+        
         navigator.credentials.create(options)
             .then((Credential) => {
                 const attestationObject = new Uint8Array(Credential.response.attestationObject);
@@ -33,6 +34,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
     obj.getCredential = function (options) {
         $("#idToken4_0").hide();
+        
         navigator.credentials.get(options)
             .then((Credential) => {
                 const clientDataJSON = new Uint8Array(Credential.response.clientDataJSON);
@@ -43,6 +45,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
                 const jdata = {
                     id: Credential.id,
+                    type: Credential.type,
                     rawId: btoa(String.fromCharCode.apply(null, rawId)),
                     userHandle: btoa(String.fromCharCode.apply(null, userHandle)),
                     authenticatorData: btoa(String.fromCharCode.apply(null, authenticatorData)),

@@ -4,24 +4,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class PublicKeyCredentialCallback {
+public class WebauthnJsonCallback {
 
     /*
-     * for prototype only
-     * todo change private
-     * write get value code in this class
+     * for prototype only todo change private write get value code in this class
      */
-    private String id;
-    private String rawId;
+    private String id; // base64url String
+    private String rawId; // base64 or byte[]
     private String type;
-    private String attestationObject;
-    private String clientDataJSON;
-    private String CredentialId;
-    private String AuthenticatorData;
-    private String Signature;
-    private String UserHandle;
+    private String attestationObject; // base64 or byte[]
+    private String clientDataJSON; // base64 or byte[]
+    private String credentialId; // base64 or byte[]
+    private String authenticatorData; // base64 or byte[]
+    private String signature; // base64 or byte[]
+    private String userHandle;
 
-    PublicKeyCredentialCallback(){
+    WebauthnJsonCallback() {
 
     }
 
@@ -44,18 +42,21 @@ public class PublicKeyCredentialCallback {
     public String getClientDataJSON() {
         return clientDataJSON;
     }
+
     public String getCredentialId() {
-        return CredentialId;
+        return credentialId;
     }
+
     public String getAuthenticatorData() {
-        return AuthenticatorData;
+        return authenticatorData;
     }
 
     public String getSignature() {
-        return Signature;
+        return signature;
     }
+
     public String getUserHandle() {
-        return UserHandle;
+        return userHandle;
     }
 
 }

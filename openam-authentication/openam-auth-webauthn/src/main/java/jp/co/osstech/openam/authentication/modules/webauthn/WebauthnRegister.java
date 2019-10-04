@@ -24,7 +24,6 @@
  *
  */
 
-
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
 /**
@@ -32,7 +31,6 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
  * @author tonoki
  */
 import com.sun.identity.shared.debug.Debug;
-
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import javax.security.auth.callback.TextOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
@@ -51,23 +49,27 @@ import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+//import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Base64;
-import java.util.Base64.Decoder;
 import java.lang.Byte;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -87,644 +89,696 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.ErrorCorrectionLevel;
 import org.forgerock.util.encode.Base64url;
 
+import com.webauthn4j.data.client.Origin;
+import com.webauthn4j.data.client.challenge.Challenge;
+import com.webauthn4j.data.client.challenge.DefaultChallenge;
+import com.webauthn4j.data.attestation.statement.AttestationStatement;
+import com.webauthn4j.data.attestation.authenticator.CredentialPublicKey;
+import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
+import com.webauthn4j.data.attestation.authenticator.AAGUID;
+import com.webauthn4j.data.PublicKeyCredential;
+import com.webauthn4j.authenticator.Authenticator;
+import com.webauthn4j.authenticator.AuthenticatorImpl;
+import com.webauthn4j.data.WebAuthnRegistrationContext;
+import com.webauthn4j.server.ServerProperty;
+import com.webauthn4j.util.ArrayUtil;
+import com.webauthn4j.util.Base64Util;
+import com.webauthn4j.util.exception.*;
+import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
+import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
+import com.webauthn4j.converter.AttestedCredentialDataConverter;
+import com.webauthn4j.converter.util.*;
+
 public class WebauthnRegister extends AMLoginModule {
-	
-	private static final String BUNDLE_NAME = "amAuthWebauthnRegister";
-	private final static Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
-	
-	private ResourceBundle bundle;
-	private Map sharedState;
 
-	// user's valid ID and principal
-	private String validatedUserID;
-	private WebauthnPrincipal userPrincipal;
+    private static final String BUNDLE_NAME = "amAuthWebauthnRegister";
+    private final static Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
 
-	// Configurations
-	private Map options;
+    private ResourceBundle bundle;
+    private Map sharedState;
+    private Map options;
 
-	private String id;
-	private String CredentialId;
-	//private String getCredentialId;
-	//private String createCredentialId;
-	private String rawId;
-	private static String userName = "";
-	private String createCred;
-	private String userCred;
-	private String displayName;
-	private Map userAttrs;
-	private StringBuilder storedChallenge;
-	private StringBuilder idArray;
-	
-	private String createCredentialId;
-	private String createAttestationObject;
-	private String createClientDataJSON;
-	
-	private String getCredentialId;
-	private String getSignature;
-	private String getClientDataJSON;
-	private String getAuthenticatorData;
-	private String getType;
-	private String getUserHandle;
-	
-	// Service Configuration Parameters
-	private String rpConfig = null;
-	private String attestationConfig = null;
-	private String attachmentConfig = null;
-	private String residentKeyConfig = null;
-	private String userVerificationConfig = null;
-	private String credentialIdAttributeNameConfig = null;
-	private String keyAttributeNameConfig = null;	
-	private String displayNameAttributeNameConfig = null;
-	
-	// Service Configuration Strings
-	private static final String RP = "iplanet-am-auth-Webauthn-rp";
-	private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
-	private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
-	private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
-	private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
-	private static final String CREDENTIALID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-credentialIdAttributeName";
-	private static final String KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
-	private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
-	private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
-	
-	// Default Values.
-   private static final int DEFAULT_AUTH_LEVEL = 0;
+    // user's valid ID and principal
+    private String validatedUserID;
+    private WebauthnPrincipal userPrincipal;
 
-	private boolean getCredentialsFromSharedState;
-	private Callback[] callbacks;
-	private Set<String> userSearchAttributes = Collections.emptySet();
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
-	/**
-	 * Initializes this <code>LoginModule</code>.
-	 *
-	 * @param subject the <code>Subject</code> to be authenticated.
-	 * @param sharedState shared <code>LoginModule</code> state.
-	 * @param options options specified in the login.
-	 *        <code>Configuration</code> for this particular
-	 *        <code>LoginModule</code>.
-	 */
-	public void init(Subject subject, Map sharedState, Map options) {    
-		if (DEBUG.messageEnabled()) {
-			DEBUG.message("Webauthn module init start");
-		}
-		java.util.Locale locale = getLoginLocale();
-		bundle = amCache.getResBundle(BUNDLE_NAME, locale);
+    // Webauthn Credentials
+    private String userName;
+    private String amCredentialIdBase64Url;
+    private byte[] amCredentialIdBytes;
+    private byte[] attestedCredentialIdBytes;
+    private String displayName;
+    private Challenge generatedChallenge;
+    private CredentialPublicKey attestedCredentialPublicKey;
+    private byte[] amChallengeBytes;
+    private String webauthnHiddenCallback;
+    private byte[] amAttestationObjectBytes;
+    private byte[] amClientDataJsonBytes;
+    private boolean amVerificationRequired;
+    private byte[] _attestedContent;
+    private long attestedCounter;
 
-		if (DEBUG.messageEnabled()) {
-			DEBUG.message("Webauthn getting resource bundle for locale: " + locale);
-		}
-		
-		this.rpConfig = CollectionHelper.getMapAttr(options, RP);
-		this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
-		this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
-		this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
-		this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
-		this.credentialIdAttributeNameConfig = CollectionHelper.getMapAttr(options, CREDENTIALID_ATTRIBUTE_NAME);
-		this.keyAttributeNameConfig = CollectionHelper.getMapAttr(options, KEY_ATTRIBUTE_NAME);
-		this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
-		
-		if (DEBUG.messageEnabled()) {
-			DEBUG.message("Webauthn module parameter are "
-					+ ", rp = " + rpConfig
-					+ ", attestation = " + attestationConfig
-					+ ", attachment = " + attachmentConfig
-					+ ", residentKey = " + residentKeyConfig
-					+ ", userVerification = " + userVerificationConfig
-					+ ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
-					+ ", displayNameAttributeName = " + displayNameAttributeNameConfig
-					+ ", keyAttributeName = " + keyAttributeNameConfig
-					);
-		}
-		
-		/*
-		 * Make Service for store challenge and other resouces
-		 * #TODO write code
-		 * 
-		 */
-        userName = (String) sharedState.get(getUserKey());
+    // Service Configuration Parameters
+    private String rpNameConfig = "";
+    private String originConfig = "";
+    private String attestationConfig = "";
+    private String attachmentConfig = "";
+    private String residentKeyConfig = "";
+    private String userVerificationConfig = "";
+    private String credentialIdAttributeNameConfig = "";
+    private String pubKeyAttributeNameConfig = "";
+    private String displayNameAttributeNameConfig = "";
+    private String counterAttributeNameConfig = "";
+
+    // Service Configuration Strings
+    private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
+    private static final String ORIGIN = "iplanet-am-auth-Webauthn-origin";
+    private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
+    private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
+    private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
+    private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
+    private static final String CREDENTIALID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-credentialIdAttributeName";
+    private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
+    private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
+    private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
+    private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
+
+    // Default Values.
+    private static final int DEFAULT_AUTH_LEVEL = 0;
+
+    private Set<String> userSearchAttributes = Collections.emptySet();
+    private Callback[] callbacks;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    /**
+     * Initializes this <code>LoginModule</code>.
+     *
+     * @param subject     the <code>Subject</code> to be authenticated.
+     * @param sharedState shared <code>LoginModule</code> state.
+     * @param options     options specified in the login. <code>Configuration</code>
+     *                    for this particular <code>LoginModule</code>.
+     */
+    public void init(Subject subject, Map sharedState, Map options) {
+
+        java.util.Locale locale = getLoginLocale();
+        bundle = amCache.getResBundle(BUNDLE_NAME, locale);
+
+        this.rpNameConfig = CollectionHelper.getMapAttr(options, RP_NAME);
+        this.originConfig = CollectionHelper.getMapAttr(options, ORIGIN);
+        this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
+        this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
+        this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
+        this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
+        this.credentialIdAttributeNameConfig = CollectionHelper.getMapAttr(options, CREDENTIALID_ATTRIBUTE_NAME);
+        this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
+        this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
+        this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
+
         if (DEBUG.messageEnabled()) {
-              DEBUG.message("userName: " + userName);
-          }
-
-		
-	}
-
-	/**
-	 * Takes an array of submitted <code>Callback</code>,
-	 * process them and decide the order of next state to go.
-	 * Return STATE_SUCCEED if the login is successful, return STATE_FAILED
-	 * if the LoginModule should be ignored.
-	 *
-	 * @param callbacks an array of <code>Callback</cdoe> for this Login state
-	 * @param state order of state. State order starts with 1.
-	 * @return int order of next state. Return STATE_SUCCEED if authentication
-	 *         is successful, return STATE_FAILED if the
-	 *         LoginModule should be ignored.
-	 * @throws AuthLoginException
-	 */
-	public int process(Callback[] callbacks, int state)
-			throws AuthLoginException {
-		if (DEBUG.messageEnabled()) {
-			DEBUG.message("in process(), login state is " + state);
-		}
-
-		this.callbacks = callbacks;
-		WebauthnRegisterModuleState moduleState = WebauthnRegisterModuleState.get(state);
-		WebauthnRegisterModuleState nextState = null;
-
-		switch (moduleState) {
-
-		case REG_START:
-
-			if (DEBUG.messageEnabled()) {
-				DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_START");
-			}
-
-			/*
-			 *  Pre Authentication for Key Registration
-			 *  expect REG_SCRIPT
-			 *  lookup DisplayName
-			 */
-	          
-			if (userName != null) {
-				nextState = WebauthnRegisterModuleState.REG_SCRIPT;
-			} else {
-			    nextState = WebauthnRegisterModuleState.REG_START;
-			}
-			
-			//generate 32byte challenge
-			//generate 16byte id
-			try {
-				storedChallenge = genBytesArrayStr(32);
-				idArray = genBytesArrayStr(16);
-			} catch(GeneralSecurityException e) {
-				throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-			}
-
-			// navigator.credentials.create Options for javascript
-			String createCredntialsJavascript = getCreateCredJavascript(
-					rpConfig,
-					idArray,
-					userName, 
-					displayName, 
-					attestationConfig, 
-					attachmentConfig, 
-					residentKeyConfig, 
-					userVerificationConfig,
-					storedChallenge
-					);
-
-			if (DEBUG.messageEnabled()) {
-				DEBUG.message("createCredntialsJavascpt is " + createCredntialsJavascript);
-			}
-
-			// Replace Callback to send Generated Javascript that include create options.
-			// only for nextState REG_SCRIPT
-			Callback createCreadentialsCallback = new ScriptTextOutputCallback(createCredntialsJavascript);
-			replaceCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue(), 1, createCreadentialsCallback);
-
-			break;
-
-		case REG_SCRIPT:
-
-			if (DEBUG.messageEnabled()) {
-				DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_SCRIPT");
-			}
-
-			// Registration Verify PublicKey Credentials
-			// expect REG_KEY
-			try {
-				nextState = verifyCreateCred(callbacks);
-			} catch (AuthLoginException ex) {
-				throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-			}
-
-			break;
-
-		case REG_KEY:
-			//maybe no need this state
-			if (DEBUG.messageEnabled()) {
-				DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_KEY");
-			}
-			// only display next button and return LOGIN_START
-			nextState = WebauthnRegisterModuleState.COMPLETE;
-
-			break;
-
-		}
-
-		return nextState.intValue();
-	}
-
-
-	/**from based membership module
-	 * User input value will be store in the callbacks[].
-	 * When user click cancel button, these input field should be reset
-	 * to blank.
-	 */
-	private void clearCallbacks(Callback[] callbacks) {
-		for (int i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] instanceof NameCallback) {
-				NameCallback nc = (NameCallback) callbacks[i];
-				nc.setName("");
-			}
-		}
-	}    
-
-	/**from based membership module
-	 * Returns <code>Principal</code>.
-	 *
-	 * @return <code>Principal</code>
-	 */
-	public Principal getPrincipal() {
-		if (userPrincipal != null) {
-			return userPrincipal;            
-		} else if (validatedUserID != null) {
-			userPrincipal = new WebauthnPrincipal(validatedUserID);
-			return userPrincipal;            
-		} else {
-			return null;
-		}
-	}
-
-	/**from based membership module
-	 * Destroy the module state
-	 */
-	@Override
-	public void destroyModuleState() {
-		validatedUserID = null;
-	}
-
-	/**from based membership module
-	 * Set all the used variables to null
-	 */
-	@Override
-	public void nullifyUsedVars() {
-		bundle = null;
-		sharedState = null;
-		options = null;
-		userName = null ;
-		userAttrs = null;
-		callbacks = null;
-	}    
-
-	/*
-	 * Verify and Store Authenticator(browser) Response Credentials for Registration
-	 * #TODO Verify and Store function are not completed.
-	 * 
-	 * @param callbacks an array of <code>Callback</cdoe> for this Login state
-	 * @return int order of next state. Return 
-	 * @throws AuthLoginException
-	 */
-	private WebauthnRegisterModuleState verifyCreateCred(Callback[] callbacks) throws AuthLoginException {
-		
-		// read HiddenValueCallback from Authenticator posted
-		for (int i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] instanceof HiddenValueCallback) {
-				createCred = ((HiddenValueCallback) callbacks[i]).getValue();
-
-				if (createCred == null) {
-					return WebauthnRegisterModuleState.REG_START;
-				}
-
-			}
-		}
-		
-		if (DEBUG.messageEnabled()) {
-		    DEBUG.message("Posted createCred = " + createCred);
-		}
-		
-		/*
-		 * Verify json PublicKeyCredential
-		 * json to ObjectMapper
-		 */
-
-		
-		if (StringUtils.isNotEmpty(createCred)) {
-			// Deserialize JSON to Map.
-
-			try {
-				PublicKeyCredential credjson = OBJECT_MAPPER.readValue(createCred, PublicKeyCredential.class);
-				createCredentialId = credjson.getRawId();
-				if (DEBUG.messageEnabled()) {
-					DEBUG.message("createCredentialId = " + createCredentialId);
-				}
-				createAttestationObject = credjson.getAttestationObject();
-				if (DEBUG.messageEnabled()) {
-					DEBUG.message("createAttestationObject = " + createAttestationObject);
-				}
-				createClientDataJSON = credjson.getClientDataJSON();
-				if (DEBUG.messageEnabled()) {
-					DEBUG.message("createClientDataJSON = " + createClientDataJSON);
-				}
-				
-			} catch (IOException e) {
-				DEBUG.error("Webauthn.process(): JSON parse error", e);
-				throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-			} 
-		}
-		
-		/*
-		 * temp registration function
-		 *  This must be change to W3C verification flow.
-		 */
-		/*
-		 * Store Webauthn informations to user profile
-		 */
-		try {
-			boolean storeResult = false;
-			storeResult = storeCredentialId(createCredentialId);
-			
-			if(storeResult) {
-				if (DEBUG.messageEnabled()) {
-					DEBUG.message("storeCredentialId was success");
-				}
-				
-				return WebauthnRegisterModuleState.REG_KEY;
-				
-			} else {
-				if (DEBUG.messageEnabled()) {
-					DEBUG.message("storeCredentialId was Fail");
-				}
-				
-				return WebauthnRegisterModuleState.REG_START;
-				
-			}
-		} catch (AuthLoginException ex) {
-			throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-		}
-		
-		
-		
-	}   
-	
-
-	/**from based membership module
-	 * Returns the password from the PasswordCallback.
-	 */
-	private String getPassword(PasswordCallback callback) {
-		char[] tmpPassword = callback.getPassword();
-
-		if (tmpPassword == null) {
-			// treat a NULL password as an empty password
-			tmpPassword = new char[0];
-		}
-
-		char[] pwd = new char[tmpPassword.length];
-		System.arraycopy(tmpPassword, 0, pwd, 0, tmpPassword.length);
-
-		return (new String(pwd));
-	}
-
-	/**from based membership module
-	 * Returns the input values as a <code>Set<String></code> for different types of Callback.
-	 * An empty <code>Set</code> will be returned if there is no value for the
-	 * Callback, or the Callback is not supported.
-	 */
-	private Set<String> getCallbackFieldValues(Callback callback) {
-		Set<String> values = new HashSet<String>();
-
-		if (callback instanceof NameCallback) {
-			String value = ((NameCallback)callback).getName();
-			if (value != null && value.length() != 0) {
-				values.add(value);
-			}
-
-		} else if (callback instanceof PasswordCallback) {
-			String value = getPassword((PasswordCallback)callback);
-			if (value != null && value.length() != 0) {
-				values.add(value);
-			}
-
-		} else if (callback instanceof ChoiceCallback) {
-			String[] vals = ((ChoiceCallback)callback).getChoices();
-			int[] selectedIndexes = ((ChoiceCallback)callback).getSelectedIndexes();
-
-			for (int i = 0; i < selectedIndexes.length; i++) {
-				values.add(vals[selectedIndexes[i]]);
-			}
-		}
-
-		return values;
-	}
-
-	/**from based membership module
-	 * Returns the first input value for the given Callback.
-	 * Returns null if there is no value for the Callback.
-	 */
-	private String getCallbackFieldValue(Callback callback) {
-		Set<String> values = getCallbackFieldValues(callback);
-		Iterator<String> it = values.iterator();
-
-		if (it.hasNext()) {
-			return it.next();
-		}
-
-		return null;
-	} 
-	
-	/*
-	 * from based membership module
-	 * 
-	 */
-	private void updateRegistrationCallbackFields(Callback[] submittedCallbacks) 
-			throws AuthLoginException {
-		Callback[] origCallbacks = getCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue());
-
-		for (int c = 0; c < origCallbacks.length; c++) {
-			if (origCallbacks[c] instanceof NameCallback) {
-				NameCallback nc = (NameCallback) origCallbacks[c];
-				nc.setName(((NameCallback) submittedCallbacks[c]).getName());
-				replaceCallback(WebauthnRegisterModuleState.REG_KEY.intValue(), c, nc);
-			} else {
-				continue;
-			}
-		}
-	}
-	
-	/*
-	 * lookup user CredentialId and public key from user data store
-	 * @return int order of next state. Return STATE_SUCCEED if authentication
-	 *         is successful, return STATE_FAILED if the
-	 *         LoginModule should be ignored.
-	 * @throws AuthLoginException
-	 */
-    private String lookupCredentialId() throws AuthLoginException{
-
-        Set<String> CredentialIds = Collections.emptySet();
-
-        try {
-        	CredentialIds = getIdentity().getAttribute(credentialIdAttributeNameConfig);
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.lookupCredentialId() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("Webauthn.lookupCredentialId() : error searching Identities with username : " + userName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+            DEBUG.message("Webauthn module parameter are " + ", rp = " + rpNameConfig + ", origin = " + originConfig
+                    + ", attestation = " + attestationConfig + ", attachment = " + attachmentConfig + ", residentKey = "
+                    + residentKeyConfig + ", userVerification = " + userVerificationConfig
+                    + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
+                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig + ", keyAttributeName = "
+                    + pubKeyAttributeNameConfig + ", counterAttributeName = " + counterAttributeNameConfig);
         }
-        
-        String CredentialId = null;
-
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(CredentialIds)) {
-        	CredentialId = CredentialIds.iterator().next();
+        userName = (String) sharedState.get(getUserKey());
+        if (StringUtils.isEmpty(userName)) {
+            try {
+                userName = getUserSessionProperty(ISAuthConstants.USER_TOKEN);
+            } catch (AuthLoginException e) {
+                DEBUG.message("Webauthn::init: Cannot lookup userName from shared State.");
+            }
         }
-
-        return CredentialId;
-    }
-    
-	/*
-	 * lookup user DisplayName and public key from user data store
-	 * @return int order of next state. Return STATE_SUCCEED if authentication
-	 *         is successful, return STATE_FAILED if the
-	 *         LoginModule should be ignored.
-	 * @throws AuthLoginException
-	 */
-    private String lookupDisplayName() throws AuthLoginException{
-
-        Set<String> displayNames = Collections.emptySet();
-
-        try {
-        	displayNames = getIdentity().getAttribute(displayNameAttributeNameConfig);
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.lookupDisplayName() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("Webauthn.lookupDisplayName() : error searching DisplayNames with username : " + userName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("userName: " + userName);
         }
-        
-        String displayName = null;
-
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(displayNames)) {
-        	displayName = displayNames.iterator().next();
-        }
-
-        return displayName;
     }
 
-    /* Store to user data store
-	 * @param String CredentialId
-	 * @param String PublicKey #TODO under development
-	 * @return boolean
-	 * @throws AuthLoginException
-	 */ 
+    /**
+     * Takes an array of submitted <code>Callback</code>, process them and decide
+     * the order of next state to go. Return STATE_SUCCEED if the login is
+     * successful, return STATE_FAILED if the LoginModule should be ignored.
+     *
+     * @param callbacks an array of <code>Callback</cdoe> for this Login state
+     * @param state     order of state. State order starts with 1.
+     * @return int order of next state. Return STATE_SUCCEED if authentication is
+     *         successful, return STATE_FAILED if the LoginModule should be ignored.
+     * @throws AuthLoginException
+     */
+    public int process(Callback[] callbacks, int state) throws AuthLoginException {
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("in process(), login state is " + state);
+        }
 
-    private boolean storeCredentialId(String CredentialId) throws AuthLoginException {
-        boolean storeIdResult = false;
+        this.callbacks = callbacks;
+        WebauthnRegisterModuleState moduleState = WebauthnRegisterModuleState.get(state);
+        WebauthnRegisterModuleState nextState = null;
+
+        switch (moduleState) {
+
+        case REG_START:
+
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_START");
+            }
+
+            /*
+             * Pre Authentication for Key Registration expect REG_SCRIPT lookup DisplayName
+             */
+
+            if (userName != null) {
+                nextState = WebauthnRegisterModuleState.REG_SCRIPT;
+            } else {
+                nextState = WebauthnRegisterModuleState.REG_START;
+            }
+
+            displayName = lookupDisplayName();
+
+            // generate 32byte challenge
+            // generate 16byte id
+
+            try {
+
+                generatedChallenge = new DefaultChallenge(genSecureRandomBytesArray(32));
+                amChallengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
+
+                amCredentialIdBytes = new DefaultChallenge(genSecureRandomBytesArray(16)).getValue();
+
+            } catch (GeneralSecurityException e) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+            }
+
+            // navigator.credentials.create Options
+            CredentialsCreateOptions credentialsCreateOptions = new CredentialsCreateOptions(rpNameConfig,
+                    amCredentialIdBytes, userName, displayName, attestationConfig, attachmentConfig, residentKeyConfig,
+                    userVerificationConfig, amChallengeBytes);
+
+            // Replace Callback to send Generated Javascript that include create options.
+            // only for nextState REG_SCRIPT
+            Callback creadentialsCreateCallback = new ScriptTextOutputCallback(
+                    generateCredntialsCreateScriptCallback(credentialsCreateOptions));
+            replaceCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue(), 1, creadentialsCreateCallback);
+
+            break;
+
+        case REG_SCRIPT:
+
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_SCRIPT");
+            }
+
+            // Registration Verify PublicKey Credentials
+            // expect REG_KEY
+            try {
+                nextState = verifyRegisterCallback(callbacks);
+            } catch (AuthLoginException ex) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            }
+
+            break;
+
+        case REG_KEY:
+            // TODO user enter credential nick name and store it at this state.
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_KEY");
+            }
+            // only display next button and return LOGIN_START
+            nextState = WebauthnRegisterModuleState.COMPLETE;
+
+            break;
+
+        }
+
+        return nextState.intValue();
+    }
+
+    /*
+     * Verify and Store Authenticator(browser) Response Credentials for Registration
+     * 
+     * @param callbacks an array of <code>Callback</cdoe> for this Login state
+     * 
+     * @return int order of next state. Return
+     * 
+     * @throws AuthLoginException
+     */
+    private WebauthnRegisterModuleState verifyRegisterCallback(Callback[] callbacks) throws AuthLoginException {
+
+        // read HiddenValueCallback from Authenticator posted
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof HiddenValueCallback) {
+                webauthnHiddenCallback = ((HiddenValueCallback) callbacks[i]).getValue();
+
+                if (webauthnHiddenCallback == null) {
+                    return WebauthnRegisterModuleState.REG_START;
+                }
+
+            }
+        }
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Posted webauthnHiddenCallback = " + webauthnHiddenCallback);
+        }
+
+        /*
+         * Map Callback to Object
+         */
+        if (StringUtils.isNotEmpty(webauthnHiddenCallback)) {
+
+            try {
+                WebauthnJsonCallback _responseJson = OBJECT_MAPPER.readValue(webauthnHiddenCallback,
+                        WebauthnJsonCallback.class);
+
+                amCredentialIdBase64Url = _responseJson.getId();
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("amCredentialIdBase64url = " + amCredentialIdBase64Url);
+                }
+
+                amAttestationObjectBytes = Base64.getDecoder().decode(_responseJson.getAttestationObject());
+                amClientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
+
+            } catch (IOException e) {
+                DEBUG.error("Webauthn.process(): JSON parse error", e);
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+            }
+        }
+
+        /*
+         * Validation authenticator response This must be change to W3C verification
+         * flow. This time use webauthn4j library to END
+         * START============================.
+         */
+        Origin amOrigin = new Origin(originConfig);
+        String amRpId = amOrigin.getHost();
+
+        byte[] amTokenBindingId = null;
+        if (userVerificationConfig.equalsIgnoreCase("required")) {
+            amVerificationRequired = true;
+        } else {
+            amVerificationRequired = false;
+        }
+        // rp:id = origin
+        ServerProperty serverProperty = new ServerProperty(amOrigin, amRpId, generatedChallenge, amTokenBindingId);
+
+        try {
+            WebAuthnRegistrationContext registrationContext = new WebAuthnRegistrationContext(amClientDataJsonBytes,
+                    amAttestationObjectBytes, serverProperty, amVerificationRequired);
+            WebAuthnRegistrationContextValidator webAuthnRegistrationContextValidator = WebAuthnRegistrationContextValidator
+                    .createNonStrictRegistrationContextValidator();
+            WebAuthnRegistrationContextValidationResponse response = webAuthnRegistrationContextValidator
+                    .validate(registrationContext);
+
+            // CredentialId <-- AttestedCredentialData <--AuthenticationData
+            // <--AttestationObject
+            attestedCredentialIdBytes = ArrayUtil.clone(response.getAttestationObject().getAuthenticatorData()
+                    .getAttestedCredentialData().getCredentialId());
+
+            // PublicKey(COSE) <-- AttestedCredentialData <--AuthenticationData
+            // <--AttestationObject
+            attestedCredentialPublicKey = response.getAttestationObject().getAuthenticatorData()
+                    .getAttestedCredentialData().getCredentialPublicKey();
+
+            // Counter <--AuthenticationData <--AttestationObject
+            attestedCounter = response.getAttestationObject().getAuthenticatorData().getSignCount();
+
+        } catch (Exception ex) {
+            DEBUG.error("Webauthn.webauthn4j.verify() : Webauthn4j exception : ", ex);
+        }
+        /*
+         * END of webauthn4j library line END============================
+         */
+
+        try {
+            // boolean _storeResult
+            boolean _storeResult = false;
+            // store CredentialId
+            _storeResult = storeByteData(attestedCredentialIdBytes, credentialIdAttributeNameConfig);
+
+            // store Public Key
+            _storeResult = storeCredentialPublicKey(attestedCredentialPublicKey);
+
+            // store Counter
+            _storeResult = storeCounter(attestedCounter);
+
+            if (_storeResult) {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("storeCredentials was success");
+                }
+                return WebauthnRegisterModuleState.REG_KEY;
+
+            } else {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("storeCredentials was Fail");
+                }
+                return WebauthnRegisterModuleState.REG_START;
+
+            }
+        } catch (Exception e) {
+            DEBUG.error("Webauthn.storeCredentials : Webauthn module exception : ", e);
+            return WebauthnRegisterModuleState.REG_START;
+        }
+    }
+
+    /*
+     * Store CredentialPublicKey to user data store
+     * 
+     * @param CredentialPublicKey amCredentialPublicKey
+     * 
+     * @return boolean
+     * 
+     * @throws AuthLoginException, IdRepoException
+     */
+    private boolean storeCredentialPublicKey(CredentialPublicKey attestedCredentialPublicKey)
+            throws AuthLoginException, IdRepoException, IOException {
+
+        boolean _storeAttestedCredentialDataResult = false;
+
+        ByteArrayOutputStream _bos = new ByteArrayOutputStream();
+        try (ObjectOutputStream _os = new ObjectOutputStream(_bos)) {
+            _os.writeObject(attestedCredentialPublicKey);
+            _attestedContent = _bos.toByteArray();
+        }
+
+        Map<String, byte[][]> map = new HashMap<String, byte[][]>();
+        byte[][] _attestedValues = new byte[1][];
+        map.put(pubKeyAttributeNameConfig, _attestedValues);
+        _attestedValues[0] = _attestedContent;
+
         try {
             AMIdentity uid = getIdentity();
-            uid.setAttributes(Collections.singletonMap(credentialIdAttributeNameConfig, Collections.singleton(CredentialId)));
+            uid.setBinaryAttributes(map);
             uid.store();
-            storeIdResult = true;
+            _storeAttestedCredentialDataResult = true;
         } catch (SSOException e) {
-            DEBUG.message("Webauthn.storeCredentialId() : Webauthn module exception : ", e);
+            DEBUG.error("Webauthn.storeCredentialId : Webauthn module exception : ", e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         } catch (IdRepoException ex) {
-            DEBUG.message("Webauthn.storeCredentialId() : error sotre Identities with CredentialId : ", ex);
+            DEBUG.error("Webauthn.storeCredentialId : error store CredentialId : ", ex);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
-        return storeIdResult;
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("storeCredentialId was Success");
+        }
+        return _storeAttestedCredentialDataResult;
     }
-    
-    /**
-     * This function provides the Javascript for Authenticator registration.
-     * #TODO Very Slow String join. It must be changed before release.
-     * @param rpConfig                from Service Configuration parameter
-     * @param idArray                 generated genBytesArrayStr(16)
-     * @param userName                from user data
-     * @param displayName             from user data
-     * @param attestationConfig       from Service Configuration parameter
-     * @param attatiment Config       from Service Configuration parameter
-     * @param residentKeyConfig       from Service Configuration parameter
-     * @param userVerificationConfig  from Service Configuration parameter
-     * @param challengeArrayStr       generated genBytesArrayStr(32)
-     * @return The Javascript required for navigator.credentials.create()
-     */
-    public static String getCreateCredJavascript(
-    		String rpConfig,
-    		StringBuilder idArray,
-    		String userName,
-    		String displayName,
-    		String attestationConfig,
-    		String attatimentConfig,
-    		String residentKeyConfig,
-    		String userVerificationConfig,
-    		StringBuilder challengeArrayStr
-           )
-    {
-    	//Very Slow BUT This is easy understandable code ##TODO must change before release.
 
-        return "require(['jp/co/osstech/openam/server/util/webauthn'], function (webauthn) {\n" +
-        "webauthn.createCredential( {" +
-        "  publicKey: {" +
-        //RP info
-        "    rp: {" +
-        "      name: '" + rpConfig + "'," +
-        "     }," +
-        //User info
-        "    user: {" +
-        "      id: new Uint8Array([" + idArray + "])," +
-        "      name: '" + userName + "'," +
-        "      displayName: '" + displayName + "'," +
-        "     }," +
-        //Pubkey param
-        "    pubKeyCredParams: [{" +
-        "      type: \"public-key\"," +
-        "      alg: -7" +
-        "       }, {" +
-        "      type: \"public-key\"," +
-        "      alg: -257" +	       
-        "     }]," +
-        //Attestation
-        "    attestation: '" + attestationConfig + "'," +
-        "    authenticatorSelection: {" +
-        "      authenticatorAttachment: '" + attatimentConfig + "'," +
-        "      requireResidentKey: " + residentKeyConfig + "," +
-        "      userVerification: \'" + userVerificationConfig + "'" +
-        "    }," +
-        //Timeout
-        "    timeout: 60000," +
-        //Challenge
-        "    challenge: new Uint8Array([" + challengeArrayStr + 
-        "    ]).buffer" +
-        "  } " +
-        "} );\n" +
-        "});";
+    /*
+     * Store Counter to user data store
+     * 
+     * @param String AuthenticatorCounter
+     * 
+     * @return boolean
+     * 
+     * @throws AuthLoginException IdRepoException
+     */
+    private boolean storeCounter(long authenticatorCounter) throws AuthLoginException, IdRepoException {
+        boolean _storeCounterResult = false;
+        Map<String, Set> map = new HashMap<String, Set>();
+        Set<String> values = new HashSet<String>();
+        String counterS = String.valueOf(authenticatorCounter);
+        values.add(counterS);
+        map.put(counterAttributeNameConfig, values);
+
+        try {
+            AMIdentity uid = getIdentity();
+            uid.setAttributes(map);
+            uid.store();
+            _storeCounterResult = true;
+        } catch (SSOException e) {
+            DEBUG.error("Webauthn.storeCounter() : Webauthn module exception : ", e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        } catch (IdRepoException ex) {
+            DEBUG.error("Webauthn.storeCounter() : error store Counter : ", ex);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+        }
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("storeCounter was Success");
+        }
+        return _storeCounterResult;
     }
-    
+
+    /*
+     * Store StringData to user data store
+     * 
+     * @param String AuthenticatorCounter
+     * 
+     * @return boolean
+     * 
+     * @throws AuthLoginException IdRepoException
+     */
+    private boolean storeStringData(String attestedStringData, String attributeName)
+            throws AuthLoginException, IdRepoException {
+        boolean _storeStringDataResult = false;
+        Map<String, Set> map = new HashMap<String, Set>();
+        Set<String> values = new HashSet<String>();
+        String counterS = String.valueOf(attestedStringData);
+        values.add(counterS);
+        map.put(attributeName, values);
+
+        try {
+            AMIdentity uid = getIdentity();
+            uid.setAttributes(map);
+            uid.store();
+            _storeStringDataResult = true;
+        } catch (SSOException e) {
+            DEBUG.error("Webauthn.storeStringData() : Webauthn module exception : ", attributeName, e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        } catch (IdRepoException ex) {
+            DEBUG.error("Webauthn.storeStringData() : error store String : ", attributeName, ex);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+        }
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("storeStringData was Success", attributeName);
+        }
+        return _storeStringDataResult;
+    }
+
+    /*
+     * Store ByteData to user data store
+     * 
+     * @param byte[] amCredentialIdBytes
+     * 
+     * @return boolean
+     * 
+     * @throws AuthLoginException, IdRepoException
+     */
+    private boolean storeByteData(byte[] attestedByteData, String attributeName)
+            throws AuthLoginException, IdRepoException {
+
+        boolean _storeByteDataResult = false;
+
+        byte[] _attestedData = attestedByteData;
+        Map<String, byte[][]> map = new HashMap<String, byte[][]>();
+        byte[][] _attestedValues = new byte[1][];
+        map.put(attributeName, _attestedValues);
+        _attestedValues[0] = _attestedData;
+
+        try {
+            AMIdentity uid = getIdentity();
+            uid.setBinaryAttributes(map);
+            uid.store();
+            _storeByteDataResult = true;
+        } catch (SSOException e) {
+            DEBUG.error("Webauthn.storeByteData : Webauthn module exception : ", attributeName, e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        } catch (IdRepoException ex) {
+            DEBUG.error("Webauthn.storeByteData : error store StringData : ", attributeName, ex);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+        }
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("storeByteData was Success", attributeName);
+        }
+        return _storeByteDataResult;
+    }
+
+    /*
+     * This function provide
+     * getCreateCredntialsScriptCallback(CreateCredentialOptions) /* 20190906
+     */
+    public static String generateCredntialsCreateScriptCallback(CredentialsCreateOptions credentialsCreateOptions) {
+        final StringBuilder _credentialCreateScript = new StringBuilder();
+
+        // function (webauthn) start
+        _credentialCreateScript
+        .append("require([\'jp/co/osstech/openam/server/util/webauthn\'], function (webauthn) { ");
+        // webauthn.createCredential start
+        _credentialCreateScript.append("webauthn.createCredential(  { ");
+        // publicKey start
+        _credentialCreateScript.append("publicKey: { ");
+
+        // RP info
+        _credentialCreateScript.append("rp: {");
+        _credentialCreateScript.append("name: \'");
+        _credentialCreateScript.append(credentialsCreateOptions.getRpNameConfig());
+        _credentialCreateScript.append("\'");
+        _credentialCreateScript.append("}");
+
+        // User info start
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("user: { ");
+        _credentialCreateScript.append("id: new Uint8Array([");
+        _credentialCreateScript.append(credentialsCreateOptions.getCredentialIdBytesArrayStr());
+        _credentialCreateScript.append("])");
+        if (!credentialsCreateOptions.getUserName().isEmpty()) {
+            _credentialCreateScript.append(", ");
+            _credentialCreateScript.append("name: \'");
+            _credentialCreateScript.append(credentialsCreateOptions.getUserName());
+            _credentialCreateScript.append("\'");
+        }
+        if (!credentialsCreateOptions.getDisplayName().isEmpty()) {
+            _credentialCreateScript.append(", ");
+            _credentialCreateScript.append("displayName: \'");
+            _credentialCreateScript.append(credentialsCreateOptions.getDisplayName());
+            _credentialCreateScript.append("\', ");
+        }
+        // User info end
+        _credentialCreateScript.append("}, ");
+
+        // Pubkey param
+        _credentialCreateScript.append("pubKeyCredParams: [{ ");
+        _credentialCreateScript.append("type: \'public-key\', ");
+        _credentialCreateScript.append("alg: -7");
+        _credentialCreateScript.append("}, {");
+        _credentialCreateScript.append("type: \'public-key\', ");
+        _credentialCreateScript.append("alg: -257 ");
+        _credentialCreateScript.append("}], ");
+
+        // Attestation
+        _credentialCreateScript.append("attestation: \'");
+        _credentialCreateScript.append(credentialsCreateOptions.getAttestationConfig());
+        _credentialCreateScript.append("\', ");
+        _credentialCreateScript.append("authenticatorSelection: { ");
+        _credentialCreateScript.append("authenticatorAttachment: \'");
+        _credentialCreateScript.append(credentialsCreateOptions.getAttachmentConfig());
+        _credentialCreateScript.append("\', ");
+        _credentialCreateScript.append("requireResidentKey: ");
+        _credentialCreateScript.append(credentialsCreateOptions.getResidentKeyConfig());
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("userVerification: \'");
+        _credentialCreateScript.append(credentialsCreateOptions.getUserVerificationConfig());
+        _credentialCreateScript.append("\' ");
+        _credentialCreateScript.append("}");
+
+        // Timeout
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("timeout: 60000");
+
+        // Challenge
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("challenge: new Uint8Array([");
+        _credentialCreateScript.append(credentialsCreateOptions.getChallengeBytesArrayStr());
+        _credentialCreateScript.append("])");
+
+        // publickey end
+        _credentialCreateScript.append("}");
+        // webauthn.createCredential end
+        _credentialCreateScript.append("} ); ");
+        // function (webauthn) end
+        _credentialCreateScript.append("});");
+        return _credentialCreateScript.toString();
+    }
+
+    /*
+     * lookup user CredentialId and public key from user data store
+     * 
+     * @return int order of next state. Return STATE_SUCCEED if authentication is
+     * successful, return STATE_FAILED if the LoginModule should be ignored.
+     * 
+     * @throws AuthLoginException
+     */
+    private String lookupDisplayName() throws AuthLoginException {
+
+        Set<String> DisplayNames = Collections.emptySet();
+
+        try {
+            DisplayNames = getIdentity().getAttribute(displayNameAttributeNameConfig);
+        } catch (SSOException e) {
+            DEBUG.error("Webauthn.lookupDisplayNames() : Webauthn module exception : ", e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        } catch (IdRepoException e) {
+            DEBUG.error("Webauthn.lookupDisplayNames() : error searching Identities with username : " + userName, e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        }
+
+        String DisplayName = null;
+
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(DisplayNames)) {
+            DisplayName = DisplayNames.iterator().next();
+        }
+
+        return DisplayName;
+    }
+
     /*
      * generate secure random byte[]
+     * 
      * @param int length
-     * @return StringBuilder "," separated array String.
+     * 
+     * @return byte[]
      */
-    private StringBuilder genBytesArrayStr(int arrayLength) throws GeneralSecurityException {
-    	byte[] byteArray = new byte[arrayLength];
-    	SecureRandom.getInstanceStrong().nextBytes(byteArray);
-    	
-		StringBuilder BytesArrayStr = new StringBuilder();
-		
-		for (int i=0; i<byteArray.length; i++ ) {
-			BytesArrayStr.append(Byte.toUnsignedInt(byteArray[i])).append(",");
-		}
-		return BytesArrayStr;
+    private byte[] genSecureRandomBytesArray(int arrayLength) throws GeneralSecurityException {
+        byte[] byteArray = new byte[arrayLength];
+        SecureRandom.getInstanceStrong().nextBytes(byteArray);
+        return byteArray;
     }
-    
+
+    /**
+     * from based membership
+     * module==============================================================================================
+     * User input value will be store in the callbacks[]. When user click cancel
+     * button, these input field should be reset to blank.
+     */
+    private void clearCallbacks(Callback[] callbacks) {
+        for (int i = 0; i < callbacks.length; i++) {
+            if (callbacks[i] instanceof NameCallback) {
+                NameCallback nc = (NameCallback) callbacks[i];
+                nc.setName("");
+            }
+        }
+    }
+
+    /**
+     * from based membership module Returns <code>Principal</code>.
+     *
+     * @return <code>Principal</code>
+     */
+    public Principal getPrincipal() {
+        if (userPrincipal != null) {
+            return userPrincipal;
+        } else if (validatedUserID != null) {
+            userPrincipal = new WebauthnPrincipal(validatedUserID);
+            return userPrincipal;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * from based membership module Destroy the module state
+     */
+    @Override
+    public void destroyModuleState() {
+        validatedUserID = null;
+    }
+
+    /**
+     * from based membership module Set all the used variables to null
+     */
+    @Override
+    public void nullifyUsedVars() {
+        bundle = null;
+        sharedState = null;
+        options = null;
+        userName = null;
+        //        userAttrs = null;
+        callbacks = null;
+    }
+
     /*
-     * make secure random challenge byte[]
-     * @return byte[] challengeBytes.
+     * from based membership module
+     * 
      */
-    private byte[] makeChallengeBytes() throws GeneralSecurityException {
-    	byte[] challengeBytes = new byte[32];
-    	SecureRandom.getInstanceStrong().nextBytes(challengeBytes);
-    	return challengeBytes;
-    }
-    
-	/*
-	 * from based membership module
-	 * 
-	 */
-	private AMIdentity getIdentity() throws SSOException, IdRepoException {
+    private AMIdentity getIdentity() throws SSOException, IdRepoException {
         AMIdentity _theID = null;
         AMIdentityRepository _amIdRepo = getAMIdentityRepository(getRequestOrg());
 
@@ -761,7 +815,6 @@ public class WebauthnRegister extends AMLoginModule {
             _theID = _results.iterator().next();
         }
 
-        return _theID;	   
-	}
+        return _theID;
+    }
 }
-

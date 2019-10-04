@@ -23,9 +23,7 @@
  * 
  */
 
-
 package jp.co.osstech.openam.authentication.modules.webauthn;
-
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -36,28 +34,28 @@ import java.util.Map;
  * 
  */
 public enum WebauthnRegisterModuleState {
-    /* the module is completed
+    /*
+     * the module is completed
      */
     COMPLETE(-1, "complete"),
-    
-    /* start of the registration process
-     * id/pw authentication and next state
+
+    /*
+     * start of the registration process id/pw authentication and next state
      */
     REG_START(1, "registration"),
-	
-    /* script registration process
-     * javascript create.credential
+
+    /*
+     * script registration process javascript create.credential
      */
     REG_SCRIPT(2, "regScript"),
-    
-    /* verify and store key registration process
+
+    /*
+     * verify and store key registration process
      * 
      */
     REG_KEY(3, "regKey");
-            
 
-    private static final Map<Integer,WebauthnRegisterModuleState> lookup = 
-            new HashMap<Integer,WebauthnRegisterModuleState>();
+    private static final Map<Integer, WebauthnRegisterModuleState> lookup = new HashMap<Integer, WebauthnRegisterModuleState>();
 
     static {
         for (WebauthnRegisterModuleState ls : EnumSet.allOf(WebauthnRegisterModuleState.class)) {
@@ -84,6 +82,5 @@ public enum WebauthnRegisterModuleState {
 
     int intValue() {
         return state;
-    }   
+    }
 }
-

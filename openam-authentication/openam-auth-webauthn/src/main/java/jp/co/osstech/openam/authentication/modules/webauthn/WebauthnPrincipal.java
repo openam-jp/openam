@@ -24,25 +24,20 @@
  *
  */
 
-
-
 package jp.co.osstech.openam.authentication.modules.webauthn;
-
 
 import java.security.Principal;
 //import java.io.Serializable;
 
-
 /**
- * This class implements the <code>Principal</code> interface
- * and represents an Webauthn user.
+ * This class implements the <code>Principal</code> interface and represents an
+ * Webauthn user.
  * <p>
- Principals such as this <code>WebauthnPrincipal</code>
- * may be associated with a particular <code>Subject</code>
- * to augment that <code>Subject</code> with an additional
- * identity.  Refer to the <code>Subject</code> class for more information
- * on how to achieve this.  Authorization decisions can then be based upon 
- * the Principals associated with a <code>Subject</code>.
+ * Principals such as this <code>WebauthnPrincipal</code> may be associated with
+ * a particular <code>Subject</code> to augment that <code>Subject</code> with
+ * an additional identity. Refer to the <code>Subject</code> class for more
+ * information on how to achieve this. Authorization decisions can then be based
+ * upon the Principals associated with a <code>Subject</code>.
  */
 public class WebauthnPrincipal implements Principal, java.io.Serializable {
 
@@ -53,7 +48,7 @@ public class WebauthnPrincipal implements Principal, java.io.Serializable {
      *
      * @param name the Webauthn user name for this user.
      * @exception NullPointerException if the <code>name</code> is
-     *            <code>null</code>.
+     *                                 <code>null</code>.
      */
     public WebauthnPrincipal(String name) {
         if (name == null) {
@@ -64,35 +59,31 @@ public class WebauthnPrincipal implements Principal, java.io.Serializable {
     }
 
     /**
-     * Returns the Webauthn user name for this 
-     * <code>WebauthnPrincipal</code>.
+     * Returns the Webauthn user name for this <code>WebauthnPrincipal</code>.
      *
-     * @return the Webauthn user name for this 
-     *         <code>WebauthnPrincipal</code>
+     * @return the Webauthn user name for this <code>WebauthnPrincipal</code>
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns a string representation of this 
-     * <code>WebauthnPrincipal</code>.
+     * Returns a string representation of this <code>WebauthnPrincipal</code>.
      *
-     * @return a string representation of this
-     *         <code>WebauthnPrincipal</code>.
+     * @return a string representation of this <code>WebauthnPrincipal</code>.
      */
     public String toString() {
-        return("WebauthnPrincipal: " + name);
+        return ("WebauthnPrincipal: " + name);
     }
 
     /**
      * Compares the specified Object with this <code>WebauthnPrincipal
-     * </code> for equality.  Returns true if the given object is also a
-     * <code>WebauthnPrincipal</code> and the two
-     * <code>WebauthnPrincipals</code> have the same user name.
+     * </code> for equality. Returns true if the given object is also a
+     * <code>WebauthnPrincipal</code> and the two <code>WebauthnPrincipals</code>
+     * have the same user name.
      *
      * @param o Object to be compared for equality with this
-     *        <code>WebauthnPrincipal</code>.
+     *          <code>WebauthnPrincipal</code>.
      * @return true if the specified Object is equal equal to this
      *         <code>WebauthnPrincipal</code>.
      */
@@ -104,15 +95,15 @@ public class WebauthnPrincipal implements Principal, java.io.Serializable {
         if (this == o) {
             return true;
         }
- 
+
         if (!(o instanceof WebauthnPrincipal)) {
             return false;
         }
-        
-        WebauthnPrincipal that = (WebauthnPrincipal)o;
+
+        WebauthnPrincipal that = (WebauthnPrincipal) o;
         return this.getName().equals(that.getName());
     }
- 
+
     /**
      * Returns a hash code for this <code>WebauthnPrincipal</code>.
      *
