@@ -6,22 +6,31 @@ public class CredentialsGetOptions {
     private String credentialIdBytesArrayStr; // byte[]
     private String userVerificationConfig;
     private String challengeBytesArrayStr; // byte[]
+    private String timeoutConfig;
+    
 
-    CredentialsGetOptions(String credentialIdBase64, String userVerificationConfig, byte[] challengeBytesArray // byte[]
+    CredentialsGetOptions(
+            String credentialIdBase64,
+            String userVerificationConfig,
+            byte[] challengeBytesArray, // byte[]
+            String timeoutConfig
     ) {
-        this.setCredentialIdBytesArrayStr(convBytesArrayToStr(Base64.getDecoder().decode(credentialIdBase64)));
-        this.setUserVerificationConfig(userVerificationConfig);
-        this.setChallengeBytesArrayStr(convBytesArrayToStr(challengeBytesArray));
-
+        this.credentialIdBytesArrayStr = convBytesArrayToStr(Base64.getDecoder().decode(credentialIdBase64));
+        this.userVerificationConfig = userVerificationConfig;
+        this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
+        this.timeoutConfig = timeoutConfig;
     }
 
-    CredentialsGetOptions(byte[] credentialIdBytesArray, // byte[],
-            String userVerificationConfig, byte[] challengeBytesArray // byte[]
+    CredentialsGetOptions(
+            byte[] credentialIdBytesArray, // byte[],
+            String userVerificationConfig,
+            byte[] challengeBytesArray, // byte[]
+            String timeoutConfig
     ) {
-        this.setCredentialIdBytesArrayStr(convBytesArrayToStr(credentialIdBytesArray));
-        this.setUserVerificationConfig(userVerificationConfig);
-        this.setChallengeBytesArrayStr(convBytesArrayToStr(challengeBytesArray));
-
+        this.credentialIdBytesArrayStr = convBytesArrayToStr(credentialIdBytesArray);
+        this.userVerificationConfig = userVerificationConfig;
+        this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
+        this.timeoutConfig = timeoutConfig;
     }
 
     /*
@@ -41,27 +50,55 @@ public class CredentialsGetOptions {
         return BytesArrayStr.toString();
     }
 
-    public String getCredentialIdBytesArrayStr() {
-        return credentialIdBytesArrayStr;
-    }
+    /*
+     * This function provide
+     * getCreateCredntialsScriptCallback(CreateCredentialOptions) 
+     */
+    public String generateCredntialsGetScriptCallback() {
+        final StringBuilder _credentialGetScript = new StringBuilder();
 
-    public void setCredentialIdBytesArrayStr(String credentialIdBytesArrayStr) {
-        this.credentialIdBytesArrayStr = credentialIdBytesArrayStr;
-    }
+        _credentialGetScript.append("require([\'jp/co/osstech/openam/server/util/webauthn\'], function (webauthn) { ");
+        _credentialGetScript.append("webauthn.getCredential(  { ");
+        _credentialGetScript.append("publicKey: {");
 
-    public String getUserVerificationConfig() {
-        return userVerificationConfig;
-    }
+        // AllowCredentials
+        _credentialGetScript.append("allowCredentials: [ {");
+        _credentialGetScript.append("type: \'public-key\', ");
+        _credentialGetScript.append("id: new Uint8Array([");
+        _credentialGetScript.append(credentialIdBytesArrayStr);
+        _credentialGetScript.append("]), ");
+        _credentialGetScript.append("transports: [");
+        _credentialGetScript.append("\'usb\', ");
+        _credentialGetScript.append("\'nfc\', ");
+        _credentialGetScript.append("\'ble\', ");
+        _credentialGetScript.append("\'internal\'");
+        _credentialGetScript.append("]");
+        _credentialGetScript.append("} ]");
 
-    public void setUserVerificationConfig(String userVerificationConfig) {
-        this.userVerificationConfig = userVerificationConfig;
-    }
+        // UserVerification
+        _credentialGetScript.append(", ");
+        _credentialGetScript.append("   userVerification: \'");
+        _credentialGetScript.append(userVerificationConfig);
+        _credentialGetScript.append("\'");
 
-    public String getChallengeBytesArrayStr() {
-        return challengeBytesArrayStr;
-    }
+        // Challenge
+        _credentialGetScript.append(", ");
+        _credentialGetScript.append("challenge: new Uint8Array([");
+        _credentialGetScript.append(challengeBytesArrayStr);
+        _credentialGetScript.append("])");
+        
+        // Timeout
+        _credentialGetScript.append(", ");
+        _credentialGetScript.append("timeout: ");
+        _credentialGetScript.append(timeoutConfig);
 
-    public void setChallengeBytesArrayStr(String challengeBytesArrayStr) {
-        this.challengeBytesArrayStr = challengeBytesArrayStr;
+        // publickey end
+        _credentialGetScript.append("} ");
+        // webauthn.getCredential end
+        _credentialGetScript.append("} );");
+        // function (webauthn) end
+        _credentialGetScript.append("});");
+        return _credentialGetScript.toString();
+
     }
 }

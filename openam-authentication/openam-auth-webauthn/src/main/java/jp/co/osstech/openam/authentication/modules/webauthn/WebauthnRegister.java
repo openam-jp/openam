@@ -124,17 +124,15 @@ public class WebauthnRegister extends AMLoginModule {
 
     // Webauthn Credentials
     private String userName;
-    private String amCredentialIdBase64Url;
-    private byte[] amCredentialIdBytes;
+    private byte[] idBytes;
     private byte[] attestedCredentialIdBytes;
-    private String displayName;
     private Challenge generatedChallenge;
     private CredentialPublicKey attestedCredentialPublicKey;
-    private byte[] amChallengeBytes;
+    private byte[] challengeBytes;
     private String webauthnHiddenCallback;
-    private byte[] amAttestationObjectBytes;
-    private byte[] amClientDataJsonBytes;
-    private boolean amVerificationRequired;
+    private byte[] attestationObjectBytes;
+    private byte[] clientDataJsonBytes;
+    private boolean verificationRequired;
     private byte[] _attestedContent;
     private long attestedCounter;
 
@@ -145,6 +143,7 @@ public class WebauthnRegister extends AMLoginModule {
     private String attachmentConfig = "";
     private String residentKeyConfig = "";
     private String userVerificationConfig = "";
+    private String timeoutConfig = "";
     private String credentialIdAttributeNameConfig = "";
     private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
@@ -157,6 +156,7 @@ public class WebauthnRegister extends AMLoginModule {
     private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
     private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
     private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
+    private static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
     private static final String CREDENTIALID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-credentialIdAttributeName";
     private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
@@ -189,19 +189,27 @@ public class WebauthnRegister extends AMLoginModule {
         this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
         this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
         this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
+        this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
         this.credentialIdAttributeNameConfig = CollectionHelper.getMapAttr(options, CREDENTIALID_ATTRIBUTE_NAME);
         this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
         this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("Webauthn module parameter are " + ", rp = " + rpNameConfig + ", origin = " + originConfig
-                    + ", attestation = " + attestationConfig + ", attachment = " + attachmentConfig + ", residentKey = "
-                    + residentKeyConfig + ", userVerification = " + userVerificationConfig
+            DEBUG.message("Webauthn module parameter are " 
+                    + ", rpName = " + rpNameConfig
+                    + ", origin = " + originConfig 
+                    + ", attestation = " + attestationConfig
+                    + ", attachment = " + attachmentConfig 
+                    + ", residentKey = " + residentKeyConfig
+                    + ", userVerification = " + userVerificationConfig 
+                    + ", timeoutConfig = " + timeoutConfig
                     + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
-                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig + ", keyAttributeName = "
-                    + pubKeyAttributeNameConfig + ", counterAttributeName = " + counterAttributeNameConfig);
+                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
+                    + ", keyAttributeName = " + pubKeyAttributeNameConfig 
+                    + ", counterAttributeName = " + counterAttributeNameConfig);
         }
+        
         userName = (String) sharedState.get(getUserKey());
         if (StringUtils.isEmpty(userName)) {
             try {
@@ -243,41 +251,38 @@ public class WebauthnRegister extends AMLoginModule {
                 DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_START");
             }
 
-            /*
-             * Pre Authentication for Key Registration expect REG_SCRIPT lookup DisplayName
-             */
-
             if (userName != null) {
                 nextState = WebauthnRegisterModuleState.REG_SCRIPT;
             } else {
                 nextState = WebauthnRegisterModuleState.REG_START;
+                break;
             }
 
-            displayName = lookupDisplayName();
-
-            // generate 32byte challenge
+            // generate 16byte challenge
             // generate 16byte id
+            generatedChallenge = new DefaultChallenge();
+            challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
 
-            try {
-
-                generatedChallenge = new DefaultChallenge(genSecureRandomBytesArray(32));
-                amChallengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
-
-                amCredentialIdBytes = new DefaultChallenge(genSecureRandomBytesArray(16)).getValue();
-
-            } catch (GeneralSecurityException e) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-            }
+            idBytes = new DefaultChallenge().getValue();
 
             // navigator.credentials.create Options
-            CredentialsCreateOptions credentialsCreateOptions = new CredentialsCreateOptions(rpNameConfig,
-                    amCredentialIdBytes, userName, displayName, attestationConfig, attachmentConfig, residentKeyConfig,
-                    userVerificationConfig, amChallengeBytes);
+            CredentialsCreateOptions credentialsCreateOptions = 
+                    new CredentialsCreateOptions(
+                    rpNameConfig,
+                    idBytes,
+                    userName,
+                    lookupStringData(displayNameAttributeNameConfig),
+                    attestationConfig,
+                    attachmentConfig,
+                    residentKeyConfig,
+                    userVerificationConfig,
+                    timeoutConfig,
+                    challengeBytes);
 
             // Replace Callback to send Generated Javascript that include create options.
             // only for nextState REG_SCRIPT
             Callback creadentialsCreateCallback = new ScriptTextOutputCallback(
-                    generateCredntialsCreateScriptCallback(credentialsCreateOptions));
+                    credentialsCreateOptions.generateCredntialsCreateScriptCallback());
             replaceCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue(), 1, creadentialsCreateCallback);
 
             break;
@@ -315,11 +320,8 @@ public class WebauthnRegister extends AMLoginModule {
 
     /*
      * Verify and Store Authenticator(browser) Response Credentials for Registration
-     * 
      * @param callbacks an array of <code>Callback</cdoe> for this Login state
-     * 
      * @return int order of next state. Return
-     * 
      * @throws AuthLoginException
      */
     private WebauthnRegisterModuleState verifyRegisterCallback(Callback[] callbacks) throws AuthLoginException {
@@ -349,13 +351,12 @@ public class WebauthnRegister extends AMLoginModule {
                 WebauthnJsonCallback _responseJson = OBJECT_MAPPER.readValue(webauthnHiddenCallback,
                         WebauthnJsonCallback.class);
 
-                amCredentialIdBase64Url = _responseJson.getId();
                 if (DEBUG.messageEnabled()) {
-                    DEBUG.message("amCredentialIdBase64url = " + amCredentialIdBase64Url);
+                    DEBUG.message("id Base64url = " + _responseJson.getId());
                 }
 
-                amAttestationObjectBytes = Base64.getDecoder().decode(_responseJson.getAttestationObject());
-                amClientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
+                attestationObjectBytes = Base64.getDecoder().decode(_responseJson.getAttestationObject());
+                clientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
 
             } catch (IOException e) {
                 DEBUG.error("Webauthn.process(): JSON parse error", e);
@@ -368,21 +369,21 @@ public class WebauthnRegister extends AMLoginModule {
          * flow. This time use webauthn4j library to END
          * START============================.
          */
-        Origin amOrigin = new Origin(originConfig);
-        String amRpId = amOrigin.getHost();
+        Origin _origin = new Origin(originConfig);
+        String _rpId = _origin.getHost();
 
-        byte[] amTokenBindingId = null;
+        byte[] _tokenBindingId = null;
         if (userVerificationConfig.equalsIgnoreCase("required")) {
-            amVerificationRequired = true;
+            verificationRequired = true;
         } else {
-            amVerificationRequired = false;
+            verificationRequired = false;
         }
         // rp:id = origin
-        ServerProperty serverProperty = new ServerProperty(amOrigin, amRpId, generatedChallenge, amTokenBindingId);
+        ServerProperty serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
 
         try {
-            WebAuthnRegistrationContext registrationContext = new WebAuthnRegistrationContext(amClientDataJsonBytes,
-                    amAttestationObjectBytes, serverProperty, amVerificationRequired);
+            WebAuthnRegistrationContext registrationContext = new WebAuthnRegistrationContext(clientDataJsonBytes,
+                    attestationObjectBytes, serverProperty, verificationRequired);
             WebAuthnRegistrationContextValidator webAuthnRegistrationContextValidator = WebAuthnRegistrationContextValidator
                     .createNonStrictRegistrationContextValidator();
             WebAuthnRegistrationContextValidationResponse response = webAuthnRegistrationContextValidator
@@ -441,11 +442,8 @@ public class WebauthnRegister extends AMLoginModule {
 
     /*
      * Store CredentialPublicKey to user data store
-     * 
      * @param CredentialPublicKey amCredentialPublicKey
-     * 
      * @return boolean
-     * 
      * @throws AuthLoginException, IdRepoException
      */
     private boolean storeCredentialPublicKey(CredentialPublicKey attestedCredentialPublicKey)
@@ -484,11 +482,8 @@ public class WebauthnRegister extends AMLoginModule {
 
     /*
      * Store Counter to user data store
-     * 
-     * @param String AuthenticatorCounter
-     * 
+     * @param long AuthenticatorCounter
      * @return boolean
-     * 
      * @throws AuthLoginException IdRepoException
      */
     private boolean storeCounter(long authenticatorCounter) throws AuthLoginException, IdRepoException {
@@ -519,11 +514,9 @@ public class WebauthnRegister extends AMLoginModule {
 
     /*
      * Store StringData to user data store
-     * 
-     * @param String AuthenticatorCounter
-     * 
+     * @param String attestedStringData,
+     * @param String attributeName
      * @return boolean
-     * 
      * @throws AuthLoginException IdRepoException
      */
     private boolean storeStringData(String attestedStringData, String attributeName)
@@ -555,11 +548,9 @@ public class WebauthnRegister extends AMLoginModule {
 
     /*
      * Store ByteData to user data store
-     * 
-     * @param byte[] amCredentialIdBytes
-     * 
+     * @param byte[] attestedByteData,
+     * @param String attributeName
      * @return boolean
-     * 
      * @throws AuthLoginException, IdRepoException
      */
     private boolean storeByteData(byte[] attestedByteData, String attributeName)
@@ -592,106 +583,15 @@ public class WebauthnRegister extends AMLoginModule {
     }
 
     /*
-     * This function provide
-     * getCreateCredntialsScriptCallback(CreateCredentialOptions) /* 20190906
-     */
-    public static String generateCredntialsCreateScriptCallback(CredentialsCreateOptions credentialsCreateOptions) {
-        final StringBuilder _credentialCreateScript = new StringBuilder();
-
-        // function (webauthn) start
-        _credentialCreateScript
-        .append("require([\'jp/co/osstech/openam/server/util/webauthn\'], function (webauthn) { ");
-        // webauthn.createCredential start
-        _credentialCreateScript.append("webauthn.createCredential(  { ");
-        // publicKey start
-        _credentialCreateScript.append("publicKey: { ");
-
-        // RP info
-        _credentialCreateScript.append("rp: {");
-        _credentialCreateScript.append("name: \'");
-        _credentialCreateScript.append(credentialsCreateOptions.getRpNameConfig());
-        _credentialCreateScript.append("\'");
-        _credentialCreateScript.append("}");
-
-        // User info start
-        _credentialCreateScript.append(", ");
-        _credentialCreateScript.append("user: { ");
-        _credentialCreateScript.append("id: new Uint8Array([");
-        _credentialCreateScript.append(credentialsCreateOptions.getCredentialIdBytesArrayStr());
-        _credentialCreateScript.append("])");
-        if (!credentialsCreateOptions.getUserName().isEmpty()) {
-            _credentialCreateScript.append(", ");
-            _credentialCreateScript.append("name: \'");
-            _credentialCreateScript.append(credentialsCreateOptions.getUserName());
-            _credentialCreateScript.append("\'");
-        }
-        if (!credentialsCreateOptions.getDisplayName().isEmpty()) {
-            _credentialCreateScript.append(", ");
-            _credentialCreateScript.append("displayName: \'");
-            _credentialCreateScript.append(credentialsCreateOptions.getDisplayName());
-            _credentialCreateScript.append("\', ");
-        }
-        // User info end
-        _credentialCreateScript.append("}, ");
-
-        // Pubkey param
-        _credentialCreateScript.append("pubKeyCredParams: [{ ");
-        _credentialCreateScript.append("type: \'public-key\', ");
-        _credentialCreateScript.append("alg: -7");
-        _credentialCreateScript.append("}, {");
-        _credentialCreateScript.append("type: \'public-key\', ");
-        _credentialCreateScript.append("alg: -257 ");
-        _credentialCreateScript.append("}], ");
-
-        // Attestation
-        _credentialCreateScript.append("attestation: \'");
-        _credentialCreateScript.append(credentialsCreateOptions.getAttestationConfig());
-        _credentialCreateScript.append("\', ");
-        _credentialCreateScript.append("authenticatorSelection: { ");
-        _credentialCreateScript.append("authenticatorAttachment: \'");
-        _credentialCreateScript.append(credentialsCreateOptions.getAttachmentConfig());
-        _credentialCreateScript.append("\', ");
-        _credentialCreateScript.append("requireResidentKey: ");
-        _credentialCreateScript.append(credentialsCreateOptions.getResidentKeyConfig());
-        _credentialCreateScript.append(", ");
-        _credentialCreateScript.append("userVerification: \'");
-        _credentialCreateScript.append(credentialsCreateOptions.getUserVerificationConfig());
-        _credentialCreateScript.append("\' ");
-        _credentialCreateScript.append("}");
-
-        // Timeout
-        _credentialCreateScript.append(", ");
-        _credentialCreateScript.append("timeout: 60000");
-
-        // Challenge
-        _credentialCreateScript.append(", ");
-        _credentialCreateScript.append("challenge: new Uint8Array([");
-        _credentialCreateScript.append(credentialsCreateOptions.getChallengeBytesArrayStr());
-        _credentialCreateScript.append("])");
-
-        // publickey end
-        _credentialCreateScript.append("}");
-        // webauthn.createCredential end
-        _credentialCreateScript.append("} ); ");
-        // function (webauthn) end
-        _credentialCreateScript.append("});");
-        return _credentialCreateScript.toString();
-    }
-
-    /*
-     * lookup user CredentialId and public key from user data store
-     * 
-     * @return int order of next state. Return STATE_SUCCEED if authentication is
-     * successful, return STATE_FAILED if the LoginModule should be ignored.
-     * 
+     * lookup StringData user data store
+     * @return String
      * @throws AuthLoginException
      */
-    private String lookupDisplayName() throws AuthLoginException {
-
-        Set<String> DisplayNames = Collections.emptySet();
+    private String lookupStringData(String attributeName) throws AuthLoginException {
+        Set<String> _attributes = Collections.emptySet();
 
         try {
-            DisplayNames = getIdentity().getAttribute(displayNameAttributeNameConfig);
+            _attributes = getIdentity().getAttribute(attributeName);
         } catch (SSOException e) {
             DEBUG.error("Webauthn.lookupDisplayNames() : Webauthn module exception : ", e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
@@ -700,20 +600,17 @@ public class WebauthnRegister extends AMLoginModule {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         }
 
-        String DisplayName = null;
+        String _attribute = null;
 
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(DisplayNames)) {
-            DisplayName = DisplayNames.iterator().next();
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(_attributes)) {
+            _attribute = _attributes.iterator().next();
         }
-
-        return DisplayName;
+        return _attribute;
     }
 
     /*
      * generate secure random byte[]
-     * 
      * @param int length
-     * 
      * @return byte[]
      */
     private byte[] genSecureRandomBytesArray(int arrayLength) throws GeneralSecurityException {

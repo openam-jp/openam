@@ -9,15 +9,20 @@ public class CredentialsCreateOptions {
     private String attachmentConfig;
     private String residentKeyConfig;
     private String userVerificationConfig;
+    private String timeoutConfig;
     private String challengeBytesArrayStr; // byte[]
 
-    CredentialsCreateOptions() {
-
-    }
-
-    CredentialsCreateOptions(String rpNameConfig, byte[] credentialIdBytesArray, // byte[]
-            String userName, String displayName, String attestationConfig, String attachmentConfig,
-            String residentKeyConfig, String userVerificationConfig, byte[] challengeBytesArray // byte[]
+    CredentialsCreateOptions(
+            String rpNameConfig,
+            byte[] credentialIdBytesArray, // byte[]
+            String userName,
+            String displayName,
+            String attestationConfig,
+            String attachmentConfig,
+            String residentKeyConfig,
+            String userVerificationConfig,
+            String timeoutConfig,
+            byte[] challengeBytesArray // byte[]
     ) {
         this.rpNameConfig = rpNameConfig;
         this.credentialIdBytesArrayStr = convBytesArrayToStr(credentialIdBytesArray);
@@ -27,82 +32,11 @@ public class CredentialsCreateOptions {
         this.attachmentConfig = attachmentConfig;
         this.residentKeyConfig = residentKeyConfig;
         this.userVerificationConfig = userVerificationConfig;
+        this.timeoutConfig = timeoutConfig;
         this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
 
     }
-
-    public String getRpNameConfig() {
-        return rpNameConfig;
-    }
-
-    public void setRpNameConfig(String rpNameConfig) {
-        this.rpNameConfig = rpNameConfig;
-    }
-
-    public String getCredentialIdBytesArrayStr() {
-        return credentialIdBytesArrayStr;
-    }
-
-    public void setCredentialIdBytesArrayStr(String credentialIdBytesArrayStr) {
-        this.credentialIdBytesArrayStr = credentialIdBytesArrayStr;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getAttachmentConfig() {
-        return attachmentConfig;
-    }
-
-    public void setAttachmentConfig(String attachmentConfig) {
-        this.attachmentConfig = attachmentConfig;
-    }
-
-    public String getAttestationConfig() {
-        return attestationConfig;
-    }
-
-    public void setAttestationConfig(String attestationConfig) {
-        this.attestationConfig = attestationConfig;
-    }
-
-    public String getResidentKeyConfig() {
-        return residentKeyConfig;
-    }
-
-    public void setResidentKeyConfig(String residentKeyConfig) {
-        this.residentKeyConfig = residentKeyConfig;
-    }
-
-    public String getUserVerificationConfig() {
-        return userVerificationConfig;
-    }
-
-    public void setUserVerificationConfig(String userVerificationConfig) {
-        this.userVerificationConfig = userVerificationConfig;
-    }
-
-    public String getChallengeBytesArrayStr() {
-        return challengeBytesArrayStr;
-    }
-
-    public void setChallengeBytesArrayStr(String challengeBytesArrayStr) {
-        this.challengeBytesArrayStr = challengeBytesArrayStr;
-    }
-
+    
     /*
      * generate secure random byte[]
      * 
@@ -120,4 +54,94 @@ public class CredentialsCreateOptions {
         return BytesArrayStr.toString();
     }
 
+    /*
+     * This function provide
+     * getCreateCredntialsScriptCallback(CreateCredentialOptions) 
+     */
+    public String generateCredntialsCreateScriptCallback() {
+        final StringBuilder _credentialCreateScript = new StringBuilder();
+
+        // function (webauthn) start
+        _credentialCreateScript
+        .append("require([\'jp/co/osstech/openam/server/util/webauthn\'], function (webauthn) { ");
+        // webauthn.createCredential start
+        _credentialCreateScript.append("webauthn.createCredential(  { ");
+        // publicKey start
+        _credentialCreateScript.append("publicKey: { ");
+
+        // RP info
+        _credentialCreateScript.append("rp: {");
+        _credentialCreateScript.append("name: \'");
+        _credentialCreateScript.append(rpNameConfig);
+        _credentialCreateScript.append("\'");
+        _credentialCreateScript.append("}");
+
+        // User info start
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("user: { ");
+        _credentialCreateScript.append("id: new Uint8Array([");
+        _credentialCreateScript.append(credentialIdBytesArrayStr);
+        _credentialCreateScript.append("])");
+        if (!userName.isEmpty()) {
+            _credentialCreateScript.append(", ");
+            _credentialCreateScript.append("name: \'");
+            _credentialCreateScript.append(userName);
+            _credentialCreateScript.append("\'");
+        }
+        if (!displayName.isEmpty()) {
+            _credentialCreateScript.append(", ");
+            _credentialCreateScript.append("displayName: \'");
+            _credentialCreateScript.append(displayName);
+            _credentialCreateScript.append("\', ");
+        }
+        // User info end
+        _credentialCreateScript.append("}");
+
+        // Pubkey param
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("pubKeyCredParams: [{ ");
+        _credentialCreateScript.append("type: \'public-key\', ");
+        _credentialCreateScript.append("alg: -7");
+        _credentialCreateScript.append("}, {");
+        _credentialCreateScript.append("type: \'public-key\', ");
+        _credentialCreateScript.append("alg: -257 ");
+        _credentialCreateScript.append("}]");
+
+        // Attestation
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("attestation: \'");
+        _credentialCreateScript.append(attestationConfig);
+        _credentialCreateScript.append("\', ");
+        _credentialCreateScript.append("authenticatorSelection: { ");
+        _credentialCreateScript.append("authenticatorAttachment: \'");
+        _credentialCreateScript.append(attachmentConfig);
+        _credentialCreateScript.append("\', ");
+        _credentialCreateScript.append("requireResidentKey: ");
+        _credentialCreateScript.append(residentKeyConfig);
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("userVerification: \'");
+        _credentialCreateScript.append(userVerificationConfig);
+        _credentialCreateScript.append("\' ");
+        _credentialCreateScript.append("}");
+
+        // Timeout
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("timeout: ");
+        _credentialCreateScript.append(timeoutConfig);
+
+        // Challenge
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("challenge: new Uint8Array([");
+        _credentialCreateScript.append(challengeBytesArrayStr);
+        _credentialCreateScript.append("])");
+
+        // publickey end
+        _credentialCreateScript.append("}");
+        // webauthn.createCredential end
+        _credentialCreateScript.append("} ); ");
+        // function (webauthn) end
+        _credentialCreateScript.append("});");
+        return _credentialCreateScript.toString();
+    }
+    
 }
