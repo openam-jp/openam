@@ -330,7 +330,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         }
 
         /*
-         * lookup CredentialId(byte[]) from User Data store
+         * lookup CredentialId(Base64Url encoded) from User Data store
          */
         try {
             credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
@@ -379,7 +379,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         }
 
         /*
-         * Map Callback to Object
+         * Map Callback Json to Object
          */
         if (StringUtils.isNotEmpty(webauthnHiddenCallback)) {
 
@@ -418,6 +418,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         String _rpId = _origin.getHost();
         byte[] _tokenBindingId = null; /* now set tokenBindingId null */
         ServerProperty serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
+
         if (userVerificationConfig.equalsIgnoreCase("required")) {
             verificationRequired = true;
         } else {
@@ -428,8 +429,9 @@ public class WebauthnAuthenticate extends AMLoginModule {
                 clientDataJsonBytes, authenticatorDataBytes, signatureBytes, serverProperty,
                 verificationRequired);
 
-        Authenticator authenticator = loadAuthenticator(); // please load authenticator object persisted in the
-        // registration process in your manner
+
+        //load Construct Authenticator Object from datastore values.
+        Authenticator authenticator = loadAuthenticator(); 
 
         WebAuthnAuthenticationContextValidator webAuthnAuthenticationContextValidator = new WebAuthnAuthenticationContextValidator();
 
@@ -437,7 +439,8 @@ public class WebauthnAuthenticate extends AMLoginModule {
                 .validate(authenticationContext, authenticator);
 
         try {
-            updateCounterResult = storeCounter(response.getAuthenticatorData().getSignCount());
+            //update datastore counter value for next authentication.
+            updateCounterResult = storeStringData(String.valueOf(response.getAuthenticatorData().getSignCount()), counterAttributeNameConfig);
         } catch (Exception e) {
             DEBUG.error("updateCounter error");
         }
@@ -468,15 +471,12 @@ public class WebauthnAuthenticate extends AMLoginModule {
      */
     private Authenticator loadAuthenticator() throws AuthLoginException, IOException, ClassNotFoundException {
 
-        // OpenAM didn't store aaguid. Use ZERO AAGUID.
+        // OpenAM didn't store aaguid now. Use ZERO AAGUID.
         AAGUID _aaguid = AAGUID.ZERO;
 
-        ByteArrayInputStream _bis = new ByteArrayInputStream(lookupByteData(pubKeyAttributeNameConfig));
-        try (ObjectInputStream _in = new ObjectInputStream(_bis)) {
-            credentialPublicKey = (CredentialPublicKey) _in.readObject();
-        } catch (Exception e) {
-            DEBUG.error("Webauthn.lookupAuthenticator() : Webauthn module exception : ", e);
-        }
+        //credentialPublicKey was stored as COSEKey byte[] data at registration time.
+        CborConverter _cborConverter = new CborConverter();
+        credentialPublicKey = _cborConverter.readValue(lookupByteData(pubKeyAttributeNameConfig), CredentialPublicKey.class);
 
         final AttestedCredentialData storedAttestedCredentialData = new AttestedCredentialData(_aaguid,
                 credentialIdBytes, credentialPublicKey);
@@ -489,52 +489,36 @@ public class WebauthnAuthenticate extends AMLoginModule {
     }
 
     /*
-     * Store Counter to user data store
-     * @param String AuthenticatorCounter
+     * Store StringData to user data store
+     * @param String attestedStringData,
+     * @param String attributeName
      * @return boolean
      * @throws AuthLoginException IdRepoException
      */
-    private boolean storeCounter(long authenticatorCounter) throws AuthLoginException, IdRepoException {
-        boolean _storeCounterResult = false;
-        Map<String, Set> map = new HashMap<String, Set>();
-        Set<String> values = new HashSet<String>();
-        String counterS = String.valueOf(authenticatorCounter);
-        values.add(counterS);
-        map.put(counterAttributeNameConfig, values);
+    private boolean storeStringData(String attestedStringData, String attributeName)
+            throws AuthLoginException, IdRepoException {
+        boolean _storeStringDataResult = false;
+        Map<String, Set> _map = new HashMap<String, Set>();
+        Set<String> _values = new HashSet<String>();
+        _values.add(attestedStringData);
+        _map.put(attributeName, _values);
 
         try {
             AMIdentity uid = getIdentity();
-            uid.setAttributes(map);
+            uid.setAttributes(_map);
             uid.store();
-            _storeCounterResult = true;
+            _storeStringDataResult = true;
         } catch (SSOException e) {
-            DEBUG.error("Webauthn.storeCounter() : Webauthn module exception : ", e);
+            DEBUG.error("Webauthn.storeStringData() : Webauthn module exception : ", attributeName, e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         } catch (IdRepoException ex) {
-            DEBUG.error("Webauthn.storeCounter() : error store Counter : ", ex);
+            DEBUG.error("Webauthn.storeStringData() : error store String : ", attributeName, ex);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("storeCounter was Success");
+            DEBUG.message("storeStringData was Success", attributeName);
         }
-        return _storeCounterResult;
-    }
-
-    /**
-     * from based membership module Returns the password from the PasswordCallback.
-     */
-    private String getPassword(PasswordCallback callback) {
-        char[] tmpPassword = callback.getPassword();
-
-        if (tmpPassword == null) {
-            // treat a NULL password as an empty password
-            tmpPassword = new char[0];
-        }
-
-        char[] pwd = new char[tmpPassword.length];
-        System.arraycopy(tmpPassword, 0, pwd, 0, tmpPassword.length);
-
-        return (new String(pwd));
+        return _storeStringDataResult;
     }
 
     /*
@@ -584,22 +568,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
         }
     }
 
-
-    
-    /*
-     * generate secure random byte[]
-     * @param int length
-     * @return byte[]
-     */
-    /*
-    private byte[] genSecureRandomBytesArray(int arrayLength) throws GeneralSecurityException {
-        byte[] byteArray = new byte[arrayLength];
-        SecureRandom.getInstanceStrong().nextBytes(byteArray);
-
-        return byteArray;
-    }
-*/
-
     /**
      * from based membership
      * module==============================================================================================
@@ -614,6 +582,24 @@ public class WebauthnAuthenticate extends AMLoginModule {
             }
         }
     }
+    
+    /**
+     * from based membership module Returns the password from the PasswordCallback.
+     */
+    private String getPassword(PasswordCallback callback) {
+        char[] tmpPassword = callback.getPassword();
+
+        if (tmpPassword == null) {
+            // treat a NULL password as an empty password
+            tmpPassword = new char[0];
+        }
+
+        char[] pwd = new char[tmpPassword.length];
+        System.arraycopy(tmpPassword, 0, pwd, 0, tmpPassword.length);
+
+        return (new String(pwd));
+    }
+
 
     /**
      * from based membership module Returns <code>Principal</code>.

@@ -413,14 +413,17 @@ public class WebauthnRegister extends AMLoginModule {
         try {
             // boolean _storeResult
             boolean _storeResult = false;
-            // store CredentialId
+            // store CredentialId as Base64Url String
             _storeResult = storeStringData(Base64UrlUtil.encodeToString(attestedCredentialIdBytes), credentialIdAttributeNameConfig);
 
-            // store Public Key
-            _storeResult = storeCredentialPublicKey(attestedCredentialPublicKey);
+            // store Public Key as COSE Key Binary
+            CborConverter _cborConverter = new CborConverter();
+            _storeResult = storeByteData(
+                    _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
+                    pubKeyAttributeNameConfig);
 
-            // store Counter
-            _storeResult = storeCounter(attestedCounter);
+            // store Counter as String
+            _storeResult = storeStringData(String.valueOf(attestedCounter), counterAttributeNameConfig);
 
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
@@ -442,78 +445,6 @@ public class WebauthnRegister extends AMLoginModule {
     }
 
     /*
-     * Store CredentialPublicKey to user data store
-     * @param CredentialPublicKey amCredentialPublicKey
-     * @return boolean
-     * @throws AuthLoginException, IdRepoException
-     */
-    private boolean storeCredentialPublicKey(CredentialPublicKey attestedCredentialPublicKey)
-            throws AuthLoginException, IdRepoException, IOException {
-
-        boolean _storeAttestedCredentialDataResult = false;
-
-        ByteArrayOutputStream _bos = new ByteArrayOutputStream();
-        try (ObjectOutputStream _os = new ObjectOutputStream(_bos)) {
-            _os.writeObject(attestedCredentialPublicKey);
-            _attestedContent = _bos.toByteArray();
-        }
-
-        Map<String, byte[][]> map = new HashMap<String, byte[][]>();
-        byte[][] _attestedValues = new byte[1][];
-        map.put(pubKeyAttributeNameConfig, _attestedValues);
-        _attestedValues[0] = _attestedContent;
-
-        try {
-            AMIdentity uid = getIdentity();
-            uid.setBinaryAttributes(map);
-            uid.store();
-            _storeAttestedCredentialDataResult = true;
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.storeCredentialId : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException ex) {
-            DEBUG.error("Webauthn.storeCredentialId : error store CredentialId : ", ex);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-        }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("storeCredentialId was Success");
-        }
-        return _storeAttestedCredentialDataResult;
-    }
-
-    /*
-     * Store Counter to user data store
-     * @param long AuthenticatorCounter
-     * @return boolean
-     * @throws AuthLoginException IdRepoException
-     */
-    private boolean storeCounter(long authenticatorCounter) throws AuthLoginException, IdRepoException {
-        boolean _storeCounterResult = false;
-        Map<String, Set> map = new HashMap<String, Set>();
-        Set<String> values = new HashSet<String>();
-        String counterS = String.valueOf(authenticatorCounter);
-        values.add(counterS);
-        map.put(counterAttributeNameConfig, values);
-
-        try {
-            AMIdentity uid = getIdentity();
-            uid.setAttributes(map);
-            uid.store();
-            _storeCounterResult = true;
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.storeCounter() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException ex) {
-            DEBUG.error("Webauthn.storeCounter() : error store Counter : ", ex);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-        }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("storeCounter was Success");
-        }
-        return _storeCounterResult;
-    }
-
-    /*
      * Store StringData to user data store
      * @param String attestedStringData,
      * @param String attributeName
@@ -523,15 +454,16 @@ public class WebauthnRegister extends AMLoginModule {
     private boolean storeStringData(String attestedStringData, String attributeName)
             throws AuthLoginException, IdRepoException {
         boolean _storeStringDataResult = false;
-        Map<String, Set> map = new HashMap<String, Set>();
-        Set<String> values = new HashSet<String>();
-        String counterS = String.valueOf(attestedStringData);
-        values.add(counterS);
-        map.put(attributeName, values);
+        Map<String, Set> _map = new HashMap<String, Set>();
+        Set<String> _values = new HashSet<String>();
+        //String _storeString = String.valueOf(attestedStringData);
+        //_values.add(_storeString);
+        _values.add(attestedStringData);
+        _map.put(attributeName, _values);
 
         try {
             AMIdentity uid = getIdentity();
-            uid.setAttributes(map);
+            uid.setAttributes(_map);
             uid.store();
             _storeStringDataResult = true;
         } catch (SSOException e) {
@@ -607,17 +539,6 @@ public class WebauthnRegister extends AMLoginModule {
             _attribute = _attributes.iterator().next();
         }
         return _attribute;
-    }
-
-    /*
-     * generate secure random byte[]
-     * @param int length
-     * @return byte[]
-     */
-    private byte[] genSecureRandomBytesArray(int arrayLength) throws GeneralSecurityException {
-        byte[] byteArray = new byte[arrayLength];
-        SecureRandom.getInstanceStrong().nextBytes(byteArray);
-        return byteArray;
     }
 
     /**
