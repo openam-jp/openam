@@ -333,7 +333,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
          * lookup CredentialId(byte[]) from User Data store
          */
         try {
-            credentialIdBytes = lookupByteData(credentialIdAttributeNameConfig);
+            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
 
             if (credentialIdBytes != null) {
                 validatedUserID = userName;

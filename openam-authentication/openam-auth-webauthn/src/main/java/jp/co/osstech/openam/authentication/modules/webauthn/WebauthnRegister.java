@@ -102,6 +102,7 @@ import com.webauthn4j.authenticator.AuthenticatorImpl;
 import com.webauthn4j.data.WebAuthnRegistrationContext;
 import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.ArrayUtil;
+import com.webauthn4j.util.Base64UrlUtil;
 import com.webauthn4j.util.Base64Util;
 import com.webauthn4j.util.exception.*;
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
@@ -413,7 +414,7 @@ public class WebauthnRegister extends AMLoginModule {
             // boolean _storeResult
             boolean _storeResult = false;
             // store CredentialId
-            _storeResult = storeByteData(attestedCredentialIdBytes, credentialIdAttributeNameConfig);
+            _storeResult = storeStringData(Base64UrlUtil.encodeToString(attestedCredentialIdBytes), credentialIdAttributeNameConfig);
 
             // store Public Key
             _storeResult = storeCredentialPublicKey(attestedCredentialPublicKey);
