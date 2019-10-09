@@ -42,12 +42,27 @@ public enum WebauthnAuthenticateModuleState {
     /*
      * start of the login process select login or key registration
      */
-    LOGIN_START(1, "loginStart"),
+    LOGIN_SELECT(1, "loginSelect"),
 
+    /*
+     * start of the login process select login or key registration
+     */
+    LOGIN_START(2, "loginStart"),
+    
     /*
      * start of the login process javascript get.credential
      */
-    LOGIN_SCRIPT(2, "loginScript");
+    LOGIN_SCRIPT(3, "loginScript"),
+    
+    /*
+     *  start login process for residentkey only 1 button.
+     */
+    REGIDENTKEY_LOGIN_START(4, "regidentkeyLoginStart"),
+    
+    /*
+     *  start login process for MFA only 1 button.
+     */
+    MFA_LOGIN_START(5, "mfaLoginStart");
 
     private static final Map<Integer, WebauthnAuthenticateModuleState> lookup = new HashMap<Integer, WebauthnAuthenticateModuleState>();
 

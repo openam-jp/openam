@@ -140,6 +140,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private byte[] clientDataJsonBytes;
 
     // Service Configuration Parameters
+    private String useMfaConfig = "";
     private String rpNameConfig = "";
     private String originConfig = "";
     private String attestationConfig = "";
@@ -165,6 +166,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
     private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
+    private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
     // Default Values.
     private static final int DEFAULT_AUTH_LEVEL = 0;
@@ -194,6 +196,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         }
 
         this.authLevel = CollectionHelper.getIntMapAttr(options, AUTH_LEVEL, DEFAULT_AUTH_LEVEL, DEBUG);
+        this.useMfaConfig = CollectionHelper.getMapAttr(options, USE_MFA);
         this.rpNameConfig = CollectionHelper.getMapAttr(options, RP_NAME);
         this.originConfig = CollectionHelper.getMapAttr(options, ORIGIN);
         this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
@@ -208,7 +211,8 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
-                    + "authLevel = " + authLevel 
+                    + "authLevel = " + authLevel
+                    + ", useMfa = " + useMfaConfig 
                     + ", rpName = " + rpNameConfig
                     + ", origin = " + originConfig 
                     + ", attestation = " + attestationConfig
@@ -221,7 +225,26 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", keyAttributeName = " + pubKeyAttributeNameConfig 
                     + ", counterAttributeName = " + counterAttributeNameConfig);
         }
+        
+        if(useMfaConfig.equalsIgnoreCase("true")) {
+            userName = (String) sharedState.get(getUserKey());
+            if (StringUtils.isEmpty(userName)) {
+                try {
+                    userName = getUserSessionProperty(ISAuthConstants.USER_TOKEN);
+                } catch (AuthLoginException e) {
+                    DEBUG.message("Webauthn::init: Cannot lookup userName from shared State.");
+
+                }
+            }
+        }
+        
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("userName: " + userName);
+        }
+        
     }
+    
+    
 
     /**
      * Takes an array of submitted <code>Callback</code>, process them and decide
@@ -244,11 +267,20 @@ public class WebauthnAuthenticate extends AMLoginModule {
         WebauthnAuthenticateModuleState nextState = null;
 
         switch (moduleState) {
+        
+        case LOGIN_SELECT:
+            if (useMfaConfig.equalsIgnoreCase("true")) {
+                nextState = WebauthnAuthenticateModuleState.MFA_LOGIN_START;
+            } else {
+                nextState = WebauthnAuthenticateModuleState.LOGIN_START;
+            }
+            break;
+        
 
         case LOGIN_START:
 
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnModuleState.LOGIN_START");
+                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_START");
             }
 
             // Authentication Start
@@ -281,7 +313,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         case LOGIN_SCRIPT:
 
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnModuleState.LOGIN_SCRIPT");
+                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_SCRIPT");
             }
 
             // Verify User Credential for Webauthn authentication
@@ -290,6 +322,67 @@ public class WebauthnAuthenticate extends AMLoginModule {
             } catch (Exception ex) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
             }
+
+            break;
+ 
+        case REGIDENTKEY_LOGIN_START:
+
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.REGIDENTKEY_LOGIN_START");
+            }
+
+            // generate 16byte challenge
+            generatedChallenge = new DefaultChallenge();
+            challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
+
+            // navigator.credentials.get Options
+            //redidentkey dosn't need stored credentialid
+            credentialIdBytes = new byte[0];
+            CredentialsGetOptions regidentkeyCredentialsGetOptions = new CredentialsGetOptions(
+                    credentialIdBytes,
+                    userVerificationConfig,
+                    challengeBytes,
+                    timeoutConfig);
+
+            // Replace Callback to send Generated Javascript that include get options.
+            // only for nextState LOGIN_SCRIPT
+            Callback regidentkeyCreadentialsGetCallback = new ScriptTextOutputCallback(
+                    regidentkeyCredentialsGetOptions.generateCredntialsGetScriptCallback());
+            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 1, regidentkeyCreadentialsGetCallback);
+
+            break;
+            
+        case MFA_LOGIN_START:
+
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.MFA_LOGIN_START");
+            }
+            credentialIdBytes = new byte[0];
+            // Authentication Start
+            // expect LOGIN_SCRIPT
+            try {
+                nextState = getMfaStoredCredentialId();
+            } catch (AuthLoginException ex) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            }
+
+            // generate 16byte challenge
+            generatedChallenge = new DefaultChallenge();
+            challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
+
+            // navigator.credentials.get Options
+
+            CredentialsGetOptions mfaCredentialsGetOptions = new CredentialsGetOptions(
+                    credentialIdBytes,
+                    userVerificationConfig,
+                    challengeBytes,
+                    timeoutConfig);
+
+            // Replace Callback to send Generated Javascript that include get options.
+            // only for nextState LOGIN_SCRIPT
+            Callback mfaCreadentialsGetCallback = new ScriptTextOutputCallback(
+                    mfaCredentialsGetOptions.generateCredntialsGetScriptCallback());
+            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 1, mfaCreadentialsGetCallback);
 
             break;
 
@@ -329,6 +422,33 @@ public class WebauthnAuthenticate extends AMLoginModule {
             userName = ((NameCallback) callbacks[0]).getName();
         }
 
+        /*
+         * lookup CredentialId(Base64Url encoded) from User Data store
+         */
+        try {
+            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+
+            if (credentialIdBytes != null) {
+                validatedUserID = userName;
+                DEBUG.message("validateUserID is " + userName);
+
+                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+                // return WebauthnModuleState.COMPLETE;
+            } else {
+                DEBUG.message("CredentialId is null ");
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            }
+        } catch (AuthLoginException ex) {
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+        }
+    }
+    
+    private WebauthnAuthenticateModuleState getMfaStoredCredentialId() throws AuthLoginException {
+
+ 
+            if (userName == null) {
+                return WebauthnAuthenticateModuleState.LOGIN_START; //Must be FAIL #TODO
+            }
         /*
          * lookup CredentialId(Base64Url encoded) from User Data store
          */
