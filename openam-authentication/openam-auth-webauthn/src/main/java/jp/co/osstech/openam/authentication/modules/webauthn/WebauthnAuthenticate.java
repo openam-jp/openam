@@ -335,8 +335,9 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
             // navigator.credentials.get Options
             //redidentkey dosn't need stored credentialid
-
+            byte[] idBytes = new DefaultChallenge().getValue();
             CredentialsGetOptions residentkeyCredentialsGetOptions = new CredentialsGetOptions(
+                    idBytes,
                     userVerificationConfig,
                     challengeBytes,
                     timeoutConfig,

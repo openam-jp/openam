@@ -68,9 +68,6 @@
                 <OptionValue>
                     <Value>Log In</Value>
                 </OptionValue>
-                <OptionValue>
-                    <Value>Cancel</Value>
-                </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
@@ -80,9 +77,6 @@
             <OptionValues>
                 <OptionValue>
                     <Value>Log In</Value>
-                </OptionValue>
-                <OptionValue>
-                    <Value>Cancel</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>

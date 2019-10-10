@@ -37,21 +37,6 @@ public class CredentialsGetOptions {
         this.timeoutConfig = timeoutConfig;
         this.residentKeyConfig = regidentKeyConfig;
     }
-    
-    CredentialsGetOptions(
-            String userVerificationConfig,
-            byte[] challengeBytesArray, // byte[]
-            String timeoutConfig,
-            String regidentKeyConfig
-    ) {
-        this.credentialIdBytesArrayStr = "";
-        this.userVerificationConfig = userVerificationConfig;
-        this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
-        this.timeoutConfig = timeoutConfig;
-        this.residentKeyConfig = regidentKeyConfig;
-    }
-    
-    
 
     /*
      * generate secure random byte[]
@@ -84,12 +69,10 @@ public class CredentialsGetOptions {
         // AllowCredentials
         _credentialGetScript.append("allowCredentials: [ {");
         _credentialGetScript.append("type: \'public-key\'");
-        if ( !residentKeyConfig.equalsIgnoreCase("true")) {
         _credentialGetScript.append(", ");
         _credentialGetScript.append("id: new Uint8Array([");
         _credentialGetScript.append(credentialIdBytesArrayStr);
         _credentialGetScript.append("])");
-        }
         _credentialGetScript.append(", ");
         _credentialGetScript.append("transports: [");
         _credentialGetScript.append("\'usb\', ");
