@@ -45,10 +45,7 @@
         </ConfirmationCallback>
     </Callbacks>
     
-    <Callbacks length="4" order="3" timeout="120" header="Login with Authenticator">
-        <TextOutputCallback>
-            Login with Authenticator
-        </TextOutputCallback>
+    <Callbacks length="3" order="3" timeout="120" header="Login with Authenticator">
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
         <HiddenValueCallback>
            <Id>PublicKeyCredential</Id>
@@ -58,11 +55,14 @@
                 <OptionValue>
                     <Value>Login</Value>
                 </OptionValue>
+                <OptionValue>
+                    <Value>Cancel</Value>
+                </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
 
-    <Callbacks length="1" order="4" timeout="120" header="Webauthn Regidentkey Authentication">
+    <Callbacks length="1" order="4" timeout="120" header="Webauthn Authentication(Residentkey)">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
@@ -75,7 +75,7 @@
         </ConfirmationCallback>
     </Callbacks>
     
-    <Callbacks length="1" order="5" timeout="120" header="Webauthn MFA Authentication">
+    <Callbacks length="1" order="5" timeout="120" header="Webauthn Authentication(MFA)">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>

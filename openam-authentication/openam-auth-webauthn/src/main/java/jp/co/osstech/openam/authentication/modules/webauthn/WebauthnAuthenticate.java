@@ -225,7 +225,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", keyAttributeName = " + pubKeyAttributeNameConfig 
                     + ", counterAttributeName = " + counterAttributeNameConfig);
         }
-        
         if(useMfaConfig.equalsIgnoreCase("true")) {
             userName = (String) sharedState.get(getUserKey());
             if (StringUtils.isEmpty(userName)) {
@@ -233,19 +232,13 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     userName = getUserSessionProperty(ISAuthConstants.USER_TOKEN);
                 } catch (AuthLoginException e) {
                     DEBUG.message("Webauthn::init: Cannot lookup userName from shared State.");
-
                 }
             }
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("userName: " + userName);
+            }
         }
-        
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("userName: " + userName);
-        }
-        
     }
-    
-    
-
     /**
      * Takes an array of submitted <code>Callback</code>, process them and decide
      * the order of next state to go. Return STATE_SUCCEED if the login is
@@ -271,6 +264,8 @@ public class WebauthnAuthenticate extends AMLoginModule {
         case LOGIN_SELECT:
             if (useMfaConfig.equalsIgnoreCase("true")) {
                 nextState = WebauthnAuthenticateModuleState.MFA_LOGIN_START;
+            } else if (residentKeyConfig.equalsIgnoreCase("true")) {
+                nextState = WebauthnAuthenticateModuleState.RESIDENTKEY_LOGIN_START;
             } else {
                 nextState = WebauthnAuthenticateModuleState.LOGIN_START;
             }
@@ -300,13 +295,14 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     credentialIdBytes,
                     userVerificationConfig,
                     challengeBytes,
-                    timeoutConfig);
+                    timeoutConfig,
+                    residentKeyConfig);
 
             // Replace Callback to send Generated Javascript that include get options.
             // only for nextState LOGIN_SCRIPT
             Callback creadentialsGetCallback = new ScriptTextOutputCallback(
                     credentialsGetOptions.generateCredntialsGetScriptCallback());
-            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 1, creadentialsGetCallback);
+            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, creadentialsGetCallback);
 
             break;
 
@@ -325,30 +321,32 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
             break;
  
-        case REGIDENTKEY_LOGIN_START:
+        case RESIDENTKEY_LOGIN_START:
 
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.REGIDENTKEY_LOGIN_START");
+                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.RESIDENTKEY_LOGIN_START");
             }
 
+            nextState = WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+                    
             // generate 16byte challenge
             generatedChallenge = new DefaultChallenge();
             challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
 
             // navigator.credentials.get Options
             //redidentkey dosn't need stored credentialid
-            credentialIdBytes = new byte[0];
-            CredentialsGetOptions regidentkeyCredentialsGetOptions = new CredentialsGetOptions(
-                    credentialIdBytes,
+
+            CredentialsGetOptions residentkeyCredentialsGetOptions = new CredentialsGetOptions(
                     userVerificationConfig,
                     challengeBytes,
-                    timeoutConfig);
+                    timeoutConfig,
+                    residentKeyConfig);
 
             // Replace Callback to send Generated Javascript that include get options.
             // only for nextState LOGIN_SCRIPT
-            Callback regidentkeyCreadentialsGetCallback = new ScriptTextOutputCallback(
-                    regidentkeyCredentialsGetOptions.generateCredntialsGetScriptCallback());
-            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 1, regidentkeyCreadentialsGetCallback);
+            Callback residentkeyCreadentialsGetCallback = new ScriptTextOutputCallback(
+                    residentkeyCredentialsGetOptions.generateCredntialsGetScriptCallback());
+            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, residentkeyCreadentialsGetCallback);
 
             break;
             
@@ -358,6 +356,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
                 DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.MFA_LOGIN_START");
             }
             credentialIdBytes = new byte[0];
+
             // Authentication Start
             // expect LOGIN_SCRIPT
             try {
@@ -376,13 +375,14 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     credentialIdBytes,
                     userVerificationConfig,
                     challengeBytes,
-                    timeoutConfig);
+                    timeoutConfig,
+                    residentKeyConfig);
 
             // Replace Callback to send Generated Javascript that include get options.
             // only for nextState LOGIN_SCRIPT
             Callback mfaCreadentialsGetCallback = new ScriptTextOutputCallback(
                     mfaCredentialsGetOptions.generateCredntialsGetScriptCallback());
-            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 1, mfaCreadentialsGetCallback);
+            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, mfaCreadentialsGetCallback);
 
             break;
 

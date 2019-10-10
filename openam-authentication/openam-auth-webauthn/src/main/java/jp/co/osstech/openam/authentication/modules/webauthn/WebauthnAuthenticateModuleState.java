@@ -57,7 +57,7 @@ public enum WebauthnAuthenticateModuleState {
     /*
      *  start login process for residentkey only 1 button.
      */
-    REGIDENTKEY_LOGIN_START(4, "regidentkeyLoginStart"),
+    RESIDENTKEY_LOGIN_START(4, "residentkeyLoginStart"),
     
     /*
      *  start login process for MFA only 1 button.

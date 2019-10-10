@@ -7,31 +7,51 @@ public class CredentialsGetOptions {
     private String userVerificationConfig;
     private String challengeBytesArrayStr; // byte[]
     private String timeoutConfig;
+    private String residentKeyConfig;
     
 
     CredentialsGetOptions(
             String credentialIdBase64,
             String userVerificationConfig,
             byte[] challengeBytesArray, // byte[]
-            String timeoutConfig
+            String timeoutConfig,
+            String residentKeyConfig
     ) {
         this.credentialIdBytesArrayStr = convBytesArrayToStr(Base64.getDecoder().decode(credentialIdBase64));
         this.userVerificationConfig = userVerificationConfig;
         this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
         this.timeoutConfig = timeoutConfig;
+        this.residentKeyConfig = residentKeyConfig;
     }
 
     CredentialsGetOptions(
             byte[] credentialIdBytesArray, // byte[],
             String userVerificationConfig,
             byte[] challengeBytesArray, // byte[]
-            String timeoutConfig
+            String timeoutConfig,
+            String regidentKeyConfig
     ) {
         this.credentialIdBytesArrayStr = convBytesArrayToStr(credentialIdBytesArray);
         this.userVerificationConfig = userVerificationConfig;
         this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
         this.timeoutConfig = timeoutConfig;
+        this.residentKeyConfig = regidentKeyConfig;
     }
+    
+    CredentialsGetOptions(
+            String userVerificationConfig,
+            byte[] challengeBytesArray, // byte[]
+            String timeoutConfig,
+            String regidentKeyConfig
+    ) {
+        this.credentialIdBytesArrayStr = "";
+        this.userVerificationConfig = userVerificationConfig;
+        this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
+        this.timeoutConfig = timeoutConfig;
+        this.residentKeyConfig = regidentKeyConfig;
+    }
+    
+    
 
     /*
      * generate secure random byte[]
@@ -63,10 +83,14 @@ public class CredentialsGetOptions {
 
         // AllowCredentials
         _credentialGetScript.append("allowCredentials: [ {");
-        _credentialGetScript.append("type: \'public-key\', ");
+        _credentialGetScript.append("type: \'public-key\'");
+        if ( !residentKeyConfig.equalsIgnoreCase("true")) {
+        _credentialGetScript.append(", ");
         _credentialGetScript.append("id: new Uint8Array([");
         _credentialGetScript.append(credentialIdBytesArrayStr);
-        _credentialGetScript.append("]), ");
+        _credentialGetScript.append("])");
+        }
+        _credentialGetScript.append(", ");
         _credentialGetScript.append("transports: [");
         _credentialGetScript.append("\'usb\', ");
         _credentialGetScript.append("\'nfc\', ");

@@ -5,7 +5,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
     var obj = {};
 
     obj.createCredential = function (options) {
-        $("#idToken4_0").hide();
+        $("#idToken3_0").hide();
 
         navigator.credentials.create(options)
             .then((Credential) => {
@@ -25,7 +25,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
                 console.log("NEW CREDENTIAL", Credential);
                 console.log("Json data", jsonbody);
                 $("#PublicKeyCredential").val(jsonbody);
-                $("#idToken4_0").click();
+                $("#idToken3_0").click();
             })
             .catch((err) => {
                 console.log("ERROR", err);
@@ -33,7 +33,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
     };
 
     obj.getCredential = function (options) {
-        $("#idToken4_0").hide();
+        $("#idToken3_0").hide();
 
         navigator.credentials.get(options)
             .then((Credential) => {
@@ -57,7 +57,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
                 console.log("Assersion", Credential);
                 console.log("Json data", jsonbody);
                 $("#PublicKeyCredential").val(jsonbody);
-                $("#idToken4_0").click();
+                $("#idToken3_0").click();
             })
             .catch((err) => {
                 console.log("ERROR", err);

@@ -258,6 +258,11 @@ public class WebauthnRegister extends AMLoginModule {
                 nextState = WebauthnRegisterModuleState.REG_START;
                 break;
             }
+            
+            // if Cancel Button Return Authentication Fail
+            if (((ConfirmationCallback)callbacks[0]).getSelectedIndex() == 1) {
+                throw new AuthLoginException("Ragistration Cancel Auth Fail");
+            }
 
             // generate 16byte challenge
             // generate 16byte id
@@ -284,7 +289,7 @@ public class WebauthnRegister extends AMLoginModule {
             // only for nextState REG_SCRIPT
             Callback creadentialsCreateCallback = new ScriptTextOutputCallback(
                     credentialsCreateOptions.generateCredntialsCreateScriptCallback());
-            replaceCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue(), 1, creadentialsCreateCallback);
+            replaceCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue(), 0, creadentialsCreateCallback);
 
             break;
 
