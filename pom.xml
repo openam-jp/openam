@@ -958,7 +958,6 @@
 
             <!-- External project dependencies -->
 
-
             <!-- Mozilla Rhino Javascript engine -->
 
             <!-- Groovy scripting support -->
@@ -966,54 +965,6 @@
             <!-- Groovy JSON parsing support -->
 
             <!-- Override dependency for ESAPI -->
-
-
-
-
-
-
-            <!-- TODO j2ee -->
-
-
-
-
-
-
-
-
-
-            <!-- TODO jmx -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             <!-- OpenDJ API -->
             <dependency>
