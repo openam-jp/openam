@@ -129,16 +129,6 @@
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
-        <esapiport.version>2013-12-04</esapiport.version>
-        <jato.version>2005-05-04</jato.version>
-        <cc-ui.version>2008-08-08</cc-ui.version>
-        <log4j.version>1.2.16</log4j.version>
-        <authapi.version>2005-08-12</authapi.version>
-        <jdmk.version>2007-01-10</jdmk.version>
-<!--        <hikaricp.version>2.4.1</hikaricp.version> -->
-<!--        <h2database.version>1.4.188</h2database.version> -->
-<!--        <activemq.version>5.13.3</.version> -->
-        <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -969,8 +959,6 @@
             <!-- External project dependencies -->
 
 
-
-
             <!-- Mozilla Rhino Javascript engine -->
 
             <!-- Groovy scripting support -->
@@ -995,7 +983,6 @@
 
 
             <!-- TODO jmx -->
-
 
 
 
