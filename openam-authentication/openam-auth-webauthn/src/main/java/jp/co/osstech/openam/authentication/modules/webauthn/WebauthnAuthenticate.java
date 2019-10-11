@@ -152,6 +152,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
     private String counterAttributeNameConfig = "";
+    private String userHandleIdAttributeNameConfig = "";
 
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
@@ -165,6 +166,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
     private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
+    private static final String USER_HANDLE_ID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-userHandleIdAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
@@ -208,6 +210,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
         this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
+        this.userHandleIdAttributeNameConfig = CollectionHelper.getMapAttr(options, USER_HANDLE_ID_ATTRIBUTE_NAME);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
@@ -223,7 +226,8 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
                     + ", keyAttributeName = " + pubKeyAttributeNameConfig 
-                    + ", counterAttributeName = " + counterAttributeNameConfig);
+                    + ", counterAttributeName = " + counterAttributeNameConfig
+                    + ", idAttributeName = " + userHandleIdAttributeNameConfig);
         }
         if(useMfaConfig.equalsIgnoreCase("true")) {
             userName = (String) sharedState.get(getUserKey());
@@ -334,8 +338,8 @@ public class WebauthnAuthenticate extends AMLoginModule {
             challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
 
             // navigator.credentials.get Options
-            //redidentkey dosn't need stored credentialid
-            byte[] idBytes = new DefaultChallenge().getValue();
+            //redidentkey dosn't need stored credentialid.
+            byte[] idBytes = new byte[0];
             CredentialsGetOptions residentkeyCredentialsGetOptions = new CredentialsGetOptions(
                     idBytes,
                     userVerificationConfig,
@@ -356,7 +360,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.MFA_LOGIN_START");
             }
-            credentialIdBytes = new byte[0];
 
             // Authentication Start
             // expect LOGIN_SCRIPT
@@ -447,9 +450,9 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private WebauthnAuthenticateModuleState getMfaStoredCredentialId() throws AuthLoginException {
 
  
-            if (userName == null) {
-                return WebauthnAuthenticateModuleState.LOGIN_START; //Must be FAIL #TODO
-            }
+        if (userName == null) {
+            return WebauthnAuthenticateModuleState.LOGIN_START; //Must be FAIL #TODO
+        }
         /*
          * lookup CredentialId(Base64Url encoded) from User Data store
          */
@@ -523,6 +526,10 @@ public class WebauthnAuthenticate extends AMLoginModule {
                 getType = _responseJson.getType();
 
                 getUserHandle = _responseJson.getUserHandle();
+                
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("_responseJson.getUserHandle() = " + _responseJson.getUserHandle());
+                }
 
             } catch (IOException e) {
                 DEBUG.error("Webauthn.process(): JSON parse error", e);
@@ -530,6 +537,38 @@ public class WebauthnAuthenticate extends AMLoginModule {
             }
         }
 
+        /*
+         * if residentKey = true
+         * get user.id from UserHandle in Client Response
+         * and using this base64url(id) as key 
+         * to search uid from datastore
+         *  then
+         * set to userName.
+         */
+        if (residentKeyConfig.equalsIgnoreCase("true")) {
+            String _userHandleId = Base64UrlUtil.encodeToString(Base64Util.decode(getUserHandle));
+            userName = searchUserNameWithUserHandle(_userHandleId);
+
+            /*
+             * lookup CredentialId(Base64Url encoded) from User Data store
+             */
+            try {
+                credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+
+                if (credentialIdBytes != null) {
+                    validatedUserID = userName;
+                    DEBUG.message("validateUserID is " + userName);
+
+                    // return WebauthnModuleState.COMPLETE;
+                } else {
+                    DEBUG.message("CredentialId is null ");
+                    throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                }
+            } catch (AuthLoginException ex) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            }
+        }
+        
         /*
          * Validation authenticator response This must be change to W3C verification
          * flow. Use webauthn4j library to END 
@@ -585,6 +624,65 @@ public class WebauthnAuthenticate extends AMLoginModule {
             return WebauthnAuthenticateModuleState.LOGIN_START;
 
         }
+    }
+    /**
+    * Searches for an account with userHandle userID in the organization organization
+    * @param attributeValue The attributeValue to compare when searching for an
+    *  identity in the organization
+    * @param organization organization or the organization name where the identity will be
+    *  looked up
+    * @return the attribute value for the identity searched. Empty string if not found or
+    *  null if an error occurs
+     * @throws AuthLoginException 
+    */
+    private String searchUserNameWithUserHandle(String userHandleId) throws AuthLoginException {
+ 
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("serchUserNameWithUserHandle= " + userHandleId);
+        }
+
+        // And the search criteria
+        IdSearchControl searchControl = new IdSearchControl();
+        searchControl.setMaxResults(1);
+        searchControl.setTimeOut(3000);
+        Set<String> _attrName = new HashSet<String>();
+        _attrName.add(userHandleIdAttributeNameConfig);
+        final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(_attrName, userHandleId);
+        searchControl.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
+        searchControl.setAllReturnAttributes(false);
+
+        try {
+            AMIdentityRepository amirepo = getAMIdentityRepository(getRequestOrg());
+
+            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, "*", searchControl);
+            if (searchResults.getErrorCode() == IdSearchResults.SUCCESS && searchResults != null) {
+                Set<AMIdentity> results = searchResults.getSearchResults();
+                if (!results.isEmpty()) {
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message(BUNDLE_NAME + results.size() + " result(s) obtained");
+                    }
+                    AMIdentity userDNId = results.iterator().next();
+                    if (userDNId != null) {
+                        if (DEBUG.messageEnabled()) {
+                             DEBUG.message(BUNDLE_NAME + "user = " + userDNId.getUniversalId());
+                             DEBUG.message(BUNDLE_NAME + "attrs =" + userDNId.getAttributes(
+                                     getUserAliasList()));
+                        }
+                        return userDNId.getName();
+                    }
+                }
+            }
+        } catch (IdRepoException idrepoex) {
+
+            throw new AuthLoginException(BUNDLE_NAME, idrepoex);
+        } catch (SSOException ssoe) {
+
+            throw new AuthLoginException(BUNDLE_NAME, ssoe);
+        }
+        if (DEBUG.messageEnabled()) {
+                    DEBUG.message(BUNDLE_NAME + " No results were found !");
+        }
+        return null;
     }
 
     /*

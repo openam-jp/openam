@@ -125,7 +125,7 @@ public class WebauthnRegister extends AMLoginModule {
 
     // Webauthn Credentials
     private String userName;
-    private byte[] idBytes;
+    private byte[] userHandleIdBytes;
     private byte[] attestedCredentialIdBytes;
     private Challenge generatedChallenge;
     private CredentialPublicKey attestedCredentialPublicKey;
@@ -149,6 +149,7 @@ public class WebauthnRegister extends AMLoginModule {
     private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
     private String counterAttributeNameConfig = "";
+    private String userHandleIdAttributeNameConfig = "";
 
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
@@ -162,6 +163,7 @@ public class WebauthnRegister extends AMLoginModule {
     private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
     private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
+    private static final String USER_HANDLE_ID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-userHandleIdAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
 
     // Default Values.
@@ -195,6 +197,8 @@ public class WebauthnRegister extends AMLoginModule {
         this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
         this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
+        this.userHandleIdAttributeNameConfig = CollectionHelper.getMapAttr(options, USER_HANDLE_ID_ATTRIBUTE_NAME);
+
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
@@ -208,7 +212,8 @@ public class WebauthnRegister extends AMLoginModule {
                     + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
                     + ", keyAttributeName = " + pubKeyAttributeNameConfig 
-                    + ", counterAttributeName = " + counterAttributeNameConfig);
+                    + ", counterAttributeName = " + counterAttributeNameConfig
+                    + ", userHandleIdAttributeName = " + userHandleIdAttributeNameConfig);
         }
         
         userName = (String) sharedState.get(getUserKey());
@@ -269,13 +274,33 @@ public class WebauthnRegister extends AMLoginModule {
             generatedChallenge = new DefaultChallenge();
             challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
 
-            idBytes = new DefaultChallenge().getValue();
+            /* 
+             * id is W3C user.id object.
+             * if residentKey = true
+             * idBytes may return as user Handle value,
+             * save this as Base64url encode(idBytes) 
+             * user attribute.
+             * and search this authentication time.
+             * But base64Url.encode(CredentialId)
+             * will be saved register. 
+             * 
+             * so
+             *  generate 64 byte random byte
+             */
+            
+            try {
+                userHandleIdBytes = genSecureRandomBytesArray(64);
+            } catch (GeneralSecurityException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            }
+            
 
             // navigator.credentials.create Options
             CredentialsCreateOptions credentialsCreateOptions = 
                     new CredentialsCreateOptions(
                     rpNameConfig,
-                    idBytes,
+                    userHandleIdBytes,
                     userName,
                     lookupStringData(displayNameAttributeNameConfig),
                     attestationConfig,
@@ -418,6 +443,10 @@ public class WebauthnRegister extends AMLoginModule {
         try {
             // boolean _storeResult
             boolean _storeResult = false;
+            
+            // store userHandleId as Base64Url String
+            _storeResult = storeStringData(Base64UrlUtil.encodeToString(userHandleIdBytes), userHandleIdAttributeNameConfig);
+
             // store CredentialId as Base64Url String
             _storeResult = storeStringData(Base64UrlUtil.encodeToString(attestedCredentialIdBytes), credentialIdAttributeNameConfig);
 
@@ -544,6 +573,18 @@ public class WebauthnRegister extends AMLoginModule {
             _attribute = _attributes.iterator().next();
         }
         return _attribute;
+    }
+
+    /* generate secure random byte[]
+     * @param int length
+     * @return byte[]
+     */
+    private byte[] genSecureRandomBytesArray(int arrayLength) throws GeneralSecurityException {
+        SecureRandom _randam = new SecureRandom();
+        byte[] _byteArray = new byte[arrayLength];
+        _randam.nextBytes(_byteArray);
+
+        return _byteArray;
     }
 
     /**

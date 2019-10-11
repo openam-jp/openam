@@ -127,7 +127,7 @@
                         order="402"
                         resourceName="timeout">
                         <DefaultValues>
-                            <Value>6000</Value> 
+                            <Value>60000</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-useMfa"
@@ -151,7 +151,7 @@
                         order="600"
                         resourceName="credentialIdAttributeName">
                         <DefaultValues>
-                            <Value>LDAP CredentialID Attribute here</Value> 
+                            <Value>LDAP CredentialID Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                        <AttributeSchema name="iplanet-am-auth-Webauthn-keyAttributeName"
@@ -161,7 +161,7 @@
                         order="700"
                         resourceName="keyAttributeName">
                         <DefaultValues>
-                            <Value>LDAP PublicKey Attribute here</Value> 
+                            <Value>LDAP PublicKey Attribute (COSEKey Binary)</Value> 
                         </DefaultValues>
                         </AttributeSchema>   
                        <AttributeSchema name="iplanet-am-auth-Webauthn-displayNameAttributeName"
@@ -171,7 +171,7 @@
                         order="800"
                         resourceName="displayNameAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Display Name Attribute here(cn)</Value> 
+                            <Value>LDAP Display Name Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                        <AttributeSchema name="iplanet-am-auth-Webauthn-counterAttributeName"
@@ -181,7 +181,17 @@
                         order="801"
                         resourceName="counterAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Counter Attribute here(long Num)</Value> 
+                            <Value>LDAP Counter Attribute (long Num)</Value> 
+                        </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-Webauthn-userHandleIdAttributeName"
+                        type="single"   
+                        syntax="string"    
+                        i18nKey="a654"
+                        order="802"
+                        resourceName="userHandleIdAttributeName">
+                        <DefaultValues>
+                            <Value>LDAP id(user Handle) Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"
@@ -282,7 +292,7 @@
                         order="402"
                         resourceName="timeout">
                         <DefaultValues>
-                            <Value>6000</Value> 
+                            <Value>60000</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-useMfa"
@@ -316,7 +326,7 @@
                         order="600"
                         resourceName="keyAttributeName">
                         <DefaultValues>
-                            <Value>LDAP PublicKey Attribute here</Value> 
+                            <Value>LDAP PublicKey Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>   
                         <AttributeSchema name="iplanet-am-auth-Webauthn-displayNameAttributeName"
@@ -326,7 +336,7 @@
                         order="700"
                         resourceName="displayNameAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Display Name Attribute here(cn)</Value> 
+                            <Value>LDAP Display Name Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-counterAttributeName"
@@ -336,7 +346,17 @@
                         order="800"
                         resourceName="counterAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Counter Attribute here(long Num)</Value> 
+                            <Value>LDAP Counter Attribute (long Num)</Value> 
+                        </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-Webauthn-userHandleIdAttributeName"
+                        type="single"   
+                        syntax="string"    
+                        i18nKey="a654"
+                        order="803"
+                        resourceName="userHandleIdAttributeName">
+                        <DefaultValues>
+                            <Value>LDAP id(user Handle) Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"

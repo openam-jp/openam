@@ -65,7 +65,8 @@ public class CredentialsGetOptions {
         _credentialGetScript.append("require([\'jp/co/osstech/openam/server/util/webauthn\'], function (webauthn) { ");
         _credentialGetScript.append("webauthn.getCredential(  { ");
         _credentialGetScript.append("publicKey: {");
-
+        
+        if (residentKeyConfig.equalsIgnoreCase("false")) {
         // AllowCredentials
         _credentialGetScript.append("allowCredentials: [ {");
         _credentialGetScript.append("type: \'public-key\'");
@@ -81,19 +82,19 @@ public class CredentialsGetOptions {
         _credentialGetScript.append("\'internal\'");
         _credentialGetScript.append("]");
         _credentialGetScript.append("} ]");
-
-        // UserVerification
         _credentialGetScript.append(", ");
-        _credentialGetScript.append("   userVerification: \'");
+        }
+        // UserVerification
+        _credentialGetScript.append("userVerification: \'");
         _credentialGetScript.append(userVerificationConfig);
         _credentialGetScript.append("\'");
+        _credentialGetScript.append(", ");
 
         // Challenge
-        _credentialGetScript.append(", ");
         _credentialGetScript.append("challenge: new Uint8Array([");
         _credentialGetScript.append(challengeBytesArrayStr);
         _credentialGetScript.append("])");
-        
+
         // Timeout
         _credentialGetScript.append(", ");
         _credentialGetScript.append("timeout: ");
