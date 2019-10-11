@@ -547,7 +547,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
          */
         if (residentKeyConfig.equalsIgnoreCase("true")) {
             String _userHandleId = Base64UrlUtil.encodeToString(Base64Util.decode(getUserHandle));
-            userName = searchUserNameWithUserHandle(_userHandleId);
+            userName = searchUserNameWithAttrValue(_userHandleId,userHandleIdAttributeNameConfig);
 
             /*
              * lookup CredentialId(Base64Url encoded) from User Data store
@@ -628,47 +628,47 @@ public class WebauthnAuthenticate extends AMLoginModule {
     /**
     * Searches for an account with userHandle userID in the organization organization
     * @param attributeValue The attributeValue to compare when searching for an
-    *  identity in the organization
-    * @param organization organization or the organization name where the identity will be
+    *  identity
+    * @param attributeName that name of where the identity will be
     *  looked up
-    * @return the attribute value for the identity searched. Empty string if not found or
-    *  null if an error occurs
+    * @return the UserName
      * @throws AuthLoginException 
     */
-    private String searchUserNameWithUserHandle(String userHandleId) throws AuthLoginException {
+    private String searchUserNameWithAttrValue(String attributeValue, String attributeName) throws AuthLoginException {
  
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("serchUserNameWithUserHandle= " + userHandleId);
+            DEBUG.message("serchUserNameWith attributeName= "+ attributeName 
+                    + " attributeValue= " + attributeValue );
         }
 
         // And the search criteria
-        IdSearchControl searchControl = new IdSearchControl();
-        searchControl.setMaxResults(1);
-        searchControl.setTimeOut(3000);
+        IdSearchControl _searchControl = new IdSearchControl();
+        _searchControl.setMaxResults(1);
+        _searchControl.setTimeOut(3000);
         Set<String> _attrName = new HashSet<String>();
-        _attrName.add(userHandleIdAttributeNameConfig);
-        final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(_attrName, userHandleId);
-        searchControl.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
-        searchControl.setAllReturnAttributes(false);
+        _attrName.add(attributeName);
+        final Map<String, Set<String>> _searchAVMap = CollectionUtils.toAvPairMap(_attrName, attributeValue);
+        _searchControl.setSearchModifiers(IdSearchOpModifier.OR, _searchAVMap);
+        _searchControl.setAllReturnAttributes(false);
 
         try {
-            AMIdentityRepository amirepo = getAMIdentityRepository(getRequestOrg());
+            AMIdentityRepository _amirepo = getAMIdentityRepository(getRequestOrg());
 
-            IdSearchResults searchResults = amirepo.searchIdentities(IdType.USER, "*", searchControl);
-            if (searchResults.getErrorCode() == IdSearchResults.SUCCESS && searchResults != null) {
-                Set<AMIdentity> results = searchResults.getSearchResults();
-                if (!results.isEmpty()) {
+            IdSearchResults _searchResults = _amirepo.searchIdentities(IdType.USER, "*", _searchControl);
+            if (_searchResults.getErrorCode() == IdSearchResults.SUCCESS && _searchResults != null) {
+                Set<AMIdentity> _results = _searchResults.getSearchResults();
+                if (!_results.isEmpty()) {
                     if (DEBUG.messageEnabled()) {
-                        DEBUG.message(BUNDLE_NAME + results.size() + " result(s) obtained");
+                        DEBUG.message(BUNDLE_NAME + _results.size() + " result(s) obtained");
                     }
-                    AMIdentity userDNId = results.iterator().next();
-                    if (userDNId != null) {
+                    AMIdentity _userDNId = _results.iterator().next();
+                    if (_userDNId != null) {
                         if (DEBUG.messageEnabled()) {
-                             DEBUG.message(BUNDLE_NAME + "user = " + userDNId.getUniversalId());
-                             DEBUG.message(BUNDLE_NAME + "attrs =" + userDNId.getAttributes(
+                             DEBUG.message(BUNDLE_NAME + "user = " + _userDNId.getUniversalId());
+                             DEBUG.message(BUNDLE_NAME + "attrs =" + _userDNId.getAttributes(
                                      getUserAliasList()));
                         }
-                        return userDNId.getName();
+                        return _userDNId.getName();
                     }
                 }
             }
