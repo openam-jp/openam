@@ -134,7 +134,6 @@ public class WebauthnRegister extends AMLoginModule {
     private byte[] attestationObjectBytes;
     private byte[] clientDataJsonBytes;
     private boolean verificationRequired;
-    private byte[] _attestedContent;
     private long attestedCounter;
 
     // Service Configuration Parameters
@@ -285,14 +284,19 @@ public class WebauthnRegister extends AMLoginModule {
              * will be saved register. 
              * 
              * so
+             * check users userHandleId value
+             * if no value
              *  generate 64 byte random byte
              */
-            
-            try {
-                userHandleIdBytes = genSecureRandomBytesArray(64);
-            } catch (GeneralSecurityException e) {
-                // TODO 自動生成された catch ブロック
-                e.printStackTrace();
+            String userHandleIdBase64url = lookupStringData(userHandleIdAttributeNameConfig);
+            if (userHandleIdBase64url.equals("")) {
+                try {
+                    userHandleIdBytes = genSecureRandomBytesArray(64);
+                } catch (Exception e) {
+                    throw new AuthLoginException(BUNDLE_NAME, "genSecureRandom", null, e);
+                }
+            } else {
+                userHandleIdBytes = Base64UrlUtil.decode(userHandleIdBase64url);
             }
             
 
@@ -445,8 +449,9 @@ public class WebauthnRegister extends AMLoginModule {
             boolean _storeResult = false;
             
             // store userHandleId as Base64Url String
+            if (lookupStringData(userHandleIdAttributeNameConfig).isEmpty()) {
             _storeResult = storeStringData(Base64UrlUtil.encodeToString(userHandleIdBytes), userHandleIdAttributeNameConfig);
-
+            }
             // store CredentialId as Base64Url String
             _storeResult = storeStringData(Base64UrlUtil.encodeToString(attestedCredentialIdBytes), credentialIdAttributeNameConfig);
 
@@ -567,11 +572,11 @@ public class WebauthnRegister extends AMLoginModule {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         }
 
-        String _attribute = null;
+        String _attribute = "";
 
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(_attributes)) {
+        if (CollectionUtils.isNotEmpty(_attributes)) {
             _attribute = _attributes.iterator().next();
-        }
+        } 
         return _attribute;
     }
 
