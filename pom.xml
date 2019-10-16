@@ -129,7 +129,10 @@
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
+        <jato.version>2005-05-04</jato.version>
         <cc-ui.version>2008-08-08</cc-ui.version>
+        <authapi.version>2005-08-12</authapi.version>
+        <jdmk.version>2007-01-10</jdmk.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -970,6 +973,11 @@
             <!-- TODO j2ee -->
 
             <!-- TODO jmx -->
+            <dependency>
+                <groupId>com.iplanet.jato</groupId>
+                <artifactId>jato</artifactId>
+                <version>${jato.version}</version>
+            </dependency>
             <dependency>
               <groupId>com.sun.web.ui</groupId>
               <artifactId>cc</artifactId>
