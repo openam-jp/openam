@@ -70,7 +70,6 @@
                             <ChoiceValue i18nKey="none">none</ChoiceValue>
                             <ChoiceValue i18nKey="direct">direct</ChoiceValue>
                             <ChoiceValue i18nKey="indirect">indirect</ChoiceValue>
-                            <ChoiceValue i18nKey="undefine">undefine</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>none</Value> 
@@ -85,7 +84,6 @@
                         <ChoiceValues>
                             <ChoiceValue i18nKey="cross-platform">cross-platform</ChoiceValue>
                             <ChoiceValue i18nKey="platform">platform</ChoiceValue>
-                            <ChoiceValue i18nKey="undefine">undefine</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>cross-platform</Value> 
@@ -137,7 +135,7 @@
                         order="600"
                         resourceName="credentialIdAttributeName">
                         <DefaultValues>
-                            <Value>LDAP CredentialID Attribute (String)</Value> 
+                            <Value>CredentialID Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                        <AttributeSchema name="iplanet-am-auth-Webauthn-keyAttributeName"
@@ -147,7 +145,7 @@
                         order="700"
                         resourceName="keyAttributeName">
                         <DefaultValues>
-                            <Value>LDAP PublicKey Attribute (COSEKey Binary)</Value> 
+                            <Value>PublicKey Attribute (COSEKey Binary)</Value> 
                         </DefaultValues>
                         </AttributeSchema>   
                        <AttributeSchema name="iplanet-am-auth-Webauthn-displayNameAttributeName"
@@ -157,7 +155,7 @@
                         order="800"
                         resourceName="displayNameAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Display Name Attribute (String)</Value> 
+                            <Value>Display Name Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                        <AttributeSchema name="iplanet-am-auth-Webauthn-counterAttributeName"
@@ -167,7 +165,7 @@
                         order="801"
                         resourceName="counterAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Counter Attribute (long Number)</Value> 
+                            <Value>Counter Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-userHandleIdAttributeName"
@@ -177,7 +175,7 @@
                         order="803"
                         resourceName="userHandleIdAttributeName">
                         <DefaultValues>
-                            <Value>LDAP id(user Handle) Attribute (String)</Value> 
+                            <Value>id(user Handle) Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"
@@ -221,7 +219,6 @@
                             <ChoiceValue i18nKey="none">none</ChoiceValue>
                             <ChoiceValue i18nKey="direct">direct</ChoiceValue>
                             <ChoiceValue i18nKey="indirect">indirect</ChoiceValue>
-                            <ChoiceValue i18nKey="undefine">undefine</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>none</Value> 
@@ -236,7 +233,6 @@
                         <ChoiceValues>
                             <ChoiceValue i18nKey="cross-platform">cross-platform</ChoiceValue>
                             <ChoiceValue i18nKey="platform">platform</ChoiceValue>
-                            <ChoiceValue i18nKey="undefine">undefine</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>cross-platform</Value> 
@@ -288,7 +284,7 @@
                         order="500"
                         resourceName="credentialIdAttributeName">
                         <DefaultValues>
-                            <Value>LDAP CredentialID Attribute (String)</Value> 
+                            <Value>CredentialID Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-keyAttributeName"
@@ -298,7 +294,7 @@
                         order="600"
                         resourceName="keyAttributeName">
                         <DefaultValues>
-                            <Value>LDAP PublicKey Attribute (COSEKey Binary)</Value> 
+                            <Value>PublicKey Attribute (COSEKey Binary)</Value> 
                         </DefaultValues>
                         </AttributeSchema>   
                         <AttributeSchema name="iplanet-am-auth-Webauthn-displayNameAttributeName"
@@ -308,7 +304,7 @@
                         order="700"
                         resourceName="displayNameAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Display Name Attribute here(String)</Value> 
+                            <Value>Display Name Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-counterAttributeName"
@@ -318,7 +314,7 @@
                         order="800"
                         resourceName="counterAttributeName">
                         <DefaultValues>
-                            <Value>LDAP Counter Attribute(long Num)</Value> 
+                            <Value>Counter Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-userHandleIdAttributeName"
@@ -328,7 +324,7 @@
                         order="803"
                         resourceName="userHandleIdAttributeName">
                         <DefaultValues>
-                            <Value>LDAP id(user Handle) Attribute(String)</Value> 
+                            <Value>id(user Handle) Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"

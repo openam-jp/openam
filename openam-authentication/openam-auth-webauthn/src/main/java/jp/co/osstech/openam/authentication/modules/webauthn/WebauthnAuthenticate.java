@@ -143,8 +143,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private String useMfaConfig = "";
     private String rpNameConfig = "";
     private String originConfig = "";
-    private String attestationConfig = "";
-    private String attachmentConfig = "";
     private String residentKeyConfig = "";
     private String userVerificationConfig = "";
     private String timeoutConfig = "";
@@ -157,8 +155,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
     private static final String ORIGIN = "iplanet-am-auth-Webauthn-origin";
-    private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
-    private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
     private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
     private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
     private static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
@@ -201,8 +197,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
         this.useMfaConfig = CollectionHelper.getMapAttr(options, USE_MFA);
         this.rpNameConfig = CollectionHelper.getMapAttr(options, RP_NAME);
         this.originConfig = CollectionHelper.getMapAttr(options, ORIGIN);
-        this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
-        this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
         this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
         this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
         this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
@@ -218,8 +212,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", useMfa = " + useMfaConfig 
                     + ", rpName = " + rpNameConfig
                     + ", origin = " + originConfig 
-                    + ", attestation = " + attestationConfig
-                    + ", attachment = " + attachmentConfig 
                     + ", residentKey = " + residentKeyConfig
                     + ", userVerification = " + userVerificationConfig 
                     + ", timeoutConfig = " + timeoutConfig
