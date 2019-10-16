@@ -129,6 +129,7 @@
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
+        <cc-ui.version>2008-08-08</cc-ui.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -965,6 +966,81 @@
             <!-- Groovy JSON parsing support -->
 
             <!-- Override dependency for ESAPI -->
+
+            <!-- TODO j2ee -->
+
+            <!-- TODO jmx -->
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc</artifactId>
+              <version>${cc-ui.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_de</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_es</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_fr</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_it</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_ja</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_ko</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_sv</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_zh</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_zh_CN</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_zh_HK</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.sun.web.ui</groupId>
+              <artifactId>cc_zh_TW</artifactId>
+              <version>${cc-ui.version}</version>
+              <scope>runtime</scope>
+            </dependency>
 
             <!-- OpenDJ API -->
             <dependency>
