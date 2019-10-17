@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import javax.servlet.http.HttpUpgradeHandler;
 
 /**
  * This class encapsulates a HttpServletRequest extending from RemoteServletRequest.
@@ -446,6 +448,19 @@ public class RemoteHttpServletRequest extends RemoteServletRequest implements Ht
     @Override
     public Part getPart(String name) throws IOException, ServletException {
          return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getPart(name) : null;
+    }
+
+    @Override
+    public String changeSessionId(){
+         return this._getHttpServletRequest() != null ? this._getHttpServletRequest().changeSessionId() : null;
+    }
+    @Override
+    public long getContentLengthLong(){
+         return this._getHttpServletRequest() != null ? this._getHttpServletRequest().getContentLengthLong() : -1L;
+    }
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException{
+         return this._getHttpServletRequest() != null ? this._getHttpServletRequest().upgrade(handlerClass) : null;
     }
 
 }

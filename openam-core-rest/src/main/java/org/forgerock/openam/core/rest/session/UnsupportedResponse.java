@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * 
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.core.rest.session;
@@ -209,6 +211,10 @@ final class UnsupportedResponse implements HttpServletResponse {
 
     @Override
     public Locale getLocale() {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void setContentLengthLong(long len) {
         throw new UnsupportedOperationException();
     }
 }
