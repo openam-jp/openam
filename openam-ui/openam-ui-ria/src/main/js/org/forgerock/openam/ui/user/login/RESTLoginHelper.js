@@ -69,10 +69,6 @@ define([
                     }
                 }
             }, function (failedStage, errorMsg) {
-                if (failedStage > 1) {
-                    // re-render login form, sending back to the start of the process.
-                    ViewManager.refresh();
-                }
                 errorCallback(errorMsg);
             });
         });
