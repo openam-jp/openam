@@ -21,6 +21,7 @@
    "Portions Copyrighted [year] [name of copyright owner]"
 
    Portions Copyrighted 2019 Open Source Solution Technology Corporation
+   Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -50,8 +51,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
