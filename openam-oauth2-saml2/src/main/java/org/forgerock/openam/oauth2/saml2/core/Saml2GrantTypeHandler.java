@@ -12,10 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
 
+import org.forgerock.oauth2.core.SAML2BearerRequestValidator;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
 import static org.forgerock.oauth2.core.Utils.*;
@@ -68,6 +70,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
 /**
  * @since 12.0.0
@@ -77,18 +80,21 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientRegistrationStore clientRegistrationStore;
     private final TokenStore tokenStore;
+    private final List<SAML2BearerRequestValidator> requestValidators;
 
     @Inject
     public Saml2GrantTypeHandler(ClientRegistrationStore clientRegistrationStore, TokenStore tokenStore,
             OAuth2UrisFactory urisFactory, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            ClientAuthenticator clientAuthenticator) {
+            ClientAuthenticator clientAuthenticator, List<SAML2BearerRequestValidator> requestValidators) {
         super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.clientRegistrationStore = clientRegistrationStore;
         this.tokenStore = tokenStore;
+        this.requestValidators = requestValidators;
     }
 
     public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
-            InvalidRequestException, ServerException, InvalidScopeException, NotFoundException {
+            InvalidRequestException, ServerException, InvalidScopeException, NotFoundException,
+            UnauthorizedClientException {
         String clientId = request.getParameter(OAuth2Constants.Params.CLIENT_ID);
         Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");
 
@@ -111,6 +117,10 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         String realm = normaliseRealm(request.<String>getParameter(OAuth2Constants.Params.REALM));
         if (clientRegistration == null) {
             clientRegistration = clientRegistrationStore.get(clientId, request);
+        }
+        
+        for (final SAML2BearerRequestValidator requestValidator : requestValidators) {
+            requestValidator.validateRequest(request, clientRegistration);
         }
 
         final Assertion assertion;

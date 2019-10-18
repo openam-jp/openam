@@ -92,6 +92,15 @@ import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
 
+// Added for checkPolicy()
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.policy.interfaces.Condition;
+import java.util.List;
+
 /**
  * Validates whether a resource owner has a current authenticated session.
  *
@@ -106,17 +115,24 @@ public class ResourceOwnerSessionValidator {
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ClientDAO clientDAO;
     private final ClientCredentialsReader clientCredentialsReader;
+    private final ClientRegistrationStore clientRegistrationStore;
     private RealmNormaliser realmNormaliser = new RealmNormaliser();
     private CoreGuiceModule.DNWrapper dnWrapper;
+    // Added for checkPolicy()
+    private static final String ACTION_NAME = "IssueToken";
+    private static final String POLICY_SET_NAME = "OAuthClientService";
+    public static final String REALM_DN = "am.policy.realmDN";
 
     @Inject
     public ResourceOwnerSessionValidator(CoreGuiceModule.DNWrapper dnWrapper, SSOTokenManager ssoTokenManager,
             OAuth2ProviderSettingsFactory providerSettingsFactory, ClientDAO clientDAO,
-            ClientCredentialsReader clientCredentialsReader) {
+            ClientCredentialsReader clientCredentialsReader,
+            ClientRegistrationStore clientRegistrationStore) {
         this.ssoTokenManager = ssoTokenManager;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientDAO = clientDAO;
         this.clientCredentialsReader = clientCredentialsReader;
+        this.clientRegistrationStore = clientRegistrationStore;
         this.dnWrapper = dnWrapper;
     }
 
@@ -175,22 +191,29 @@ public class ResourceOwnerSessionValidator {
                     setCurrentAcr(token, request, acrValuesStr);
                 }
 
+                long authTime;
                 try {
-                    final long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
-
+                    authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
                     if (isPastMaxAge(getMaxAge(request), authTime)) {
                         alterMaxAge(request);
                         throw authenticationRequired(request, token);
                     }
-
+                } catch (Exception ex) { //Exception as chance of MANY exception types here.
+                    logger.error("Error authenticating user against OpenAM : ", ex);
+                    throw new LoginRequiredException();
+                }
+                
+                // Additional check for policy if enabled
+                checkPolicy(request, clientRegistrationStore);
+                
+                try {
                     final AMIdentity id = IdUtils.getIdentity(
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
 
                     return new ResourceOwner(id.getName(), id, authTime);
-
-                } catch (Exception e) { //Exception as chance of MANY exception types here.
-                    logger.error("Error authenticating user against OpenAM: ", e);
+                } catch (IdRepoException repoEx) {
+                    logger.error("Failed to retrieve the user from IdRepo : ", repoEx);
                     throw new LoginRequiredException();
                 }
             } else if (OAuth2Constants.TokenEndpoint.PASSWORD.equals(request.getParameter(GRANT_TYPE))
@@ -371,6 +394,35 @@ public class ResourceOwnerSessionValidator {
         }
         return new ResourceOwnerAuthenticationRequired(loginUrl);
     }
+    
+    private ResourceOwnerAuthenticationRequired additionalAuthenticationRequired(OAuth2Request request, Parameter param)
+            throws AccessDeniedException, URISyntaxException, ServerException, NotFoundException,
+            UnsupportedEncodingException {
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        Template loginUrlTemplate = providerSettings.getCustomLoginUrlTemplate();
+
+        removeLoginPrompt(request.<Request>getRequest());
+
+        String gotoUrl = request.<Request>getRequest().getResourceRef().toString();
+        if (request.getParameter(USER_CODE) != null) {
+            gotoUrl += (gotoUrl.indexOf('?') > -1 ? "&" : "?") + USER_CODE + "=" + request.getParameter(USER_CODE);
+        }
+        String realm = request.getParameter(OAuth2Constants.Custom.REALM);
+        String locale = getRequestLocale(request);
+
+        URI loginUrl;
+        if (loginUrlTemplate != null) {
+            loginUrl = buildCustomLoginUrl(loginUrlTemplate, gotoUrl, null, realm, null, null, locale);
+        } else {
+            loginUrl = buildDefaultLoginUrl(request, gotoUrl, null, realm, null, null, locale);
+        }
+
+        final Reference loginRef = new Reference(loginUrl);
+        loginRef.addQueryParameter(param);
+        loginUrl = loginRef.toUri();
+
+        return new ResourceOwnerAuthenticationRequired(loginUrl);
+    }
 
     private String getRequestLocale(OAuth2Request request) {
         final String locale = request.getParameter(LOCALE);
@@ -513,6 +565,90 @@ public class ResourceOwnerSessionValidator {
         }
         return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + deploymentURI
                 + "/UI/Login";
+    }
+
+        /**
+     * Check policy before issuing a token for additional protection
+     */
+    private void checkPolicy(OAuth2Request request, ClientRegistrationStore clientRegistrationStore) throws
+            ResourceOwnerAuthenticationRequired, LoginRequiredException,
+            NotFoundException, AccessDeniedException, SSOException,
+            URISyntaxException, ServerException, UnsupportedEncodingException {
+
+        String spName;
+        try { // If Policy Based Protection is not enabled, then return without checkining.
+            ClientCredentials clientCredentials = clientCredentialsReader.extractCredentials(request, null);
+            String clientId = clientCredentials.getClientId();
+            ClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
+            if (!clientRegistration.isPolicyBasedProtectionEnabled()) return;
+            spName = String.format("client_id=%s", clientId);
+        } catch (InvalidRequestException | InvalidClientException ex) {
+            logger.error("Error getting clientid", ex);
+            throw new NotFoundException("Invalid request");
+        }
+
+        String realm;
+        try {
+            realm = realmNormaliser.normalise((String)request.getParameter("realm"));
+        } catch (org.forgerock.json.resource.NotFoundException ex) {
+            throw new NotFoundException(ex.getMessage());
+        }
+        SSOToken adminSSOToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        SSOToken token = getResourceOwnerSession(request);
+
+        // At this point, it has been confirmed that "auth2Realm.equals(tokenRealm)".
+        Set<String> set = new HashSet<>();
+        set.add(token.getProperty("Organization"));
+        Map<String, Set<String>> env = new HashMap<>();
+        env.put(REALM_DN, set);
+
+        Entitlement result;
+        try {
+            Evaluator evaluator = new Evaluator(SubjectUtils.createSubject(adminSSOToken), POLICY_SET_NAME);
+            List<Entitlement> entitlements = evaluator.evaluate(realm, SubjectUtils.createSubject(token), spName, env, false);
+            result = entitlements.get(0);
+        } catch (EntitlementException ex) {
+            logger.error("Error in evaluating the access policy: ", ex);
+            throw new ServerException("Access denied");
+        }
+
+        Boolean allowed = result.getActionValue(ACTION_NAME);
+        if (allowed == null || !allowed) {
+
+            if (result.hasAdvice()){
+                Map <String, Set<String>> advices = result.getAdvices();
+                Set<String> advice;
+                String paramName = null;
+                String realmQualifiedData = null;
+
+                advice = advices.get(Condition.AUTH_LEVEL_CONDITION_ADVICE);
+                if (advice != null && !advice.isEmpty()) {
+                    paramName = ISAuthConstants.AUTH_LEVEL_PARAM;
+                    realmQualifiedData = advice.iterator().next();
+                }
+                if (paramName == null) {
+                    advice = advices.get(Condition.AUTH_SCHEME_CONDITION_ADVICE);
+                    if (advice != null && !advice.isEmpty()) {
+                        paramName = ISAuthConstants.MODULE_PARAM;
+                        realmQualifiedData = advice.iterator().next();
+                    }
+                }
+                if (paramName == null) {
+                    advice = advices.get(Condition.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE);
+                    if (advice != null && !advice.isEmpty()) {
+                        paramName = ISAuthConstants.SERVICE_PARAM;
+                        realmQualifiedData = advice.iterator().next();
+                    }
+                }
+                if (paramName != null && realmQualifiedData != null) {
+                    String adviceValue = AMAuthUtils.getDataFromRealmQualifiedData(realmQualifiedData);
+                    throw additionalAuthenticationRequired(request, new Parameter(paramName, adviceValue));
+                }
+            }
+
+            logger.warning("Access not allowed according to access policy");
+            throw new AccessDeniedException("Access denied");
+        }
     }
 
     /**
