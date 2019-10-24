@@ -12,14 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -41,6 +43,7 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
@@ -96,7 +99,7 @@ public class RealmContextFilterTest {
         initMocks(this);
         filter = new RealmContextFilter(coreWrapper, realmValidator);
 
-        given(coreWrapper.getOrganization(any(SSOToken.class), eq(ENDPOINT_PATH_ELEMENT)))
+        given(coreWrapper.getOrganization(nullable(SSOToken.class), eq(ENDPOINT_PATH_ELEMENT)))
                 .willThrow(IdRepoException.class);
     }
 
@@ -490,7 +493,7 @@ public class RealmContextFilterTest {
         ArgumentCaptor<org.forgerock.json.resource.Request> requestCaptor = ArgumentCaptor.forClass(org.forgerock.json.resource.Request.class);
 
         collectCRUDPAQArguments(requestHandler, contextCaptor, requestCaptor);
-
+        
         verifyRealmContext(contextCaptor.getValue(), "", "/", null);
         verifyUriRouterContextForInvalidRealm(contextCaptor.getValue());
         verifyResolvedResourcePath(requestCaptor.getValue(), INVALID_SUB_REALM + "/" + ENDPOINT_PATH_ELEMENT);
@@ -510,22 +513,22 @@ public class RealmContextFilterTest {
 
     private void mockDnsAlias(String alias, String realm) throws Exception {
         mockRealmAlias(alias, realm);
-        given(coreWrapper.isValidFQDN(anyString())).willReturn(true);
+        given(coreWrapper.isValidFQDN(any(String.class))).willReturn(true);
     }
 
     private void mockInvalidDnsAlias(String alias) throws Exception {
         mockInvalidRealmAlias(alias);
-        given(coreWrapper.isValidFQDN(anyString())).willReturn(false);
+        given(coreWrapper.isValidFQDN(any(String.class))).willReturn(false);
     }
 
     private void mockRealmAlias(String alias, String realm) throws Exception {
-        given(coreWrapper.getOrganization(any(SSOToken.class), eq(alias))).willReturn(realm);
-        given(coreWrapper.convertOrgNameToRealmName(realm)).willReturn(realm);
-        given(realmValidator.isRealm(realm)).willReturn(true);
+        given(coreWrapper.getOrganization(nullable(SSOToken.class), eq(alias))).willReturn(realm);
+        given(coreWrapper.convertOrgNameToRealmName(eq(realm))).willReturn(realm);
+        given(realmValidator.isRealm(eq(realm))).willReturn(true);
     }
 
     private void mockInvalidRealmAlias(String alias) throws Exception {
-        doThrow(IdRepoException.class).when(coreWrapper).getOrganization(any(SSOToken.class), eq(alias));
+        doThrow(IdRepoException.class).when(coreWrapper).getOrganization(nullable(SSOToken.class), eq(alias));
     }
 
     private void verifyRealmContext(Context context, String expectedDnsAliasRealm,
@@ -577,21 +580,21 @@ public class RealmContextFilterTest {
         verify(requestHandler, atLeast(0)).handleDelete(contextCaptor.capture(), (DeleteRequest) requestCaptor.capture());
         verify(requestHandler, atLeast(0)).handlePatch(contextCaptor.capture(), (PatchRequest) requestCaptor.capture());
         verify(requestHandler, atLeast(0)).handleAction(contextCaptor.capture(), (ActionRequest) requestCaptor.capture());
-        verify(requestHandler, atLeast(0)).handleQuery(contextCaptor.capture(), (QueryRequest) requestCaptor.capture(), any(QueryResponseHandler.class));
+        verify(requestHandler, atLeast(0)).handleQuery(contextCaptor.capture(), (QueryRequest) requestCaptor.capture(), any(QueryResourceHandler.class));
     }
 
     private Handler getHttpHandler(RequestHandler requestHandler) {
         ResourceResponse response = mock(ResourceResponse.class);
         Promise<ResourceResponse, ResourceException> result = Promises.newResultPromise(response);
 
-        given(requestHandler.handleCreate(any(Context.class), any(CreateRequest.class))).willReturn(result);
+        given(requestHandler.handleCreate(nullable(Context.class), nullable(CreateRequest.class))).willReturn(result);
         given(requestHandler.handleRead(any(Context.class), any(ReadRequest.class))).willReturn(result);
         given(requestHandler.handleUpdate(any(Context.class), any(UpdateRequest.class))).willReturn(result);
         given(requestHandler.handleDelete(any(Context.class), any(DeleteRequest.class))).willReturn(result);
         given(requestHandler.handlePatch(any(Context.class), any(PatchRequest.class))).willReturn(result);
         given(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
                 .willReturn(Promises.<ActionResponse, ResourceException>newResultPromise(mock(ActionResponse.class)));
-        given(requestHandler.handleQuery(any(Context.class), any(QueryRequest.class), any(QueryResponseHandler.class)))
+        given(requestHandler.handleQuery(nullable(Context.class), nullable(QueryRequest.class), nullable(QueryResourceHandler.class)))
                 .willReturn(Promises.<QueryResponse, ResourceException>newResultPromise(mock(QueryResponse.class)));
         FilterChain filterChain = new FilterChain(requestHandler, filter);
         return CrestHttp.newHttpHandler(filterChain);

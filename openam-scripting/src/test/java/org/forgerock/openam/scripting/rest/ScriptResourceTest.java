@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.scripting.rest;
 
@@ -21,8 +23,7 @@ import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -116,7 +117,7 @@ public class ScriptResourceTest {
         Logger logger = mock(Logger.class);
         ScriptingService scriptingService = new MockScriptingService();
         ScriptingServiceFactory serviceFactory = mock(ScriptingServiceFactory.class);
-        when(serviceFactory.create(anyString())).thenReturn(scriptingService);
+        when(serviceFactory.create(nullable(String.class))).thenReturn(scriptingService);
         ExceptionMappingHandler<ScriptException, ResourceException> errorHandler = new ScriptExceptionMappingHandler();
         scriptResource = new ScriptResource(logger, serviceFactory, errorHandler,
                 new StandardScriptValidator(new StandardScriptEngineManager()));
@@ -188,7 +189,7 @@ public class ScriptResourceTest {
 
         QueryRequest queryRequest = mock(QueryRequest.class);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
-        given(mockHandler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(mockHandler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
 
         // when
         Promise<QueryResponse, ResourceException> promise =
@@ -428,7 +429,7 @@ public class ScriptResourceTest {
         }
 
         QueryResourceHandler resultHandler = mock(QueryResourceHandler.class);
-        given(resultHandler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(resultHandler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
         QueryRequest queryRequest = mock(QueryRequest.class);
         when(queryRequest.getPageSize()).thenReturn(5);
 
@@ -450,7 +451,7 @@ public class ScriptResourceTest {
 
         // when
         Mockito.reset(resultHandler);
-        given(resultHandler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(resultHandler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
         resources = ArgumentCaptor.forClass(ResourceResponse.class);
         when(queryRequest.getPagedResultsOffset()).thenReturn(5);
         scriptResource.queryCollection(context, queryRequest, resultHandler).getOrThrowUninterruptibly();

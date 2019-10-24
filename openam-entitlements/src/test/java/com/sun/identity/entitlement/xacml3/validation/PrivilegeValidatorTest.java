@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package com.sun.identity.entitlement.xacml3.validation;
 
@@ -25,7 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.Matchers.anyListOf;
+import org.mockito.ArgumentMatchers;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.testng.AssertJUnit.fail;
@@ -44,7 +46,7 @@ public class PrivilegeValidatorTest {
     @Test
     public void shouldErrorIfRealmWasNotValid() throws EntitlementException {
         doThrow(new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER))
-                .when(mockValidator).validateRealms(anyListOf(String.class));
+                .when(mockValidator).validateRealms(ArgumentMatchers.<String>anyCollection());
         try {
             validator.validateReferralPrivilege(createReferral("Badger"));
             fail();

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.core.rest.server;
@@ -113,7 +114,7 @@ public class ServerInfoResourceTest {
         ActionRequest request = mock(ActionRequest.class);
         given(request.getAction()).willReturn("validateGoto");
         given(request.getContent()).willReturn(requestJson);
-        given(mockDomainExtractor.extractValidDomains(any(String.class))).willReturn(asSet(VALID_URL));
+        given(mockDomainExtractor.extractValidDomains(nullable(String.class))).willReturn(asSet(VALID_URL));
 
         // When
         Promise<ActionResponse, ResourceException> promise = 

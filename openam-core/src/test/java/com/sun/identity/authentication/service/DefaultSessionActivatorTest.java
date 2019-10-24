@@ -12,13 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.authentication.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -59,7 +61,7 @@ public class DefaultSessionActivatorTest {
         MockitoAnnotations.initMocks(this);
 
         given(mockState.getOrgDN()).willReturn(ORGDN);
-        given(mockSessionService.newInternalSession(eq(ORGDN), any(HttpSession.class), eq(false)))
+        given(mockSessionService.newInternalSession(eq(ORGDN), nullable(HttpSession.class), eq(false)))
                 .willReturn(mockNewSession);
         given(mockNewSession.getID()).willReturn(SID);
     }
@@ -73,7 +75,7 @@ public class DefaultSessionActivatorTest {
         DefaultSessionActivator.INSTANCE.activateSession(mockState, mockSessionService, mockAuthSession, null, null);
 
         // Then
-        verify(mockSessionService).newInternalSession(eq(ORGDN), any(HttpSession.class), anyBoolean());
+        verify(mockSessionService).newInternalSession(eq(ORGDN), nullable(HttpSession.class), anyBoolean());
     }
 
     @Test

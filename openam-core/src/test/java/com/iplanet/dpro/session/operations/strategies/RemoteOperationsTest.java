@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -31,8 +33,9 @@ import java.util.Arrays;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -58,7 +61,7 @@ public class RemoteOperationsTest {
         mockRequests = mock(Requests.class);
         mockResponse = mock(SessionResponse.class);
         given(mockRequests.sendRequestWithRetry(
-                any(URL.class),
+                nullable(URL.class),
                 any(SessionRequest.class),
                 any(Session.class))).willReturn(mockResponse);
 
@@ -116,7 +119,7 @@ public class RemoteOperationsTest {
         remoteOperations.logout(mockSession);
 
         // Then
-        verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
+        verify(mockRequests).sendRequestWithRetry(nullable(URL.class), any(SessionRequest.class), eq(mockSession));
     }
 
     @Test
@@ -127,7 +130,7 @@ public class RemoteOperationsTest {
         remoteOperations.destroy(mockRequester, mockSession);
 
         // Then
-        verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
+        verify(mockRequests).sendRequestWithRetry(nullable(URL.class), any(SessionRequest.class), eq(mockSession));
     }
 
     @Test
@@ -139,6 +142,6 @@ public class RemoteOperationsTest {
         remoteOperations.setProperty(mockSession, name, value);
 
         // Then
-        verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));
+        verify(mockRequests).sendRequestWithRetry(nullable(URL.class), any(SessionRequest.class), eq(mockSession));
     }
 }

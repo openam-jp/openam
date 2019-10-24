@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.cts.impl;
@@ -80,9 +82,9 @@ public class LdapAdapterTest {
         Token token = new Token("badger", TokenType.SESSION);
 
         Result successResult = mockSuccessfulResult();
-        given(mockConnection.add(any(Entry.class))).willReturn(successResult);
+        given(mockConnection.add(nullable(Entry.class))).willReturn(successResult);
 
-        given(mockConversion.getEntry(any(Token.class))).willReturn(mock(Entry.class));
+        given(mockConversion.getEntry(nullable(Token.class))).willReturn(mock(Entry.class));
 
         // When
         adapter.create(mockConnection, token);
@@ -229,13 +231,13 @@ public class LdapAdapterTest {
     public void shouldQuery() throws Exception {
         // Given
         final QueryBuilder<Connection, Filter> mockBuilder = mock(QueryBuilder.class);
-        given(mockBuilder.withFilter(any(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
+        given(mockBuilder.withFilter(nullable(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
             @Override
             public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
                 return mockBuilder;
             }
         });
-        given(mockBuilder.execute(any(Connection.class)))
+        given(mockBuilder.execute(nullable(Connection.class)))
                 .willReturn(Arrays.asList((Collection<Token>) Arrays.asList(new Token("weasel", TokenType.OAUTH))).iterator());
         given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
         QueryFilterVisitor<Filter, Void, CoreTokenField> visitor = mock(QueryFilterVisitor.class);
@@ -247,7 +249,7 @@ public class LdapAdapterTest {
         Collection<Token> result = adapter.query(mockConnection, filter);
 
         // Then
-        verify(mockBuilder).withFilter(any(Filter.class));
+        verify(mockBuilder).withFilter(nullable(Filter.class));
         verify(mockBuilder).execute(mockConnection);
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.iterator().next().getTokenId()).isEqualTo("weasel");
@@ -257,7 +259,7 @@ public class LdapAdapterTest {
     public void shouldPartialQuery() throws Exception {
         // Given
         final QueryBuilder<Connection, Filter> mockBuilder = mock(QueryBuilder.class);
-        given(mockBuilder.withFilter(any(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
+        given(mockBuilder.withFilter(nullable(Filter.class))).willAnswer(new Answer<QueryBuilder<Connection, Filter>>() {
             @Override
             public QueryBuilder<Connection, Filter> answer(InvocationOnMock invocation) throws Throwable {
                 return mockBuilder;
@@ -271,7 +273,7 @@ public class LdapAdapterTest {
         });
 
         PartialToken partialToken = new PartialToken(new HashMap<CoreTokenField, Object>());
-        given(mockBuilder.executeAttributeQuery(any(Connection.class)))
+        given(mockBuilder.executeAttributeQuery(nullable(Connection.class)))
                 .willReturn(Arrays.asList((Collection<PartialToken>) Arrays.asList(partialToken)).iterator());
         given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
         QueryFilterVisitor<Filter, Void, CoreTokenField> visitor = mock(QueryFilterVisitor.class);
@@ -286,7 +288,7 @@ public class LdapAdapterTest {
         Collection<PartialToken> result = adapter.partialQuery(mockConnection, filter);
 
         // Then
-        verify(mockBuilder).withFilter(any(Filter.class));
+        verify(mockBuilder).withFilter(nullable(Filter.class));
         verify(mockBuilder).returnTheseAttributes(asSet(CoreTokenField.STRING_ONE));
         verify(mockBuilder).executeAttributeQuery(mockConnection);
         assertThat(result).containsOnly(partialToken);

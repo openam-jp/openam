@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.core.rest.cts;
 
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.fail;
@@ -38,7 +39,7 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.util.promise.Promise;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -66,7 +67,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
-        given(mockSerialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(mockToken);
+        given(mockSerialisation.deserialise(nullable(String.class), ArgumentMatchers.<Class<Object>>any())).willReturn(mockToken);
 
         // When
         resource.createInstance(null, request);
@@ -80,7 +81,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
-        doThrow(IllegalArgumentException.class).when(mockStore).createAsync(any(Token.class));
+        doThrow(IllegalArgumentException.class).when(mockStore).createAsync(nullable(Token.class));
 
         // When
         Promise<ResourceResponse, ResourceException> promise = resource.createInstance(null, request);
@@ -105,8 +106,8 @@ public class CoreTokenResourceTest {
     public void shouldReadTokenFromStore() throws CoreTokenException {
         // Given
         String one = "badger";
-        given(mockStore.read(anyString())).willReturn(mockToken);
-        given(mockSerialisation.serialise(any())).willReturn("{ \"value\": \"some JSON\" }");
+        given(mockStore.read(nullable(String.class))).willReturn(mockToken);
+        given(mockSerialisation.serialise(nullable(Object.class))).willReturn("{ \"value\": \"some JSON\" }");
 
         // When
         resource.readInstance(null, one, mock(ReadRequest.class));
@@ -119,8 +120,8 @@ public class CoreTokenResourceTest {
     public void shouldReadAndReturnTokenInSerialisedForm() throws CoreTokenException {
         // Given
         String serialisedToken = "{ \"value\": \"some JSON\" }";
-        given(mockStore.read(anyString())).willReturn(mockToken);
-        given(mockSerialisation.serialise(any(Token.class))).willReturn(serialisedToken);
+        given(mockStore.read(nullable(String.class))).willReturn(mockToken);
+        given(mockSerialisation.serialise(nullable(Token.class))).willReturn(serialisedToken);
 
         // When
         Promise<ResourceResponse, ResourceException> promise = resource.readInstance(null, "", mock(ReadRequest.class));
@@ -132,7 +133,7 @@ public class CoreTokenResourceTest {
     @Test
     public void shouldIndicateWhenNoTokenCanBeRead() throws CoreTokenException {
         // Given
-        given(mockStore.read(anyString())).willReturn(null);
+        given(mockStore.read(nullable(String.class))).willReturn(null);
 
         // When
         Promise<ResourceResponse, ResourceException> promise = resource.readInstance(null, "badger", mock(ReadRequest.class));
@@ -154,12 +155,12 @@ public class CoreTokenResourceTest {
         JsonValue value = mock(JsonValue.class);
         given(value.toString()).willReturn("{ \"value\": \"test\" }");
         given(updateRequest.getContent()).willReturn(value);
-        given(mockSerialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(mockToken);
+        given(mockSerialisation.deserialise(nullable(String.class), ArgumentMatchers.<Class<Object>>any())).willReturn(mockToken);
 
         // When
         resource.updateInstance(null, "badger", updateRequest);
 
         // Then
-        verify(mockStore).updateAsync(any(Token.class));
+        verify(mockStore).updateAsync(nullable(Token.class));
     }
 }

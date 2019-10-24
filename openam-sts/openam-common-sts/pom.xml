@@ -14,6 +14,7 @@
  *
  * Copyright 2013-2015 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -81,7 +82,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.easytesting</groupId>
