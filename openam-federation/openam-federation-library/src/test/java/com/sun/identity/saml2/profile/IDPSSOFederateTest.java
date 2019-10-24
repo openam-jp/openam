@@ -12,12 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.saml2.profile;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
 import org.forgerock.openam.saml2.IDPRequestValidator;
@@ -66,18 +68,18 @@ public class IDPSSOFederateTest {
     @BeforeMethod
     public void initMocks() throws ServerFaultException, ClientFaultException {
         MockitoAnnotations.initMocks(this);
-        when(actorFactory.getIDPRequestValidator(Mockito.anyString(), anyBoolean())).thenReturn(validator);
+        when(actorFactory.getIDPRequestValidator(nullable(String.class), anyBoolean())).thenReturn(validator);
         when(actorFactory.getSAMLAuthenticator(
-                any(IDPSSOFederateRequest.class),
-                any(HttpServletRequest.class),
-                any(HttpServletResponse.class),
-                any(PrintWriter.class),
+                nullable(IDPSSOFederateRequest.class),
+                nullable(HttpServletRequest.class),
+                nullable(HttpServletResponse.class),
+                nullable(PrintWriter.class),
                 anyBoolean())).thenReturn(authenticator);
         when(actorFactory.getSAMLAuthenticatorLookup(
-                any(IDPSSOFederateRequest.class),
-                any(HttpServletRequest.class),
-                any(HttpServletResponse.class),
-                any(PrintWriter.class))).thenReturn(authenticationLookup);
+                nullable(IDPSSOFederateRequest.class),
+                nullable(HttpServletRequest.class),
+                nullable(HttpServletResponse.class),
+                nullable(PrintWriter.class))).thenReturn(authenticationLookup);
         idpSsoFederateRequest = new IDPSSOFederate(false, cookieRedirector, actorFactory);
     }
 
@@ -91,8 +93,8 @@ public class IDPSSOFederateTest {
 
         // Arrange
         when(cookieRedirector.needSetLBCookieAndRedirect(
-                any(HttpServletRequest.class),
-                any(HttpServletResponse.class),
+                nullable(HttpServletRequest.class),
+                nullable(HttpServletResponse.class),
                 anyBoolean())).thenReturn(true);
         // Act
         idpSsoFederateRequest.process(mockRequest, mockResponse, mockPrintWriter, null);
@@ -107,8 +109,8 @@ public class IDPSSOFederateTest {
         when(mockRequest.getParameter("ReqID")).thenReturn("");
 
         when(cookieRedirector.needSetLBCookieAndRedirect(
-                any(HttpServletRequest.class),
-                any(HttpServletResponse.class),
+                nullable(HttpServletRequest.class),
+                nullable(HttpServletResponse.class),
                 anyBoolean())).thenReturn(false);
 
         // Act
@@ -126,8 +128,8 @@ public class IDPSSOFederateTest {
         when(mockRequest.getParameter("ReqID")).thenReturn("12345");
 
         when(cookieRedirector.needSetLBCookieAndRedirect(
-                any(HttpServletRequest.class),
-                any(HttpServletResponse.class),
+                nullable(HttpServletRequest.class),
+                nullable(HttpServletResponse.class),
                 anyBoolean())).thenReturn(false);
 
         // Act

@@ -12,6 +12,8 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014-2015 ForgeRock AS.
+*
+* Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 */
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
@@ -49,13 +51,13 @@ public class MonitoredCTSConnectionFactoryTest {
     @Test
     public void shouldAddToFailedConnectionOnError() throws Exception {
         //given
-        doThrow(Exception.class).when(connectionFactory).create();
+        doThrow(DataLayerException.class).when(connectionFactory).create();
 
         //when
         try {
             monitoredConnectionFactory.create();
             fail("Should throw exception");
-        } catch (Exception e) {
+        } catch (DataLayerException e) {
             // expected
         }
 

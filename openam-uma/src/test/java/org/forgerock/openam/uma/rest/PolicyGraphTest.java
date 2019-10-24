@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -22,9 +24,6 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.anySet;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.*;
@@ -51,6 +50,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.test.assertj.AssertJPromiseAssert;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -108,7 +108,7 @@ public class PolicyGraphTest {
     @BeforeMethod
     public void setup() throws Exception {
         initMocks(this);
-        given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
+        given(resourceSetStoreFactory.create(nullable(String.class))).willReturn(resourceSetStore);
     }
 
     @Test(expectedExceptions = IllegalStateException.class)
@@ -167,10 +167,10 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(delegate.updatePolicies(isNull(Context.class), anySet()))
+        given(delegate.updatePolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<JsonValue>anySet()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
 
-        given(delegate.deletePolicies(isNull(Context.class), anySet()))
+        given(delegate.deletePolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<String>anyCollection()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
 
         // When
@@ -196,10 +196,9 @@ public class PolicyGraphTest {
 
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
-
-        given(delegate.updatePolicies(isNull(Context.class), anySet()))
+        
+        given(delegate.updatePolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<JsonValue>anySet()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
-
         // When
         Promise<List<List<ResourceResponse>>, ResourceException> promise = graph.update(null, delegate);
 
@@ -223,13 +222,13 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(resourceSetStore.read(anyString(), anyString()))
+        given(resourceSetStore.read(nullable(String.class), nullable(String.class)))
                 .willReturn(new ResourceSetDescription(RESOURCE_SET_ID, "RESOURCE_SERVER_ID", ALICE, null));
-
-        given(delegate.updatePolicies(isNull(Context.class), anySet()))
+        
+        given(delegate.updatePolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<JsonValue>anySet()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
 
-        given(delegate.createPolicies(isNull(Context.class), anySet()))
+        given(delegate.createPolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<JsonValue>anySet()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
 
         // When
@@ -257,13 +256,13 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(resourceSetStore.read(anyString(), anyString()))
+        given(resourceSetStore.read(nullable(String.class), nullable(String.class)))
                 .willReturn(new ResourceSetDescription(RESOURCE_SET_ID, "RESOURCE_SERVER_ID", ALICE, null));
 
-        given(delegate.updatePolicies(isNull(Context.class), anySet()))
+        given(delegate.updatePolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<JsonValue>anySet()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
 
-        given(delegate.createPolicies(isNull(Context.class), anySet()))
+        given(delegate.createPolicies(ArgumentMatchers.<Context>isNull(), ArgumentMatchers.<JsonValue>anySet()))
                 .willReturn(Promises.<List<ResourceResponse>, ResourceException>newResultPromise(Collections.<ResourceResponse>emptyList()));
 
         // When
@@ -289,21 +288,21 @@ public class PolicyGraphTest {
 
     private String policyDeleted() {
         ArgumentCaptor<Set> policyIdCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(delegate).deletePolicies(isNull(Context.class), policyIdCaptor.capture());
+        verify(delegate).deletePolicies(ArgumentMatchers.<Context>isNull(), policyIdCaptor.capture());
         assertThat(policyIdCaptor.getValue()).hasSize(1);
         return (String) policyIdCaptor.getValue().iterator().next();
     }
 
     private JsonValue policyUpdated() {
         ArgumentCaptor<Set> policyCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(delegate).updatePolicies(isNull(Context.class), policyCaptor.capture());
+        verify(delegate).updatePolicies(ArgumentMatchers.<Context>isNull(), policyCaptor.capture());
         assertThat(policyCaptor.getValue()).hasSize(1);
         return (JsonValue) policyCaptor.getValue().iterator().next();
     }
 
     private JsonValue policyCreated() {
         ArgumentCaptor<Set> policyCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(delegate).createPolicies(isNull(Context.class), policyCaptor.capture());
+        verify(delegate).createPolicies(ArgumentMatchers.<Context>isNull(), policyCaptor.capture());
         assertThat(policyCaptor.getValue()).hasSize(1);
         return (JsonValue) policyCaptor.getValue().iterator().next();
     }

@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.cts.reaper;
 
@@ -27,11 +29,11 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
+import org.mockito.ArgumentMatchers;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Matchers.anyCollection;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
@@ -72,7 +74,7 @@ public class CTSReaperTest {
         // Given
         Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(null);
-        given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(new CountDownLatch(0));
+        given(mockTokenDeletion.deleteBatch(ArgumentMatchers.<String>anyCollection())).willReturn(new CountDownLatch(0));
 
         // When
         reaper.run();
@@ -91,7 +93,7 @@ public class CTSReaperTest {
         Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
         given(mockQuery.nextPage()).willReturn(tokens).willReturn(tokens).willReturn(tokens).willReturn(null);
 
-        given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(one).willReturn(two).willReturn(three);
+        given(mockTokenDeletion.deleteBatch(ArgumentMatchers.<String>anyCollection())).willReturn(one).willReturn(two).willReturn(three);
 
         // When
         reaper.run();

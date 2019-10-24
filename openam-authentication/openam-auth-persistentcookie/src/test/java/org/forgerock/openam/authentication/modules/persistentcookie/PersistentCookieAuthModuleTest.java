@@ -12,13 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * 
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.*;
 
 import javax.security.auth.Subject;
@@ -52,7 +52,7 @@ import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.openam.authentication.modules.common.AMLoginModuleBinder;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.utils.AMKeyProvider;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockSettings;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -203,7 +203,7 @@ public class PersistentCookieAuthModuleTest {
         Callback[] callbacks = new Callback[0];
         int state = ISAuthConstants.LOGIN_START;
 
-        given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(null);
+        given(jwtSessionModule.validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any())).willReturn(null);
         shouldInitialiseAuthModule();
 
         //When
@@ -219,7 +219,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
-        verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
+        verify(jwtSessionModule).validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "cookieNotValid");
     }
@@ -233,7 +233,7 @@ public class PersistentCookieAuthModuleTest {
         Jwt jwt = mock(Jwt.class);
         JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
 
-        given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(jwt);
+        given(jwtSessionModule.validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any())).willReturn(jwt);
 
         given(jwt.getClaimsSet()).willReturn(claimsSet);
         given(claimsSet.getClaim("org.forgerock.authentication.context", Map.class)).willReturn(null);
@@ -252,7 +252,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
-        verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
+        verify(jwtSessionModule).validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "jaspiContextNotFound");
     }
@@ -268,7 +268,7 @@ public class PersistentCookieAuthModuleTest {
         JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
         Map<String, Object> internalMap = mock(HashMap.class);
 
-        given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(jwt);
+        given(jwtSessionModule.validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any())).willReturn(jwt);
 
         given(jwt.getClaimsSet()).willReturn(claimsSet);
         given(claimsSet.getClaim("org.forgerock.authentication.context", Map.class)).willReturn(internalMap);
@@ -289,7 +289,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
-        verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
+        verify(jwtSessionModule).validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailedDiffRealm");
     }
@@ -305,7 +305,7 @@ public class PersistentCookieAuthModuleTest {
 
         Map<String, Object> internalMap = mock(HashMap.class);
 
-        given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(jwt);
+        given(jwtSessionModule.validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any())).willReturn(jwt);
 
         given(jwt.getClaimsSet()).willReturn(claimsSet);
         given(claimsSet.getClaim("org.forgerock.authentication.context", Map.class)).willReturn(internalMap);
@@ -320,7 +320,7 @@ public class PersistentCookieAuthModuleTest {
         //Then
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
         verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
-        verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
+        verify(jwtSessionModule).validateJwtSessionCookie(ArgumentMatchers.<MessageInfo>any());
         verify(amLoginModuleBinder).setUserSessionProperty("jwtValidated", "true");
         assertEquals(returnedState, ISAuthConstants.LOGIN_SUCCEED);
     }
@@ -606,8 +606,6 @@ public class PersistentCookieAuthModuleTest {
 
     @Test
     public void shouldStoreClientIPOnLoginSuccess() throws AuthenticationException, SSOException {
-
-        //Given
         MessageInfo messageInfo = mock(MessageInfo.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);

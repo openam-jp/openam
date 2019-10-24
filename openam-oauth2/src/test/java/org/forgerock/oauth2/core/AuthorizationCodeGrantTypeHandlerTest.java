@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -31,7 +33,7 @@ import java.util.Set;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -66,7 +68,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
                 tokenInvalidator, providerSettingsFactory, urisFactory, accessTokenGenerator);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>any())).willReturn(providerSettings);
 
         uris = mock(OAuth2Uris.class);
         given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
@@ -83,7 +85,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
 
         //When
         grantTypeHandler.handle(request);
@@ -104,7 +106,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(true);
 
         try {
@@ -114,7 +116,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         } catch (InvalidGrantException e) {
             //Then
             verify(requestValidator).validateRequest(request, clientRegistration);
-            verify(tokenInvalidator).invalidateTokens(eq(request), anyString(), anyString(), anyString());
+            verify(tokenInvalidator).invalidateTokens(eq(request), nullable(String.class), nullable(String.class), nullable(String.class));
         }
     }
 
@@ -130,7 +132,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("OTHER_REDIRECT_URI");
 
@@ -153,7 +155,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -178,7 +180,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -207,19 +209,19 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(true);
-        given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
-                eq(request), isNull(String.class))).willReturn(refreshToken);
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
+        given(tokenStore.createRefreshToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), ArgumentMatchers.<String>anySet(),
+                eq(request), nullable(String.class))).willReturn(refreshToken);
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                ArgumentMatchers.<String>anySet(), ArgumentMatchers.<RefreshToken>any(), nullable(String.class), nullable(String.class), eq(request)))
                 .willReturn(accessToken);
-        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(), eq(request)))
                 .willReturn(validatedScope);
 
         //When
@@ -229,10 +231,10 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
-        verify(accessToken).addExtraData(eq("refresh_token"), anyString());
-        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(accessToken).addExtraData(eq("refresh_token"), nullable(String.class));
+        verify(accessToken).addExtraData(eq("nonce"), nullable(String.class));
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
-        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        verify(accessToken, never()).addExtraData(eq("scope"), nullable(String.class));
         assertEquals(actualAccessToken, accessToken);
     }
 
@@ -250,17 +252,17 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                ArgumentMatchers.<String>anySet(), ArgumentMatchers.<RefreshToken>any(), nullable(String.class), nullable(String.class), eq(request)))
                 .willReturn(accessToken);
-        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(), eq(request)))
                 .willReturn(validatedScope);
 
         //When
@@ -270,10 +272,10 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
-        verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
-        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(accessToken, never()).addExtraData(eq("refresh_token"), nullable(String.class));
+        verify(accessToken).addExtraData(eq("nonce"), nullable(String.class));
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
-        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        verify(accessToken, never()).addExtraData(eq("scope"), nullable(String.class));
         assertEquals(actualAccessToken, accessToken);
     }
 
@@ -291,15 +293,15 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                ArgumentMatchers.<String>anySet(), ArgumentMatchers.<RefreshToken>any(), nullable(String.class), nullable(String.class), eq(request)))
                 .willReturn(accessToken);
         given(authorizationCode.getScope()).willReturn(validatedScope);
 
@@ -310,10 +312,10 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
-        verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
-        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(accessToken, never()).addExtraData(eq("refresh_token"), nullable(String.class));
+        verify(accessToken).addExtraData(eq("nonce"), nullable(String.class));
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
-        verify(accessToken).addExtraData(eq("scope"), anyString());
+        verify(accessToken).addExtraData(eq("scope"), nullable(String.class));
         assertEquals(actualAccessToken, accessToken);
     }
 

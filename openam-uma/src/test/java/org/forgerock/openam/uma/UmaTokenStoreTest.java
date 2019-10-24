@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.uma;
@@ -57,7 +59,7 @@ public class UmaTokenStoreTest {
         providerSettings = mock(UmaProviderSettings.class);
         store = new UmaTokenStore("REALM", rptAdapter, permissionTicketAdapter, cts, providerSettingsFactory);
 
-        given(providerSettingsFactory.get(anyString())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(nullable(String.class))).willReturn(providerSettings);
     }
 
     @Test

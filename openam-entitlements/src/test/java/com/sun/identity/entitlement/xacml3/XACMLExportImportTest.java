@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -22,10 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.Time.getCalendarInstance;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -92,7 +93,7 @@ public class XACMLExportImportTest {
         applicationServiceFactory = mock(ApplicationServiceFactory.class);
         applicationService = mock(ApplicationService.class);
         resourceTypeService = mock(ResourceTypeService.class);
-        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+        when(applicationServiceFactory.create(any(Subject.class), nullable(String.class))).thenReturn(applicationService);
 
         Application application = mock(Application.class);
         URLResourceName urlResourceName = mock(URLResourceName.class);
@@ -108,13 +109,13 @@ public class XACMLExportImportTest {
 
         // Given (shared test state)
 
-        given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), any(Subject.class))).willReturn(pm);
-        given(applicationServiceFactory.create(any(Subject.class), anyString())).willReturn(applicationService);
-        given(applicationService.getApplication(anyString())).willReturn(application);
+        given(pmFactory.createReferralPrivilegeManager(eq(ROOT_REALM), nullable(Subject.class))).willReturn(pm);
+        given(applicationServiceFactory.create(nullable(Subject.class), nullable(String.class))).willReturn(applicationService);
+        given(applicationService.getApplication(nullable(String.class))).willReturn(application);
         given(application.getResourceComparator()).willReturn(urlResourceName);
-        given(urlResourceName.compare(anyString(), anyString(), anyBoolean())).willReturn(ResourceMatch.EXACT_MATCH);
+        given(urlResourceName.compare(nullable(String.class), nullable(String.class), anyBoolean())).willReturn(ResourceMatch.EXACT_MATCH);
         given(application.getResourceTypeUuids()).willReturn(Collections.singleton("123"));
-        given(resourceTypeService.getResourceType(any(Subject.class), anyString(), anyString())).willReturn(resourceType);
+        given(resourceTypeService.getResourceType(nullable(Subject.class), nullable(String.class), nullable(String.class))).willReturn(resourceType);
     }
 
     @Test
@@ -169,8 +170,8 @@ public class XACMLExportImportTest {
         verify(validator).validatePrivilege(privilegeToAdd);
         verify(validator).validatePrivilege(privilegeToUpdate);
 
-        verify(pm, times(0)).add(any(Privilege.class));
-        verify(pm, times(0)).modify(any(Privilege.class));
+        verify(pm, times(0)).add(nullable(Privilege.class));
+        verify(pm, times(0)).modify(nullable(Privilege.class));
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -201,10 +202,10 @@ public class XACMLExportImportTest {
     private <T extends IPrivilege> T invalid(T privilege) throws EntitlementException {
         if (privilege instanceof Privilege) {
             doThrow(new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER))
-                    .when(validator).validatePrivilege(any(Privilege.class));
+                    .when(validator).validatePrivilege(nullable(Privilege.class));
         } else {
             doThrow(new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER))
-                    .when(validator).validateReferralPrivilege(any(ReferralPrivilege.class));
+                    .when(validator).validateReferralPrivilege(nullable(ReferralPrivilege.class));
         }
         return privilege;
     }

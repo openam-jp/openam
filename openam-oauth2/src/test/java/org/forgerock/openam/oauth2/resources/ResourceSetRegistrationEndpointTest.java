@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.oauth2.resources;
@@ -21,7 +23,6 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.*;
 
 import java.net.URI;
@@ -63,7 +64,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.restlet.Request;
@@ -117,7 +118,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>any())).willReturn(providerSettings);
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
         ExceptionHandler exceptionHandler = mock(ExceptionHandler.class);
@@ -142,7 +143,7 @@ public class ResourceSetRegistrationEndpointTest {
         given(endpoint.getResponse()).willReturn(response);
 
         OAuth2Request oAuth2Request = mock(OAuth2Request.class);
-        given(requestFactory.create(Matchers.<Request>anyObject())).willReturn(oAuth2Request);
+        given(requestFactory.create(ArgumentMatchers.<Request>any())).willReturn(oAuth2Request);
         given(oAuth2Request.getToken(AccessToken.class)).willReturn(accessToken);
     }
 
@@ -177,7 +178,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         given(entity.getJsonObject()).willReturn(jsonObject);
         given(jsonObject.toString()).willReturn(jsonString);
-        given(validator.validate(anyMapOf(String.class, Object.class)))
+        given(validator.validate(ArgumentMatchers.<String,Object>anyMap()))
                 .willReturn(RESOURCE_SET_DESCRIPTION_CONTENT.asMap());
 
         return entity;
@@ -191,7 +192,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         given(entity.getJsonObject()).willReturn(jsonObject);
         given(jsonObject.toString()).willReturn(jsonString);
-        given(validator.validate(anyMapOf(String.class, Object.class)))
+        given(validator.validate(ArgumentMatchers.<String,Object>anyMap()))
                 .willReturn(RESOURCE_SET_DESCRIPTION_UPDATED_CONTENT.asMap());
 
         return entity;
@@ -210,7 +211,7 @@ public class ResourceSetRegistrationEndpointTest {
                 resourceSetDescription.setId("123");
                 return null;
             }
-        }).when(store).create(any(OAuth2Request.class), any(ResourceSetDescription.class));
+        }).when(store).create(nullable(OAuth2Request.class), nullable(ResourceSetDescription.class));
 
         setUriResourceSetId();
         noConditions();
@@ -222,9 +223,9 @@ public class ResourceSetRegistrationEndpointTest {
         ArgumentCaptor<ResourceSetDescription> resourceSetCaptor =
                 ArgumentCaptor.forClass(ResourceSetDescription.class);
         InOrder inOrder = inOrder(resourceRegistrationFilter, store, resourceRegistrationFilter);
-        inOrder.verify(resourceRegistrationFilter).beforeResourceRegistration(any(ResourceSetDescription.class));
-        inOrder.verify(store).create(Matchers.<OAuth2Request>anyObject(), resourceSetCaptor.capture());
-        inOrder.verify(resourceRegistrationFilter).afterResourceRegistration(any(ResourceSetDescription.class));
+        inOrder.verify(resourceRegistrationFilter).beforeResourceRegistration(nullable(ResourceSetDescription.class));
+        inOrder.verify(store).create(ArgumentMatchers.<OAuth2Request>any(), resourceSetCaptor.capture());
+        inOrder.verify(resourceRegistrationFilter).afterResourceRegistration(nullable(ResourceSetDescription.class));
         assertThat(resourceSetCaptor.getValue().getId()).isNotNull().isNotEmpty();
         assertThat(resourceSetCaptor.getValue().getClientId()).isEqualTo("CLIENT_ID");
         assertThat(resourceSetCaptor.getValue().getName()).isEqualTo("NAME");
@@ -236,8 +237,8 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
-        verify(hook).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
-        verify(labelRegistration).updateLabelsForNewResourceSet(any(ResourceSetDescription.class));
+        verify(hook).resourceSetCreated(nullable(String.class), ArgumentMatchers.<ResourceSetDescription>any());
+        verify(labelRegistration).updateLabelsForNewResourceSet(nullable(ResourceSetDescription.class));
     }
 
     @Test
@@ -247,7 +248,7 @@ public class ResourceSetRegistrationEndpointTest {
         //Given
         JsonRepresentation entity = createCreateRequestRepresentation();
 
-        when(store.query(any(QueryFilter.class))).thenReturn(
+        when(store.query(nullable(QueryFilter.class))).thenReturn(
                 asSet(new ResourceSetDescription("id", "CLIENT_ID", "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap())));
 
         noConditions();
@@ -326,7 +327,7 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(responseRep.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
-        verify(labelRegistration).updateLabelsForExistingResourceSet(any(ResourceSetDescription.class));
+        verify(labelRegistration).updateLabelsForExistingResourceSet(nullable(ResourceSetDescription.class));
     }
 
     @Test
@@ -345,7 +346,7 @@ public class ResourceSetRegistrationEndpointTest {
         ArgumentCaptor<Status> responseStatusCaptor = ArgumentCaptor.forClass(Status.class);
         verify(response).setStatus(responseStatusCaptor.capture());
         assertThat(responseStatusCaptor.getValue().getCode()).isEqualTo(204);
-        verify(labelRegistration).updateLabelsForDeletedResourceSet(any(ResourceSetDescription.class));
+        verify(labelRegistration).updateLabelsForDeletedResourceSet(nullable(ResourceSetDescription.class));
     }
 
     @Test
@@ -364,7 +365,7 @@ public class ResourceSetRegistrationEndpointTest {
 
         noUriResourceSetId();
         noConditions();
-        given(store.query(any(QueryFilter.class)))
+        given(store.query(nullable(QueryFilter.class)))
                 .willReturn(resourceSetDescriptions);
 
         //When

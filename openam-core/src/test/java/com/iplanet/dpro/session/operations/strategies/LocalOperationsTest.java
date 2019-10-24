@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -66,7 +68,7 @@ public class LocalOperationsTest {
     public void shouldReturnSessionInfoOnRefresh() throws SessionException {
         // Given
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
-        given(mockService.getSessionInfo(any(SessionID.class), anyBoolean())).willReturn(mockSessionInfo);
+        given(mockService.getSessionInfo(nullable(SessionID.class), anyBoolean())).willReturn(mockSessionInfo);
         // When
         SessionInfo result = local.refresh(mock(Session.class), true);
         // Then
