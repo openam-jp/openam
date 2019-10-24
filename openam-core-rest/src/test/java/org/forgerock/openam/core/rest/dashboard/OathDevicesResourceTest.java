@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.core.rest.dashboard;
@@ -23,9 +25,7 @@ import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAsser
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.forgerock.openam.utils.Time.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -92,8 +92,8 @@ public class OathDevicesResourceTest {
         MockitoAnnotations.initMocks(this);
         resource = new OathDevicesResourceTestClass(dao, contextHelper, debug, oathServiceFactory);
 
-        given(contextHelper.getUserId((Context) anyObject())).willReturn(USER_ID);
-        given(oathServiceFactory.create(anyString())).willReturn(oathService);
+        given(contextHelper.getUserId((Context) nullable(Object.class))).willReturn(USER_ID);
+        given(oathServiceFactory.create(nullable(String.class))).willReturn(oathService);
     }
 
     private Context ctx() throws SSOException {
@@ -111,7 +111,7 @@ public class OathDevicesResourceTest {
         devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", newDate().getTime()))));
         devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", newDate().getTime() + 1000))));
 
-        given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
+        given(dao.getDeviceProfiles(nullable(String.class), nullable(String.class))).willReturn(devices);
 
         // When
         Promise<QueryResponse, ResourceException> actual = resource.queryCollection(ctx(), request, handler);
@@ -120,7 +120,7 @@ public class OathDevicesResourceTest {
         // Then
         assertThat(response).isNotNull();
         verify(dao, times(1)).getDeviceProfiles(USER_ID, "/");
-        verify(handler, times(2)).handleResource(any(ResourceResponse.class));
+        verify(handler, times(2)).handleResource(nullable(ResourceResponse.class));
     }
 
     /**
@@ -142,7 +142,7 @@ public class OathDevicesResourceTest {
         devices.add(json(object(field("uuid", "UUID_1"), field("name", "NAME_1"))));
         devices.add(json(object(field("uuid", "UUID_2"), field("name", "NAME_2"))));
 
-        given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
+        given(dao.getDeviceProfiles(nullable(String.class), nullable(String.class))).willReturn(devices);
 
         // WHEN
         Promise<ResourceResponse, ResourceException> actual = resource.deleteInstance(ctx(), request.getResourcePath(),
@@ -151,7 +151,7 @@ public class OathDevicesResourceTest {
         // THEN
         assertThat(actual).succeeded();
         ArgumentCaptor<List> devicesCaptor = ArgumentCaptor.forClass(List.class);
-        verify(dao).saveDeviceProfiles(anyString(), anyString(), devicesCaptor.capture());
+        verify(dao).saveDeviceProfiles(nullable(String.class), nullable(String.class), devicesCaptor.capture());
         assertThat(devicesCaptor.getValue()).hasSize(1);
     }
 
@@ -164,7 +164,7 @@ public class OathDevicesResourceTest {
         devices.add(json(object(field("uuid", "UUID_1"), field("name", "NAME_1"))));
         devices.add(json(object(field("uuid", "UUID_2"), field("name", "NAME_2"))));
 
-        given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
+        given(dao.getDeviceProfiles(nullable(String.class), nullable(String.class))).willReturn(devices);
 
         // When
         Promise<ResourceResponse, ResourceException> promise = resource.deleteInstance(ctx(), request.getResourcePath(),
@@ -240,7 +240,7 @@ public class OathDevicesResourceTest {
 
             AMIdentity mockId = mock(AMIdentity.class);
             try {
-                given(mockId.getAttribute(anyString())).willReturn(attribute); // makes them
+                given(mockId.getAttribute(nullable(String.class))).willReturn(attribute); // makes them
             } catch (IdRepoException | SSOException e) {
                 e.printStackTrace();
             }

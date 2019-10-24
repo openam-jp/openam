@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.maven.plugins.inject.content;
@@ -26,7 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -75,8 +77,8 @@ public class IOFactoryTest {
         ioFactory.writeContent(writer, content, contentConverter);
 
         //Then
-        verify(contentConverter, times(2)).convert(anyString());
-        verify(writer, times(2)).write(anyString());
+        verify(contentConverter, times(2)).convert(nullable(String.class));
+        verify(writer, times(2)).write(nullable(String.class));
         verify(writer, times(2)).newLine();
 
         verify(reader).close();

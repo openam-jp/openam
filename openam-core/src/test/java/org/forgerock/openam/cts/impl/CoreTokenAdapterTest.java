@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.cts.impl;
 
@@ -68,7 +70,7 @@ public class CoreTokenAdapterTest {
         adapter.create(token);
 
         // Then
-        verify(mockTaskDispatcher).create(eq(token), any(ResultHandler.class));
+        verify(mockTaskDispatcher).create(eq(token), nullable(ResultHandler.class));
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +141,7 @@ public class CoreTokenAdapterTest {
         adapter.updateOrCreate(token);
 
         // Then
-        verify(mockTaskDispatcher).update(eq(token), any(ResultHandler.class));
+        verify(mockTaskDispatcher).update(eq(token), nullable(ResultHandler.class));
     }
 
     @Test
@@ -151,7 +153,7 @@ public class CoreTokenAdapterTest {
         adapter.delete(tokenId);
 
         // Then
-        verify(mockTaskDispatcher).delete(eq(tokenId), any(ResultHandler.class));
+        verify(mockTaskDispatcher).delete(eq(tokenId), nullable(ResultHandler.class));
     }
 
     @Test
@@ -164,7 +166,7 @@ public class CoreTokenAdapterTest {
 
         // Then
         ArgumentCaptor<TokenFilter> captor = ArgumentCaptor.forClass(TokenFilter.class);
-        verify(mockTaskDispatcher).partialQuery(captor.capture(), any(ResultHandler.class));
+        verify(mockTaskDispatcher).partialQuery(captor.capture(), nullable(ResultHandler.class));
         TokenFilter capturedFilter = captor.getValue();
         assertThat(capturedFilter).isSameAs(filter);
         assertThat(capturedFilter.getReturnFields()).containsOnly(CoreTokenField.TOKEN_ID);

@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -23,8 +25,7 @@ import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.times;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -97,7 +98,7 @@ public class ApplicationsResourceTest {
         debug = mock(Debug.class);
         applicationServiceFactory = mock(ApplicationServiceFactory.class);
         applicationService = mock(ApplicationService.class);
-        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+        when(applicationServiceFactory.create(nullable(Subject.class), nullable(String.class))).thenReturn(applicationService);
         applicationTypeManagerWrapper = mock(ApplicationTypeManagerWrapper.class);
         applicationWrapper = mock(ApplicationWrapper.class);
         applicationsResource = new ApplicationsResource(debug, applicationServiceFactory, applicationTypeManagerWrapper,
@@ -205,7 +206,7 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(applicationWrapper.getName()).willReturn("newApplication");
-        doThrow(new EntitlementException(1)).when(applicationService).saveApplication(any(Application.class));
+        doThrow(new EntitlementException(1)).when(applicationService).saveApplication(nullable(Application.class));
 
         //when
         Promise<ResourceResponse, ResourceException> result =
@@ -307,7 +308,7 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         Application mockApplication = mock(Application.class);
-        given(applicationService.getApplication(anyString())).willReturn(mockApplication);
+        given(applicationService.getApplication(nullable(String.class))).willReturn(mockApplication);
 
         // When
         applicationsResource.readInstance(serverContext, resourceID, null);
@@ -331,13 +332,13 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         Application mockApplication = mock(Application.class);
-        given(applicationService.getApplication(anyString())).willReturn(mockApplication);
+        given(applicationService.getApplication(nullable(String.class))).willReturn(mockApplication);
 
         // When
         applicationsResource.readInstance(serverContext, resourceID, null);
 
         // Then
-        verify(applicationService).getApplication(anyString());
+        verify(applicationService).getApplication(nullable(String.class));
     }
 
     @Test
@@ -354,13 +355,13 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
         Application mockApplication = mock(Application.class);
-        given(applicationService.getApplication(anyString())).willReturn(mockApplication);
+        given(applicationService.getApplication(nullable(String.class))).willReturn(mockApplication);
 
         // When
         applicationsResource.readInstance(serverContext, resourceID, null);
 
         // Then
-        verify(applicationService).getApplication(anyString());
+        verify(applicationService).getApplication(nullable(String.class));
     }
 
     @Test (expectedExceptions = NotFoundException.class)
@@ -401,7 +402,7 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
 
         given(subjectContext.getCallerSubject()).willReturn(subject);
-        given(applicationService.search(any(QueryFilter.class)))
+        given(applicationService.search(nullable(QueryFilter.class)))
                 .willReturn(singleton(application));
 
         //When
@@ -476,7 +477,7 @@ public class ApplicationsResourceTest {
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
         given(applicationService.saveApplication(application)).willReturn(application);
-        given(applicationService.search(any(QueryFilter.class))).willReturn(singleton(application));
+        given(applicationService.search(nullable(QueryFilter.class))).willReturn(singleton(application));
         given(applicationWrapper.getName()).willReturn(resourceId);
         given(applicationWrapper.getDisplayName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(application);
@@ -538,9 +539,9 @@ public class ApplicationsResourceTest {
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(applicationService.search(any(QueryFilter.class)))
+        given(applicationService.search(nullable(QueryFilter.class)))
                 .willReturn(singleton(mockApplication));
-        doThrow(new EntitlementException(326)).when(applicationService).saveApplication(any(Application.class));
+        doThrow(new EntitlementException(326)).when(applicationService).saveApplication(nullable(Application.class));
 
         //When
         Promise<ResourceResponse, ResourceException> result =
@@ -568,8 +569,8 @@ public class ApplicationsResourceTest {
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(applicationService.search(any(QueryFilter.class))).willReturn(singleton(mockApplication));
-        doThrow(new EntitlementException(404)).when(applicationService).saveApplication(any(Application.class));
+        given(applicationService.search(nullable(QueryFilter.class))).willReturn(singleton(mockApplication));
+        doThrow(new EntitlementException(404)).when(applicationService).saveApplication(nullable(Application.class));
 
         //When
         Promise<ResourceResponse, ResourceException> result =
@@ -672,7 +673,7 @@ public class ApplicationsResourceTest {
         given(request.getSortKeys()).willReturn(Arrays.asList(SortKey.ascendingOrder("name")));
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
-        given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(handler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
 
         Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5", "iPlanetAMWebAgentService");
         Set<Application> apps = new HashSet<>();
@@ -681,14 +682,14 @@ public class ApplicationsResourceTest {
             given(app.getName()).willReturn(appName);
             apps.add(app);
         }
-        given(applicationService.search(any(QueryFilter.class))).willReturn(apps);
+        given(applicationService.search(nullable(QueryFilter.class))).willReturn(apps);
 
         // When
         Promise<QueryResponse, ResourceException> result =
                 applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then
-        verify(applicationService).search(any(QueryFilter.class));
+        verify(applicationService).search(nullable(QueryFilter.class));
 
         ArgumentCaptor<ResourceResponse> resourceCapture = ArgumentCaptor.forClass(ResourceResponse.class);
         verify(handler, times(3)).handleResource(resourceCapture.capture());
@@ -741,18 +742,18 @@ public class ApplicationsResourceTest {
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         Application app = mock(Application.class);
-        given(applicationService.search(any(QueryFilter.class)))
+        given(applicationService.search(nullable(QueryFilter.class)))
                 .willReturn(singleton(app));
         given(app.getName()).willReturn("agentProtectedApplication");
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
-        given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(handler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
 
         // When...
         applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then...
-        verify(applicationService).search(any(QueryFilter.class));
+        verify(applicationService).search(nullable(QueryFilter.class));
 
         ArgumentCaptor<ResourceResponse> resourceCapture = ArgumentCaptor.forClass(ResourceResponse.class);
         verify(handler).handleResource(resourceCapture.capture());
@@ -775,13 +776,13 @@ public class ApplicationsResourceTest {
         given(request.getPagedResultsOffset()).willReturn(1);
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
-        given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(handler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
 
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         EntitlementException exception = new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR);
-        given(applicationService.search(any(QueryFilter.class))).willThrow(exception);
+        given(applicationService.search(nullable(QueryFilter.class))).willThrow(exception);
 
         // When
         Promise<QueryResponse, ResourceException> result = applicationsResource.queryCollection(serverContext, request,
@@ -831,7 +832,7 @@ public class ApplicationsResourceTest {
         given(request.getPagedResultsOffset()).willReturn(1);
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
-        given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
+        given(handler.handleResource(nullable(ResourceResponse.class))).willReturn(true);
 
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
@@ -843,14 +844,14 @@ public class ApplicationsResourceTest {
             given(app.getName()).willReturn(appName);
             apps.add(app);
         }
-        given(applicationService.search(any(QueryFilter.class))).willReturn(apps);
+        given(applicationService.search(nullable(QueryFilter.class))).willReturn(apps);
 
         // When
         Promise<QueryResponse, ResourceException> result = applicationsResource.queryCollection(serverContext, request,
                 handler);
 
         // Then
-        verify(applicationService).search(any(QueryFilter.class));
+        verify(applicationService).search(nullable(QueryFilter.class));
         result.getOrThrowUninterruptibly();
     }
 

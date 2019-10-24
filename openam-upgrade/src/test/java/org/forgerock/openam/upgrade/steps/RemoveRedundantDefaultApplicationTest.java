@@ -12,13 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.upgrade.steps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -101,7 +103,7 @@ public final class RemoveRedundantDefaultApplicationTest {
         assertThat(isApplicable).isTrue();
         verify(applicationService).deleteApplication(eq("app1"));
         verify(applicationService).deleteApplication(eq("app2"));
-        assertThat(report).containsSequence("successfully removed", "app1", "failed to be removed", "app2");
+        assertThat(report).containsSubsequence("successfully removed", "app1", "failed to be removed", "app2");
     }
 
 }

@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -20,9 +21,6 @@ package org.forgerock.oauth2.core;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.isNull;
-import static org.mockito.Mockito.anySetOf;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,7 +36,7 @@ import java.util.Set;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.openam.oauth2.IdentityManager;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -76,7 +74,7 @@ public class AccessTokenServiceTest {
                 providerSettingsFactory, urisFactory, identityManager);
 
         providerSettings = mock(OAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
+        given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>any())).willReturn(providerSettings);
 
         uris = mock(OAuth2Uris.class);
         given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
@@ -250,10 +248,10 @@ public class AccessTokenServiceTest {
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(resourceOwner);
         given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
-        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
-                anySetOf(String.class), eq(request))).willReturn(validatedScope);
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request)))
+        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(),
+                ArgumentMatchers.<String>anySet(), eq(request))).willReturn(validatedScope);
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                nullable(String.class), ArgumentMatchers.<String>anySet(), eq(refreshToken), nullable(String.class), nullable(String.class), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -261,7 +259,7 @@ public class AccessTokenServiceTest {
 
         //Then
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
-        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        verify(accessToken, never()).addExtraData(eq("scope"), nullable(String.class));
         assertEquals(actualAccessToken, accessToken);
     }
 
@@ -285,10 +283,10 @@ public class AccessTokenServiceTest {
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(resourceOwner);
         given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
-        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
-                anySetOf(String.class), eq(request))).willReturn(validatedScope);
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request)))
+        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(),
+                ArgumentMatchers.<String>anySet(), eq(request))).willReturn(validatedScope);
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                nullable(String.class), ArgumentMatchers.<String>anySet(), eq(refreshToken), nullable(String.class), nullable(String.class), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -296,7 +294,7 @@ public class AccessTokenServiceTest {
 
         //Then
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
-        verify(accessToken).addExtraData(eq("scope"), anyString());
+        verify(accessToken).addExtraData(eq("scope"), nullable(String.class));
         assertEquals(actualAccessToken, accessToken);
     }
 
@@ -325,16 +323,16 @@ public class AccessTokenServiceTest {
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(identityManager.getResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(resourceOwner);
         given(refreshToken.getExpiryTime()).willReturn(currentTimeMillis() + 100);
-        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
-                anySetOf(String.class), eq(request))).willReturn(validatedScope);
+        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(),
+                ArgumentMatchers.<String>anySet(), eq(request))).willReturn(validatedScope);
 
         given(providerSettings.issueRefreshTokensOnRefreshingToken()).willReturn(true);
-        given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
-                eq(request), isNull(String.class), anyString())).willReturn(newRefreshToken);
+        given(tokenStore.createRefreshToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), ArgumentMatchers.<String>anySet(),
+                eq(request), nullable(String.class), nullable(String.class))).willReturn(newRefreshToken);
         given(newRefreshToken.toString()).willReturn(newRefreshTokenId);
 
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), anyString(), eq(request)))
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                nullable(String.class), ArgumentMatchers.<String>anySet(), eq(newRefreshToken), nullable(String.class), nullable(String.class), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -342,7 +340,7 @@ public class AccessTokenServiceTest {
 
         //Then
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
-        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        verify(accessToken, never()).addExtraData(eq("scope"), nullable(String.class));
         verify(accessToken).addExtraData("refresh_token", newRefreshTokenId);
         assertEquals(actualAccessToken, accessToken);
 

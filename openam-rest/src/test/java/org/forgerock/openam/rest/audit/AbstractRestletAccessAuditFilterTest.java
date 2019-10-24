@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.rest.audit;
 
@@ -98,14 +100,14 @@ public class AbstractRestletAccessAuditFilterTest {
         request.setDate(newDate());
         Response response = new Response(request);
         request.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
+        when(eventPublisher.isAuditing(nullable(String.class), nullable(String.class), nullable(EventName.class))).thenReturn(true);
 
         // When
         auditFilter.beforeHandle(request, response);
 
         // Then
         ArgumentCaptor<AuditEvent> captor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(eventPublisher).tryPublish(anyString(), captor.capture());
+        verify(eventPublisher).tryPublish(nullable(String.class), captor.capture());
         assertThat(captor.getValue().getValue()).isObject()
                 .hasObject("request")
                 .hasObject("detail")
@@ -121,14 +123,14 @@ public class AbstractRestletAccessAuditFilterTest {
         request.setDate(newDate());
         Response response = new Response(request);
         response.setEntity(new JsonRepresentation((Map<String, Object>) object(field("fred", "v"), field("gary", 7))));
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
+        when(eventPublisher.isAuditing(nullable(String.class), nullable(String.class), nullable(EventName.class))).thenReturn(true);
 
         // When
         auditFilter.afterHandle(request, response);
 
         // Then
         ArgumentCaptor<AuditEvent> captor = ArgumentCaptor.forClass(AuditEvent.class);
-        verify(eventPublisher).tryPublish(anyString(), captor.capture());
+        verify(eventPublisher).tryPublish(nullable(String.class), captor.capture());
         assertThat(captor.getValue().getValue()).isObject()
                 .hasObject("response")
                 .hasObject("detail")
