@@ -607,6 +607,8 @@ public class PersistentCookieAuthModuleTest {
 
     @Test
     public void shouldStoreClientIPOnLoginSuccess() throws AuthenticationException, SSOException {
+
+        //Given
         persistentCookieAuthModule = new PersistentCookieAuthModule(new ServletJwtSessionModule(), amKeyProvider, coreWrapper) {
             @Override
             protected String getKeyAlias(String orgName) throws SSOException, SMSException {
