@@ -286,17 +286,17 @@ public abstract class SmsResourceProvider {
         }
         return json(object(
                 field(ResourceResponse.FIELD_CONTENT_ID, resourceId),
-                field(NAME, getI18NName()),
+                field(NAME, getI18NName(getLocale(context))),
                 field(COLLECTION, schema.supportsMultipleConfigurations())));
     }
-
-    private String getI18NName() {
+    
+    private String getI18NName(Locale locale) {
         String i18nKey = schema.getI18NKey();
         String i18nName = schema.getName();
         if (StringUtils.isEmpty(i18nName)) {
             i18nName = schema.getServiceName();
         }
-        ResourceBundle rb = resourceBundleCache.getResBundle(schema.getI18NFileName(), defaultLocale);
+        ResourceBundle rb = resourceBundleCache.getResBundle(schema.getI18NFileName(), locale);
         if (rb != null && StringUtils.isNotEmpty(i18nKey)) {
             i18nName = com.sun.identity.shared.locale.Locale.getString(rb, i18nKey, debug);
         }
@@ -427,11 +427,12 @@ public abstract class SmsResourceProvider {
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
-        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole");
+        Locale requestLocale = getLocale(context);
+        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole", requestLocale);
         String serviceType = schemas.getServiceType().getType();
         List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
 
-        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), getLocale(context));
+        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), requestLocale);
 
         for (AttributeSchema attribute : schemas.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
