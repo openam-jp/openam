@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
@@ -117,7 +118,8 @@ public class ReaperConnection<C extends Closeable> implements ReaperQuery {
     /**
      * Close and null the connection.
      */
-    private void close() {
+    public void close() {
         IOUtils.closeIfNotNull(connection);
+        connection = null;
     }
 }

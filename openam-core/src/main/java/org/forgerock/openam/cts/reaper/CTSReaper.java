@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.cts.reaper;
 
@@ -25,6 +26,8 @@ import org.forgerock.openam.cts.impl.query.reaper.ReaperQueryFactory;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 
 import javax.inject.Inject;
+
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,9 +96,7 @@ public class CTSReaper implements Runnable {
         // Latches will track deletion of each page of results
         List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
 
-        ReaperQuery reaperQuery = queryFactory.getQuery();
-
-        try {
+        try (ReaperQuery reaperQuery = queryFactory.getQuery()) {
             long total = 0;
             query.start();
             for (Collection<String> ids = reaperQuery.nextPage(); ids != null; ids = reaperQuery.nextPage()) {
@@ -131,7 +132,7 @@ public class CTSReaper implements Runnable {
             monitoringStore.addReaperRun(query.getStartTime(), query.getTime() + waiting.getTime(), total);
 
             debug("Worker threads Time: {0}ms", Long.toString(waiting.getTime()));
-        } catch (CoreTokenException e) {
+        } catch (CoreTokenException | IOException e) {
             debug.error("CTS Reaper failed", e);
         }
 
