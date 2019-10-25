@@ -21,13 +21,14 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.encode.Base64;
 
 import org.forgerock.openam.oauth2.OAuth2Constants;
 
@@ -62,6 +63,7 @@ public class OAuthConf {
     private String scope = null;
     private String authServiceUrl = null;
     private String tokenServiceUrl = null;
+    private String tokenServiceAuthMethod = null;
     private String profileServiceUrl = null;
     private String profileServiceParam = null;
     private String ssoProxyUrl = null;
@@ -100,6 +102,7 @@ public class OAuthConf {
         }
         authServiceUrl = CollectionHelper.getMapAttr(config, KEY_AUTH_SERVICE);
         tokenServiceUrl = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE);
+        tokenServiceAuthMethod = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE_AUTH_METHOD);
         profileServiceUrl = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE);
         profileServiceParam = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE_PARAM, "access_token");
         // ssoLoginUrl = CollectionHelper.getMapAttr(config, KEY_SSO_LOGIN_URL);
@@ -278,9 +281,11 @@ public class OAuthConf {
         OAuthUtil.debugMessage("authentication code: " + code);
 
         try {
-            postParameters.put(PARAM_CLIENT_ID, clientId);
+            if ("client_secret_post".equals(getTokenServiceAuthMethod())) {
+                postParameters.put(PARAM_CLIENT_ID, clientId);
+                postParameters.put(PARAM_CLIENT_SECRET, clientSecret);
+            }
             postParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
-            postParameters.put(PARAM_CLIENT_SECRET, clientSecret);
             postParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
             postParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
 
@@ -290,6 +295,10 @@ public class OAuthConf {
             throw new AuthLoginException("Problem to build the Token Service URL", ex);
         }
         return postParameters;
+    }
+
+    String getTokenServiceAuthMethod() {
+        return tokenServiceAuthMethod;
     }
 
     public String getProfileServiceUrl() {
@@ -347,6 +356,11 @@ public class OAuthConf {
 
     public boolean isOpenIDConnect() {
         return openIDConnect;
+    }
+
+    public String getBasicAuthorizaionHeader() {
+        String plain = clientId + ":" + clientSecret;
+        return "Basic " + Base64.encode(plain.getBytes());
     }
 
 }
