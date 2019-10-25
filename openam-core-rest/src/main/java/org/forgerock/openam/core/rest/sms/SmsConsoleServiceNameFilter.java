@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -165,11 +166,26 @@ public class SmsConsoleServiceNameFilter {
      * @throws SSOException In the case where we cannot use an admin token to query the schema.
      */
     public Map<String, String> mapNameToDisplayName(Set<String> names) throws SMSException, SSOException {
+        return mapNameToDisplayName(names, getDefaultLocale());
+    }
+    
+    /**
+     * Maps service internal names to displayable (localized) names via their resource names.
+     * Services without resource names are not included in the returned map.
+     *
+     *
+     * @param names Set of internal service names.
+     * @param locale service name locale
+     * @return A map of resource service names to display names.
+     * @throws SMSException In the case where the SMS cannot be queried correctly.
+     * @throws SSOException In the case where we cannot use an admin token to query the schema.
+     */
+    public Map<String, String> mapNameToDisplayName(Set<String> names, java.util.Locale locale) throws SMSException, SSOException {
         final Map<String, String> map = new HashMap<>(names.size());
         for (String name : names) {
             if (smsConsoleServiceConfig.isServiceVisible(name)) {
                 final ServiceSchemaManager serviceSchemaManager = serviceSchemaManagerFactory.build(name);
-                String displayName = getLocalizedServiceName(serviceSchemaManager, name);
+                String displayName = getLocalizedServiceName(serviceSchemaManager, name, locale);
                 String resourceName = serviceSchemaManager.getResourceName();
                 if (!name.equals(displayName) && !StringUtils.isBlank(resourceName)) {
                     map.put(resourceName, displayName);
@@ -178,8 +194,9 @@ public class SmsConsoleServiceNameFilter {
         }
         return map;
     }
-
-    private String getLocalizedServiceName(ServiceSchemaManager serviceSchemaManager, String service) {
+    
+    private String getLocalizedServiceName(ServiceSchemaManager serviceSchemaManager, String service,
+                java.util.Locale locale) {
 
         try {
             String rbName = serviceSchemaManager.getI18NFileName();
@@ -197,7 +214,7 @@ public class SmsConsoleServiceNameFilter {
 
                 if (!StringUtils.isBlank(i18nKey)) {
                     return com.sun.identity.shared.locale.Locale.getString(
-                            AMResourceBundleCache.getInstance().getResBundle(rbName, getDefaultLocale()), i18nKey,
+                            AMResourceBundleCache.getInstance().getResBundle(rbName, locale), i18nKey,
                             debug);
                 }
             }

@@ -12,12 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.cts.impl.query.reaper;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.reaper.CTSReaper;
 
+import java.io.Closeable;
 import java.util.Collection;
 
 /**
@@ -26,7 +28,7 @@ import java.util.Collection;
  *
  * @see CTSReaper
  */
-public interface ReaperQuery {
+public interface ReaperQuery extends Closeable {
     /**
      * Repeated calls will return further results from query.
      *

@@ -25,6 +25,7 @@
  * $Id: ConfigureSalesForceAppsCompleteViewBean.java,v 1.3 2009/07/28 17:45:40 babysunil Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.console.task;
 
@@ -35,6 +36,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMPropertySheet;
+import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
@@ -123,6 +125,7 @@ public class ConfigureSalesForceAppsCompleteViewBean
             super.beginDisplay(event);
             HttpServletRequest req = getRequestContext().getRequest();
             String realm = req.getParameter("realm");
+            setPageSessionAttribute(AMAdminConstants.CURRENT_REALM, realm);
             String idp = req.getParameter("idp");
             String attrMapp = req.getParameter("attrMapp");
             String spEntityId = req.getParameter(ENTITY_ID);
@@ -191,6 +194,8 @@ public class ConfigureSalesForceAppsCompleteViewBean
                 ConfigureSalesForceAppsFinishWarningViewBean vb =
                         (ConfigureSalesForceAppsFinishWarningViewBean) getViewBean(
                         ConfigureSalesForceAppsFinishWarningViewBean.class);
+                String realm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
+                vb.setPageSessionAttribute(AMAdminConstants.CURRENT_REALM, realm);
                 vb.forwardTo(getRequestContext());
             }
         } catch (AMConsoleException e) {

@@ -21,6 +21,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
@@ -34,6 +36,7 @@ public class OAuthParam {
     static final String KEY_CLIENT_SECRET = "iplanet-am-auth-oauth-client-secret";
     static final String KEY_AUTH_SERVICE = "iplanet-am-auth-oauth-auth-service";
     static final String KEY_TOKEN_SERVICE = "iplanet-am-auth-oauth-token-service";
+    static final String KEY_TOKEN_SERVICE_AUTH_METHOD = "iplanet-am-auth-oauth-token-service-authentication-method";
     static final String KEY_PROFILE_SERVICE = "iplanet-am-auth-oauth-user-profile-service";
     static final String KEY_PROFILE_SERVICE_PARAM = "iplanet-am-auth-oauth-user-profile-param";
     static final String KEY_SCOPE = "iplanet-am-auth-oauth-scope";

@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
+* Portions Copyrighted 2017 Open Source Solution Technology Corporation.
 */
 package org.forgerock.openam.saml2;
 
@@ -28,6 +29,8 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.logging.LogUtil;
+import com.sun.identity.saml2.plugins.IDPAuthnContextInfo;
+import com.sun.identity.saml2.plugins.IDPAuthnContextMapper;
 import com.sun.identity.saml2.profile.CacheObject;
 import com.sun.identity.saml2.profile.ClientFaultException;
 import com.sun.identity.saml2.profile.IDPCache;
@@ -138,6 +141,55 @@ public class UtilProxySAMLAuthenticatorLookup extends SAMLBase implements SAMLAu
         }
 
         SAML2Utils.debug.message("{} RequestID= {}", classMethod, data.getRequestID());
+        
+        // Fix for Session Upgrade Bypass
+        IDPAuthnContextMapper idpAuthnContextMapper = null;
+        try {
+            idpAuthnContextMapper = IDPSSOUtil.getIDPAuthnContextMapper(data.getRealm(), data.getIdpEntityID());
+        } catch (SAML2Exception sme) {
+            SAML2Utils.debug.error(classMethod, sme);
+        }
+        if (idpAuthnContextMapper == null) {
+            SAML2Utils.debug.error(classMethod + "Unable to get IDPAuthnContextMapper from meta.");
+            throw new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);
+        }
+        
+        IDPAuthnContextInfo idpAuthnContextInfo = null;
+        try {
+            idpAuthnContextInfo = idpAuthnContextMapper.getIDPAuthnContextInfo(data.getAuthnRequest(),
+                    data.getIdpEntityID(), data.getRealm());
+        } catch (SAML2Exception sme) {
+            SAML2Utils.debug.error(classMethod, sme);
+        }
+
+        if (idpAuthnContextInfo == null) {
+            SAML2Utils.debug.message("{} Unable to find valid AuthnContext. Sending error Response.", classMethod);
+            try {
+                Response res = SAML2Utils.getErrorResponse(data.getAuthnRequest(), SAML2Constants.REQUESTER,
+                        SAML2Constants.NO_AUTHN_CONTEXT, null, data.getIdpEntityID());
+                StringBuffer returnedBinding = new StringBuffer();
+                String acsURL = IDPSSOUtil.getACSurl(data.getSpEntityID(), data.getRealm(),
+                        data.getAuthnRequest(), request, returnedBinding);
+                String acsBinding = returnedBinding.toString();
+                IDPSSOUtil.sendResponse(request, response, out, acsBinding, data.getSpEntityID(), data.getIdpEntityID(), data.getIdpMetaAlias(), data.getRealm(),
+                        data.getRelayState(), acsURL, res, data.getSession());
+            } catch (SAML2Exception sme) {
+                SAML2Utils.debug.error(classMethod, sme);
+                throw new ServerFaultException(data.getIdpAdapter(), METADATA_ERROR);
+            }
+            return;
+        }
+
+        /** 
+         * Since Session Upgrade has been done at this stage, #isSessionUpgrade() should return false,
+         * if not, it implies a possible security breach.
+         */
+        boolean upgradeNeeded;
+        upgradeNeeded = isSessionUpgrade(idpAuthnContextInfo, data.getSession());
+        if (upgradeNeeded) {
+            throw new SessionException("Session upgrade was skipped: Possible attempt to compromise security.");
+        }
+        // End of Fix
 
         boolean isSessionUpgrade = false;
 
@@ -274,6 +326,52 @@ public class UtilProxySAMLAuthenticatorLookup extends SAMLBase implements SAMLAu
         }
 
         return true;
+    }
+
+    /**
+     * Iterates through the RequestedAuthnContext from the Service Provider and
+     * check if user has already authenticated with a sufficient authentication
+     * level.
+     * <p/>
+     * If RequestAuthnContext is not found in the authenticated AuthnContext
+     * then session upgrade will be done .
+     *
+     * @return true if the requester requires to re-authenticate
+     */
+    private static boolean isSessionUpgrade(IDPAuthnContextInfo idpAuthnContextInfo, Object session) {
+
+        String classMethod = "IDPSSOFederate.isSessionUpgrade: ";
+
+        if (session != null) {
+            // Get the Authentication Context required
+            String authnClassRef = idpAuthnContextInfo.getAuthnContext().
+                    getAuthnContextClassRef();
+            // Get the AuthN level associated with the Authentication Context
+            int authnLevel = idpAuthnContextInfo.getAuthnLevel();
+
+            SAML2Utils.debug.message(classMethod + "Requested AuthnContext: authnClassRef=" + authnClassRef +
+                    " authnLevel=" + authnLevel);
+
+            int sessionAuthnLevel = 0;
+
+            try {
+                final String strAuthLevel = SessionManager.getProvider().getProperty(session,
+                        SAML2Constants.AUTH_LEVEL)[0];
+                if (strAuthLevel.contains(":")) {
+                    String[] realmAuthLevel = strAuthLevel.split(":");
+                    sessionAuthnLevel = Integer.parseInt(realmAuthLevel[1]);
+                } else {
+                    sessionAuthnLevel = Integer.parseInt(strAuthLevel);
+                }
+                SAML2Utils.debug.message(classMethod + "Current session Authentication Level: " + sessionAuthnLevel);
+            } catch (SessionException sex) {
+                SAML2Utils.debug.error(classMethod + " Couldn't get the session Auth Level", sex);
+            }
+
+            return authnLevel > sessionAuthnLevel;
+        } else {
+            return true;
+        }
     }
 
 }
