@@ -72,8 +72,8 @@ define({
                     src: "themes/dark/images/login-logo-white.png",
                     title: "OpenAM",
                     alt: "OpenAM",
-                    height: "228px",
-                    width: "220px"
+                    height: "104px",
+                    width: "210px"
                 }
             }
         }
