@@ -34,7 +34,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.policy.interfaces.Condition;
+import org.forgerock.openam.entitlement.conditions.environment.ConditionConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -52,7 +52,6 @@ import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.sm.DNMapper;
 import java.io.IOException;
 import java.security.AccessController;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -185,14 +184,14 @@ public class PolicyCheckIDPAdapter implements SAML2IdentityProviderAdapter {
                 String paramName = null;
                 String realmQualifiedData = null;
                 
-                advice = advices.get(Condition.AUTH_LEVEL_CONDITION_ADVICE);
+                advice = advices.get(ConditionConstants.AUTH_LEVEL_CONDITION_ADVICE);
                 if (advice != null && !advice.isEmpty()) {
                     paramName = ISAuthConstants.AUTH_LEVEL_PARAM;
                     realmQualifiedData = advice.iterator().next();
                 }
                 
                 if (paramName == null) {
-                    advice = advices.get(Condition.AUTH_SCHEME_CONDITION_ADVICE);
+                    advice = advices.get(ConditionConstants.AUTH_SCHEME_CONDITION_ADVICE);
                     if (advice != null && !advice.isEmpty()) {
                         paramName = ISAuthConstants.MODULE_PARAM;
                         realmQualifiedData = advice.iterator().next();
@@ -200,7 +199,7 @@ public class PolicyCheckIDPAdapter implements SAML2IdentityProviderAdapter {
                 }
 
                 if (paramName == null) {
-                    advice = advices.get(Condition.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE);
+                    advice = advices.get(ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE);
                     if (advice != null && !advice.isEmpty()) {
                         paramName = ISAuthConstants.SERVICE_PARAM;
                         realmQualifiedData = advice.iterator().next();
