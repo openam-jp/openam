@@ -156,6 +156,6 @@ public interface ClientRegistration {
       *
       * @return true if enabled.
       */
-     boolean isPolicyBasedProtectionEnabled();
+    boolean isPolicyBasedProtectionEnabled();
 
 }

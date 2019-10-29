@@ -17,12 +17,13 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
-import org.forgerock.oauth2.core.SAML2BearerRequestValidator;
+
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
 import static org.forgerock.oauth2.core.Utils.*;
 import static org.forgerock.openam.utils.Time.*;
 
+import org.forgerock.oauth2.core.SAML2BearerRequestValidator;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.AudienceRestriction;

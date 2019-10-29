@@ -98,7 +98,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.policy.interfaces.Condition;
+import org.forgerock.openam.entitlement.conditions.environment.ConditionConstants;
 import java.util.List;
 
 /**
@@ -401,9 +401,9 @@ public class ResourceOwnerSessionValidator {
         OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         Template loginUrlTemplate = providerSettings.getCustomLoginUrlTemplate();
 
-        removeLoginPrompt(request.<Request>getRequest());
+        removeLoginPrompt(request.getRequest());
 
-        String gotoUrl = request.<Request>getRequest().getResourceRef().toString();
+        String gotoUrl = request.getRequest().getResourceRef().toString();
         if (request.getParameter(USER_CODE) != null) {
             gotoUrl += (gotoUrl.indexOf('?') > -1 ? "&" : "?") + USER_CODE + "=" + request.getParameter(USER_CODE);
         }
@@ -567,7 +567,7 @@ public class ResourceOwnerSessionValidator {
                 + "/UI/Login";
     }
 
-        /**
+    /**
      * Check policy before issuing a token for additional protection
      */
     private void checkPolicy(OAuth2Request request, ClientRegistrationStore clientRegistrationStore) throws
@@ -621,20 +621,20 @@ public class ResourceOwnerSessionValidator {
                 String paramName = null;
                 String realmQualifiedData = null;
 
-                advice = advices.get(Condition.AUTH_LEVEL_CONDITION_ADVICE);
+                advice = advices.get(ConditionConstants.AUTH_LEVEL_CONDITION_ADVICE);
                 if (advice != null && !advice.isEmpty()) {
                     paramName = ISAuthConstants.AUTH_LEVEL_PARAM;
                     realmQualifiedData = advice.iterator().next();
                 }
                 if (paramName == null) {
-                    advice = advices.get(Condition.AUTH_SCHEME_CONDITION_ADVICE);
+                    advice = advices.get(ConditionConstants.AUTH_SCHEME_CONDITION_ADVICE);
                     if (advice != null && !advice.isEmpty()) {
                         paramName = ISAuthConstants.MODULE_PARAM;
                         realmQualifiedData = advice.iterator().next();
                     }
                 }
                 if (paramName == null) {
-                    advice = advices.get(Condition.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE);
+                    advice = advices.get(ConditionConstants.AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE);
                     if (advice != null && !advice.isEmpty()) {
                         paramName = ISAuthConstants.SERVICE_PARAM;
                         realmQualifiedData = advice.iterator().next();
