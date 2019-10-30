@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.cts.impl;
 
@@ -150,7 +151,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
             // Perform the Save of the Token to the Token Repository.
             SAMLToken samlToken = new SAMLToken(primaryKey, secondaryKey, expirationTime, samlObj);
             Token token = tokenAdapter.toToken(samlToken);
-            persistentStore.createAsync(token);
+            persistentStore.updateAsync(token);
         } catch (CoreTokenException e) {
             debug.error("SAML2CTSPersistentStore.saveSAML2Token(): failed to save SAML2 " +
                     "token using primary key:" + primaryKey, e);
