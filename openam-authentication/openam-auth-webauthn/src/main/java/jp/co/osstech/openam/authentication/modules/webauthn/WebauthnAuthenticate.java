@@ -67,7 +67,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.UUID;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.lang.Byte;
@@ -85,7 +84,6 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.security.auth.login.LoginException;
-import javax.xml.bind.DatatypeConverter;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -109,7 +107,6 @@ import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.ArrayUtil;
 import com.webauthn4j.util.Base64UrlUtil;
 import com.webauthn4j.util.Base64Util;
-import com.webauthn4j.util.UUIDUtil;
 import com.webauthn4j.validator.WebAuthnAuthenticationContextValidationResponse;
 import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
 
