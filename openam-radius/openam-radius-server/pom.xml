@@ -63,8 +63,10 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-            </plugin>
+              </plugin>
+<!--
               <plugin>
+-->
                  <!--  Enforce Checkstyle during compilation
 
                  Strictly speaking Checkstyle should be invoked as a
@@ -74,6 +76,7 @@
                       the site is generated (which may never occur for some
                       projects). -->
                 
+<!--
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-checkstyle-plugin</artifactId>
                  <executions>
@@ -84,7 +87,9 @@
                              <headerLocation>${checkstyleHeaderLocation}</headerLocation>
                              <suppressionsLocation>${checkstyleUnitTestSuppressionsLocation}</suppressionsLocation>
                              <includeTestSourceDirectory>false</includeTestSourceDirectory>
+-->
                              <!--  Only output errors if we're not expecting any -->
+<!--
                              <consoleOutput>${checkstyleFailOnError}</consoleOutput>
                              <failsOnError>${checkstyleFailOnError}</failsOnError>
                              <excludes>**/resources/**/*</excludes>
@@ -96,6 +101,7 @@
                      </execution>
                  </executions>
              </plugin>         
+-->
         </plugins>
     </build>
 </project>
