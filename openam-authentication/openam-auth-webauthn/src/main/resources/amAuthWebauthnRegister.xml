@@ -168,16 +168,6 @@
                             <Value>Counter Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
-                        <AttributeSchema name="iplanet-am-auth-Webauthn-userHandleIdAttributeName"
-                        type="single"   
-                        syntax="string"    
-                        i18nKey="a654"
-                        order="803"
-                        resourceName="userHandleIdAttributeName">
-                        <DefaultValues>
-                            <Value>id(user Handle) Attribute (String)</Value> 
-                        </DefaultValues>
-                        </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"
                     type="single"
                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -315,16 +305,6 @@
                         resourceName="counterAttributeName">
                         <DefaultValues>
                             <Value>Counter Attribute (String)</Value> 
-                        </DefaultValues>
-                        </AttributeSchema>
-                        <AttributeSchema name="iplanet-am-auth-Webauthn-userHandleIdAttributeName"
-                        type="single"   
-                        syntax="string"    
-                        i18nKey="a654"
-                        order="803"
-                        resourceName="userHandleIdAttributeName">
-                        <DefaultValues>
-                            <Value>id(user Handle) Attribute (String)</Value> 
                         </DefaultValues>
                         </AttributeSchema>
                         <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"

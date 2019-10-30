@@ -67,9 +67,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.lang.Byte;
+import java.nio.ByteBuffer;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -83,6 +85,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.security.auth.login.LoginException;
+import javax.xml.bind.DatatypeConverter;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -106,6 +109,7 @@ import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.ArrayUtil;
 import com.webauthn4j.util.Base64UrlUtil;
 import com.webauthn4j.util.Base64Util;
+import com.webauthn4j.util.UUIDUtil;
 import com.webauthn4j.validator.WebAuthnAuthenticationContextValidationResponse;
 import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
 
@@ -150,7 +154,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
     private String counterAttributeNameConfig = "";
-    private String userHandleIdAttributeNameConfig = "";
 
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
@@ -162,7 +165,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
     private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
-    private static final String USER_HANDLE_ID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-userHandleIdAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
@@ -204,7 +206,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
         this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
         this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
-        this.userHandleIdAttributeNameConfig = CollectionHelper.getMapAttr(options, USER_HANDLE_ID_ATTRIBUTE_NAME);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
@@ -218,8 +219,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
                     + ", keyAttributeName = " + pubKeyAttributeNameConfig 
-                    + ", counterAttributeName = " + counterAttributeNameConfig
-                    + ", idAttributeName = " + userHandleIdAttributeNameConfig);
+                    + ", counterAttributeName = " + counterAttributeNameConfig);
         }
         if(useMfaConfig.equalsIgnoreCase("true")) {
             userName = (String) sharedState.get(getUserKey());
@@ -531,16 +531,14 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
         /*
          * if residentKey = true
-         * get user.id from UserHandle in Client Response
-         * and using this base64url(id) as key 
-         * to search uid from datastore
-         *  then
-         * set to userName.
+         * get UserHandle in Client Response
+         * and using this base64encoded binary as entryUUID
+         * to search userName from datastore
          */
         if (residentKeyConfig.equalsIgnoreCase("true")) {
-            String _userHandleId = Base64UrlUtil.encodeToString(Base64Util.decode(getUserHandle));
-            userName = searchUserNameWithAttrValue(_userHandleId,userHandleIdAttributeNameConfig);
-
+            String _userHandleIdStr = byteArrayToAsciiString(Base64Util.decode(getUserHandle));
+            userName = searchUserNameWithAttrValue(_userHandleIdStr,"entryUUID");
+            
             /*
              * lookup CredentialId(Base64Url encoded) from User Data store
              */
@@ -779,6 +777,20 @@ public class WebauthnAuthenticate extends AMLoginModule {
         }
     }
 
+    /*
+     * Convert Byte Array user.id(userHandle=entryUUID)
+     * to
+     * ASCII String for search entryUUID
+     */
+    private String byteArrayToAsciiString(byte[] bytes) {
+        StringBuffer _sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            _sb.append( Character.toChars(bytes[i]) );
+        }
+        return _sb.toString();
+    }
+
+    
     /**
      * from based membership
      * module==============================================================================================

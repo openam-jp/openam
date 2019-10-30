@@ -66,6 +66,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Base64;
 import java.lang.Byte;
 import java.lang.reflect.Field;
@@ -104,6 +105,7 @@ import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.ArrayUtil;
 import com.webauthn4j.util.Base64UrlUtil;
 import com.webauthn4j.util.Base64Util;
+import com.webauthn4j.util.UUIDUtil;
 import com.webauthn4j.util.exception.*;
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
@@ -148,7 +150,6 @@ public class WebauthnRegister extends AMLoginModule {
     private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
     private String counterAttributeNameConfig = "";
-    private String userHandleIdAttributeNameConfig = "";
 
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
@@ -162,7 +163,6 @@ public class WebauthnRegister extends AMLoginModule {
     private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
     private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
-    private static final String USER_HANDLE_ID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-userHandleIdAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
 
     // Default Values.
@@ -196,7 +196,6 @@ public class WebauthnRegister extends AMLoginModule {
         this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
         this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
-        this.userHandleIdAttributeNameConfig = CollectionHelper.getMapAttr(options, USER_HANDLE_ID_ATTRIBUTE_NAME);
 
 
         if (DEBUG.messageEnabled()) {
@@ -211,8 +210,7 @@ public class WebauthnRegister extends AMLoginModule {
                     + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
                     + ", keyAttributeName = " + pubKeyAttributeNameConfig 
-                    + ", counterAttributeName = " + counterAttributeNameConfig
-                    + ", userHandleIdAttributeName = " + userHandleIdAttributeNameConfig);
+                    + ", counterAttributeName = " + counterAttributeNameConfig);
         }
         
         userName = (String) sharedState.get(getUserKey());
@@ -273,32 +271,14 @@ public class WebauthnRegister extends AMLoginModule {
             generatedChallenge = new DefaultChallenge();
             challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
 
-            /* 
-             * id is W3C user.id object.
-             * if residentKey = true
-             * idBytes may return as user Handle value,
-             * save this as Base64url encode(idBytes) 
-             * user attribute.
-             * and search this authentication time.
-             * But base64Url.encode(CredentialId)
-             * will be saved register. 
+
+            /*
+             * Use LDAP entryUUID as userHandleId
              * 
-             * so
-             * check users userHandleId value
-             * if no value
-             *  generate 64 byte random byte
              */
-            String userHandleIdBase64url = lookupStringData(userHandleIdAttributeNameConfig);
-            if (userHandleIdBase64url.equals("")) {
-                try {
-                    userHandleIdBytes = genSecureRandomBytesArray(64);
-                } catch (Exception e) {
-                    throw new AuthLoginException(BUNDLE_NAME, "genSecureRandom", null, e);
-                }
-            } else {
-                userHandleIdBytes = Base64UrlUtil.decode(userHandleIdBase64url);
-            }
-            
+            //ByteBuffer _bb = ByteBuffer.wrap(lookupByteData("entryUUID"));
+            //userHandleIdBytes = _bb.array();
+            userHandleIdBytes = lookupByteData("entryUUID");
 
             // navigator.credentials.create Options
             CredentialsCreateOptions credentialsCreateOptions = 
@@ -449,9 +429,11 @@ public class WebauthnRegister extends AMLoginModule {
             boolean _storeResult = false;
             
             // store userHandleId as Base64Url String
+            /* comment out 20191028
             if (lookupStringData(userHandleIdAttributeNameConfig).isEmpty()) {
             _storeResult = storeStringData(Base64UrlUtil.encodeToString(userHandleIdBytes), userHandleIdAttributeNameConfig);
             }
+            */
             // store CredentialId as Base64Url String
             _storeResult = storeStringData(Base64UrlUtil.encodeToString(attestedCredentialIdBytes), credentialIdAttributeNameConfig);
 
@@ -579,6 +561,28 @@ public class WebauthnRegister extends AMLoginModule {
         } 
         return _attribute;
     }
+    
+    /*
+     * lookup Byte user data store
+     * @return byte[]
+     * @throws AuthLoginException
+     */
+    private byte[] lookupByteData(String attributeName) throws AuthLoginException {
+
+        Set<String> _attribute = CollectionUtils.asSet(attributeName);
+
+        try {
+            Map<String, byte[][]> _lookupByteData = getIdentity().getBinaryAttributes(_attribute);
+            return _lookupByteData.get(attributeName)[0];
+        } catch (SSOException e) {
+            DEBUG.error("Webauthn.lookupCredentialId() : Webauthn module exception : ", e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        } catch (IdRepoException e) {
+            DEBUG.error("Webauthn.lookupCredentialId() : error searching Identities with username : " + userName, e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        }
+    }
+
 
     /* generate secure random byte[]
      * @param int length
