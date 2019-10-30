@@ -84,9 +84,10 @@
                         <ChoiceValues>
                             <ChoiceValue i18nKey="cross-platform">cross-platform</ChoiceValue>
                             <ChoiceValue i18nKey="platform">platform</ChoiceValue>
+                            <ChoiceValue i18nKey="undefined">undefined</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>cross-platform</Value> 
+                            <Value>undefined</Value> 
                         </DefaultValues>
                         </AttributeSchema>             
                         <AttributeSchema name="iplanet-am-auth-Webauthn-residentKey"
@@ -223,9 +224,10 @@
                         <ChoiceValues>
                             <ChoiceValue i18nKey="cross-platform">cross-platform</ChoiceValue>
                             <ChoiceValue i18nKey="platform">platform</ChoiceValue>
+                            <ChoiceValue i18nKey="undefined">undefined</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>cross-platform</Value> 
+                            <Value>undefined</Value> 
                         </DefaultValues>
                         </AttributeSchema>             
                         <AttributeSchema name="iplanet-am-auth-Webauthn-residentKey"

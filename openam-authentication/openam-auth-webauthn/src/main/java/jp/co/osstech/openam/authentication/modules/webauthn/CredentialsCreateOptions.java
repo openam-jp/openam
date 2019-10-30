@@ -82,18 +82,15 @@ public class CredentialsCreateOptions {
         _credentialCreateScript.append("id: new Uint8Array([");
         _credentialCreateScript.append(credentialIdBytesArrayStr);
         _credentialCreateScript.append("])");
-        if (!userName.isEmpty()) {
-            _credentialCreateScript.append(", ");
-            _credentialCreateScript.append("name: \'");
-            _credentialCreateScript.append(userName);
-            _credentialCreateScript.append("\'");
-        }
-        if (!displayName.isEmpty()) {
-            _credentialCreateScript.append(", ");
-            _credentialCreateScript.append("displayName: \'");
-            _credentialCreateScript.append(displayName);
-            _credentialCreateScript.append("\', ");
-        }
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("name: \'");
+        _credentialCreateScript.append(userName);
+        _credentialCreateScript.append("\'");
+        _credentialCreateScript.append(", ");
+        _credentialCreateScript.append("displayName: \'");
+        _credentialCreateScript.append(displayName);
+        _credentialCreateScript.append("\', ");
+
         // User info end
         _credentialCreateScript.append("}");
 
@@ -112,10 +109,14 @@ public class CredentialsCreateOptions {
         _credentialCreateScript.append("attestation: \'");
         _credentialCreateScript.append(attestationConfig);
         _credentialCreateScript.append("\', ");
+        
+        // Authenticator Selection
         _credentialCreateScript.append("authenticatorSelection: { ");
-        _credentialCreateScript.append("authenticatorAttachment: \'");
-        _credentialCreateScript.append(attachmentConfig);
-        _credentialCreateScript.append("\', ");
+        if (!attachmentConfig.equalsIgnoreCase("undefined")) {
+            _credentialCreateScript.append("authenticatorAttachment: \'");
+            _credentialCreateScript.append(attachmentConfig);
+            _credentialCreateScript.append("\', ");
+        }
         _credentialCreateScript.append("requireResidentKey: ");
         _credentialCreateScript.append(residentKeyConfig);
         _credentialCreateScript.append(", ");
