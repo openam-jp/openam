@@ -16,17 +16,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright Open Source Solution Technology Corporation
+ * Copyright 2019 Open Source Solution Technology Corporation
  */
 -->
 
 <ServicesConfiguration>
-    <Service name="Webauthn" version="1.0">
+    <Service name="AuthenticatorWebAuthn" version="1.0">
         <Schema
-            serviceHierarchy="/DSAMEConfig/WebauthnService"
-            i18nFileName="WebauthnService"
+            serviceHierarchy="/DSAMEConfig/AuthenticatorWebAuthnService"
+            i18nFileName="AuthenticatorWebAuthnService"
             revisionNumber="1"
-            resourceName="webauthnService"
+            resourceName="authenticatorWebAuthnService"
             i18nKey="openam-auth-webauthn-service-description">
 
             <Organization>
