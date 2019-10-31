@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+<!--
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright Open Source Solution Technology Corporation
+ */
+-->
+
+<ServicesConfiguration>
+    <Service name="Webauthn" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/WebauthnService"
+            i18nFileName="WebauthnService"
+            revisionNumber="1"
+            resourceName="webauthnService"
+            i18nKey="openam-auth-webauthn-service-description">
+
+            <Organization>
+                <AttributeSchema name="openam-auth-webauthn-objectclass-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a100"
+                    order="100"
+                    resourceName="objectClassName">
+                    <DefaultValues>
+                        <Value>fido2Credential</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-credentialid-attribute-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a101"
+                    order="200"
+                    resourceName="credentialIdAttributeName">
+                    <DefaultValues>
+                        <Value>fido2CredentialID</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-key-attribute-Name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102"
+                    order="300"
+                    resourceName="keyAttributeName">
+                    <DefaultValues>
+                        <Value>fido2PublicKey</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-displayname-attribute-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a103"
+                    order="400"
+                    resourceName="displayNameAttributeName">
+                    <DefaultValues>
+                        <Value>fido2CredentialName</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-counter-attribute-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a104"
+                    order="500"
+                    resourceName="counterAttributeName">
+                    <DefaultValues>
+                        <Value>fido2SignCount</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-server"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a200"
+                    order="1000"
+                    resourceName="primaryLdapServer">
+                    <DefaultValues>
+                        <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-wbauthn-ldap-server2"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a201"
+                    order="1100"
+                    resourceName="secondaryLdapServer">
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-base-dn"
+                    type="list"
+                    syntax="dn"
+                    i18nKey="a202"
+                    order="1200"
+                    resourceName="userSearchStartDN">
+                    <DefaultValues>
+                        <Value>ou=credentials,@UM_NORMALIZED_ORGBASE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-bind-dn"
+                    type="single"
+                    syntax="dn"
+                    i18nKey="a203"
+                    order="1300"
+                    resourceName="userBindDN">
+                    <DefaultValues>
+                        <Value>@UM_DS_DIRMGRDN@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-bind-passwd"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a204"
+                    order="1400"
+                    resourceName="userBindPassword">
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-connection-mode"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a205"
+                    order="1500">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a2051">LDAP</ChoiceValue>
+                        <ChoiceValue i18nKey="a2052">LDAPS</ChoiceValue>
+                        <ChoiceValue i18nKey="a2053">StartTLS</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>@LDAP_CONNECTION_MODE@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-secure-protocol-version"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a206"
+                    order="1600">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a2061">TLSv1</ChoiceValue>
+                        <ChoiceValue i18nKey="a2062">TLSv1.1</ChoiceValue>
+                        <ChoiceValue i18nKey="a2063">TLSv1.2</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>TLSv1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-ssl-trust-all"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a207"
+                    order="1700"
+                    resourceName="trustAllServerCertificates">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-heartbeat-interval"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a208"
+                    order="1800"
+                    resourceName="connectionHeartbeatInterval">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-heartbeat-timeunit"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a209"
+                    order="1900"
+                    resourceName="connectionHeartbeatTimeUnit">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a2091">SECONDS</ChoiceValue>
+                        <ChoiceValue i18nKey="a2092">MINUTES</ChoiceValue>
+                        <ChoiceValue i18nKey="a2093">HOURS</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SECONDS</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-operation-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a210"
+                    order="2000"
+                    resourceName="operationTimeout">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
