@@ -38,16 +38,24 @@ import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.TrustManagers;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.time.Duration;
@@ -230,7 +238,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     
     private synchronized Connection getConnection() throws LdapException {
         if (cPool == null) {
-        	initializeConnection();
+            initializeConnection();
         }
         return cPool.getConnection();
     }
@@ -244,22 +252,69 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      */
     public boolean createAuthenticator(String credentialId, byte[] publicKey, String counter,
             byte[] entryUUID) {
-    	String dn = DN.valueOf(baseDN).child(credentialAttrName ,credentialId).toString();
-    	Entry entry = new LinkedHashMapEntry(dn);
-    	Set<String> objectClasses = CollectionUtils.asSet(className);
-    	entry.addAttribute("objectClass", objectClasses.toArray());
-    	entry.addAttribute(credentialAttrName, credentialId);
-    	entry.addAttribute(keyAttrName, publicKey);
-    	entry.addAttribute(counterAttrName, counter);
-    	entry.addAttribute("fido2UserID", entryUUID);
-    	
-    	try {
-			Connection conn = getConnection();
-			conn.add(LDAPRequests.newAddRequest(entry));
-		} catch (LdapException e) {
-			e.printStackTrace();
-		}
-    	return false;
+        String dn = DN.valueOf(baseDN).child(credentialAttrName ,credentialId).toString();
+        Entry entry = new LinkedHashMapEntry(dn);
+        Set<String> objectClasses = CollectionUtils.asSet(className);
+        entry.addAttribute("objectClass", objectClasses.toArray());
+        entry.addAttribute(credentialAttrName, credentialId);
+        entry.addAttribute(keyAttrName, publicKey);
+        entry.addAttribute(counterAttrName, counter);
+        entry.addAttribute("fido2UserID", entryUUID);
+        
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.add(LDAPRequests.newAddRequest(entry));
+        } catch (LdapException e) {
+            // TODO
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeIfNotNull(conn);
+        }
+        return false;
+    }
+    
+    public Set<String> getCredentialIds(byte[] entryUUID) {
+        Set<String> credentialIds = new HashSet<String>();
+        SearchScope scope = SearchScope.SINGLE_LEVEL;
+        Filter userIdFilter = Filter.valueOf("fido2UserID"+ "=" + byteArrayToAsciiString(entryUUID));
+        Filter objectClassFilter = Filter.valueOf("objectClass"+ "=" + className);
+        Filter searchFilter = Filter.and(userIdFilter, objectClassFilter);
+        SearchRequest searchRequest = 
+                LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter, 
+                        new String[]{credentialAttrName});
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            ConnectionEntryReader reader = conn.search(searchRequest);
+            while (reader.hasNext()) {
+                if (reader.isEntry()) {
+                    SearchResultEntry entry = reader.readEntry();
+                    Attribute attribute = entry.getAttribute(credentialAttrName);
+                    credentialIds.add(attribute.firstValue().toString());
+                } else {
+                    //ignore search result references
+                    reader.readReference();
+                }
+            }
+        } catch (LdapException e) {
+            // TODO
+            e.printStackTrace();
+        } catch (SearchResultReferenceIOException e) {
+            // TODO
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeIfNotNull(conn);
+        }
+        return credentialIds;
+    }
+    
+    private String byteArrayToAsciiString(byte[] bytes) {
+        StringBuffer _sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            _sb.append( Character.toChars(bytes[i]) );
+        }
+        return _sb.toString();
     }
     
     @Override

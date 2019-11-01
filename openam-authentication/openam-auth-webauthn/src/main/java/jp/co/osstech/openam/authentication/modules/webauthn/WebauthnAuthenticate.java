@@ -31,7 +31,8 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
  * @author tonoki
  */
 import com.sun.identity.shared.debug.Debug;
-
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import javax.security.auth.callback.TextOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
@@ -81,10 +82,15 @@ import javax.security.auth.callback.PasswordCallback;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.security.auth.login.LoginException;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.ErrorCorrectionLevel;
@@ -109,6 +115,9 @@ import com.webauthn4j.util.Base64UrlUtil;
 import com.webauthn4j.util.Base64Util;
 import com.webauthn4j.validator.WebAuthnAuthenticationContextValidationResponse;
 import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
+
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 
 public class WebauthnAuthenticate extends AMLoginModule {
 
@@ -172,6 +181,12 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private Callback[] callbacks;
     private Set<String> userSearchAttributes = Collections.emptySet();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    
+    private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
+            InjectorHolder.getInstance(Key.get(
+                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
+                    Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
+    private AuthenticatorWebAuthnService webauthnService;
 
     /**
      * Initializes this <code>LoginModule</code>.
@@ -255,6 +270,13 @@ public class WebauthnAuthenticate extends AMLoginModule {
         switch (moduleState) {
         
         case LOGIN_SELECT:
+            try {
+                String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+                webauthnService = webauthnServiceFactory.create(realm);
+            } catch (SSOException|SMSException ex) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            }
+            
             if (useMfaConfig.equalsIgnoreCase("true")) {
                 nextState = WebauthnAuthenticateModuleState.MFA_LOGIN_START;
             } else if (residentKeyConfig.equalsIgnoreCase("true")) {
@@ -419,7 +441,14 @@ public class WebauthnAuthenticate extends AMLoginModule {
          * lookup CredentialId(Base64Url encoded) from User Data store
          */
         try {
-            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+            byte[] entryUUID = lookupByteData("entryUUID");
+            Set<String> credentialIds = webauthnService.getCredentialIds(entryUUID);
+            if (credentialIds.isEmpty()) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            }
+            // TODO
+            credentialIdBytes = Base64UrlUtil.decode(credentialIds.iterator().next());
+            //credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
 
             if (credentialIdBytes != null) {
                 validatedUserID = userName;
@@ -446,7 +475,14 @@ public class WebauthnAuthenticate extends AMLoginModule {
          * lookup CredentialId(Base64Url encoded) from User Data store
          */
         try {
-            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+            byte[] entryUUID = lookupByteData("entryUUID");
+            Set<String> credentialIds = webauthnService.getCredentialIds(entryUUID);
+            if (credentialIds.isEmpty()) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            }
+            // TODO
+            credentialIdBytes = Base64UrlUtil.decode(credentialIds.iterator().next());
+            //credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
 
             if (credentialIdBytes != null) {
                 validatedUserID = userName;
@@ -540,6 +576,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
              * lookup CredentialId(Base64Url encoded) from User Data store
              */
             try {
+                // TODO: How to detect credentialId(Authenticator)?
                 credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
 
                 if (credentialIdBytes != null) {
