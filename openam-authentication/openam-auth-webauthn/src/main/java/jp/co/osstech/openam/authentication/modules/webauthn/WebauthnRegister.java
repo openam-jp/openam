@@ -31,6 +31,7 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
  * @author tonoki
  */
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import javax.security.auth.callback.TextOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
@@ -83,6 +84,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.security.auth.login.LoginException;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.ErrorCorrectionLevel;
@@ -105,6 +112,10 @@ import com.webauthn4j.util.Base64UrlUtil;
 import com.webauthn4j.util.Base64Util;
 import com.webauthn4j.util.exception.*;
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
+
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
+
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
 import com.webauthn4j.converter.AttestedCredentialDataConverter;
 import com.webauthn4j.converter.util.*;
@@ -168,7 +179,13 @@ public class WebauthnRegister extends AMLoginModule {
     private Set<String> userSearchAttributes = Collections.emptySet();
     private Callback[] callbacks;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
+    
+    private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
+            InjectorHolder.getInstance(Key.get(
+                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
+                    Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
+    private AuthenticatorWebAuthnService webauthnService;
+    
     /**
      * Initializes this <code>LoginModule</code>.
      *
@@ -443,6 +460,13 @@ public class WebauthnRegister extends AMLoginModule {
             // store Counter as String
             _storeResult = storeStringData(String.valueOf(attestedCounter), counterAttributeNameConfig);
 
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            webauthnService = webauthnServiceFactory.create(realm);
+            webauthnService.createAuthenticator(
+            		Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
+            		_cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
+            		String.valueOf(attestedCounter), userHandleIdBytes);
+            
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("storeCredentials was success");

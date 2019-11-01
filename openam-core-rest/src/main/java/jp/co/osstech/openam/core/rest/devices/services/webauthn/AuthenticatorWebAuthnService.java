@@ -24,6 +24,8 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -32,12 +34,18 @@ import javax.net.ssl.SSLContext;
 
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
 import org.forgerock.openam.core.rest.devices.services.DeviceService;
+import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.TrustManagers;
 import org.forgerock.util.Options;
@@ -102,6 +110,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     private String keyAttrName = null;
     private String displayNameAttrName = null;
     private String counterAttrName = null;
+    private String baseDN = null;
     private ConnectionFactory cPool = null;
     
     /**
@@ -120,6 +129,11 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             ServiceConfig scm = configManager.getOrganizationConfig(realm, null);
             options = scm.getAttributes();
 
+            baseDN = CollectionHelper.getServerMapAttr(options, WEBAUTHN_LDAP_BASE_DN);
+            if (baseDN == null) {
+                debug.error("BaseDN for search was null");
+            }
+            
             className = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CLASS_NAME);
             credentialAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME);
             keyAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_KEY_ATTRIBUTE_NAME);
@@ -141,11 +155,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                 CollectionHelper.getServerMapAttrs(options, WEBAUTHN_PRIMARY_LDAP_SERVER);
         Set<String> secondaryServers =
                 CollectionHelper.getServerMapAttrs(options, WEBAUTHN_SECONDARY_LDAP_SERVER);
-        String baseDN = 
-                CollectionHelper.getServerMapAttr(options, WEBAUTHN_LDAP_BASE_DN);
-        if (baseDN == null) {
-            debug.error("BaseDN for search was null");
-        }
+        
         String bindDN = 
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_BIND_DN, "");
         char[] bindPassword = 
@@ -216,6 +226,40 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+    
+    private synchronized Connection getConnection() throws LdapException {
+        if (cPool == null) {
+        	initializeConnection();
+        }
+        return cPool.getConnection();
+    }
+
+    /**
+     * 
+     * @param credentialId
+     * @param publicKey
+     * @param counter
+     * @return
+     */
+    public boolean createAuthenticator(String credentialId, byte[] publicKey, String counter,
+            byte[] entryUUID) {
+    	String dn = DN.valueOf(baseDN).child(credentialAttrName ,credentialId).toString();
+    	Entry entry = new LinkedHashMapEntry(dn);
+    	Set<String> objectClasses = CollectionUtils.asSet(className);
+    	entry.addAttribute("objectClass", objectClasses.toArray());
+    	entry.addAttribute(credentialAttrName, credentialId);
+    	entry.addAttribute(keyAttrName, publicKey);
+    	entry.addAttribute(counterAttrName, counter);
+    	entry.addAttribute("fido2UserID", entryUUID);
+    	
+    	try {
+			Connection conn = getConnection();
+			conn.add(LDAPRequests.newAddRequest(entry));
+		} catch (LdapException e) {
+			e.printStackTrace();
+		}
+    	return false;
     }
     
     @Override
