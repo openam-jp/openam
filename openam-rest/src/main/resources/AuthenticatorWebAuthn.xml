@@ -50,7 +50,7 @@
                         <Value>fido2CredentialID</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="openam-auth-webauthn-key-attribute-Name"
+                <AttributeSchema name="openam-auth-webauthn-key-attribute-name"
                     type="single"
                     syntax="string"
                     i18nKey="a102"
@@ -102,7 +102,7 @@
                     syntax="dn"
                     i18nKey="a202"
                     order="1200"
-                    resourceName="userSearchStartDN">
+                    resourceName="baseDN">
                     <DefaultValues>
                         <Value>ou=credentials,@UM_NORMALIZED_ORGBASE@</Value>
                     </DefaultValues>
