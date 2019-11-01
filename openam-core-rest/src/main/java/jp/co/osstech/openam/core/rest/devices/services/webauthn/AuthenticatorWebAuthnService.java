@@ -250,16 +250,16 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      * @param counter
      * @return
      */
-    public boolean createAuthenticator(String credentialId, byte[] publicKey, String counter,
-            byte[] entryUUID) {
-        String dn = DN.valueOf(baseDN).child(credentialAttrName ,credentialId).toString();
+    public boolean createAuthenticator(WebAuthnAuthenticator authenticator) {
+        String dn = DN.valueOf(baseDN)
+                .child(credentialAttrName, authenticator.getCredentialID()).toString();
         Entry entry = new LinkedHashMapEntry(dn);
         Set<String> objectClasses = CollectionUtils.asSet(className);
         entry.addAttribute("objectClass", objectClasses.toArray());
-        entry.addAttribute(credentialAttrName, credentialId);
-        entry.addAttribute(keyAttrName, publicKey);
-        entry.addAttribute(counterAttrName, counter);
-        entry.addAttribute("fido2UserID", entryUUID);
+        entry.addAttribute(credentialAttrName, authenticator.getCredentialID());
+        entry.addAttribute(keyAttrName, authenticator.getPublicKey());
+        entry.addAttribute(counterAttrName, authenticator.getSignCount());
+        entry.addAttribute("fido2UserID", authenticator.getUserID());
         
         Connection conn = null;
         try {
@@ -274,24 +274,32 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         return false;
     }
     
-    public Set<String> getCredentialIds(byte[] entryUUID) {
-        Set<String> credentialIds = new HashSet<String>();
+    public Set<WebAuthnAuthenticator> getAuthenticators(byte[] userID) {
+        Set<WebAuthnAuthenticator> authenticators = new HashSet<WebAuthnAuthenticator>();
         SearchScope scope = SearchScope.SINGLE_LEVEL;
-        Filter userIdFilter = Filter.valueOf("fido2UserID"+ "=" + byteArrayToAsciiString(entryUUID));
+        Filter userIdFilter = 
+                Filter.valueOf("fido2UserID"+ "=" + WebAuthnAuthenticator.getUserIDAsString(userID));
         Filter objectClassFilter = Filter.valueOf("objectClass"+ "=" + className);
         Filter searchFilter = Filter.and(userIdFilter, objectClassFilter);
         SearchRequest searchRequest = 
                 LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter, 
-                        new String[]{credentialAttrName});
+                        new String[]{credentialAttrName, keyAttrName, counterAttrName});
         Connection conn = null;
         try {
             conn = getConnection();
             ConnectionEntryReader reader = conn.search(searchRequest);
             while (reader.hasNext()) {
+                WebAuthnAuthenticator authenticator = new WebAuthnAuthenticator();
+                authenticator.setUserID(userID);
                 if (reader.isEntry()) {
                     SearchResultEntry entry = reader.readEntry();
                     Attribute attribute = entry.getAttribute(credentialAttrName);
-                    credentialIds.add(attribute.firstValue().toString());
+                    authenticator.setCredentialID(attribute.firstValue().toString());
+                    attribute = entry.getAttribute(keyAttrName);
+                    authenticator.setPublicKey(attribute.firstValue().toByteArray());
+                    attribute = entry.getAttribute(counterAttrName);
+                    authenticator.setSignCount(Long.valueOf(attribute.firstValue().toString()));
+                    authenticators.add(authenticator);
                 } else {
                     //ignore search result references
                     reader.readReference();
@@ -306,15 +314,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
-        return credentialIds;
-    }
-    
-    private String byteArrayToAsciiString(byte[] bytes) {
-        StringBuffer _sb = new StringBuffer();
-        for (int i = 0; i < bytes.length; i++) {
-            _sb.append( Character.toChars(bytes[i]) );
-        }
-        return _sb.toString();
+        return authenticators;
     }
     
     @Override

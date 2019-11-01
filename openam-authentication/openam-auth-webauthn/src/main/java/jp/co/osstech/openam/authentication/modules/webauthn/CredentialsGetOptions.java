@@ -1,41 +1,30 @@
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
 import java.util.Base64;
+import java.util.Set;
+
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 public class CredentialsGetOptions {
-    private String credentialIdBytesArrayStr; // byte[]
+    //private String credentialIdBytesArrayStr; // byte[]
+    private Set<WebAuthnAuthenticator> authenticators;
     private String userVerificationConfig;
     private String challengeBytesArrayStr; // byte[]
     private String timeoutConfig;
     private String residentKeyConfig;
-    
 
     CredentialsGetOptions(
-            String credentialIdBase64,
+            Set<WebAuthnAuthenticator> authenticators,
             String userVerificationConfig,
             byte[] challengeBytesArray, // byte[]
             String timeoutConfig,
             String residentKeyConfig
     ) {
-        this.credentialIdBytesArrayStr = convBytesArrayToStr(Base64.getDecoder().decode(credentialIdBase64));
+        this.authenticators = authenticators;
         this.userVerificationConfig = userVerificationConfig;
         this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
         this.timeoutConfig = timeoutConfig;
         this.residentKeyConfig = residentKeyConfig;
-    }
-
-    CredentialsGetOptions(
-            byte[] credentialIdBytesArray, // byte[],
-            String userVerificationConfig,
-            byte[] challengeBytesArray, // byte[]
-            String timeoutConfig,
-            String regidentKeyConfig
-    ) {
-        this.credentialIdBytesArrayStr = convBytesArrayToStr(credentialIdBytesArray);
-        this.userVerificationConfig = userVerificationConfig;
-        this.challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
-        this.timeoutConfig = timeoutConfig;
-        this.residentKeyConfig = regidentKeyConfig;
     }
 
     /*
@@ -67,22 +56,28 @@ public class CredentialsGetOptions {
         _credentialGetScript.append("publicKey: {");
         
         if (residentKeyConfig.equalsIgnoreCase("false")) {
-        // AllowCredentials
-        _credentialGetScript.append("allowCredentials: [ {");
-        _credentialGetScript.append("type: \'public-key\'");
-        _credentialGetScript.append(", ");
-        _credentialGetScript.append("id: new Uint8Array([");
-        _credentialGetScript.append(credentialIdBytesArrayStr);
-        _credentialGetScript.append("])");
-        _credentialGetScript.append(", ");
-        _credentialGetScript.append("transports: [");
-        _credentialGetScript.append("\'usb\', ");
-        _credentialGetScript.append("\'nfc\', ");
-        _credentialGetScript.append("\'ble\', ");
-        _credentialGetScript.append("\'internal\'");
-        _credentialGetScript.append("]");
-        _credentialGetScript.append("} ]");
-        _credentialGetScript.append(", ");
+            // AllowCredentials
+            _credentialGetScript.append("allowCredentials: [ ");
+            int size = 0;
+            for (WebAuthnAuthenticator authenticator: authenticators) {
+                _credentialGetScript.append("{type: \'public-key\'");
+                _credentialGetScript.append(", ");
+                _credentialGetScript.append("id: new Uint8Array([");
+                _credentialGetScript.append(authenticator.getRawCredentialIdAsString());
+                _credentialGetScript.append("])");
+                _credentialGetScript.append(", ");
+                _credentialGetScript.append("transports: [");
+                _credentialGetScript.append("\'usb\', ");
+                _credentialGetScript.append("\'nfc\', ");
+                _credentialGetScript.append("\'ble\', ");
+                _credentialGetScript.append("\'internal\'");
+                _credentialGetScript.append("] }");
+                if (++size <= authenticators.size()) {
+                    _credentialGetScript.append(",");
+                }
+            }
+            _credentialGetScript.append(" ]");
+            _credentialGetScript.append(", ");
         }
         // UserVerification
         _credentialGetScript.append("userVerification: \'");

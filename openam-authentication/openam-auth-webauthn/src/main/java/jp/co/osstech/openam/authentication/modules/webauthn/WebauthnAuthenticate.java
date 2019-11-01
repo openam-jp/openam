@@ -118,6 +118,7 @@ import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
 
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 public class WebauthnAuthenticate extends AMLoginModule {
 
@@ -137,7 +138,8 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
     // Webauthn Credentials
     private String userName;
-    private byte[] credentialIdBytes;
+    //private byte[] credentialIdBytes;
+    private Set<WebAuthnAuthenticator> authenticators;
     private CredentialPublicKey credentialPublicKey;
     private byte[] rawIdBytes;
     private String webauthnHiddenCallback;
@@ -307,7 +309,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
             // navigator.credentials.get Options
             CredentialsGetOptions credentialsGetOptions = new CredentialsGetOptions(
-                    credentialIdBytes,
+                    authenticators,
                     userVerificationConfig,
                     challengeBytes,
                     timeoutConfig,
@@ -350,9 +352,9 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
             // navigator.credentials.get Options
             //redidentkey dosn't need stored credentialid.
-            byte[] idBytes = new byte[0];
-            CredentialsGetOptions residentkeyCredentialsGetOptions = new CredentialsGetOptions(
-                    idBytes,
+            CredentialsGetOptions residentkeyCredentialsGetOptions = 
+                    new CredentialsGetOptions(
+                    null,
                     userVerificationConfig,
                     challengeBytes,
                     timeoutConfig,
@@ -387,7 +389,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
             // navigator.credentials.get Options
 
             CredentialsGetOptions mfaCredentialsGetOptions = new CredentialsGetOptions(
-                    credentialIdBytes,
+                    authenticators,
                     userVerificationConfig,
                     challengeBytes,
                     timeoutConfig,
@@ -442,24 +444,24 @@ public class WebauthnAuthenticate extends AMLoginModule {
          */
         try {
             byte[] entryUUID = lookupByteData("entryUUID");
-            Set<String> credentialIds = webauthnService.getCredentialIds(entryUUID);
-            if (credentialIds.isEmpty()) {
+            authenticators = webauthnService.getAuthenticators(entryUUID);
+            if (authenticators.isEmpty()) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
-            // TODO
-            credentialIdBytes = Base64UrlUtil.decode(credentialIds.iterator().next());
-            //credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
-
-            if (credentialIdBytes != null) {
-                validatedUserID = userName;
-                DEBUG.message("validateUserID is " + userName);
-
-                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-                // return WebauthnModuleState.COMPLETE;
-            } else {
-                DEBUG.message("CredentialId is null ");
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-            }
+            return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+            
+//            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+//
+//            if (credentialIdBytes != null) {
+//                validatedUserID = userName;
+//                DEBUG.message("validateUserID is " + userName);
+//
+//                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+//                // return WebauthnModuleState.COMPLETE;
+//            } else {
+//                DEBUG.message("CredentialId is null ");
+//                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+//            }
         } catch (AuthLoginException ex) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
@@ -476,24 +478,24 @@ public class WebauthnAuthenticate extends AMLoginModule {
          */
         try {
             byte[] entryUUID = lookupByteData("entryUUID");
-            Set<String> credentialIds = webauthnService.getCredentialIds(entryUUID);
-            if (credentialIds.isEmpty()) {
+            authenticators = webauthnService.getAuthenticators(entryUUID);
+            if (authenticators.isEmpty()) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
-            // TODO
-            credentialIdBytes = Base64UrlUtil.decode(credentialIds.iterator().next());
-            //credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
-
-            if (credentialIdBytes != null) {
-                validatedUserID = userName;
-                DEBUG.message("validateUserID is " + userName);
-
-                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-                // return WebauthnModuleState.COMPLETE;
-            } else {
-                DEBUG.message("CredentialId is null ");
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-            }
+            return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+            
+//            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+//
+//            if (credentialIdBytes != null) {
+//                validatedUserID = userName;
+//                DEBUG.message("validateUserID is " + userName);
+//
+//                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+//                // return WebauthnModuleState.COMPLETE;
+//            } else {
+//                DEBUG.message("CredentialId is null ");
+//                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+//            }
         } catch (AuthLoginException ex) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
@@ -570,27 +572,31 @@ public class WebauthnAuthenticate extends AMLoginModule {
          */
         if (residentKeyConfig.equalsIgnoreCase("true")) {
             String _userHandleIdStr = byteArrayToAsciiString(Base64Util.decode(getUserHandle));
-            userName = searchUserNameWithAttrValue(_userHandleIdStr,"entryUUID");
+            userName = searchUserNameWithAttrValue(_userHandleIdStr, "entryUUID");
             
             /*
              * lookup CredentialId(Base64Url encoded) from User Data store
              */
-            try {
-                // TODO: How to detect credentialId(Authenticator)?
-                credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
-
-                if (credentialIdBytes != null) {
-                    validatedUserID = userName;
-                    DEBUG.message("validateUserID is " + userName);
-
-                    // return WebauthnModuleState.COMPLETE;
-                } else {
-                    DEBUG.message("CredentialId is null ");
-                    throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-                }
-            } catch (AuthLoginException ex) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+// TODO: How to detect credentialId(Authenticator)?
+            authenticators = webauthnService.getAuthenticators(Base64Util.decode(getUserHandle));
+            if (authenticators.isEmpty()) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
+//            try {
+//                credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
+//
+//                if (credentialIdBytes != null) {
+//                    validatedUserID = userName;
+//                    DEBUG.message("validateUserID is " + userName);
+//
+//                    // return WebauthnModuleState.COMPLETE;
+//                } else {
+//                    DEBUG.message("CredentialId is null ");
+//                    throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+//                }
+//            } catch (AuthLoginException ex) {
+//                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+//            }
         }
         
         /*
@@ -638,7 +644,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Webauthn Authentication success");
             }
-
+            validatedUserID = userName;
             return WebauthnAuthenticateModuleState.COMPLETE;
 
         } else {
@@ -717,14 +723,26 @@ public class WebauthnAuthenticate extends AMLoginModule {
         // OpenAM didn't store aaguid now. Use ZERO AAGUID.
         AAGUID _aaguid = AAGUID.ZERO;
 
+        WebAuthnAuthenticator selected = null;
+        for (WebAuthnAuthenticator authenticator : authenticators) {
+            if (authenticator.isSelected(Base64url.encode(rawIdBytes))) {
+                selected = authenticator;
+                break;
+            }
+        }
+        if (selected == null) {
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+        }
+        
         //credentialPublicKey was stored as COSEKey byte[] data at registration time.
         CborConverter _cborConverter = new CborConverter();
-        credentialPublicKey = _cborConverter.readValue(lookupByteData(pubKeyAttributeNameConfig), CredentialPublicKey.class);
+        credentialPublicKey = _cborConverter.readValue(selected.getPublicKey(), CredentialPublicKey.class);
 
-        final AttestedCredentialData storedAttestedCredentialData = new AttestedCredentialData(_aaguid,
-                credentialIdBytes, credentialPublicKey);
+        final AttestedCredentialData storedAttestedCredentialData = 
+                new AttestedCredentialData(_aaguid, 
+                        Base64UrlUtil.decode(selected.getCredentialID()), credentialPublicKey);
         final AttestationStatement noneAttestationStatement = new NoneAttestationStatement();
-        final long storedCounter = Long.parseLong(lookupStringData(counterAttributeNameConfig));
+        final long storedCounter = selected.getSignCount();
         Authenticator storedAuthenticator = new AuthenticatorImpl(storedAttestedCredentialData,
                 noneAttestationStatement, storedCounter);
 

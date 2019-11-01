@@ -115,6 +115,7 @@ import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
 
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
 import com.webauthn4j.converter.AttestedCredentialDataConverter;
@@ -462,10 +463,11 @@ public class WebauthnRegister extends AMLoginModule {
 
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             webauthnService = webauthnServiceFactory.create(realm);
-            webauthnService.createAuthenticator(
-            		Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
-            		_cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
-            		String.valueOf(attestedCounter), userHandleIdBytes);
+            WebAuthnAuthenticator authenticator = new WebAuthnAuthenticator(
+                    Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
+                    _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
+                    new Long(attestedCounter), userHandleIdBytes);
+            webauthnService.createAuthenticator(authenticator);
             
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
