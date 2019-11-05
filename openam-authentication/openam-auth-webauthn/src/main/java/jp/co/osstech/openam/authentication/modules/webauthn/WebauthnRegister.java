@@ -155,10 +155,7 @@ public class WebauthnRegister extends AMLoginModule {
     private String residentKeyConfig = "";
     private String userVerificationConfig = "";
     private String timeoutConfig = "";
-    private String credentialIdAttributeNameConfig = "";
-    private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
-    private String counterAttributeNameConfig = "";
 
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
@@ -168,10 +165,7 @@ public class WebauthnRegister extends AMLoginModule {
     private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
     private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
     private static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
-    private static final String CREDENTIALID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-credentialIdAttributeName";
-    private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
-    private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
 
     // Default Values.
@@ -207,10 +201,7 @@ public class WebauthnRegister extends AMLoginModule {
         this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
         this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
         this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
-        this.credentialIdAttributeNameConfig = CollectionHelper.getMapAttr(options, CREDENTIALID_ATTRIBUTE_NAME);
-        this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
-        this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
 
 
         if (DEBUG.messageEnabled()) {
@@ -222,10 +213,7 @@ public class WebauthnRegister extends AMLoginModule {
                     + ", residentKey = " + residentKeyConfig
                     + ", userVerification = " + userVerificationConfig 
                     + ", timeoutConfig = " + timeoutConfig
-                    + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
-                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
-                    + ", keyAttributeName = " + pubKeyAttributeNameConfig 
-                    + ", counterAttributeName = " + counterAttributeNameConfig);
+                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig);
         }
         
         userName = (String) sharedState.get(getUserKey());
@@ -443,31 +431,14 @@ public class WebauthnRegister extends AMLoginModule {
             // boolean _storeResult
             boolean _storeResult = false;
             
-            // store userHandleId as Base64Url String
-            /* comment out 20191028
-            if (lookupStringData(userHandleIdAttributeNameConfig).isEmpty()) {
-            _storeResult = storeStringData(Base64UrlUtil.encodeToString(userHandleIdBytes), userHandleIdAttributeNameConfig);
-            }
-            */
-            // store CredentialId as Base64Url String
-            _storeResult = storeStringData(Base64UrlUtil.encodeToString(attestedCredentialIdBytes), credentialIdAttributeNameConfig);
-
-            // store Public Key as COSE Key Binary
             CborConverter _cborConverter = new CborConverter();
-            _storeResult = storeByteData(
-                    _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
-                    pubKeyAttributeNameConfig);
-
-            // store Counter as String
-            _storeResult = storeStringData(String.valueOf(attestedCounter), counterAttributeNameConfig);
-
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             webauthnService = webauthnServiceFactory.create(realm);
             WebAuthnAuthenticator authenticator = new WebAuthnAuthenticator(
                     Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
                     _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
                     new Long(attestedCounter), userHandleIdBytes);
-            webauthnService.createAuthenticator(authenticator);
+            _storeResult = webauthnService.createAuthenticator(authenticator);
             
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
@@ -486,77 +457,6 @@ public class WebauthnRegister extends AMLoginModule {
             DEBUG.error("Webauthn.storeCredentials : Webauthn module exception : ", e);
             return WebauthnRegisterModuleState.REG_START;
         }
-    }
-
-    /*
-     * Store StringData to user data store
-     * @param String attestedStringData,
-     * @param String attributeName
-     * @return boolean
-     * @throws AuthLoginException IdRepoException
-     */
-    private boolean storeStringData(String attestedStringData, String attributeName)
-            throws AuthLoginException, IdRepoException {
-        boolean _storeStringDataResult = false;
-        Map<String, Set> _map = new HashMap<String, Set>();
-        Set<String> _values = new HashSet<String>();
-        //String _storeString = String.valueOf(attestedStringData);
-        //_values.add(_storeString);
-        _values.add(attestedStringData);
-        _map.put(attributeName, _values);
-
-        try {
-            AMIdentity uid = getIdentity();
-            uid.setAttributes(_map);
-            uid.store();
-            _storeStringDataResult = true;
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.storeStringData() : Webauthn module exception : ", attributeName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException ex) {
-            DEBUG.error("Webauthn.storeStringData() : error store String : ", attributeName, ex);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-        }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("storeStringData was Success", attributeName);
-        }
-        return _storeStringDataResult;
-    }
-
-    /*
-     * Store ByteData to user data store
-     * @param byte[] attestedByteData,
-     * @param String attributeName
-     * @return boolean
-     * @throws AuthLoginException, IdRepoException
-     */
-    private boolean storeByteData(byte[] attestedByteData, String attributeName)
-            throws AuthLoginException, IdRepoException {
-
-        boolean _storeByteDataResult = false;
-
-        byte[] _attestedData = attestedByteData;
-        Map<String, byte[][]> map = new HashMap<String, byte[][]>();
-        byte[][] _attestedValues = new byte[1][];
-        map.put(attributeName, _attestedValues);
-        _attestedValues[0] = _attestedData;
-
-        try {
-            AMIdentity uid = getIdentity();
-            uid.setBinaryAttributes(map);
-            uid.store();
-            _storeByteDataResult = true;
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.storeByteData : Webauthn module exception : ", attributeName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException ex) {
-            DEBUG.error("Webauthn.storeByteData : error store StringData : ", attributeName, ex);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-        }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("storeByteData was Success", attributeName);
-        }
-        return _storeByteDataResult;
     }
 
     /*
@@ -603,34 +503,6 @@ public class WebauthnRegister extends AMLoginModule {
         } catch (IdRepoException e) {
             DEBUG.error("Webauthn.lookupCredentialId() : error searching Identities with username : " + userName, e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        }
-    }
-
-
-    /* generate secure random byte[]
-     * @param int length
-     * @return byte[]
-     */
-    private byte[] genSecureRandomBytesArray(int arrayLength) throws GeneralSecurityException {
-        SecureRandom _randam = new SecureRandom();
-        byte[] _byteArray = new byte[arrayLength];
-        _randam.nextBytes(_byteArray);
-
-        return _byteArray;
-    }
-
-    /**
-     * from based membership
-     * module==============================================================================================
-     * User input value will be store in the callbacks[]. When user click cancel
-     * button, these input field should be reset to blank.
-     */
-    private void clearCallbacks(Callback[] callbacks) {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof NameCallback) {
-                NameCallback nc = (NameCallback) callbacks[i];
-                nc.setName("");
-            }
         }
     }
 

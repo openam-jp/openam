@@ -159,10 +159,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private String residentKeyConfig = "";
     private String userVerificationConfig = "";
     private String timeoutConfig = "";
-    private String credentialIdAttributeNameConfig = "";
-    private String pubKeyAttributeNameConfig = "";
     private String displayNameAttributeNameConfig = "";
-    private String counterAttributeNameConfig = "";
 
     // Service Configuration Strings
     private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
@@ -170,10 +167,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
     private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
     private static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
-    private static final String CREDENTIALID_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-credentialIdAttributeName";
-    private static final String PUBLIC_KEY_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-keyAttributeName";
     private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
-    private static final String COUNTER_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-counterAttributeName";
     private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
@@ -217,10 +211,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
         this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
         this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
         this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
-        this.credentialIdAttributeNameConfig = CollectionHelper.getMapAttr(options, CREDENTIALID_ATTRIBUTE_NAME);
-        this.pubKeyAttributeNameConfig = CollectionHelper.getMapAttr(options, PUBLIC_KEY_ATTRIBUTE_NAME);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
-        this.counterAttributeNameConfig = CollectionHelper.getMapAttr(options, COUNTER_ATTRIBUTE_NAME);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
@@ -231,10 +222,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", residentKey = " + residentKeyConfig
                     + ", userVerification = " + userVerificationConfig 
                     + ", timeoutConfig = " + timeoutConfig
-                    + ", credentialIdAttributeName = " + credentialIdAttributeNameConfig
-                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig 
-                    + ", keyAttributeName = " + pubKeyAttributeNameConfig 
-                    + ", counterAttributeName = " + counterAttributeNameConfig);
+                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig);
         }
         if(useMfaConfig.equalsIgnoreCase("true")) {
             userName = (String) sharedState.get(getUserKey());
@@ -450,19 +438,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
             return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-            
-//            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
-//
-//            if (credentialIdBytes != null) {
-//                validatedUserID = userName;
-//                DEBUG.message("validateUserID is " + userName);
-//
-//                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-//                // return WebauthnModuleState.COMPLETE;
-//            } else {
-//                DEBUG.message("CredentialId is null ");
-//                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-//            }
         } catch (AuthLoginException ex) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
@@ -484,19 +459,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
             return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-            
-//            credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
-//
-//            if (credentialIdBytes != null) {
-//                validatedUserID = userName;
-//                DEBUG.message("validateUserID is " + userName);
-//
-//                return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-//                // return WebauthnModuleState.COMPLETE;
-//            } else {
-//                DEBUG.message("CredentialId is null ");
-//                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-//            }
         } catch (AuthLoginException ex) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
@@ -578,26 +540,10 @@ public class WebauthnAuthenticate extends AMLoginModule {
             /*
              * lookup CredentialId(Base64Url encoded) from User Data store
              */
-// TODO: How to detect credentialId(Authenticator)?
             authenticators = webauthnService.getAuthenticators(Base64Util.decode(getUserHandle));
             if (authenticators.isEmpty()) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
-//            try {
-//                credentialIdBytes = Base64UrlUtil.decode(lookupStringData(credentialIdAttributeNameConfig));
-//
-//                if (credentialIdBytes != null) {
-//                    validatedUserID = userName;
-//                    DEBUG.message("validateUserID is " + userName);
-//
-//                    // return WebauthnModuleState.COMPLETE;
-//                } else {
-//                    DEBUG.message("CredentialId is null ");
-//                    throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-//                }
-//            } catch (AuthLoginException ex) {
-//                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-//            }
         }
         
         /*
@@ -633,8 +579,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
             //update datastore counter value for next authentication.
             selectedAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
             updateCounterResult = webauthnService.updateCounter(selectedAuthenticator);
-
-            updateCounterResult = storeStringData(String.valueOf(response.getAuthenticatorData().getSignCount()), counterAttributeNameConfig);
         } catch (Exception e) {
             DEBUG.error("updateCounter error");
         }
@@ -753,65 +697,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
     }
 
     /*
-     * Store StringData to user data store
-     * @param String attestedStringData,
-     * @param String attributeName
-     * @return boolean
-     * @throws AuthLoginException IdRepoException
-     */
-    private boolean storeStringData(String attestedStringData, String attributeName)
-            throws AuthLoginException, IdRepoException {
-        boolean _storeStringDataResult = false;
-        Map<String, Set> _map = new HashMap<String, Set>();
-        Set<String> _values = new HashSet<String>();
-        _values.add(attestedStringData);
-        _map.put(attributeName, _values);
-
-        try {
-            AMIdentity uid = getIdentity();
-            uid.setAttributes(_map);
-            uid.store();
-            _storeStringDataResult = true;
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.storeStringData() : Webauthn module exception : ", attributeName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException ex) {
-            DEBUG.error("Webauthn.storeStringData() : error store String : ", attributeName, ex);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-        }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("storeStringData was Success", attributeName);
-        }
-        return _storeStringDataResult;
-    }
-
-    /*
-     * lookup StringData user data store
-     * @return String
-     * @throws AuthLoginException
-     */
-    private String lookupStringData(String attributeName) throws AuthLoginException {
-        Set<String> _attributes = Collections.emptySet();
-
-        try {
-            _attributes = getIdentity().getAttribute(attributeName);
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.lookupDisplayNames() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("Webauthn.lookupDisplayNames() : error searching Identities with username : " + userName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        }
-
-        String _attribute = null;
-
-        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(_attributes)) {
-            _attribute = _attributes.iterator().next();
-        }
-        return _attribute;
-    }
-
-    /*
      * lookup Byte user data store
      * @return byte[]
      * @throws AuthLoginException
@@ -844,40 +729,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
         }
         return _sb.toString();
     }
-
-    
-    /**
-     * from based membership
-     * module==============================================================================================
-     * User input value will be store in the callbacks[]. When user click cancel
-     * button, these input field should be reset to blank.
-     */
-    private void clearCallbacks(Callback[] callbacks) {
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof NameCallback) {
-                NameCallback nc = (NameCallback) callbacks[i];
-                nc.setName("");
-            }
-        }
-    }
-    
-    /**
-     * from based membership module Returns the password from the PasswordCallback.
-     */
-    private String getPassword(PasswordCallback callback) {
-        char[] tmpPassword = callback.getPassword();
-
-        if (tmpPassword == null) {
-            // treat a NULL password as an empty password
-            tmpPassword = new char[0];
-        }
-
-        char[] pwd = new char[tmpPassword.length];
-        System.arraycopy(tmpPassword, 0, pwd, 0, tmpPassword.length);
-
-        return (new String(pwd));
-    }
-
 
     /**
      * from based membership module Returns <code>Principal</code>.

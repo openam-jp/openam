@@ -261,6 +261,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      * @return Returns true if the entry is successfully saved.
      */
     public boolean createAuthenticator(WebAuthnAuthenticator authenticator) {
+        boolean result = false;
         String dn = DN.valueOf(baseDN)
                 .child(credentialAttrName, authenticator.getCredentialID()).toString();
         Entry entry = new LinkedHashMapEntry(dn);
@@ -275,13 +276,14 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         try {
             conn = getConnection();
             conn.add(LDAPRequests.newAddRequest(entry));
+            result = true;
         } catch (LdapException e) {
             // TODO
             e.printStackTrace();
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
-        return false;
+        return result;
     }
     
     /**
