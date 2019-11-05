@@ -82,8 +82,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             "openam-auth-webauthn-credentialid-attribute-name";
     private static final String WEBAUTHN_KEY_ATTRIBUTE_NAME = 
             "openam-auth-webauthn-key-attribute-name";
-    private static final String WEBAUTHN_DISPLAYNAME_ATTRIBUTE_NAME = 
-            "openam-auth-webauthn-displayname-attribute-name";
+    private static final String WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME = 
+            "openam-auth-webauthn-credentialname-attribute-name";
     private static final String WEBAUTHN_COUNTER_ATTRIBUTE_NAME = 
             "openam-auth-webauthn-counter-attribute-name";
     
@@ -118,7 +118,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     private String className = null;
     private String credentialAttrName = null;
     private String keyAttrName = null;
-    private String displayNameAttrName = null;
+    private String credentialNameAttrName = null;
     private String counterAttrName = null;
     private String baseDN = null;
     private ConnectionFactory cPool = null;
@@ -147,7 +147,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             className = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CLASS_NAME);
             credentialAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME);
             keyAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_KEY_ATTRIBUTE_NAME);
-            displayNameAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_DISPLAYNAME_ATTRIBUTE_NAME);
+            credentialNameAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME);
             counterAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_COUNTER_ATTRIBUTE_NAME);
             
         } catch (SMSException | SSOException e) {

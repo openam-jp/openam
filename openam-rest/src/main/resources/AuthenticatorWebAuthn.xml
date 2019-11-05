@@ -60,12 +60,12 @@
                         <Value>fido2PublicKey</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="openam-auth-webauthn-displayname-attribute-name"
+                <AttributeSchema name="openam-auth-webauthn-credentialname-attribute-name"
                     type="single"
                     syntax="string"
                     i18nKey="a103"
                     order="400"
-                    resourceName="displayNameAttributeName">
+                    resourceName="credentialNameAttributeName">
                     <DefaultValues>
                         <Value>fido2CredentialName</Value>
                     </DefaultValues>
