@@ -49,10 +49,12 @@ import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
+import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.TrustManagers;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -315,6 +317,28 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             IOUtils.closeIfNotNull(conn);
         }
         return authenticators;
+    }
+    
+    public boolean updateCounter(WebAuthnAuthenticator authenticator) {
+        boolean result = false;
+        String dn = DN.valueOf(baseDN)
+                .child(credentialAttrName, authenticator.getCredentialID()).toString();
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
+        modifyRequest.addModification(
+                ModificationType.REPLACE, counterAttrName, authenticator.getSignCount());
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.modify(modifyRequest);
+            result = true;
+        } catch (LdapException e) {
+            // TODO
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeIfNotNull(conn);
+        }
+        return result;
     }
     
     @Override

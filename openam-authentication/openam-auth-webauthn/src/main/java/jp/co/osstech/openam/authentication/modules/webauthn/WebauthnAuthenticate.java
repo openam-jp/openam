@@ -140,6 +140,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private String userName;
     //private byte[] credentialIdBytes;
     private Set<WebAuthnAuthenticator> authenticators;
+    private WebAuthnAuthenticator selectedAuthenticator = null;
     private CredentialPublicKey credentialPublicKey;
     private byte[] rawIdBytes;
     private String webauthnHiddenCallback;
@@ -630,6 +631,9 @@ public class WebauthnAuthenticate extends AMLoginModule {
 
         try {
             //update datastore counter value for next authentication.
+            selectedAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
+            updateCounterResult = webauthnService.updateCounter(selectedAuthenticator);
+
             updateCounterResult = storeStringData(String.valueOf(response.getAuthenticatorData().getSignCount()), counterAttributeNameConfig);
         } catch (Exception e) {
             DEBUG.error("updateCounter error");
@@ -723,26 +727,25 @@ public class WebauthnAuthenticate extends AMLoginModule {
         // OpenAM didn't store aaguid now. Use ZERO AAGUID.
         AAGUID _aaguid = AAGUID.ZERO;
 
-        WebAuthnAuthenticator selected = null;
         for (WebAuthnAuthenticator authenticator : authenticators) {
             if (authenticator.isSelected(Base64url.encode(rawIdBytes))) {
-                selected = authenticator;
+                selectedAuthenticator = authenticator;
                 break;
             }
         }
-        if (selected == null) {
+        if (selectedAuthenticator == null) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
         //credentialPublicKey was stored as COSEKey byte[] data at registration time.
         CborConverter _cborConverter = new CborConverter();
-        credentialPublicKey = _cborConverter.readValue(selected.getPublicKey(), CredentialPublicKey.class);
+        credentialPublicKey = _cborConverter.readValue(selectedAuthenticator.getPublicKey(), CredentialPublicKey.class);
 
         final AttestedCredentialData storedAttestedCredentialData = 
                 new AttestedCredentialData(_aaguid, 
-                        Base64UrlUtil.decode(selected.getCredentialID()), credentialPublicKey);
+                        Base64UrlUtil.decode(selectedAuthenticator.getCredentialID()), credentialPublicKey);
         final AttestationStatement noneAttestationStatement = new NoneAttestationStatement();
-        final long storedCounter = selected.getSignCount();
+        final long storedCounter = selectedAuthenticator.getSignCount();
         Authenticator storedAuthenticator = new AuthenticatorImpl(storedAttestedCredentialData,
                 noneAttestationStatement, storedCounter);
 
