@@ -1,18 +1,18 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2019 Open Source Solution Technology Corporation
-*/
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2019 Open Source Solution Technology Corporation
+ */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
 import com.iplanet.sso.SSOException;
@@ -158,7 +158,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
     }
     
-    public void initializeConnection() {
+    /**
+     * Initialize the LDAP connection pool.
+     */
+    private void initializeConnection() {
         debug.message("LDAP initialize()");
             
         Set<String> primaryServers =
@@ -238,6 +241,12 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
     }
     
+    /**
+     * Get a connection from the connection pool.
+     * 
+     * @return The LDAP connection.
+     * @throws LdapException If the connection request failed for some reason.
+     */
     private synchronized Connection getConnection() throws LdapException {
         if (cPool == null) {
             initializeConnection();
@@ -246,11 +255,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     }
 
     /**
+     * Create an LDAP entry for the authenticator.
      * 
-     * @param credentialId
-     * @param publicKey
-     * @param counter
-     * @return
+     * @param authenticator The target authenticator.
+     * @return Returns true if the entry is successfully saved.
      */
     public boolean createAuthenticator(WebAuthnAuthenticator authenticator) {
         String dn = DN.valueOf(baseDN)
@@ -276,6 +284,12 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         return false;
     }
     
+    /**
+     * Get authenticators associated with userID.
+     * 
+     * @param userID The user handle of the user account entity.
+     * @return A collection of authenticators associated with userID.
+     */
     public Set<WebAuthnAuthenticator> getAuthenticators(byte[] userID) {
         Set<WebAuthnAuthenticator> authenticators = new HashSet<WebAuthnAuthenticator>();
         SearchScope scope = SearchScope.SINGLE_LEVEL;
@@ -319,6 +333,12 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         return authenticators;
     }
     
+    /**
+     * Update the signature counter.
+     * 
+     * @param authenticator The target authenticator.
+     * @return Returns true if the entry is successfully saved.
+     */
     public boolean updateCounter(WebAuthnAuthenticator authenticator) {
         boolean result = false;
         String dn = DN.valueOf(baseDN)
@@ -350,5 +370,4 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     public DeviceSerialisation getDeviceSerialisationStrategy() {
         return null;
     }
-
 }
