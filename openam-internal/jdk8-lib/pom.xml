@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+<!--
+  <parent>
+    <groupId>jp.co.ogis_ri</groupId>
+    <artifactId>javax.support</artifactId>
+    <version>1.0.0</version>
+  </parent>
+-->
+  <parent>
+    <groupId>jp.openam</groupId>
+    <artifactId>jp.internal</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>jdk8-lib</artifactId>
+  <name>Ogis-ri jdk internal library</name>
+  <profiles>
+      <profile>
+          <id>jdk11-internal</id>
+          <activation>
+              <jdk>[11,)</jdk>
+          </activation>
+          <properties>
+              <jdk11.opt.arg1>--patch-module</jdk11.opt.arg1>
+              <jdk11.opt.arg2>jdk.unsupported=/home/builduser/work/openam-jp-internal/jdk8-lib/src/main/java</jdk11.opt.arg2>
+          </properties>
+      </profile>
+  </profiles>
+  <build>
+      <plugins>
+          <plugin>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.6.0</version>
+              <configuration>
+                  <compilerArgs>
+                      <arg>${jdk11.opt.arg1}</arg>
+                      <arg>${jdk11.opt.arg2}</arg>
+                  </compilerArgs>
+                  <source>${maven.compiler.source}</source>
+                  <target>${maven.compiler.target}</target>
+                  <encoding>UTF-8</encoding>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <executions>
+                  <execution>
+                      <goals>
+                          <goal>jar</goal>
+                      </goals>
+                  </execution>
+              </executions>
+           </plugin>
+      </plugins>
+  </build>
+<!--
+        <dependencies>
+            <dependency>
+                <groupId>jp.co.ogis_ri</groupId>
+                <artifactId>java-base</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+        </dependencies>
+-->
+</project>
