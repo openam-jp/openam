@@ -12,25 +12,6 @@
   <name>Ogis-ri Jdk Internal</name>
   <packaging>pom</packaging>
   <modules>
-<!--
-    <module>java-base</module>
--->
     <module>jdk8-lib</module>
   </modules>
-<!--
-  <properties>
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
-  </properties>
--->
-<!--
-  <dependencies>
-    <dependency>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-assert</artifactId>
-      <version>1.4</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
--->
 </project>
