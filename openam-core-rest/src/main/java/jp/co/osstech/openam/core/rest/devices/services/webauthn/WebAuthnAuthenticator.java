@@ -29,6 +29,7 @@ public class WebAuthnAuthenticator {
     private byte[] publicKey = null;
     private Long signCount = null;
     private byte[] userID = null;
+    private String credentialName = null;
     
     /**
      * Default constructor.
@@ -46,11 +47,27 @@ public class WebAuthnAuthenticator {
      */
     public WebAuthnAuthenticator(String credentialID, byte[] publicKey, Long signCount,
             byte[] userID) {
+        this(credentialID, publicKey, signCount, userID, "Default Credential");
+    }
+    
+    /**
+     * Basic constructor for WebAuthnAuthenticator.
+     * 
+     * @param credentialID The Credential ID.
+     * @param publicKey The public key.
+     * @param signCount The signature counter.
+     * @param userID The user handle of the user account entity.
+     * @param credentailDisplayName The Credential Display Name.
+     */
+    public WebAuthnAuthenticator(String credentialID, byte[] publicKey, Long signCount,
+            byte[] userID, String credentialName) {
         this.credentialID = credentialID;
         this.publicKey = publicKey;
         this.signCount = signCount;
         this.userID = userID;
+        this.setCredentialName(credentialName);
     }
+
 
     /**
      * Get the Credential ID.
@@ -133,6 +150,23 @@ public class WebAuthnAuthenticator {
         this.userID = userID;
     }
     
+    /**
+     * Get the credential display name.
+     * 
+     * @return credential display name.
+     */
+    public String getCredentialName() {
+        return credentialName;
+    }
+    /**
+     * Set the credential display name.
+     * 
+     * @param credentail display name.
+     */
+    public void setCredentialName(String credentialName) {
+        this.credentialName = credentialName;
+    }
+
     /**
      * Determine if the Credential ID match.
      * 

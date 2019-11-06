@@ -270,6 +270,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         entry.addAttribute(credentialAttrName, authenticator.getCredentialID());
         entry.addAttribute(keyAttrName, authenticator.getPublicKey());
         entry.addAttribute(counterAttrName, authenticator.getSignCount());
+        entry.addAttribute(credentialNameAttrName, authenticator.getCredentialName());
         entry.addAttribute("fido2UserID", authenticator.getUserID());
         
         Connection conn = null;
@@ -348,6 +349,34 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
         modifyRequest.addModification(
                 ModificationType.REPLACE, counterAttrName, authenticator.getSignCount());
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.modify(modifyRequest);
+            result = true;
+        } catch (LdapException e) {
+            // TODO
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeIfNotNull(conn);
+        }
+        return result;
+    }
+    
+    /**
+     * Update the Credential Name.
+     * 
+     * @param authenticator The target authenticator.
+     * @return Returns true if the entry is successfully saved.
+     */
+    public boolean storeCredentialName(WebAuthnAuthenticator authenticator) {
+        boolean result = false;
+        String dn = DN.valueOf(baseDN)
+                .child(credentialAttrName, authenticator.getCredentialID()).toString();
+        ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
+        modifyRequest.addModification(
+                ModificationType.REPLACE, credentialNameAttrName, authenticator.getCredentialName());
 
         Connection conn = null;
         try {

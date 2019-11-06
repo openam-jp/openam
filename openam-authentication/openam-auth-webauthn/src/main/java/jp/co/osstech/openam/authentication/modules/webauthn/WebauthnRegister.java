@@ -146,6 +146,7 @@ public class WebauthnRegister extends AMLoginModule {
     private byte[] clientDataJsonBytes;
     private boolean verificationRequired;
     private long attestedCounter;
+    private WebAuthnAuthenticator attestedAuthenticator;
 
     // Service Configuration Parameters
     private String rpNameConfig = "";
@@ -326,8 +327,14 @@ public class WebauthnRegister extends AMLoginModule {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_KEY");
             }
+            
+            try {
+                nextState = storeCredentialNameCallback(callbacks);
+            } catch (Exception ex) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            }
             // only display next button and return LOGIN_START
-            nextState = WebauthnRegisterModuleState.COMPLETE;
+            //nextState = WebauthnRegisterModuleState.COMPLETE;
 
             break;
 
@@ -434,11 +441,11 @@ public class WebauthnRegister extends AMLoginModule {
             CborConverter _cborConverter = new CborConverter();
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             webauthnService = webauthnServiceFactory.create(realm);
-            WebAuthnAuthenticator authenticator = new WebAuthnAuthenticator(
+            attestedAuthenticator = new WebAuthnAuthenticator(
                     Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
                     _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
                     new Long(attestedCounter), userHandleIdBytes);
-            _storeResult = webauthnService.createAuthenticator(authenticator);
+            _storeResult = webauthnService.createAuthenticator(attestedAuthenticator);
             
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
@@ -457,6 +464,48 @@ public class WebauthnRegister extends AMLoginModule {
             DEBUG.error("Webauthn.storeCredentials : Webauthn module exception : ", e);
             return WebauthnRegisterModuleState.REG_START;
         }
+    }
+    
+    /*
+     * Store Authenticator(browser) Response Credentials for Registration
+     * @param callbacks an array of <code>Callback</cdoe> for this Login state
+     * @return int order of next state. Return
+     * @throws AuthLoginException
+     */
+    private WebauthnRegisterModuleState storeCredentialNameCallback(Callback[] callbacks) throws AuthLoginException {
+        
+        String credentialname = ((NameCallback) callbacks[1]).getName();
+        
+        if (StringUtils.isNotEmpty(credentialname)) {
+            
+            attestedAuthenticator.setCredentialName(credentialname);
+            try {
+                // boolean _storeResult
+                boolean _storeResult = false;
+                _storeResult = webauthnService.storeCredentialName(attestedAuthenticator);
+
+                if (_storeResult) {
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("storeCredentialName was success");
+                    }
+                    return WebauthnRegisterModuleState.COMPLETE;
+
+                } else {
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("storeCredentialName was Fail");
+                    }
+                    return WebauthnRegisterModuleState.REG_START;
+
+                }
+            } catch (Exception e) {
+                DEBUG.error("Webauthn.storeCredentialName : Webauthn module exception : ", e);
+                return WebauthnRegisterModuleState.REG_START;
+            }
+
+        } else {
+            return WebauthnRegisterModuleState.COMPLETE;
+        }
+        
     }
 
     /*
