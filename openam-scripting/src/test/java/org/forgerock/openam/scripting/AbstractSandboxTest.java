@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.scripting;
@@ -41,7 +42,7 @@ import static org.testng.Assert.fail;
  * white-list exactly those classes that the script should have access to (and never white-list reflection or
  * java.lang.Class) or run OpenAM with a SecurityManager enabled and an appropriate security policy in place.
  */
-public abstract class AbstractSandboxTests {
+public abstract class AbstractSandboxTest {
 
     private ScriptEngine scriptEngine;
 
@@ -71,7 +72,7 @@ public abstract class AbstractSandboxTests {
         return (T) result;
     }
 
-    private <T> T eval(String...script) throws ScriptException {
+    protected <T> T eval(String...script) throws ScriptException {
         return eval(new SimpleBindings(), script);
     }
 
