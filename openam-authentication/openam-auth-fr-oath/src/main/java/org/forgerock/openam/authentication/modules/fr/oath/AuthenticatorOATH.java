@@ -469,7 +469,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         OathDeviceSettings settings = oathDevices.createDeviceProfile(minSecretKeyLength);
         settings.setChecksumDigit(checksum);
 
-        if (this.issueRecoveryCodesEnabled) {
+        if (issueRecoveryCodesEnabled) {
             try {
                 settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.ALPHANUMERIC, false));
             } catch (CodeException e) {
