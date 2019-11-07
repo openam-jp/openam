@@ -57,7 +57,7 @@
                     order="101"
                     resourceName="origin">
                     <DefaultValues>
-                        <Value>https://openam.example.com:443</Value> 
+                        <Value>https://@SERVER_HOST@:443</Value> 
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-attestation"
@@ -167,7 +167,7 @@
                         order="101"
                         resourceName="origin">
                         <DefaultValues>
-                            <Value>https://openam.example.com:443</Value> 
+                            <Value>https://@SERVER_HOST@:443</Value> 
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-attestation"
