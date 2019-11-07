@@ -57,7 +57,12 @@ public class AuthenticatorWebAuthnServiceFactory implements DeviceServiceFactory
     @Override
     public AuthenticatorWebAuthnService create(ServiceConfigManager serviceConfigManager, String realm)
             throws SSOException, SMSException {
-        return new AuthenticatorWebAuthnService(serviceConfigManager, realm);
+        AuthenticatorWebAuthnService newService = new AuthenticatorWebAuthnService(serviceConfigManager, realm);
+        AuthenticatorWebAuthnService oldService = serviceSettingsMap.put(realm, newService);
+        if (oldService != null) {
+            oldService.close();
+        }
+        return newService;
     }
 
 }
