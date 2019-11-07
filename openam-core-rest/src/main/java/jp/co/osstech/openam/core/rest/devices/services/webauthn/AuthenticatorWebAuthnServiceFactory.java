@@ -16,10 +16,16 @@
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
 import com.iplanet.sso.SSOException;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Singleton;
 import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 /**
  * Produces AuthenticatorWebAuthnService's for a specific realm.
@@ -30,6 +36,24 @@ public class AuthenticatorWebAuthnServiceFactory implements DeviceServiceFactory
     /** Name of this factory for Guice purposes. */
     public static final String FACTORY_NAME = "AuthenticatorWebAuthnServiceFactory";
 
+    private final Map<String, AuthenticatorWebAuthnService> serviceSettingsMap = new HashMap<>();
+    
+    /**
+     * Default constructor.
+     */
+    public AuthenticatorWebAuthnServiceFactory() {
+        ShutdownManager shutdownManager = ShutdownManager.getInstance();
+        shutdownManager.addShutdownListener(new ShutdownListener() {
+            @Override
+            public void shutdown() {
+                for (String realm : serviceSettingsMap.keySet()) {
+                    AuthenticatorWebAuthnService service = serviceSettingsMap.get(realm);
+                    service.close();
+                }
+            }
+        });
+    }
+    
     @Override
     public AuthenticatorWebAuthnService create(ServiceConfigManager serviceConfigManager, String realm)
             throws SSOException, SMSException {

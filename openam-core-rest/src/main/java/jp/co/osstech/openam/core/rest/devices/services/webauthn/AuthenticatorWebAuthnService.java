@@ -267,9 +267,11 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      * @return The LDAP connection.
      * @throws LdapException If the connection request failed for some reason.
      */
-    private synchronized Connection getConnection() throws LdapException {
-        if (cPool == null) {
-            initializeConnection();
+    private Connection getConnection() throws LdapException {
+        synchronized(this) {
+            if (cPool == null) {
+                initializeConnection();
+            }
         }
         return cPool.getConnection();
     }
@@ -414,6 +416,18 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         return result;
     }
     
+    /**
+     * Close connection pool.
+     */
+    public void close() {
+        synchronized(this) {
+            if (cPool != null) {
+                cPool.close();
+                cPool = null;
+            }
+        }
+    }
+    
     @Override
     public String getConfigStorageAttributeName() {
         return null;
@@ -423,4 +437,5 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     public DeviceSerialisation getDeviceSerialisationStrategy() {
         return null;
     }
+
 }
