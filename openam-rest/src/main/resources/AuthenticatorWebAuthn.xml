@@ -30,13 +30,14 @@
             i18nKey="openam-auth-webauthn-service-description">
 
             <Organization>
-                <AttributeSchema name="openam-auth-webauthn-objectclass-name"
-                    type="single"
+                <AttributeSchema name="openam-auth-webauthn-objectclass-names"
+                    type="list"
                     syntax="string"
                     i18nKey="a100"
                     order="100"
-                    resourceName="objectClassName">
+                    resourceName="objectClassNames">
                     <DefaultValues>
+                        <Value>top</Value>
                         <Value>fido2Credential</Value>
                     </DefaultValues>
                 </AttributeSchema>
@@ -80,6 +81,16 @@
                         <Value>fido2SignCount</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-user-handle-id-attribute-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a105"
+                    order="600"
+                    resourceName="userHandleIdAttributeName">
+                    <DefaultValues>
+                        <Value>fido2UserID</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="openam-auth-webauthn-ldap-server"
                     type="list"
                     syntax="string"
@@ -98,7 +109,7 @@
                     resourceName="secondaryLdapServer">
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-webauthn-ldap-base-dn"
-                    type="list"
+                    type="single"
                     syntax="dn"
                     i18nKey="a202"
                     order="1200"
@@ -199,6 +210,16 @@
                     resourceName="operationTimeout">
                     <DefaultValues>
                         <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-webauthn-ldap-connection-pool-max-size"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a211"
+                    order="2100"
+                    resourceName="connectionPoolMaxSize">
+                    <DefaultValues>
+                        <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

@@ -76,8 +76,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
 
     private static final String DEBUG_LOCATION = "AuthenticatorWebAuthnService";
 
-    private static final String WEBAUTHN_CLASS_NAME = 
-            "openam-auth-webauthn-objectclass-name";
+    private static final String WEBAUTHN_CLASS_NAMES = 
+            "openam-auth-webauthn-objectclass-names";
     private static final String WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME = 
             "openam-auth-webauthn-credentialid-attribute-name";
     private static final String WEBAUTHN_KEY_ATTRIBUTE_NAME = 
@@ -86,6 +86,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             "openam-auth-webauthn-credentialname-attribute-name";
     private static final String WEBAUTHN_COUNTER_ATTRIBUTE_NAME = 
             "openam-auth-webauthn-counter-attribute-name";
+    private static final String WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME = 
+            "openam-auth-webauthn-user-handle-id-attribute-name";
     
     private static final String WEBAUTHN_PRIMARY_LDAP_SERVER = 
             "openam-auth-webauthn-ldap-server";
@@ -109,17 +111,31 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             "openam-auth-webauthn-ldap-heartbeat-timeunit";
     private static final String WEBAUTHN_LDAP_OPERATION_TIMEOUT = 
             "openam-auth-webauthn-ldap-operation-timeout";
+    private static final String WEBAUTHN_LDAP_CON_POOL_MAX_SIZE = 
+            "openam-auth-webauthn-ldap-connection-pool-max-size";
 
-    private final static int MIN_CONNECTION_POOL_SIZE = 1;
-    private final static int MAX_CONNECTION_POOL_SIZE = 10;
+    private static final Set<String> DEFAULT_WEBAUTHN_CLASS_NAMES = 
+            CollectionUtils.asSet("top", "fido2Credential");
+    private static final String DEFAULT_WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME = 
+            "fido2CredentialID";
+    private static final String DEFAULT_WEBAUTHN_KEY_ATTRIBUTE_NAME = 
+            "fido2PublicKey";
+    private static final String DEFAULT_WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME = 
+            "fido2CredentialName";
+    private static final String DEFAULT_WEBAUTHN_COUNTER_ATTRIBUTE_NAME = 
+            "fido2SignCount";
+    private static final String DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME = 
+            "fido2UserID";
+    private final static int DEFAULT_CON_POOL_MAX_SIZE = 10;
     
     final private Debug debug;
     private Map<String, Set<?>> options;
-    private String className = null;
+    private Set<String> classNames = null;
     private String credentialAttrName = null;
     private String keyAttrName = null;
     private String credentialNameAttrName = null;
     private String counterAttrName = null;
+    private String useridAttrName = null;
     private String baseDN = null;
     private ConnectionFactory cPool = null;
     
@@ -139,16 +155,24 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             ServiceConfig scm = configManager.getOrganizationConfig(realm, null);
             options = scm.getAttributes();
 
-            baseDN = CollectionHelper.getServerMapAttr(options, WEBAUTHN_LDAP_BASE_DN);
+            baseDN = CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_BASE_DN);
             if (baseDN == null) {
                 debug.error("BaseDN for search was null");
             }
-            
-            className = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CLASS_NAME);
-            credentialAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME);
-            keyAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_KEY_ATTRIBUTE_NAME);
-            credentialNameAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME);
-            counterAttrName = CollectionHelper.getServerMapAttr(options, WEBAUTHN_COUNTER_ATTRIBUTE_NAME);
+            classNames = (Set<String>) options.get(WEBAUTHN_CLASS_NAMES);
+            if (classNames == null || classNames.size() == 0) {
+                classNames = DEFAULT_WEBAUTHN_CLASS_NAMES;
+            }
+            credentialAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME,
+                    DEFAULT_WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME);
+            keyAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_KEY_ATTRIBUTE_NAME,
+                    DEFAULT_WEBAUTHN_KEY_ATTRIBUTE_NAME);
+            credentialNameAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME,
+                    DEFAULT_WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME);
+            counterAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_COUNTER_ATTRIBUTE_NAME,
+                    DEFAULT_WEBAUTHN_COUNTER_ATTRIBUTE_NAME);
+            useridAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME,
+                    DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME);
             
         } catch (SMSException | SSOException e) {
             if (debug.errorEnabled()) {
@@ -188,18 +212,14 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_HEARTBEAT_TIMEUNIT, "SECONDS");
         int operationTimeout = 
                 CollectionHelper.getIntMapAttr(options, WEBAUTHN_LDAP_OPERATION_TIMEOUT , 0 , debug);
-
+        int maxPoolSize = 
+                CollectionHelper.getIntMapAttr(options, WEBAUTHN_LDAP_CON_POOL_MAX_SIZE,
+                        DEFAULT_CON_POOL_MAX_SIZE, debug);
         
         try {
             Options options = Options.defaultOptions()
                     .set(LDAPConnectionFactory.REQUEST_TIMEOUT, 
                             new Duration((long) operationTimeout, TimeUnit.SECONDS));
-        
-            int min = MIN_CONNECTION_POOL_SIZE;
-            int max = MAX_CONNECTION_POOL_SIZE;
-            if (min >= max) {
-                min = max - 1;
-            }
         
             Set<LDAPURL> primaryUrls = LDAPUtils.convertToLDAPURLs(primaryServers);
             Set<LDAPURL> secondaryUrls = LDAPUtils.convertToLDAPURLs(secondaryServers);
@@ -219,12 +239,12 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             }
             
             ConnectionFactory primaryCf = LDAPUtils.newFailoverConnectionPool(primaryUrls, bindDN,
-                    bindPassword, max, heartBeatInterval, heartBeatTimeUnit, options);
+                    bindPassword, maxPoolSize, heartBeatInterval, heartBeatTimeUnit, options);
             if (secondaryServers.isEmpty()) {
                 cPool = primaryCf;
             } else {
                 ConnectionFactory secondaryCf = LDAPUtils.newFailoverConnectionPool(secondaryUrls, bindDN,
-                        bindPassword, max, heartBeatInterval, heartBeatTimeUnit, options);
+                        bindPassword, maxPoolSize, heartBeatInterval, heartBeatTimeUnit, options);
                 cPool = Connections.newFailoverLoadBalancer(CollectionUtils.asList(primaryCf, secondaryCf), options);
             }
 
@@ -265,13 +285,13 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         String dn = DN.valueOf(baseDN)
                 .child(credentialAttrName, authenticator.getCredentialID()).toString();
         Entry entry = new LinkedHashMapEntry(dn);
-        Set<String> objectClasses = CollectionUtils.asSet(className);
+        Set<String> objectClasses = classNames;
         entry.addAttribute("objectClass", objectClasses.toArray());
         entry.addAttribute(credentialAttrName, authenticator.getCredentialID());
         entry.addAttribute(keyAttrName, authenticator.getPublicKey());
         entry.addAttribute(counterAttrName, authenticator.getSignCount());
         entry.addAttribute(credentialNameAttrName, authenticator.getCredentialName());
-        entry.addAttribute("fido2UserID", authenticator.getUserID());
+        entry.addAttribute(useridAttrName, authenticator.getUserID());
         
         Connection conn = null;
         try {
@@ -296,10 +316,12 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     public Set<WebAuthnAuthenticator> getAuthenticators(byte[] userID) {
         Set<WebAuthnAuthenticator> authenticators = new HashSet<WebAuthnAuthenticator>();
         SearchScope scope = SearchScope.SINGLE_LEVEL;
-        Filter userIdFilter = 
-                Filter.valueOf("fido2UserID"+ "=" + WebAuthnAuthenticator.getUserIDAsString(userID));
-        Filter objectClassFilter = Filter.valueOf("objectClass"+ "=" + className);
-        Filter searchFilter = Filter.and(userIdFilter, objectClassFilter);
+        Filter searchFilter = 
+                Filter.valueOf(useridAttrName + "=" + WebAuthnAuthenticator.getUserIDAsString(userID));
+        for (String className : classNames) {
+            Filter objectClassFilter = Filter.valueOf("objectClass"+ "=" + className);
+            searchFilter = Filter.and(searchFilter, objectClassFilter);
+        }
         SearchRequest searchRequest = 
                 LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter, 
                         new String[]{credentialAttrName, keyAttrName, counterAttrName});
