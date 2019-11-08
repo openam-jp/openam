@@ -24,6 +24,7 @@
  *
  * $Id: CaseInsensitiveProperties.java,v 1.2 2008/06/25 05:42:25 qcheng Exp $
  *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.common;
@@ -32,6 +33,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * A case insensitive Properties with case preservation. If key is a String, a
@@ -39,6 +42,8 @@ import java.util.Set;
  * is preserved.
  */
 public class CaseInsensitiveProperties extends Properties {
+
+    private Map<String,String> keyExchange = new HashMap<>();
 
     static class CaseInsensitiveEnumeration implements Enumeration {
         Enumeration mEnum = null;
@@ -78,18 +83,29 @@ public class CaseInsensitiveProperties extends Properties {
     }
 
     public String getProperty(String key) {
-        return (String) super.get(new CaseInsensitiveKey(key));
+        return (String) this.get(key);
     }
 
     public Object setProperty(String key, String value) {
-        return super.put(new CaseInsensitiveKey(key), value);
+        return this.put(key, value);
     }
 
     public boolean containsKey(Object key) {
         boolean retval;
-        if (key instanceof String) {
-            CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
-            retval = super.containsKey(ciKey);
+        if (key instanceof CaseInsensitiveKey) {
+            String actualKey = keyExchange.get(key.toString().toLowerCase());
+            if (actualKey != null) {
+                retval = super.containsKey(actualKey);
+            } else {
+            	retval = false;
+            }
+        } else if( key instanceof String){
+            String actualKey = keyExchange.get(((String)key).toLowerCase());
+            if (actualKey != null) {
+                retval = super.containsKey(actualKey);
+            } else {
+            	retval = false;
+            }
         } else {
             retval = super.containsKey(key);
         }
@@ -99,8 +115,11 @@ public class CaseInsensitiveProperties extends Properties {
     public Object get(Object key) {
         Object retval;
         if (key instanceof String) {
-            CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
-            retval = super.get(ciKey);
+            String actualKey = keyExchange.get(((String)key).toLowerCase());
+            retval = super.get(actualKey);
+        } else if (key instanceof CaseInsensitiveKey) {
+            String actualKey = keyExchange.get(key.toString().toLowerCase());
+            retval = super.get(actualKey);
         } else {
             retval = super.get(key);
         }
@@ -115,8 +134,7 @@ public class CaseInsensitiveProperties extends Properties {
         CaseInsensitiveHashSet ciSet = new CaseInsensitiveHashSet();
         Iterator iter = keys.iterator();
         while (iter.hasNext()) {
-            // keys are already CaseInsensitiveKey's so we can just add it.
-            ciSet.add(iter.next());
+            ciSet.add(new CaseInsensitiveKey((String)iter.next()));
         }
         return ciSet;
     }
@@ -139,9 +157,26 @@ public class CaseInsensitiveProperties extends Properties {
 
     public Object put(Object key, Object value) {
         Object retval;
+        String paramKey = null;
         if (key instanceof String) {
-            CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
-            retval = super.put(ciKey, value);
+            paramKey = (String)key;
+        } else if (key instanceof CaseInsensitiveKey){
+        	paramKey = key.toString();
+        }
+        if (paramKey != null) {
+        	String lowKey = paramKey.toLowerCase();
+            String actualKey = keyExchange.get(lowKey);
+            if (actualKey != null) {
+                retval = super.remove(actualKey);
+            } else {
+            	retval = null;
+            }
+            if (value != null) {
+                keyExchange.put(lowKey,paramKey);
+            } else {
+                keyExchange.remove(lowKey);
+            }
+            super.put(paramKey,value);
         } else {
             retval = super.put(key, value);
         }
@@ -150,13 +185,25 @@ public class CaseInsensitiveProperties extends Properties {
 
     public Object remove(Object key) {
         Object retval;
+        String lowKey = null;
         if (key instanceof String) {
-            CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
-            retval = super.remove(ciKey);
+            lowKey = ((String)key).toLowerCase();
+        } else if (key instanceof CaseInsensitiveKey){
+            lowKey = key.toString().toLowerCase();
+        }
+        if (lowKey != null) {
+            String actualKey = keyExchange.get(lowKey);
+            retval = super.remove(actualKey);
+            keyExchange.remove(lowKey);
         } else {
             retval = super.remove(key);
         }
         return retval;
+    }
+
+    public void clear(){
+        keyExchange.clear();
+        super.clear();
     }
 
 }
