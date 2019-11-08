@@ -376,6 +376,9 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
+        webauthnValidator.validateGetResponse(getValidationConfig(), _responseJson,
+                _selectedAuthenticator, DEBUG);
+        
         boolean _storeResult = webauthnService.updateCounter(_selectedAuthenticator);
         if (_storeResult) {
             setAuthLevel(authLevel);
