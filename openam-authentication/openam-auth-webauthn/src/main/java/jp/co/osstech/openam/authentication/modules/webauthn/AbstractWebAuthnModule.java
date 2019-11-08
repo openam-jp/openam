@@ -24,8 +24,13 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -37,6 +42,9 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 
 /**
  * Abstract Class for WebauthnRegister / WebauthnAuthenticate
@@ -63,7 +71,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     protected String timeoutConfig = "";
     protected String displayNameAttributeNameConfig = "";
     
-    // 
+    // Common
     protected ResourceBundle bundle;
     protected String userName;
     protected int authLevel;
@@ -71,6 +79,14 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     // user's valid ID and principal
     protected String validatedUserID;
     protected WebauthnPrincipal userPrincipal;
+    
+    // WebAuthn
+    protected final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
+            InjectorHolder.getInstance(Key.get(
+                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
+                    Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
+    protected AuthenticatorWebAuthnService webauthnService;
+    protected WebAuthnValidator webauthnValidator = InjectorHolder.getInstance(WebAuthnValidator.class);
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {

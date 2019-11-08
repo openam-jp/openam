@@ -44,18 +44,10 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 import com.iplanet.sso.SSOException;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.StringUtils;
 
-import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
-import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 /**
@@ -84,13 +76,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
     // Webauthn
     private byte[] userHandleIdBytes;
     private WebAuthnAuthenticator attestedAuthenticator;
-    private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
-            InjectorHolder.getInstance(Key.get(
-                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
-                    Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
-    private AuthenticatorWebAuthnService webauthnService;
-    private WebAuthnValidator webauthnValidator = new WebAuthn4JValidatorImpl();
-    
+
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         if (DEBUG.messageEnabled()) {

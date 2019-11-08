@@ -29,6 +29,9 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
+
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
+
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
@@ -54,20 +57,11 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.encode.Base64url;
-
-import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
-import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
-import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 /**
  * WebAuthn (Authenticate) Authentication Module.
@@ -94,12 +88,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
 
     // Webauthn
     private Set<WebAuthnAuthenticator> authenticators = null;
-    private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
-            InjectorHolder.getInstance(Key.get(
-                    new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
-                    Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
-    private AuthenticatorWebAuthnService webauthnService;
-    private WebAuthnValidator webauthnValidator = new WebAuthn4JValidatorImpl();
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
