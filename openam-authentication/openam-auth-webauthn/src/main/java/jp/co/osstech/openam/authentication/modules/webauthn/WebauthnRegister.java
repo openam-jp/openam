@@ -67,6 +67,12 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
     private static final Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    // Module States
+    private final int STATE_COMPLETE = -1;
+    private final int STATE_REG_START = 1;
+    private final int STATE_REG_SCRIPT = 2;
+    private final int STATE_REG_KEY = 3;
+    
     // Configuration Strings for Register
     private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
     private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
@@ -128,25 +134,24 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             DEBUG.message("in process(), login state is " + state);
         }
 
-        WebauthnRegisterModuleState moduleState = WebauthnRegisterModuleState.get(state);
-        WebauthnRegisterModuleState nextState = null;
+        int nextState;
 
-        switch (moduleState) {
+        switch (state) {
 
-        case REG_START:
+        case STATE_REG_START:
             nextState = createScript(callbacks);
             break;
-        case REG_SCRIPT:
+        case STATE_REG_SCRIPT:
             nextState = storeAuthenticator(callbacks);
             break;
-        case REG_KEY:
+        case STATE_REG_KEY:
             nextState = storeCredentialName(callbacks);
             break;
         default:
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
-        return nextState.intValue();
+        return nextState;
     }
     
     /**
@@ -156,17 +161,17 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnRegisterModuleState createScript(Callback[] callbacks) 
+    private int createScript(Callback[] callbacks) 
             throws AuthLoginException {
         
-        WebauthnRegisterModuleState nextState;
+        int nextState;
         
         if (DEBUG.messageEnabled()) {
             DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_START");
         }
 
         if (userName != null) {
-            nextState = WebauthnRegisterModuleState.REG_SCRIPT;
+            nextState = STATE_REG_SCRIPT;
         } else {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
@@ -200,7 +205,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         // only for nextState REG_SCRIPT
         Callback creadentialsCreateCallback = new ScriptTextOutputCallback(
                 credentialsCreateOptions.generateCredntialsCreateScriptCallback());
-        replaceCallback(WebauthnRegisterModuleState.REG_SCRIPT.intValue(), 0, creadentialsCreateCallback);
+        replaceCallback(STATE_REG_SCRIPT, 0, creadentialsCreateCallback);
         
         return nextState;
     }
@@ -212,10 +217,10 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnRegisterModuleState storeAuthenticator(Callback[] callbacks) 
+    private int storeAuthenticator(Callback[] callbacks) 
             throws AuthLoginException {
         
-        WebauthnRegisterModuleState nextState;
+        int nextState;
         
         if (DEBUG.messageEnabled()) {
             DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_SCRIPT");
@@ -256,7 +261,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("storeCredentials was success");
                 }
-                nextState = WebauthnRegisterModuleState.REG_KEY;
+                nextState = STATE_REG_KEY;
             } else {
                 DEBUG.error("storeCredentials was Fail");
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
@@ -276,10 +281,10 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnRegisterModuleState storeCredentialName(Callback[] callbacks) 
+    private int storeCredentialName(Callback[] callbacks) 
             throws AuthLoginException {
         
-        WebauthnRegisterModuleState nextState;
+        int nextState;
         // TODO user enter credential nick name and store it at this state.
         if (DEBUG.messageEnabled()) {
             DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_KEY");
@@ -295,7 +300,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("storeCredentialName was success");
                 }
-                nextState = WebauthnRegisterModuleState.COMPLETE;
+                nextState = STATE_COMPLETE;
             } else {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("storeCredentialName was Fail");
@@ -303,7 +308,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
         } else {
-            nextState = WebauthnRegisterModuleState.COMPLETE;
+            nextState = STATE_COMPLETE;
         }
         return nextState;
     }

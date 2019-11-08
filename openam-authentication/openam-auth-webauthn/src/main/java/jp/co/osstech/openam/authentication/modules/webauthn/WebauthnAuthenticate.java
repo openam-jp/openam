@@ -77,6 +77,14 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private static final Debug DEBUG = Debug.getInstance(WebauthnAuthenticate.class.getSimpleName());
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     
+    // Module States
+    private final int STATE_COMPLETE = -1;
+    private final int STATE_LOGIN_SELECT = 1;
+    private final int STATE_LOGIN_START = 2;
+    private final int STATE_LOGIN_SCRIPT = 3;
+    private final int STATE_RESIDENTKEY_LOGIN_START = 4;
+    private final int STATE_MFA_LOGIN_START = 5;
+    
     // Configuration Strings for Authenticate
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
@@ -135,31 +143,30 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             DEBUG.message("in process(), login state is " + state);
         }
 
-        WebauthnAuthenticateModuleState moduleState = WebauthnAuthenticateModuleState.get(state);
-        WebauthnAuthenticateModuleState nextState = null;
+        int nextState;
 
-        switch (moduleState) {
+        switch (state) {
         
-        case LOGIN_SELECT:
+        case STATE_LOGIN_SELECT:
             nextState = selectLoginType();
             break;
-        case LOGIN_START:
+        case STATE_LOGIN_START:
             nextState = handlePasswordLessLoginStartCallbacks(callbacks);
             break;
-        case LOGIN_SCRIPT:
+        case STATE_LOGIN_SCRIPT:
             nextState = verifyAuthenticatorCallback(callbacks);
             break;
-        case RESIDENTKEY_LOGIN_START:
+        case STATE_RESIDENTKEY_LOGIN_START:
             nextState = handleResidentKeyLoginStartCallbacks(callbacks);
             break;
-        case MFA_LOGIN_START:
+        case STATE_MFA_LOGIN_START:
             nextState = handleMfaLoginStartCallbacks(callbacks);
             break;
         default:
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
-        return nextState.intValue();
+        return nextState;
     }
 
     /**
@@ -167,9 +174,9 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnAuthenticateModuleState selectLoginType() throws AuthLoginException {
+    private int selectLoginType() throws AuthLoginException {
         
-        WebauthnAuthenticateModuleState nextState;
+        int nextState;
         
         try {
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
@@ -182,11 +189,11 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             if (userName == null) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
-            nextState = WebauthnAuthenticateModuleState.MFA_LOGIN_START;
+            nextState = STATE_MFA_LOGIN_START;
         } else if (residentKeyConfig.equalsIgnoreCase("true")) {
-            nextState = WebauthnAuthenticateModuleState.RESIDENTKEY_LOGIN_START;
+            nextState = STATE_RESIDENTKEY_LOGIN_START;
         } else {
-            nextState = WebauthnAuthenticateModuleState.LOGIN_START;
+            nextState = STATE_LOGIN_START;
         }
         return nextState;
     }
@@ -198,11 +205,11 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnAuthenticateModuleState handlePasswordLessLoginStartCallbacks(Callback[] callbacks) 
+    private int handlePasswordLessLoginStartCallbacks(Callback[] callbacks) 
             throws AuthLoginException {
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_START");
+            DEBUG.message("ThisState = LOGIN_START");
         }
 
         userName = ((NameCallback) callbacks[0]).getName();
@@ -211,7 +218,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         
         createLoginScript();
 
-        return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+        return STATE_LOGIN_SCRIPT;
     }
     
     /**
@@ -221,16 +228,16 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnAuthenticateModuleState handleResidentKeyLoginStartCallbacks(Callback[] callbacks)
+    private int handleResidentKeyLoginStartCallbacks(Callback[] callbacks)
             throws AuthLoginException {
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.RESIDENTKEY_LOGIN_START");
+            DEBUG.message("ThisState = RESIDENTKEY_LOGIN_START");
         }
 
         createLoginScript();
 
-        return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+        return STATE_LOGIN_SCRIPT;
     }
 
     /**
@@ -240,18 +247,18 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnAuthenticateModuleState handleMfaLoginStartCallbacks(Callback[] callbacks)
+    private int handleMfaLoginStartCallbacks(Callback[] callbacks)
             throws AuthLoginException {
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.MFA_LOGIN_START");
+            DEBUG.message("ThisState = MFA_LOGIN_START");
         }
 
         getStoredCredentialId();
         
         createLoginScript();
         
-        return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+        return STATE_LOGIN_SCRIPT;
     }
     
     /**
@@ -297,7 +304,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         // only for nextState LOGIN_SCRIPT
         Callback creadentialsGetCallback = new ScriptTextOutputCallback(
                 credentialsGetOptions.generateCredntialsGetScriptCallback());
-        replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, creadentialsGetCallback);
+        replaceCallback(STATE_LOGIN_SCRIPT, 0, creadentialsGetCallback);
     }
 
     /**
@@ -307,7 +314,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private WebauthnAuthenticateModuleState verifyAuthenticatorCallback(Callback[] callbacks)
+    private int verifyAuthenticatorCallback(Callback[] callbacks)
             throws AuthLoginException {
         
         if (DEBUG.messageEnabled()) {
@@ -376,7 +383,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
                 DEBUG.message("Webauthn Authentication success");
             }
             validatedUserID = userName;
-            return WebauthnAuthenticateModuleState.COMPLETE;
+            return STATE_COMPLETE;
         } else {
             DEBUG.error("updateCounter error");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
