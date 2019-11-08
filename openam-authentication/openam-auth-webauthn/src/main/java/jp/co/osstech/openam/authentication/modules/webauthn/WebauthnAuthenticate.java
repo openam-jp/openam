@@ -26,10 +26,6 @@
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
-/**
- *
- * @author tonoki
- */
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
@@ -91,6 +87,9 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWeb
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
+/**
+ * WebAuthn (Authenticate) Authentication Module.
+ */
 public class WebauthnAuthenticate extends AbstractWebAuthnModule {
 
     private static final String BUNDLE_NAME = "amAuthWebauthnAuthenticate";
@@ -105,13 +104,9 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private String getType;
     private String getUserHandle;
 
-    // user's valid ID and principal
-    private String validatedUserID;
-    private WebauthnPrincipal userPrincipal;
-
     // Webauthn Credentials
     //private byte[] credentialIdBytes;
-    private Set<WebAuthnAuthenticator> authenticators;
+    private Set<WebAuthnAuthenticator> authenticators = null;
     private WebAuthnAuthenticator selectedAuthenticator = null;
     private CredentialPublicKey credentialPublicKey;
     private byte[] rawIdBytes;
@@ -124,7 +119,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private byte[] signatureBytes;
     private byte[] clientDataJsonBytes;
 
-    private boolean getCredentialsFromSharedState;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
@@ -182,171 +176,125 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         switch (moduleState) {
         
         case LOGIN_SELECT:
-            try {
-                String realm = DNMapper.orgNameToRealmName(getRequestOrg());
-                webauthnService = webauthnServiceFactory.create(realm);
-            } catch (SSOException|SMSException ex) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-            }
-            
-            if (useMfaConfig.equalsIgnoreCase("true")) {
-                nextState = WebauthnAuthenticateModuleState.MFA_LOGIN_START;
-            } else if (residentKeyConfig.equalsIgnoreCase("true")) {
-                nextState = WebauthnAuthenticateModuleState.RESIDENTKEY_LOGIN_START;
-            } else {
-                nextState = WebauthnAuthenticateModuleState.LOGIN_START;
-            }
+            nextState = selectLoginType();
             break;
-        
-
         case LOGIN_START:
-
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_START");
-            }
-
-            // Authentication Start
-            // expect LOGIN_SCRIPT
-            try {
-                nextState = getStoredCredentialId(callbacks);
-            } catch (AuthLoginException ex) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-            }
-
-            // generate 16byte challenge
-                generatedChallenge = new DefaultChallenge();
-                challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
-
-            // navigator.credentials.get Options
-            CredentialsGetOptions credentialsGetOptions = new CredentialsGetOptions(
-                    authenticators,
-                    userVerificationConfig,
-                    challengeBytes,
-                    timeoutConfig,
-                    residentKeyConfig);
-
-            // Replace Callback to send Generated Javascript that include get options.
-            // only for nextState LOGIN_SCRIPT
-            Callback creadentialsGetCallback = new ScriptTextOutputCallback(
-                    credentialsGetOptions.generateCredntialsGetScriptCallback());
-            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, creadentialsGetCallback);
-
+            nextState = handlePasswordLessLoginStartCallbacks(callbacks);
             break;
-
         case LOGIN_SCRIPT:
-
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_SCRIPT");
-            }
-
-            // Verify User Credential for Webauthn authentication
-            try {
-                nextState = verifyAuthenticatorCallback(callbacks);
-            } catch (Exception ex) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-            }
-
+            nextState = verifyAuthenticatorCallback(callbacks);
             break;
- 
         case RESIDENTKEY_LOGIN_START:
-
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.RESIDENTKEY_LOGIN_START");
-            }
-
-            nextState = WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-                    
-            // generate 16byte challenge
-            generatedChallenge = new DefaultChallenge();
-            challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
-
-            // navigator.credentials.get Options
-            //redidentkey dosn't need stored credentialid.
-            CredentialsGetOptions residentkeyCredentialsGetOptions = 
-                    new CredentialsGetOptions(
-                    null,
-                    userVerificationConfig,
-                    challengeBytes,
-                    timeoutConfig,
-                    residentKeyConfig);
-
-            // Replace Callback to send Generated Javascript that include get options.
-            // only for nextState LOGIN_SCRIPT
-            Callback residentkeyCreadentialsGetCallback = new ScriptTextOutputCallback(
-                    residentkeyCredentialsGetOptions.generateCredntialsGetScriptCallback());
-            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, residentkeyCreadentialsGetCallback);
-
+            nextState = handleResidentKeyLoginStartCallbacks(callbacks);
             break;
-            
         case MFA_LOGIN_START:
-
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.MFA_LOGIN_START");
-            }
-
-            // Authentication Start
-            // expect LOGIN_SCRIPT
-            try {
-                nextState = getMfaStoredCredentialId();
-            } catch (AuthLoginException ex) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-            }
-
-            // generate 16byte challenge
-            generatedChallenge = new DefaultChallenge();
-            challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
-
-            // navigator.credentials.get Options
-
-            CredentialsGetOptions mfaCredentialsGetOptions = new CredentialsGetOptions(
-                    authenticators,
-                    userVerificationConfig,
-                    challengeBytes,
-                    timeoutConfig,
-                    residentKeyConfig);
-
-            // Replace Callback to send Generated Javascript that include get options.
-            // only for nextState LOGIN_SCRIPT
-            Callback mfaCreadentialsGetCallback = new ScriptTextOutputCallback(
-                    mfaCredentialsGetOptions.generateCredntialsGetScriptCallback());
-            replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, mfaCreadentialsGetCallback);
-
+            nextState = handleMfaLoginStartCallbacks(callbacks);
             break;
-
+        default:
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
         return nextState.intValue();
     }
 
-    /*
-     * Webauthn Authentication LOGIN_START lookup user webauthn data from datastore
-     * #TODO PublicKey from lookupCredentialId()
+    /**
+     * Select login type (PasswordLess / ResidentKey / MFA).
+     * @return A value indicating the next state.
+     * @throws AuthLoginException
+     */
+    private WebauthnAuthenticateModuleState selectLoginType() throws AuthLoginException {
+        
+        WebauthnAuthenticateModuleState nextState;
+        
+        try {
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            webauthnService = webauthnServiceFactory.create(realm);
+        } catch (SSOException|SMSException ex) {
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+        }
+        
+        if (useMfaConfig.equalsIgnoreCase("true")) {
+            if (userName == null) {
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            }
+            nextState = WebauthnAuthenticateModuleState.MFA_LOGIN_START;
+        } else if (residentKeyConfig.equalsIgnoreCase("true")) {
+            nextState = WebauthnAuthenticateModuleState.RESIDENTKEY_LOGIN_START;
+        } else {
+            nextState = WebauthnAuthenticateModuleState.LOGIN_START;
+        }
+        return nextState;
+    }
+
+    /**
+     * Handle callbacks of password less login starting.
      * 
-     * @param callbacks an array of <code>Callback</cdoe> for this Login state
+     * @param callbacks The callbacks.
+     * @return A value indicating the next state.
+     * @throws AuthLoginException
+     */
+    private WebauthnAuthenticateModuleState handlePasswordLessLoginStartCallbacks(Callback[] callbacks) 
+            throws AuthLoginException {
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_START");
+        }
+
+        userName = ((NameCallback) callbacks[0]).getName();
+        
+        getStoredCredentialId();
+        
+        createLoginScript();
+
+        return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+    }
+    
+    /**
+     * Handle callbacks of resident key login starting.
      * 
-     * @return int order of next state.
+     * @param callbacks The callbacks.
+     * @return A value indicating the next state.
+     * @throws AuthLoginException
+     */
+    private WebauthnAuthenticateModuleState handleResidentKeyLoginStartCallbacks(Callback[] callbacks)
+            throws AuthLoginException {
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.RESIDENTKEY_LOGIN_START");
+        }
+
+        createLoginScript();
+
+        return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+    }
+
+    /**
+     * Handle callbacks of MFA login starting.
+     * 
+     * @param callbacks The callbacks.
+     * @return A value indicating the next state.
+     * @throws AuthLoginException
+     */
+    private WebauthnAuthenticateModuleState handleMfaLoginStartCallbacks(Callback[] callbacks)
+            throws AuthLoginException {
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.MFA_LOGIN_START");
+        }
+
+        getStoredCredentialId();
+        
+        createLoginScript();
+        
+        return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
+    }
+    
+    /**
+     * Get user authenticators.
      * 
      * @throws AuthLoginException
      */
-    private WebauthnAuthenticateModuleState getStoredCredentialId(Callback[] callbacks) throws AuthLoginException {
-        Callback[] idCallbacks = new Callback[1];
-
-        if (callbacks != null && callbacks.length == 0) {
-            if (userName == null) {
-                return WebauthnAuthenticateModuleState.LOGIN_START;
-            }
-
-            getCredentialsFromSharedState = true;
-            NameCallback nameCallback = new NameCallback("dummy");
-            nameCallback.setName(userName);
-            idCallbacks[0] = nameCallback;
-
-        } else {
-            idCallbacks = callbacks;
-            // callbacks is not null
-            userName = ((NameCallback) callbacks[0]).getName();
-        }
-
+    private void getStoredCredentialId() throws AuthLoginException {
         /*
          * lookup CredentialId(Base64Url encoded) from User Data store
          */
@@ -356,57 +304,58 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             if (authenticators.isEmpty()) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
-            return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
-        } catch (AuthLoginException ex) {
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
-        }
-    }
-    
-    private WebauthnAuthenticateModuleState getMfaStoredCredentialId() throws AuthLoginException {
-
- 
-        if (userName == null) {
-            return WebauthnAuthenticateModuleState.LOGIN_START; //Must be FAIL #TODO
-        }
-        /*
-         * lookup CredentialId(Base64Url encoded) from User Data store
-         */
-        try {
-            byte[] entryUUID = lookupByteData("entryUUID");
-            authenticators = webauthnService.getAuthenticators(entryUUID);
-            if (authenticators.isEmpty()) {
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-            }
-            return WebauthnAuthenticateModuleState.LOGIN_SCRIPT;
         } catch (AuthLoginException ex) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
     }
 
-    /*
-     * Verify Authenticator(browser) Response Credentials for Authentication #TODO
-     * Verify function is not completed.
+    /**
+     * Create logn javascript (credentials.get).
      * 
-     * @param callbacks an array of <code>Callback</cdoe> for this Login state
+     * @throws AuthLoginException
+     */
+    private void createLoginScript() throws AuthLoginException {
+        // generate 16byte challenge
+        generatedChallenge = new DefaultChallenge();
+        challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
+
+        // navigator.credentials.get Options
+        //redidentkey dosn't need stored credentialid(authenticators = null).
+        CredentialsGetOptions credentialsGetOptions = new CredentialsGetOptions(
+                authenticators,
+                userVerificationConfig,
+                challengeBytes,
+                timeoutConfig,
+                residentKeyConfig);
+
+        // Replace Callback to send Generated Javascript that include get options.
+        // only for nextState LOGIN_SCRIPT
+        Callback creadentialsGetCallback = new ScriptTextOutputCallback(
+                credentialsGetOptions.generateCredntialsGetScriptCallback());
+        replaceCallback(WebauthnAuthenticateModuleState.LOGIN_SCRIPT.intValue(), 0, creadentialsGetCallback);
+    }
+
+    /**
+     * Verify Authenticator(browser) Response Credentials for Authentication
      * 
-     * @return int order of next state. Return STATE_SUCCEED if authentication is
-     * successful
-     * 
+     * @param callbacks The callbacks.
+     * @return A value indicating the next state.
      * @throws AuthLoginException
      */
     private WebauthnAuthenticateModuleState verifyAuthenticatorCallback(Callback[] callbacks)
-            throws AuthLoginException, ClassNotFoundException, IOException {
+            throws AuthLoginException {
+        
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_SCRIPT");
+        }
 
         // read HiddenValueCallback from Authenticator posted
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof HiddenValueCallback) {
-                webauthnHiddenCallback = ((HiddenValueCallback) callbacks[i]).getValue();
-
-                if (webauthnHiddenCallback == null) {
-                    return WebauthnAuthenticateModuleState.LOGIN_START;
-                }
-            }
+        webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
+        // TODO: Cancel
+        if (StringUtils.isEmpty(webauthnHiddenCallback)) {
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
+        
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Posted webauthnHiddenCallback = " + webauthnHiddenCallback);
         }
@@ -414,36 +363,28 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         /*
          * Map Callback Json to Object
          */
-        if (StringUtils.isNotEmpty(webauthnHiddenCallback)) {
+        try {
+            WebauthnJsonCallback _responseJson = OBJECT_MAPPER.readValue(webauthnHiddenCallback,
+                    WebauthnJsonCallback.class);
 
-            try {
-                WebauthnJsonCallback _responseJson = OBJECT_MAPPER.readValue(webauthnHiddenCallback,
-                        WebauthnJsonCallback.class);
-
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("id Base64Url = " + _responseJson.getId());
-                }
-
-                rawIdBytes = Base64.getDecoder().decode(_responseJson.getRawId());
-
-                authenticatorDataBytes = Base64.getDecoder().decode(_responseJson.getAuthenticatorData());
-
-                clientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
-
-                signatureBytes = Base64.getDecoder().decode(_responseJson.getSignature());
-
-                getType = _responseJson.getType();
-
-                getUserHandle = _responseJson.getUserHandle();
-                
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("_responseJson.getUserHandle() = " + _responseJson.getUserHandle());
-                }
-
-            } catch (IOException e) {
-                DEBUG.error("Webauthn.process(): JSON parse error", e);
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("id Base64Url = " + _responseJson.getId());
             }
+
+            rawIdBytes = Base64.getDecoder().decode(_responseJson.getRawId());
+            authenticatorDataBytes = Base64.getDecoder().decode(_responseJson.getAuthenticatorData());
+            clientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
+            signatureBytes = Base64.getDecoder().decode(_responseJson.getSignature());
+            getType = _responseJson.getType();
+            getUserHandle = _responseJson.getUserHandle();
+                
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("_responseJson.getUserHandle() = " + _responseJson.getUserHandle());
+            }
+
+        } catch (IOException e) {
+            DEBUG.error("Webauthn.process(): JSON parse error", e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         }
 
         /*
@@ -522,15 +463,25 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
 
         }
     }
+    
     /**
     * Searches for an account with userHandle userID in the organization organization
+    * 
     * @param attributeValue The attributeValue to compare when searching for an
     *  identity
     * @param attributeName that name of where the identity will be
-    *  looked up
+    *  
     * @return the UserName
      * @throws AuthLoginException 
     */
+    /**
+     * Searches for an account with userHandle userID in the organization organization.
+     * 
+     * @param attributeValue The attributeValue to compare when searching for an identity.
+     * @param attributeName that name of where the identity will be looked up.
+     * @return The user name.
+     * @throws AuthLoginException
+     */
     private String searchUserNameWithAttrValue(String attributeValue, String attributeName) throws AuthLoginException {
  
         if (DEBUG.messageEnabled()) {
@@ -558,6 +509,9 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
                     if (DEBUG.messageEnabled()) {
                         DEBUG.message(BUNDLE_NAME + _results.size() + " result(s) obtained");
                     }
+                    if (_results.size() > 1) {
+                        throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                    }
                     AMIdentity _userDNId = _results.iterator().next();
                     if (_userDNId != null) {
                         if (DEBUG.messageEnabled()) {
@@ -570,22 +524,20 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
                 }
             }
         } catch (IdRepoException idrepoex) {
-
             throw new AuthLoginException(BUNDLE_NAME, idrepoex);
         } catch (SSOException ssoe) {
-
             throw new AuthLoginException(BUNDLE_NAME, ssoe);
         }
         if (DEBUG.messageEnabled()) {
-                    DEBUG.message(BUNDLE_NAME + " No results were found !");
+            DEBUG.message(BUNDLE_NAME + " No results were found !");
         }
-        return null;
+        throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
     }
 
     /*
      * load Authenticator Object data for use webauthn4j validation
      */
-    private Authenticator loadAuthenticator() throws AuthLoginException, IOException, ClassNotFoundException {
+    private Authenticator loadAuthenticator() throws AuthLoginException {
 
         // OpenAM didn't store aaguid now. Use ZERO AAGUID.
         AAGUID _aaguid = AAGUID.ZERO;
@@ -624,7 +576,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     public void nullifyUsedVars() {
         bundle = null;
         userName = null;
-
     }
 
     @Override
