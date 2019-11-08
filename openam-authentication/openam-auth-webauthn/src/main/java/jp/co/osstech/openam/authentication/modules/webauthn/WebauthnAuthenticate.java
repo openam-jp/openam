@@ -51,6 +51,7 @@ import java.util.Base64;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 
 import com.google.inject.Key;
@@ -321,9 +322,13 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_SCRIPT");
         }
 
+        // if Cancel Button Return Authentication Fail
+        if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
+            throw new AuthLoginException("Authentication Cancel Auth Fail");
+        }
+        
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
-        // TODO: Cancel
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }

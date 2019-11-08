@@ -226,9 +226,13 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_SCRIPT");
         }
 
+        // if Cancel Button Return Authentication Fail
+        if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
+            throw new AuthLoginException("Ragistration Cancel Auth Fail");
+        }
+
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
-        // TODO: Cancel
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
