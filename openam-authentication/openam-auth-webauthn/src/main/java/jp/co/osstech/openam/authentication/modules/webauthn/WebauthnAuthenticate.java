@@ -34,14 +34,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.security.auth.callback.TextOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.InvalidPasswordException;
-import com.sun.identity.authentication.spi.MessageLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -51,56 +47,31 @@ import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Base64;
-import java.util.Base64.Decoder;
-import java.lang.Byte;
-import java.nio.ByteBuffer;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.MapType;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.security.auth.login.LoginException;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.openam.utils.qr.ErrorCorrectionLevel;
 import org.forgerock.util.encode.Base64url;
 
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.authenticator.AuthenticatorImpl;
 import com.webauthn4j.converter.util.CborConverter;
 import com.webauthn4j.data.WebAuthnAuthenticationContext;
-import com.webauthn4j.data.WebAuthnRegistrationContext;
 import com.webauthn4j.data.attestation.authenticator.AAGUID;
 import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
 import com.webauthn4j.data.attestation.authenticator.CredentialPublicKey;
@@ -120,15 +91,17 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWeb
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
-public class WebauthnAuthenticate extends AMLoginModule {
+public class WebauthnAuthenticate extends AbstractWebAuthnModule {
 
     private static final String BUNDLE_NAME = "amAuthWebauthnAuthenticate";
     private final static Debug DEBUG = Debug.getInstance(WebauthnAuthenticate.class.getSimpleName());
+    
+    // Configuration Strings for Authenticate
+    private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
-    private ResourceBundle bundle;
-    private Map sharedState;
-    private Map options;
-    private int authLevel;
+    // Configuration Parameters for Authenticate
+    private String useMfaConfig = "";
+    
     private String getType;
     private String getUserHandle;
 
@@ -137,7 +110,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private WebauthnPrincipal userPrincipal;
 
     // Webauthn Credentials
-    private String userName;
     //private byte[] credentialIdBytes;
     private Set<WebAuthnAuthenticator> authenticators;
     private WebAuthnAuthenticator selectedAuthenticator = null;
@@ -152,31 +124,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
     private byte[] signatureBytes;
     private byte[] clientDataJsonBytes;
 
-    // Service Configuration Parameters
-    private String useMfaConfig = "";
-    private String rpNameConfig = "";
-    private String originConfig = "";
-    private String residentKeyConfig = "";
-    private String userVerificationConfig = "";
-    private String timeoutConfig = "";
-    private String displayNameAttributeNameConfig = "";
-
-    // Service Configuration Strings
-    private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
-    private static final String ORIGIN = "iplanet-am-auth-Webauthn-origin";
-    private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
-    private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
-    private static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
-    private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
-    private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
-    private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
-
-    // Default Values.
-    private static final int DEFAULT_AUTH_LEVEL = 0;
-
     private boolean getCredentialsFromSharedState;
-    private Callback[] callbacks;
-    private Set<String> userSearchAttributes = Collections.emptySet();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
@@ -185,33 +133,15 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
     private AuthenticatorWebAuthnService webauthnService;
 
-    /**
-     * Initializes this <code>LoginModule</code>.
-     *
-     * @param subject     the <code>Subject</code> to be authenticated.
-     * @param sharedState shared <code>LoginModule</code> state.
-     * @param options     options specified in the login. <code>Configuration</code>
-     *                    for this particular <code>LoginModule</code>.
-     */
+    @Override
     public void init(Subject subject, Map sharedState, Map options) {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module init start");
         }
-        java.util.Locale locale = getLoginLocale();
-        bundle = amCache.getResBundle(BUNDLE_NAME, locale);
 
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Webauthn getting resource bundle for locale: " + locale);
-        }
-
-        this.authLevel = CollectionHelper.getIntMapAttr(options, AUTH_LEVEL, DEFAULT_AUTH_LEVEL, DEBUG);
+        super.init(subject, sharedState, options);
+        
         this.useMfaConfig = CollectionHelper.getMapAttr(options, USE_MFA);
-        this.rpNameConfig = CollectionHelper.getMapAttr(options, RP_NAME);
-        this.originConfig = CollectionHelper.getMapAttr(options, ORIGIN);
-        this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
-        this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
-        this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
-        this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
@@ -224,6 +154,7 @@ public class WebauthnAuthenticate extends AMLoginModule {
                     + ", timeoutConfig = " + timeoutConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig);
         }
+        
         if(useMfaConfig.equalsIgnoreCase("true")) {
             userName = (String) sharedState.get(getUserKey());
             if (StringUtils.isEmpty(userName)) {
@@ -238,23 +169,13 @@ public class WebauthnAuthenticate extends AMLoginModule {
             }
         }
     }
-    /**
-     * Takes an array of submitted <code>Callback</code>, process them and decide
-     * the order of next state to go. Return STATE_SUCCEED if the login is
-     * successful, return STATE_FAILED if the LoginModule should be ignored.
-     *
-     * @param callbacks an array of <code>Callback</cdoe> for this Login state
-     * @param state     order of state. State order starts with 1.
-     * @return int order of next state. Return STATE_SUCCEED if authentication is
-     *         successful, return STATE_FAILED if the LoginModule should be ignored.
-     * @throws AuthLoginException
-     */
+    
+    @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("in process(), login state is " + state);
         }
 
-        this.callbacks = callbacks;
         WebauthnAuthenticateModuleState moduleState = WebauthnAuthenticateModuleState.get(state);
         WebauthnAuthenticateModuleState nextState = null;
 
@@ -411,8 +332,6 @@ public class WebauthnAuthenticate extends AMLoginModule {
         Callback[] idCallbacks = new Callback[1];
 
         if (callbacks != null && callbacks.length == 0) {
-            userName = (String) sharedState.get(getUserKey());
-
             if (userName == null) {
                 return WebauthnAuthenticateModuleState.LOGIN_START;
             }
@@ -696,118 +615,25 @@ public class WebauthnAuthenticate extends AMLoginModule {
         return storedAuthenticator;
     }
 
-    /*
-     * lookup Byte user data store
-     * @return byte[]
-     * @throws AuthLoginException
-     */
-    private byte[] lookupByteData(String attributeName) throws AuthLoginException {
-
-        Set<String> _attribute = CollectionUtils.asSet(attributeName);
-
-        try {
-            Map<String, byte[][]> _lookupByteData = getIdentity().getBinaryAttributes(_attribute);
-            return _lookupByteData.get(attributeName)[0];
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.lookupCredentialId() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("Webauthn.lookupCredentialId() : error searching Identities with username : " + userName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        }
-    }
-
-    /*
-     * Convert Byte Array user.id(userHandle=entryUUID)
-     * to
-     * ASCII String for search entryUUID
-     */
-    private String byteArrayToAsciiString(byte[] bytes) {
-        StringBuffer _sb = new StringBuffer();
-        for (int i = 0; i < bytes.length; i++) {
-            _sb.append( Character.toChars(bytes[i]) );
-        }
-        return _sb.toString();
-    }
-
-    /**
-     * from based membership module Returns <code>Principal</code>.
-     *
-     * @return <code>Principal</code>
-     */
-    public Principal getPrincipal() {
-        if (userPrincipal != null) {
-            return userPrincipal;
-        } else if (validatedUserID != null) {
-            userPrincipal = new WebauthnPrincipal(validatedUserID);
-            return userPrincipal;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * from based membership module Destroy the module state
-     */
     @Override
     public void destroyModuleState() {
         validatedUserID = null;
     }
 
-    /**
-     * from based membership module Set all the used variables to null
-     */
     @Override
     public void nullifyUsedVars() {
         bundle = null;
-        sharedState = null;
-        options = null;
         userName = null;
-        // userAttrs = null;
-        callbacks = null;
+
     }
 
-    /*
-     * from based membership module
-     * 
-     */
-    private AMIdentity getIdentity() throws SSOException, IdRepoException {
-        AMIdentity _theID = null;
-        AMIdentityRepository _amIdRepo = getAMIdentityRepository(getRequestOrg());
-
-        IdSearchControl _idsc = new IdSearchControl();
-        _idsc.setAllReturnAttributes(true);
-        Set<AMIdentity> _results = Collections.emptySet();
-
-        try {
-            IdSearchResults _searchResults = _amIdRepo.searchIdentities(IdType.USER, userName, _idsc);
-            if (_searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("{}.getIdentity : searching user identity with alternative attributes {}", "Webauthn",
-                            userSearchAttributes);
-                }
-                Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
-                _idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
-                _searchResults = _amIdRepo.searchIdentities(IdType.USER, "*", _idsc);
-            }
-
-            if (_searchResults != null) {
-                _results = _searchResults.getSearchResults();
-            }
-        } catch (SSOException e) {
-            DEBUG.error("{}.getIdentity : Error searching Identities with username '{}' ", "Webauthn", userName, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("{}.getIdentity : Module exception", "Webauthn", e);
-        }
-
-        if (_results.isEmpty()) {
-            DEBUG.error("{}.getIdentity : User '{}' is not found", "Webauthn", userName);
-        } else if (_results.size() > 1) {
-            DEBUG.error("{}.getIdentity : More than one user found for the userName '{}'", "Webauthn", userName);
-        } else {
-            _theID = _results.iterator().next();
-        }
-
-        return _theID;
+    @Override
+    protected Debug getDebugInstance() {
+        return DEBUG;
+    }
+    
+    @Override
+    protected String getBundleName() {
+        return BUNDLE_NAME;
     }
 }

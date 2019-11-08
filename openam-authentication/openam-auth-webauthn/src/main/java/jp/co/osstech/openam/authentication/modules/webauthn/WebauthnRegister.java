@@ -33,56 +33,21 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.security.auth.callback.TextOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.InvalidPasswordException;
-import com.sun.identity.authentication.spi.MessageLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchOpModifier;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
-//import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.Base64;
-import java.lang.Byte;
-import java.lang.reflect.Field;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.security.auth.login.LoginException;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -90,52 +55,38 @@ import com.google.inject.name.Names;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
-import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.openam.utils.qr.ErrorCorrectionLevel;
-import org.forgerock.util.encode.Base64url;
 
+import com.webauthn4j.converter.util.*;
 import com.webauthn4j.data.client.Origin;
 import com.webauthn4j.data.client.challenge.Challenge;
 import com.webauthn4j.data.client.challenge.DefaultChallenge;
-import com.webauthn4j.data.attestation.statement.AttestationStatement;
 import com.webauthn4j.data.attestation.authenticator.CredentialPublicKey;
-import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
-import com.webauthn4j.data.attestation.authenticator.AAGUID;
-import com.webauthn4j.data.PublicKeyCredential;
-import com.webauthn4j.authenticator.Authenticator;
-import com.webauthn4j.authenticator.AuthenticatorImpl;
 import com.webauthn4j.data.WebAuthnRegistrationContext;
 import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.ArrayUtil;
 import com.webauthn4j.util.Base64UrlUtil;
-import com.webauthn4j.util.Base64Util;
-import com.webauthn4j.util.exception.*;
 import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
+import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
 
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
-import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
-import com.webauthn4j.converter.AttestedCredentialDataConverter;
-import com.webauthn4j.converter.util.*;
-
-public class WebauthnRegister extends AMLoginModule {
+public class WebauthnRegister extends AbstractWebAuthnModule {
 
     private static final String BUNDLE_NAME = "amAuthWebauthnRegister";
     private final static Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
 
-    private ResourceBundle bundle;
-    private Map sharedState;
-    private Map options;
-
-    // user's valid ID and principal
-    private String validatedUserID;
-    private WebauthnPrincipal userPrincipal;
-
+    // Configuration Strings for Register
+    private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
+    private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
+    
+    // Configuration Parameters for Register
+    private String attestationConfig = "";
+    private String attachmentConfig = "";
+    
     // Webauthn Credentials
-    private String userName;
     private byte[] userHandleIdBytes;
     private byte[] attestedCredentialIdBytes;
     private Challenge generatedChallenge;
@@ -148,32 +99,6 @@ public class WebauthnRegister extends AMLoginModule {
     private long attestedCounter;
     private WebAuthnAuthenticator attestedAuthenticator;
 
-    // Service Configuration Parameters
-    private String rpNameConfig = "";
-    private String originConfig = "";
-    private String attestationConfig = "";
-    private String attachmentConfig = "";
-    private String residentKeyConfig = "";
-    private String userVerificationConfig = "";
-    private String timeoutConfig = "";
-    private String displayNameAttributeNameConfig = "";
-
-    // Service Configuration Strings
-    private static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
-    private static final String ORIGIN = "iplanet-am-auth-Webauthn-origin";
-    private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
-    private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
-    private static final String RESIDENTKEY = "iplanet-am-auth-Webauthn-residentKey";
-    private static final String USER_VERIFICATION = "iplanet-am-auth-Webauthn-userVerification";
-    private static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
-    private static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
-    private static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
-
-    // Default Values.
-    private static final int DEFAULT_AUTH_LEVEL = 0;
-
-    private Set<String> userSearchAttributes = Collections.emptySet();
-    private Callback[] callbacks;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
@@ -182,31 +107,20 @@ public class WebauthnRegister extends AMLoginModule {
                     Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
     private AuthenticatorWebAuthnService webauthnService;
     
-    /**
-     * Initializes this <code>LoginModule</code>.
-     *
-     * @param subject     the <code>Subject</code> to be authenticated.
-     * @param sharedState shared <code>LoginModule</code> state.
-     * @param options     options specified in the login. <code>Configuration</code>
-     *                    for this particular <code>LoginModule</code>.
-     */
+    @Override
     public void init(Subject subject, Map sharedState, Map options) {
-
-        java.util.Locale locale = getLoginLocale();
-        bundle = amCache.getResBundle(BUNDLE_NAME, locale);
-
-        this.rpNameConfig = CollectionHelper.getMapAttr(options, RP_NAME);
-        this.originConfig = CollectionHelper.getMapAttr(options, ORIGIN);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Webauthn module init start");
+        }
+        
+        super.init(subject, sharedState, options);
+        
         this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
         this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
-        this.residentKeyConfig = CollectionHelper.getMapAttr(options, RESIDENTKEY);
-        this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
-        this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
-        this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
-
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Webauthn module parameter are " 
+                    + "authLevel = " + authLevel
                     + ", rpName = " + rpNameConfig
                     + ", origin = " + originConfig 
                     + ", attestation = " + attestationConfig
@@ -230,23 +144,12 @@ public class WebauthnRegister extends AMLoginModule {
         }
     }
 
-    /**
-     * Takes an array of submitted <code>Callback</code>, process them and decide
-     * the order of next state to go. Return STATE_SUCCEED if the login is
-     * successful, return STATE_FAILED if the LoginModule should be ignored.
-     *
-     * @param callbacks an array of <code>Callback</cdoe> for this Login state
-     * @param state     order of state. State order starts with 1.
-     * @return int order of next state. Return STATE_SUCCEED if authentication is
-     *         successful, return STATE_FAILED if the LoginModule should be ignored.
-     * @throws AuthLoginException
-     */
+    @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("in process(), login state is " + state);
         }
 
-        this.callbacks = callbacks;
         WebauthnRegisterModuleState moduleState = WebauthnRegisterModuleState.get(state);
         WebauthnRegisterModuleState nextState = null;
 
@@ -261,8 +164,7 @@ public class WebauthnRegister extends AMLoginModule {
             if (userName != null) {
                 nextState = WebauthnRegisterModuleState.REG_SCRIPT;
             } else {
-                nextState = WebauthnRegisterModuleState.REG_START;
-                break;
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
             
             // if Cancel Button Return Authentication Fail
@@ -508,131 +410,25 @@ public class WebauthnRegister extends AMLoginModule {
         
     }
 
-    /*
-     * lookup StringData user data store
-     * @return String
-     * @throws AuthLoginException
-     */
-    private String lookupStringData(String attributeName) throws AuthLoginException {
-        Set<String> _attributes = Collections.emptySet();
-
-        try {
-            _attributes = getIdentity().getAttribute(attributeName);
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.lookupDisplayNames() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("Webauthn.lookupDisplayNames() : error searching Identities with username : " + userName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        }
-
-        String _attribute = "";
-
-        if (CollectionUtils.isNotEmpty(_attributes)) {
-            _attribute = _attributes.iterator().next();
-        } 
-        return _attribute;
-    }
-    
-    /*
-     * lookup Byte user data store
-     * @return byte[]
-     * @throws AuthLoginException
-     */
-    private byte[] lookupByteData(String attributeName) throws AuthLoginException {
-
-        Set<String> _attribute = CollectionUtils.asSet(attributeName);
-
-        try {
-            Map<String, byte[][]> _lookupByteData = getIdentity().getBinaryAttributes(_attribute);
-            return _lookupByteData.get(attributeName)[0];
-        } catch (SSOException e) {
-            DEBUG.error("Webauthn.lookupCredentialId() : Webauthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("Webauthn.lookupCredentialId() : error searching Identities with username : " + userName, e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-        }
-    }
-
-    /**
-     * from based membership module Returns <code>Principal</code>.
-     *
-     * @return <code>Principal</code>
-     */
-    public Principal getPrincipal() {
-        if (userPrincipal != null) {
-            return userPrincipal;
-        } else if (validatedUserID != null) {
-            userPrincipal = new WebauthnPrincipal(validatedUserID);
-            return userPrincipal;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * from based membership module Destroy the module state
-     */
     @Override
     public void destroyModuleState() {
         validatedUserID = null;
     }
 
-    /**
-     * from based membership module Set all the used variables to null
-     */
     @Override
     public void nullifyUsedVars() {
         bundle = null;
-        sharedState = null;
-        options = null;
         userName = null;
-        //        userAttrs = null;
-        callbacks = null;
     }
 
-    /*
-     * from based membership module
-     * 
-     */
-    private AMIdentity getIdentity() throws SSOException, IdRepoException {
-        AMIdentity _theID = null;
-        AMIdentityRepository _amIdRepo = getAMIdentityRepository(getRequestOrg());
-
-        IdSearchControl _idsc = new IdSearchControl();
-        _idsc.setAllReturnAttributes(true);
-        Set<AMIdentity> _results = Collections.emptySet();
-
-        try {
-            IdSearchResults _searchResults = _amIdRepo.searchIdentities(IdType.USER, userName, _idsc);
-            if (_searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("{}.getIdentity : searching user identity with alternative attributes {}", "Webauthn",
-                            userSearchAttributes);
-                }
-                Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
-                _idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
-                _searchResults = _amIdRepo.searchIdentities(IdType.USER, "*", _idsc);
-            }
-
-            if (_searchResults != null) {
-                _results = _searchResults.getSearchResults();
-            }
-        } catch (SSOException e) {
-            DEBUG.error("{}.getIdentity : Error searching Identities with username '{}' ", "Webauthn", userName, e);
-        } catch (IdRepoException e) {
-            DEBUG.error("{}.getIdentity : Module exception", "Webauthn", e);
-        }
-
-        if (_results.isEmpty()) {
-            DEBUG.error("{}.getIdentity : User '{}' is not found", "Webauthn", userName);
-        } else if (_results.size() > 1) {
-            DEBUG.error("{}.getIdentity : More than one user found for the userName '{}'", "Webauthn", userName);
-        } else {
-            _theID = _results.iterator().next();
-        }
-
-        return _theID;
+    @Override
+    protected Debug getDebugInstance() {
+        return DEBUG;
     }
+    
+    @Override
+    protected String getBundleName() {
+        return BUNDLE_NAME;
+    }
+
 }
