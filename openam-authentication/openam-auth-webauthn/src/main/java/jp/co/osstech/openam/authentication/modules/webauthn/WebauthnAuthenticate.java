@@ -64,25 +64,6 @@ import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.encode.Base64url;
 
-import com.webauthn4j.authenticator.Authenticator;
-import com.webauthn4j.authenticator.AuthenticatorImpl;
-import com.webauthn4j.converter.util.CborConverter;
-import com.webauthn4j.data.WebAuthnAuthenticationContext;
-import com.webauthn4j.data.attestation.authenticator.AAGUID;
-import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
-import com.webauthn4j.data.attestation.authenticator.CredentialPublicKey;
-import com.webauthn4j.data.attestation.statement.AttestationStatement;
-import com.webauthn4j.data.attestation.statement.NoneAttestationStatement;
-import com.webauthn4j.data.client.Origin;
-import com.webauthn4j.data.client.challenge.Challenge;
-import com.webauthn4j.data.client.challenge.DefaultChallenge;
-import com.webauthn4j.server.ServerProperty;
-import com.webauthn4j.util.ArrayUtil;
-import com.webauthn4j.util.Base64UrlUtil;
-import com.webauthn4j.util.Base64Util;
-import com.webauthn4j.validator.WebAuthnAuthenticationContextValidationResponse;
-import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
-
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
@@ -92,40 +73,24 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
  */
 public class WebauthnAuthenticate extends AbstractWebAuthnModule {
 
-    private static final String BUNDLE_NAME = "amAuthWebauthnAuthenticate";
-    private final static Debug DEBUG = Debug.getInstance(WebauthnAuthenticate.class.getSimpleName());
+    public static final String BUNDLE_NAME = "amAuthWebauthnAuthenticate";
+    private static final Debug DEBUG = Debug.getInstance(WebauthnAuthenticate.class.getSimpleName());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     
     // Configuration Strings for Authenticate
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
     // Configuration Parameters for Authenticate
     private String useMfaConfig = "";
-    
-    private String getType;
-    private String getUserHandle;
 
-    // Webauthn Credentials
-    //private byte[] credentialIdBytes;
+    // Webauthn
     private Set<WebAuthnAuthenticator> authenticators = null;
-    private WebAuthnAuthenticator selectedAuthenticator = null;
-    private CredentialPublicKey credentialPublicKey;
-    private byte[] rawIdBytes;
-    private String webauthnHiddenCallback;
-    private Challenge generatedChallenge;
-    private byte[] challengeBytes;
-    private boolean updateCounterResult = false;
-    private boolean verificationRequired;
-    private byte[] authenticatorDataBytes;
-    private byte[] signatureBytes;
-    private byte[] clientDataJsonBytes;
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
             InjectorHolder.getInstance(Key.get(
                     new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
                     Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
     private AuthenticatorWebAuthnService webauthnService;
+    private WebAuthnValidator webauthnValidator = new WebAuthn4JValidatorImpl();
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -315,16 +280,16 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      * @throws AuthLoginException
      */
     private void createLoginScript() throws AuthLoginException {
-        // generate 16byte challenge
-        generatedChallenge = new DefaultChallenge();
-        challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
+
+        // Generate challenge
+        byte[] _challengeBytes = webauthnValidator.generateChallenge();
 
         // navigator.credentials.get Options
         //redidentkey dosn't need stored credentialid(authenticators = null).
         CredentialsGetOptions credentialsGetOptions = new CredentialsGetOptions(
                 authenticators,
                 userVerificationConfig,
-                challengeBytes,
+                _challengeBytes,
                 timeoutConfig,
                 residentKeyConfig);
 
@@ -350,43 +315,34 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         }
 
         // read HiddenValueCallback from Authenticator posted
-        webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
+        String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         // TODO: Cancel
-        if (StringUtils.isEmpty(webauthnHiddenCallback)) {
+        if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("Posted webauthnHiddenCallback = " + webauthnHiddenCallback);
+            DEBUG.message("Posted webauthnHiddenCallback = " + _webauthnHiddenCallback);
         }
 
         /*
          * Map Callback Json to Object
          */
+        WebauthnJsonCallback _responseJson;
         try {
-            WebauthnJsonCallback _responseJson = OBJECT_MAPPER.readValue(webauthnHiddenCallback,
-                    WebauthnJsonCallback.class);
-
+            _responseJson = OBJECT_MAPPER.readValue(_webauthnHiddenCallback, WebauthnJsonCallback.class);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("id Base64Url = " + _responseJson.getId());
-            }
-
-            rawIdBytes = Base64.getDecoder().decode(_responseJson.getRawId());
-            authenticatorDataBytes = Base64.getDecoder().decode(_responseJson.getAuthenticatorData());
-            clientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
-            signatureBytes = Base64.getDecoder().decode(_responseJson.getSignature());
-            getType = _responseJson.getType();
-            getUserHandle = _responseJson.getUserHandle();
-                
-            if (DEBUG.messageEnabled()) {
                 DEBUG.message("_responseJson.getUserHandle() = " + _responseJson.getUserHandle());
             }
-
         } catch (IOException e) {
             DEBUG.error("Webauthn.process(): JSON parse error", e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         }
 
+        byte[] _userHandleBytes = Base64.getDecoder().decode(_responseJson.getUserHandle());
+        byte[] _rawIdBytes = Base64.getDecoder().decode(_responseJson.getRawId());
+        
         /*
          * if residentKey = true
          * get UserHandle in Client Response
@@ -394,86 +350,39 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
          * to search userName from datastore
          */
         if (residentKeyConfig.equalsIgnoreCase("true")) {
-            String _userHandleIdStr = byteArrayToAsciiString(Base64Util.decode(getUserHandle));
+            String _userHandleIdStr = byteArrayToAsciiString(_userHandleBytes);
             userName = searchUserNameWithAttrValue(_userHandleIdStr, "entryUUID");
-            
-            /*
-             * lookup CredentialId(Base64Url encoded) from User Data store
-             */
-            authenticators = webauthnService.getAuthenticators(Base64Util.decode(getUserHandle));
+            authenticators = webauthnService.getAuthenticators(_userHandleBytes);
             if (authenticators.isEmpty()) {
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
         }
         
-        /*
-         * Validation authenticator response This must be change to W3C verification
-         * flow. Use webauthn4j library to END 
-         * START============================.
-         */
-        Origin _origin = new Origin(originConfig);
-        String _rpId = _origin.getHost();
-        byte[] _tokenBindingId = null; /* now set tokenBindingId null */
-        ServerProperty serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
-
-        if (userVerificationConfig.equalsIgnoreCase("required")) {
-            verificationRequired = true;
-        } else {
-            verificationRequired = false;
+        WebAuthnAuthenticator _selectedAuthenticator = null;
+        for (WebAuthnAuthenticator authenticator : authenticators) {
+            if (authenticator.isSelected(Base64url.encode(_rawIdBytes))) {
+                _selectedAuthenticator = authenticator;
+                break;
+            }
         }
-
-        WebAuthnAuthenticationContext authenticationContext = new WebAuthnAuthenticationContext(rawIdBytes,
-                clientDataJsonBytes, authenticatorDataBytes, signatureBytes, serverProperty,
-                verificationRequired);
-
-
-        //load Construct Authenticator Object from datastore values.
-        Authenticator authenticator = loadAuthenticator(); 
-
-        WebAuthnAuthenticationContextValidator webAuthnAuthenticationContextValidator = new WebAuthnAuthenticationContextValidator();
-
-        WebAuthnAuthenticationContextValidationResponse response = webAuthnAuthenticationContextValidator
-                .validate(authenticationContext, authenticator);
-
-        try {
-            //update datastore counter value for next authentication.
-            selectedAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
-            updateCounterResult = webauthnService.updateCounter(selectedAuthenticator);
-        } catch (Exception e) {
-            DEBUG.error("updateCounter error");
+        if (_selectedAuthenticator == null) {
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
-        /*
-         * END of webauthn4j library line 
-         * END============================
-         */
-
-        if (updateCounterResult) {
+        
+        boolean _storeResult = webauthnService.updateCounter(_selectedAuthenticator);
+        if (_storeResult) {
             setAuthLevel(authLevel);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Webauthn Authentication success");
             }
             validatedUserID = userName;
             return WebauthnAuthenticateModuleState.COMPLETE;
-
         } else {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("Webauthn Authentication Fail");
-            }
-            return WebauthnAuthenticateModuleState.LOGIN_START;
-
+            DEBUG.error("updateCounter error");
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
     }
     
-    /**
-    * Searches for an account with userHandle userID in the organization organization
-    * 
-    * @param attributeValue The attributeValue to compare when searching for an
-    *  identity
-    * @param attributeName that name of where the identity will be
-    *  
-    * @return the UserName
-     * @throws AuthLoginException 
-    */
     /**
      * Searches for an account with userHandle userID in the organization organization.
      * 
@@ -532,39 +441,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             DEBUG.message(BUNDLE_NAME + " No results were found !");
         }
         throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-    }
-
-    /*
-     * load Authenticator Object data for use webauthn4j validation
-     */
-    private Authenticator loadAuthenticator() throws AuthLoginException {
-
-        // OpenAM didn't store aaguid now. Use ZERO AAGUID.
-        AAGUID _aaguid = AAGUID.ZERO;
-
-        for (WebAuthnAuthenticator authenticator : authenticators) {
-            if (authenticator.isSelected(Base64url.encode(rawIdBytes))) {
-                selectedAuthenticator = authenticator;
-                break;
-            }
-        }
-        if (selectedAuthenticator == null) {
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
-        }
-        
-        //credentialPublicKey was stored as COSEKey byte[] data at registration time.
-        CborConverter _cborConverter = new CborConverter();
-        credentialPublicKey = _cborConverter.readValue(selectedAuthenticator.getPublicKey(), CredentialPublicKey.class);
-
-        final AttestedCredentialData storedAttestedCredentialData = 
-                new AttestedCredentialData(_aaguid, 
-                        Base64UrlUtil.decode(selectedAuthenticator.getCredentialID()), credentialPublicKey);
-        final AttestationStatement noneAttestationStatement = new NoneAttestationStatement();
-        final long storedCounter = selectedAuthenticator.getSignCount();
-        Authenticator storedAuthenticator = new AuthenticatorImpl(storedAttestedCredentialData,
-                noneAttestationStatement, storedCounter);
-
-        return storedAuthenticator;
     }
 
     @Override

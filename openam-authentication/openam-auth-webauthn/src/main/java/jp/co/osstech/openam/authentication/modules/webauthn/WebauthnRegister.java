@@ -28,6 +28,7 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
@@ -36,7 +37,6 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Base64;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -48,22 +48,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.sso.SSOException;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServiceFactory;
 import org.forgerock.openam.utils.StringUtils;
-
-import com.webauthn4j.converter.util.*;
-import com.webauthn4j.data.client.Origin;
-import com.webauthn4j.data.client.challenge.Challenge;
-import com.webauthn4j.data.client.challenge.DefaultChallenge;
-import com.webauthn4j.data.attestation.authenticator.CredentialPublicKey;
-import com.webauthn4j.data.WebAuthnRegistrationContext;
-import com.webauthn4j.server.ServerProperty;
-import com.webauthn4j.util.ArrayUtil;
-import com.webauthn4j.util.Base64UrlUtil;
-import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
-import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
 
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
@@ -74,8 +63,9 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
  */
 public class WebauthnRegister extends AbstractWebAuthnModule {
 
-    private static final String BUNDLE_NAME = "amAuthWebauthnRegister";
-    private final static Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
+    public static final String BUNDLE_NAME = "amAuthWebauthnRegister";
+    private static final Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     // Configuration Strings for Register
     private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
@@ -85,26 +75,15 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
     private String attestationConfig = "";
     private String attachmentConfig = "";
     
-    // Webauthn Credentials
+    // Webauthn
     private byte[] userHandleIdBytes;
-    private byte[] attestedCredentialIdBytes;
-    private Challenge generatedChallenge;
-    private CredentialPublicKey attestedCredentialPublicKey;
-    private byte[] challengeBytes;
-    private String webauthnHiddenCallback;
-    private byte[] attestationObjectBytes;
-    private byte[] clientDataJsonBytes;
-    private boolean verificationRequired;
-    private long attestedCounter;
     private WebAuthnAuthenticator attestedAuthenticator;
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
             InjectorHolder.getInstance(Key.get(
                     new TypeLiteral<AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService>>(){},
                     Names.named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)));
     private AuthenticatorWebAuthnService webauthnService;
+    private WebAuthnValidator webauthnValidator = new WebAuthn4JValidatorImpl();
     
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -197,10 +176,8 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             throw new AuthLoginException("Ragistration Cancel Auth Fail");
         }
 
-        // generate 16byte challenge
-        // generate 16byte id
-        generatedChallenge = new DefaultChallenge();
-        challengeBytes = ArrayUtil.clone(generatedChallenge.getValue());
+        // Generate challenge
+        byte[] _challengeBytes = webauthnValidator.generateChallenge();
 
         // Use LDAP entryUUID as userHandleId
         userHandleIdBytes = lookupByteData("entryUUID");
@@ -217,7 +194,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
                 residentKeyConfig,
                 userVerificationConfig,
                 timeoutConfig,
-                challengeBytes);
+                _challengeBytes);
 
         // Replace Callback to send Generated Javascript that include create options.
         // only for nextState REG_SCRIPT
@@ -229,7 +206,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
     }
 
     /**
-     * Verify the response of javascript create.credential and store the authenticator.
+     * Verify the response of javascript credential.create and store the authenticator.
      * 
      * @param callbacks The callbacks.
      * @return A value indicating the next state.
@@ -239,16 +216,54 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             throws AuthLoginException {
         
         WebauthnRegisterModuleState nextState;
+        
         if (DEBUG.messageEnabled()) {
             DEBUG.message("ThisState = WebauthnRegisterModuleState.REG_SCRIPT");
         }
 
-        // Registration Verify PublicKey Credentials
-        // expect REG_KEY
+        // read HiddenValueCallback from Authenticator posted
+        String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
+        // TODO: Cancel
+        if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+        }
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Posted webauthnHiddenCallback = " + _webauthnHiddenCallback);
+        }
+
+        WebauthnJsonCallback _responseJson;
         try {
-            nextState = verifyRegisterCallback(callbacks);
-        } catch (AuthLoginException ex) {
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            _responseJson = OBJECT_MAPPER.readValue(_webauthnHiddenCallback,
+                    WebauthnJsonCallback.class);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("id Base64url = " + _responseJson.getId());
+            }
+        } catch (IOException e) {
+            DEBUG.error("Webauthn.process(): JSON parse error", e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+        }
+
+        attestedAuthenticator = webauthnValidator.validateCreateResponse(
+                getValidationConfig(), _responseJson, userHandleIdBytes, DEBUG);
+
+        try {
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            webauthnService = webauthnServiceFactory.create(realm);
+            boolean _storeResult = webauthnService.createAuthenticator(attestedAuthenticator);
+            
+            if (_storeResult) {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("storeCredentials was success");
+                }
+                nextState = WebauthnRegisterModuleState.REG_KEY;
+            } else {
+                DEBUG.error("storeCredentials was Fail");
+                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            }
+        } catch (SSOException | SMSException e) {
+            DEBUG.error("Webauthn.storeCredentials : Webauthn module exception : ", e);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
         return nextState;
@@ -293,129 +308,6 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         return nextState;
     }
     
-    /*
-     * Verify and Store Authenticator(browser) Response Credentials for Registration
-     * @param callbacks an array of <code>Callback</cdoe> for this Login state
-     * @return int order of next state. Return
-     * @throws AuthLoginException
-     */
-    private WebauthnRegisterModuleState verifyRegisterCallback(Callback[] callbacks) throws AuthLoginException {
-
-        // read HiddenValueCallback from Authenticator posted
-        for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof HiddenValueCallback) {
-                webauthnHiddenCallback = ((HiddenValueCallback) callbacks[i]).getValue();
-
-                if (webauthnHiddenCallback == null) {
-                    return WebauthnRegisterModuleState.REG_START;
-                }
-
-            }
-        }
-
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Posted webauthnHiddenCallback = " + webauthnHiddenCallback);
-        }
-
-        /*
-         * Map Callback to Object
-         */
-        if (StringUtils.isNotEmpty(webauthnHiddenCallback)) {
-
-            try {
-                WebauthnJsonCallback _responseJson = OBJECT_MAPPER.readValue(webauthnHiddenCallback,
-                        WebauthnJsonCallback.class);
-
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("id Base64url = " + _responseJson.getId());
-                }
-
-                attestationObjectBytes = Base64.getDecoder().decode(_responseJson.getAttestationObject());
-                clientDataJsonBytes = Base64.getDecoder().decode(_responseJson.getClientDataJSON());
-
-            } catch (IOException e) {
-                DEBUG.error("Webauthn.process(): JSON parse error", e);
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
-            }
-        }
-
-        /*
-         * Validation authenticator response This must be change to W3C verification
-         * flow. This time use webauthn4j library to END
-         * START============================.
-         */
-        Origin _origin = new Origin(originConfig);
-        String _rpId = _origin.getHost();
-
-        byte[] _tokenBindingId = null;
-        if (userVerificationConfig.equalsIgnoreCase("required")) {
-            verificationRequired = true;
-        } else {
-            verificationRequired = false;
-        }
-        // rp:id = origin
-        ServerProperty serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
-
-        try {
-            WebAuthnRegistrationContext registrationContext = new WebAuthnRegistrationContext(clientDataJsonBytes,
-                    attestationObjectBytes, serverProperty, verificationRequired);
-            WebAuthnRegistrationContextValidator webAuthnRegistrationContextValidator = WebAuthnRegistrationContextValidator
-                    .createNonStrictRegistrationContextValidator();
-            WebAuthnRegistrationContextValidationResponse response = webAuthnRegistrationContextValidator
-                    .validate(registrationContext);
-
-            // CredentialId <-- AttestedCredentialData <--AuthenticationData
-            // <--AttestationObject
-            attestedCredentialIdBytes = ArrayUtil.clone(response.getAttestationObject().getAuthenticatorData()
-                    .getAttestedCredentialData().getCredentialId());
-
-            // PublicKey(COSE) <-- AttestedCredentialData <--AuthenticationData
-            // <--AttestationObject
-            attestedCredentialPublicKey = response.getAttestationObject().getAuthenticatorData()
-                    .getAttestedCredentialData().getCredentialPublicKey();
-
-            // Counter <--AuthenticationData <--AttestationObject
-            attestedCounter = response.getAttestationObject().getAuthenticatorData().getSignCount();
-
-        } catch (Exception ex) {
-            DEBUG.error("Webauthn.webauthn4j.verify() : Webauthn4j exception : ", ex);
-        }
-        /*
-         * END of webauthn4j library line END============================
-         */
-
-        try {
-            // boolean _storeResult
-            boolean _storeResult = false;
-            
-            CborConverter _cborConverter = new CborConverter();
-            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
-            webauthnService = webauthnServiceFactory.create(realm);
-            attestedAuthenticator = new WebAuthnAuthenticator(
-                    Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
-                    _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
-                    new Long(attestedCounter), userHandleIdBytes);
-            _storeResult = webauthnService.createAuthenticator(attestedAuthenticator);
-            
-            if (_storeResult) {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("storeCredentials was success");
-                }
-                return WebauthnRegisterModuleState.REG_KEY;
-
-            } else {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("storeCredentials was Fail");
-                }
-                return WebauthnRegisterModuleState.REG_START;
-
-            }
-        } catch (Exception e) {
-            DEBUG.error("Webauthn.storeCredentials : Webauthn module exception : ", e);
-            return WebauthnRegisterModuleState.REG_START;
-        }
-    }
-
     @Override
     public void destroyModuleState() {
         validatedUserID = null;

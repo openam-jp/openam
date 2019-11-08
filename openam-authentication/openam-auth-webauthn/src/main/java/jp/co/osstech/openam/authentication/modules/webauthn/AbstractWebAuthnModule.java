@@ -209,6 +209,21 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     }
 
     /**
+     * Get the configuration for WebAuthn validation
+     * 
+     * @return The configuration for WebAuthn validation.
+     */
+    protected WebAuthnValidatorConfig getValidationConfig() {
+        boolean verificationRequired;
+        if (userVerificationConfig.equalsIgnoreCase("required")) {
+            verificationRequired = true;
+        } else {
+            verificationRequired = false;
+        }
+        return new WebAuthnValidatorConfig(originConfig, verificationRequired);
+    }
+    
+    /**
      * Get debug instance.
      * @return The debug instance.
      */
