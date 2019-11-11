@@ -43,10 +43,10 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
 /**
  * WebAuthn (Register) Authentication Module.
  */
-public class WebauthnRegister extends AbstractWebAuthnModule {
+public class WebAuthnRegister extends AbstractWebAuthnModule {
 
-    public static final String BUNDLE_NAME = "amAuthWebauthnRegister";
-    private static final Debug DEBUG = Debug.getInstance(WebauthnRegister.class.getSimpleName());
+    public static final String BUNDLE_NAME = "amAuthWebAuthnRegister";
+    private static final Debug DEBUG = Debug.getInstance(WebAuthnRegister.class.getSimpleName());
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     // Module States
@@ -63,14 +63,14 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
     private String attestationConfig = "";
     private String attachmentConfig = "";
     
-    // Webauthn
+    // WebAuthn
     private byte[] userHandleIdBytes;
     private WebAuthnAuthenticator attestedAuthenticator;
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("WebauthnRegister module init start");
+            DEBUG.message("WebAuthnRegister module init start");
         }
         
         super.init(subject, sharedState, options);
@@ -79,7 +79,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("WebauthnRegister module parameter are " 
+            DEBUG.message("WebAuthnRegister module parameter are " 
                     + "authLevel = " + authLevel
                     + ", rpName = " + rpNameConfig
                     + ", origin = " + originConfig 
@@ -96,18 +96,18 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             try {
                 userName = getUserSessionProperty(ISAuthConstants.USER_TOKEN);
             } catch (AuthLoginException e) {
-                DEBUG.message("WebauthnRegister.init() : Cannot lookup userName from shared State.");
+                DEBUG.message("WebAuthnRegister.init() : Cannot lookup userName from shared State.");
             }
         }
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("WebauthnRegister.init() : userName is " + userName);
+            DEBUG.message("WebAuthnRegister.init() : userName is " + userName);
         }
     }
 
     @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("WebauthnRegister.process() : login state is " + state);
+            DEBUG.message("WebAuthnRegister.process() : login state is " + state);
         }
 
         int nextState;
@@ -116,24 +116,24 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
 
         case STATE_REG_START:
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("WebauthnRegister.process() : This state is REG_START.");
+                DEBUG.message("WebAuthnRegister.process() : This state is REG_START.");
             }
             nextState = createScript(callbacks);
             break;
         case STATE_REG_SCRIPT:
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("WebauthnRegister.process() : This state is REG_SCRIPT.");
+                DEBUG.message("WebAuthnRegister.process() : This state is REG_SCRIPT.");
             }
             nextState = storeAuthenticator(callbacks);
             break;
         case STATE_REG_KEY:
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("WebauthnRegister.process() : This state is REG_KEY.");
+                DEBUG.message("WebAuthnRegister.process() : This state is REG_KEY.");
             }
             nextState = storeCredentialName(callbacks);
             break;
         default:
-            DEBUG.error("WebauthnRegister.process() : Invalid module state.");
+            DEBUG.error("WebAuthnRegister.process() : Invalid module state.");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
@@ -208,7 +208,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
-            DEBUG.error("WebauthnRegister.storeAuthenticator() : webauthnHiddenCallback is empty");
+            DEBUG.error("WebAuthnRegister.storeAuthenticator() : webauthnHiddenCallback is empty");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
@@ -216,15 +216,15 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             DEBUG.message("Posted webauthnHiddenCallback = " + _webauthnHiddenCallback);
         }
 
-        WebauthnJsonCallback _responseJson;
+        WebAuthnJsonCallback _responseJson;
         try {
             _responseJson = OBJECT_MAPPER.readValue(_webauthnHiddenCallback,
-                    WebauthnJsonCallback.class);
+                    WebAuthnJsonCallback.class);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("id Base64url = " + _responseJson.getId());
             }
         } catch (IOException e) {
-            DEBUG.error("WebauthnRegister.storeAuthenticator(): JSON parse error", e);
+            DEBUG.error("WebAuthnRegister.storeAuthenticator(): JSON parse error", e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         }
 
@@ -238,15 +238,15 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
-                    DEBUG.message("WebauthnRegister.storeAuthenticator() was success");
+                    DEBUG.message("WebAuthnRegister.storeAuthenticator() was success");
                 }
                 nextState = STATE_REG_KEY;
             } else {
-                DEBUG.error("WebauthnRegister.storeAuthenticator() was Fail");
+                DEBUG.error("WebAuthnRegister.storeAuthenticator() was Fail");
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
         } catch (SSOException | SMSException e) {
-            DEBUG.error("WebauthnRegister.storeAuthenticator() : Webauthn module exception : ", e);
+            DEBUG.error("WebAuthnRegister.storeAuthenticator() : WebAuthn module exception : ", e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
@@ -273,12 +273,12 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
             _storeResult = webauthnService.storeCredentialName(attestedAuthenticator);
             if (_storeResult) {
                 if (DEBUG.messageEnabled()) {
-                    DEBUG.message("WebauthnRegister.storeCredentialName() was success");
+                    DEBUG.message("WebAuthnRegister.storeCredentialName() was success");
                 }
                 nextState = STATE_COMPLETE;
             } else {
                 if (DEBUG.messageEnabled()) {
-                    DEBUG.message("WebauthnRegister.storeCredentialName() was Fail");
+                    DEBUG.message("WebAuthnRegister.storeCredentialName() was Fail");
                 }
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }

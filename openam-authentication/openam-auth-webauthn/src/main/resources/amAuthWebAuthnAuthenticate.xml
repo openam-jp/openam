@@ -23,13 +23,13 @@
     "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
-    <Service name="iPlanetAMAuthWebauthnAuthenticateService" version="1.0">
+    <Service name="iPlanetAMAuthWebAuthnAuthenticateService" version="1.0">
         <Schema
-            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthWebauthnAuthenticateService"
-            i18nFileName="amAuthWebauthnAuthenticate"
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthWebAuthnAuthenticateService"
+            i18nFileName="amAuthWebAuthnAuthenticate"
             revisionNumber="30"
             i18nKey="iplanet-am-auth-Webauthn-Authenticate-service-description"
-            resourceName="WebauthnAuthenticate">
+            resourceName="WebAuthnAuthenticate">
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-rp"

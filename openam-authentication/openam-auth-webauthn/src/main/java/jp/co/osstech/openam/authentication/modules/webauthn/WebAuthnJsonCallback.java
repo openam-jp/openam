@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class WebauthnJsonCallback {
+public class WebAuthnJsonCallback {
 
     /*
      * for prototype only todo change private write get value code in this class
@@ -35,7 +35,7 @@ public class WebauthnJsonCallback {
     private String signature; // base64 or byte[]
     private String userHandle;
 
-    WebauthnJsonCallback() {
+    WebAuthnJsonCallback() {
 
     }
 

@@ -47,7 +47,7 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWeb
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 
 /**
- * Abstract Class for WebauthnRegister / WebauthnAuthenticate
+ * Abstract Class for WebAuthnRegister / WebAuthnAuthenticate
  */
 public abstract class AbstractWebAuthnModule extends AMLoginModule {
     
@@ -78,7 +78,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
 
     // user's valid ID and principal
     protected String validatedUserID;
-    protected WebauthnPrincipal userPrincipal;
+    protected WebAuthnPrincipal userPrincipal;
     
     // WebAuthn
     protected final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
@@ -95,7 +95,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         java.util.Locale locale = getLoginLocale();
         bundle = amCache.getResBundle(getBundleName(), locale);
         if (debug.messageEnabled()) {
-            debug.message("Webauthn getting resource bundle for locale: " + locale);
+            debug.message("WebAuthn getting resource bundle for locale: " + locale);
         }
 
         this.rpNameConfig = CollectionHelper.getMapAttr(options, RP_NAME);
@@ -114,7 +114,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         if (userPrincipal != null) {
             return userPrincipal;
         } else if (validatedUserID != null) {
-            userPrincipal = new WebauthnPrincipal(validatedUserID);
+            userPrincipal = new WebAuthnPrincipal(validatedUserID);
             return userPrincipal;
         } else {
             return null;
@@ -154,16 +154,16 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
                 _results = _searchResults.getSearchResults();
             }
         } catch (SSOException e) {
-            debug.error("Webauthn.getIdentity : Error searching Identities with username '{}' ", userName, e);
+            debug.error("WebAuthn.getIdentity : Error searching Identities with username '{}' ", userName, e);
         } catch (IdRepoException e) {
-            debug.error("Webauthn.getIdentity : Module exception", e);
+            debug.error("WebAuthn.getIdentity : Module exception", e);
         }
 
         if (_results.isEmpty()) {
-            debug.error("Webauthn.getIdentity : User '{}' is not found", userName);
+            debug.error("WebAuthn.getIdentity : User '{}' is not found", userName);
             throw new AuthLoginException(getBundleName(), "authFailed", null);
         } else if (_results.size() > 1) {
-            debug.error("Webauthn.getIdentity : More than one user found for the userName '{}'", userName);
+            debug.error("WebAuthn.getIdentity : More than one user found for the userName '{}'", userName);
             throw new AuthLoginException(getBundleName(), "authFailed", null);
         } else {
             return _results.iterator().next();
@@ -184,10 +184,10 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         try {
             _attributes = getIdentity().getAttribute(attributeName);
         } catch (SSOException e) {
-            debug.error("Webauthn.lookupStringData() : Webauthn module exception", e);
+            debug.error("WebAuthn.lookupStringData() : WebAuthn module exception", e);
             throw new AuthLoginException(getBundleName(), "authFailed", null, e);
         } catch (IdRepoException e) {
-            debug.error("Webauthn.lookupStringData() : error searching Identities with username {}", userName, e);
+            debug.error("WebAuthn.lookupStringData() : error searching Identities with username {}", userName, e);
             throw new AuthLoginException(getBundleName(), "authFailed", null, e);
         }
 
@@ -214,10 +214,10 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
             Map<String, byte[][]> _lookupByteData = getIdentity().getBinaryAttributes(_attribute);
             return _lookupByteData.get(attributeName)[0];
         } catch (SSOException e) {
-            debug.error("Webauthn.lookupByteData() : Webauthn module exception", e);
+            debug.error("WebAuthn.lookupByteData() : WebAuthn module exception", e);
             throw new AuthLoginException(getBundleName(), "authFailed", null, e);
         } catch (IdRepoException e) {
-            debug.error("Webauthn.lookupByteData() : error searching Identities with username {}", userName, e);
+            debug.error("WebAuthn.lookupByteData() : error searching Identities with username {}", userName, e);
             throw new AuthLoginException(getBundleName(), "authFailed", null, e);
         }
     }

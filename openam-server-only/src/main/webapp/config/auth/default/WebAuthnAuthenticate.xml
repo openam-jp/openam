@@ -20,11 +20,11 @@
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
-<ModuleProperties moduleName="WebauthnAuthenticate" version="1.0" >
-    <Callbacks length="0" order="1" timeout="120" header="Webauthn Authentication Selecter">
+<ModuleProperties moduleName="WebAuthnAuthenticate" version="1.0" >
+    <Callbacks length="0" order="1" timeout="120" header="WebAuthn Authentication Selecter">
     </Callbacks>
 
-    <Callbacks length="2" order="2" timeout="120" header="Webauthn Authentication">
+    <Callbacks length="2" order="2" timeout="120" header="WebAuthn Authentication">
         <NameCallback>
             <Prompt>UserID:</Prompt>
         </NameCallback>
@@ -54,7 +54,7 @@
         </ConfirmationCallback>
     </Callbacks>
 
-    <Callbacks length="1" order="4" timeout="120" header="Webauthn Authentication(Residentkey)">
+    <Callbacks length="1" order="4" timeout="120" header="WebAuthn Authentication(Residentkey)">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
@@ -64,7 +64,7 @@
         </ConfirmationCallback>
     </Callbacks>
     
-    <Callbacks length="1" order="5" timeout="120" header="Webauthn Authentication(MFA)">
+    <Callbacks length="1" order="5" timeout="120" header="WebAuthn Authentication(MFA)">
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>

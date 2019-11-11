@@ -21,26 +21,26 @@ import java.security.Principal;
 
 /**
  * This class implements the <code>Principal</code> interface and represents an
- * Webauthn user.
+ * WebAuthn user.
  * <p>
- * Principals such as this <code>WebauthnPrincipal</code> may be associated with
+ * Principals such as this <code>WebAuthnPrincipal</code> may be associated with
  * a particular <code>Subject</code> to augment that <code>Subject</code> with
  * an additional identity. Refer to the <code>Subject</code> class for more
  * information on how to achieve this. Authorization decisions can then be based
  * upon the Principals associated with a <code>Subject</code>.
  */
-public class WebauthnPrincipal implements Principal, java.io.Serializable {
+public class WebAuthnPrincipal implements Principal, java.io.Serializable {
 
     private String name;
 
     /**
-     * Creates a <code>WebauthnPrincipal</code> with a Webauthn user name.
+     * Creates a <code>WebAuthnPrincipal</code> with a WebAuthn user name.
      *
-     * @param name the Webauthn user name for this user.
+     * @param name the WebAuthn user name for this user.
      * @exception NullPointerException if the <code>name</code> is
      *                                 <code>null</code>.
      */
-    public WebauthnPrincipal(String name) {
+    public WebAuthnPrincipal(String name) {
         if (name == null) {
             throw new NullPointerException("illegal null input");
         }
@@ -49,33 +49,33 @@ public class WebauthnPrincipal implements Principal, java.io.Serializable {
     }
 
     /**
-     * Returns the Webauthn user name for this <code>WebauthnPrincipal</code>.
+     * Returns the WebAuthn user name for this <code>WebAuthnPrincipal</code>.
      *
-     * @return the Webauthn user name for this <code>WebauthnPrincipal</code>
+     * @return the WebAuthn user name for this <code>WebAuthnPrincipal</code>
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns a string representation of this <code>WebauthnPrincipal</code>.
+     * Returns a string representation of this <code>WebAuthnPrincipal</code>.
      *
-     * @return a string representation of this <code>WebauthnPrincipal</code>.
+     * @return a string representation of this <code>WebAuthnPrincipal</code>.
      */
     public String toString() {
-        return ("WebauthnPrincipal: " + name);
+        return ("WebAuthnPrincipal: " + name);
     }
 
     /**
-     * Compares the specified Object with this <code>WebauthnPrincipal
+     * Compares the specified Object with this <code>WebAuthnPrincipal
      * </code> for equality. Returns true if the given object is also a
-     * <code>WebauthnPrincipal</code> and the two <code>WebauthnPrincipals</code>
+     * <code>WebAuthnPrincipal</code> and the two <code>WebAuthnPrincipals</code>
      * have the same user name.
      *
      * @param o Object to be compared for equality with this
-     *          <code>WebauthnPrincipal</code>.
+     *          <code>WebAuthnPrincipal</code>.
      * @return true if the specified Object is equal equal to this
-     *         <code>WebauthnPrincipal</code>.
+     *         <code>WebAuthnPrincipal</code>.
      */
     public boolean equals(Object o) {
         if (o == null) {
@@ -86,18 +86,18 @@ public class WebauthnPrincipal implements Principal, java.io.Serializable {
             return true;
         }
 
-        if (!(o instanceof WebauthnPrincipal)) {
+        if (!(o instanceof WebAuthnPrincipal)) {
             return false;
         }
 
-        WebauthnPrincipal that = (WebauthnPrincipal) o;
+        WebAuthnPrincipal that = (WebAuthnPrincipal) o;
         return this.getName().equals(that.getName());
     }
 
     /**
-     * Returns a hash code for this <code>WebauthnPrincipal</code>.
+     * Returns a hash code for this <code>WebAuthnPrincipal</code>.
      *
-     * @return a hash code for this <code>WebauthnPrincipal</code>.
+     * @return a hash code for this <code>WebAuthnPrincipal</code>.
      */
     public int hashCode() {
         return name.hashCode();

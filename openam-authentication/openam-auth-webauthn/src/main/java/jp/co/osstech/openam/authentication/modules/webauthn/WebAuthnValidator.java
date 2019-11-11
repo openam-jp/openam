@@ -42,7 +42,7 @@ public interface WebAuthnValidator {
      * @return WebAuthnAuthenticator instance to store.
      * @throws AuthLoginException
      */
-    WebAuthnAuthenticator validateCreateResponse(WebAuthnValidatorConfig config, WebauthnJsonCallback responseJson,
+    WebAuthnAuthenticator validateCreateResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
             byte[] userHandleIdBytes, Debug debug) throws AuthLoginException;
 
     /**
@@ -55,7 +55,7 @@ public interface WebAuthnValidator {
      * @param debug Debug instance.
      * @throws AuthLoginException
      */
-    void validateGetResponse(WebAuthnValidatorConfig config, WebauthnJsonCallback responseJson,
+    void validateGetResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
             WebAuthnAuthenticator amAuthenticator, Debug debug) throws AuthLoginException;
 
 }

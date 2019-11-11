@@ -56,7 +56,7 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
     }
     
     @Override
-    public WebAuthnAuthenticator validateCreateResponse(WebAuthnValidatorConfig config, WebauthnJsonCallback responseJson,
+    public WebAuthnAuthenticator validateCreateResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
             byte[] userHandleIdBytes, Debug debug) throws AuthLoginException {
         
         try {
@@ -105,14 +105,14 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             return amAuthenticator;
             
         } catch (Exception ex) {
-            debug.error("Webauthn.validateCreateResponse : Error validating response. User handle is {}", 
+            debug.error("WebAuthn.validateCreateResponse : Error validating response. User handle is {}", 
                     WebAuthnAuthenticator.getUserIDAsString(userHandleIdBytes), ex);
-            throw new AuthLoginException(WebauthnRegister.BUNDLE_NAME, "authFailed", null, ex);
+            throw new AuthLoginException(WebAuthnRegister.BUNDLE_NAME, "authFailed", null, ex);
         }
     }
     
     @Override
-    public void validateGetResponse(WebAuthnValidatorConfig config, WebauthnJsonCallback responseJson,
+    public void validateGetResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
             WebAuthnAuthenticator amAuthenticator, Debug debug) throws AuthLoginException {
         
         try {
@@ -160,9 +160,9 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             amAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
         
         } catch (Exception ex) {
-            debug.error("Webauthn.validateGetResponse : Error validating response. User handle is {}", 
+            debug.error("WebAuthn.validateGetResponse : Error validating response. User handle is {}", 
                     WebAuthnAuthenticator.getUserIDAsString(amAuthenticator.getUserID()), ex);
-            throw new AuthLoginException(WebauthnAuthenticate.BUNDLE_NAME, "authFailed", null, ex);
+            throw new AuthLoginException(WebAuthnAuthenticate.BUNDLE_NAME, "authFailed", null, ex);
         }
     }
 }
