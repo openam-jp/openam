@@ -18,13 +18,12 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * The POJO for deserializing WebAuthn PublicKeyCredential JSON response.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class WebAuthnJsonCallback {
 
-    /*
-     * for prototype only todo change private write get value code in this class
-     */
     private String id; // base64url String
     private String rawId; // base64 or byte[]
     private String type;
@@ -35,26 +34,48 @@ public class WebAuthnJsonCallback {
     private String signature; // base64 or byte[]
     private String userHandle;
 
+    /**
+     * Base constructor.
+     */
     WebAuthnJsonCallback() {
-
     }
 
+    /**
+     * Get the value of PublicKeyCredential.id.
+     * @return The value of PublicKeyCredential.id.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.rawId.
+     * @return The value of PublicKeyCredential.rawId.
+     */
     public String getRawId() {
         return rawId;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.type.
+     * @return The value of PublicKeyCredential.type.
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.response.attestationObject.
+     * @return The value of PublicKeyCredential.response.attestationObject.
+     */
     public String getAttestationObject() {
         return attestationObject;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.response.clientDataJSON.
+     * @return The value of PublicKeyCredential.response.clientDataJSON.
+     */
     public String getClientDataJSON() {
         return clientDataJSON;
     }
@@ -63,16 +84,27 @@ public class WebAuthnJsonCallback {
         return credentialId;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.response.attestationObject.
+     * @return The value of PublicKeyCredential.response.attestationObject.
+     */
     public String getAuthenticatorData() {
         return authenticatorData;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.response.signature.
+     * @return The value of PublicKeyCredential.response.signature.
+     */
     public String getSignature() {
         return signature;
     }
 
+    /**
+     * Get the value of PublicKeyCredential.response.userHandle.
+     * @return The value of PublicKeyCredential.response.userHandle.
+     */
     public String getUserHandle() {
         return userHandle;
     }
-
 }
