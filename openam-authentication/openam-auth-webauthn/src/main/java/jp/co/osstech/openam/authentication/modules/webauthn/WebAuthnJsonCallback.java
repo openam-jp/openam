@@ -29,7 +29,6 @@ public class WebAuthnJsonCallback {
     private String type;
     private String attestationObject; // base64 or byte[]
     private String clientDataJSON; // base64 or byte[]
-    private String credentialId; // base64 or byte[]
     private String authenticatorData; // base64 or byte[]
     private String signature; // base64 or byte[]
     private String userHandle;
@@ -78,10 +77,6 @@ public class WebAuthnJsonCallback {
      */
     public String getClientDataJSON() {
         return clientDataJSON;
-    }
-
-    public String getCredentialId() {
-        return credentialId;
     }
 
     /**
