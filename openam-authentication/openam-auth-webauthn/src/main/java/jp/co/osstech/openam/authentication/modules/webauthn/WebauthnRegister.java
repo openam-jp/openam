@@ -179,24 +179,20 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         // Use LDAP entryUUID as userHandleId
         userHandleIdBytes = lookupByteData("entryUUID");
 
-        // navigator.credentials.create Options
-        CredentialsCreateOptions credentialsCreateOptions = 
-                new CredentialsCreateOptions(
-                rpNameConfig,
-                userHandleIdBytes,
-                userName,
-                lookupStringData(displayNameAttributeNameConfig),
-                attestationConfig,
-                attachmentConfig,
-                residentKeyConfig,
-                userVerificationConfig,
-                timeoutConfig,
-                _challengeBytes);
-
         // Replace Callback to send Generated Javascript that include create options.
         // only for nextState REG_SCRIPT
-        Callback creadentialsCreateCallback = new ScriptTextOutputCallback(
-                credentialsCreateOptions.generateCredntialsCreateScriptCallback());
+        Callback creadentialsCreateCallback = 
+                ScriptCallbackGenerator.generateCredntialsCreateScriptCallback(
+                        rpNameConfig,
+                        userHandleIdBytes,
+                        userName,
+                        lookupStringData(displayNameAttributeNameConfig),
+                        attestationConfig,
+                        attachmentConfig,
+                        residentKeyConfig,
+                        userVerificationConfig,
+                        timeoutConfig,
+                        _challengeBytes);
         replaceCallback(STATE_REG_SCRIPT, 0, creadentialsCreateCallback);
         
         return nextState;

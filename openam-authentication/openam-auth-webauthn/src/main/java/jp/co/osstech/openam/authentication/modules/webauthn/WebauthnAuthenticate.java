@@ -289,19 +289,16 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         // Generate challenge
         byte[] _challengeBytes = webauthnValidator.generateChallenge();
 
-        // navigator.credentials.get Options
-        //redidentkey dosn't need stored credentialid(authenticators = null).
-        CredentialsGetOptions credentialsGetOptions = new CredentialsGetOptions(
-                authenticators,
-                userVerificationConfig,
-                _challengeBytes,
-                timeoutConfig,
-                residentKeyConfig);
-
         // Replace Callback to send Generated Javascript that include get options.
         // only for nextState LOGIN_SCRIPT
-        Callback creadentialsGetCallback = new ScriptTextOutputCallback(
-                credentialsGetOptions.generateCredntialsGetScriptCallback());
+        // redidentkey dosn't need stored credentialid(authenticators = null).
+        Callback creadentialsGetCallback = 
+                ScriptCallbackGenerator.generateCredntialsGetScriptCallback(
+                        authenticators,
+                        residentKeyConfig,
+                        userVerificationConfig,
+                        timeoutConfig,
+                        _challengeBytes);
         replaceCallback(STATE_LOGIN_SCRIPT, 0, creadentialsGetCallback);
     }
 
