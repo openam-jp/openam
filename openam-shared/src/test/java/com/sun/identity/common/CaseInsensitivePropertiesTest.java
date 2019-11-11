@@ -78,8 +78,8 @@ public class CaseInsensitivePropertiesTest {
         assertTrue(keySet.contains(new CaseInsensitiveKey("ONE")));
         assertTrue(keySet.contains(new CaseInsensitiveKey("TWO")));
         for (Object o: keySet) {
-        	assertTrue( o instanceof String);
-        	assertTrue(pp.containsKey((String)o));
+            assertTrue( o instanceof String);
+            assertTrue(pp.containsKey((String)o));
         }
         
         assertEquals(pp.remove("OnE"),"une");

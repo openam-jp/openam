@@ -97,14 +97,14 @@ public class CaseInsensitiveProperties extends Properties {
             if (actualKey != null) {
                 retval = super.containsKey(actualKey);
             } else {
-            	retval = false;
+                retval = false;
             }
         } else if( key instanceof String){
             String actualKey = keyExchange.get(((String)key).toLowerCase());
             if (actualKey != null) {
                 retval = super.containsKey(actualKey);
             } else {
-            	retval = false;
+                retval = false;
             }
         } else {
             retval = super.containsKey(key);
@@ -161,15 +161,15 @@ public class CaseInsensitiveProperties extends Properties {
         if (key instanceof String) {
             paramKey = (String)key;
         } else if (key instanceof CaseInsensitiveKey){
-        	paramKey = key.toString();
+            paramKey = key.toString();
         }
         if (paramKey != null) {
-        	String lowKey = paramKey.toLowerCase();
+            String lowKey = paramKey.toLowerCase();
             String actualKey = keyExchange.get(lowKey);
             if (actualKey != null) {
                 retval = super.remove(actualKey);
             } else {
-            	retval = null;
+                retval = null;
             }
             if (value != null) {
                 keyExchange.put(lowKey,paramKey);

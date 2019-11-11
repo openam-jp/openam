@@ -31,68 +31,6 @@
         </dependency>      
   </dependencies>
 
-    <profiles>
-<!--         <profile>
-            <id>jdk11.maven-checkstyle.opt</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <properties>
-                <jdk.checkstyle.skip>true</jdk.checkstyle.skip>
-            </properties>
-        </profile> -->
-        <profile>
-            <id>jdk8.maven-checkstyle.opt</id>
-            <activation>
-                <jdk>[,11)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                      <!--
-                      Enforce Checkstyle during compilation
-
-                      Strictly speaking Checkstyle should be invoked as a
-                          report during site generation. However, we want
-                          to fail the build if source code does not comply with
-                          our coding guidelines, and not at a later stage when
-                          the site is generated (which may never occur for some
-                          projects).
-                      -->
-
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-checkstyle-plugin</artifactId>
-                      <executions>
-                          <execution>
-                              <id>check-src-and-tests</id>
-                              <configuration>
-                                  <skip>${jdk.checkstyle.skip}</skip>
-                                  <configLocation>${checkstyleSourceConfigLocation}</configLocation>
-                                  <headerLocation>${checkstyleHeaderLocation}</headerLocation>
-                                  <suppressionsLocation>${checkstyleUnitTestSuppressionsLocation}</suppressionsLocation>
-                                  <includeTestSourceDirectory>false</includeTestSourceDirectory>
-                                   <!-- Only output errors if we're not expecting any -->
-                                  <consoleOutput>${checkstyleFailOnError}</consoleOutput>
-                                  <failsOnError>${checkstyleFailOnError}</failsOnError>
-                                  <excludes>**/resources/**/*</excludes>
-                              </configuration>
-                              <phase>process-test-classes</phase>
-                              <goals>
-                                  <goal>checkstyle</goal>
-                              </goals>
-                          </execution>
-                      </executions>
-                    </plugin>
-                </plugins>
-            </build>
-
-
-            <properties>
-                <jdk.checkstyle.skip>false</jdk.checkstyle.skip>
-            </properties>
-        </profile>
-    </profiles>
-
     <!-- Build -->
     <build>
         <resources>
