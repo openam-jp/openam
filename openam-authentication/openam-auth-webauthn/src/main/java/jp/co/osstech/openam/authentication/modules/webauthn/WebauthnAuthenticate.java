@@ -447,17 +447,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     }
 
     @Override
-    public void destroyModuleState() {
-        validatedUserID = null;
-    }
-
-    @Override
-    public void nullifyUsedVars() {
-        bundle = null;
-        userName = null;
-    }
-
-    @Override
     protected Debug getDebugInstance() {
         return DEBUG;
     }

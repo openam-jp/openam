@@ -121,6 +121,18 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         }
     }
     
+    @Override
+    public void destroyModuleState() {
+        validatedUserID = null;
+        userPrincipal = null;
+    }
+
+    @Override
+    public void nullifyUsedVars() {
+        bundle = null;
+        userName = null;
+    }
+    
     /**
      * Get user identity object.
      * 

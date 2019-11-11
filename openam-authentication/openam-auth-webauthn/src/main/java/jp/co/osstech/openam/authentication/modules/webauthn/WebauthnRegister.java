@@ -302,17 +302,6 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         }
         return nextState;
     }
-    
-    @Override
-    public void destroyModuleState() {
-        validatedUserID = null;
-    }
-
-    @Override
-    public void nullifyUsedVars() {
-        bundle = null;
-        userName = null;
-    }
 
     @Override
     protected Debug getDebugInstance() {
