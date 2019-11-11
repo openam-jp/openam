@@ -222,6 +222,7 @@ public class WebauthnRegister extends AbstractWebAuthnModule {
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
+            DEBUG.error("WebauthnRegister.storeAuthenticator() : webauthnHiddenCallback is empty");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
