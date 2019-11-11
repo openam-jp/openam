@@ -36,6 +36,7 @@ import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
 import org.forgerock.openam.core.rest.devices.services.DeviceService;
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtilException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
@@ -175,17 +176,17 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME);
             
         } catch (SMSException | SSOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("Error connecting to SMS to retrieve config for AuthenticatorWebAuthnService.", e);
-            }
+            debug.error("Error connecting to SMS to retrieve config for AuthenticatorWebAuthnService.", e);
             throw e;
         }
     }
     
     /**
      * Initialize the LDAP connection pool.
+     * 
+     * @throws LDAPUtilException 
      */
-    private void initializeConnection() {
+    private void initializeConnection() throws LDAPUtilException {
         debug.message("LDAP initialize()");
             
         Set<String> primaryServers =
@@ -256,8 +257,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             });
             
         } catch (GeneralSecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            debug.error("Unable to create connection pool", e);
+            throw new LDAPUtilException(e);
         }
     }
     
@@ -266,8 +267,9 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      * 
      * @return The LDAP connection.
      * @throws LdapException If the connection request failed for some reason.
+     * @throws LDAPUtilException 
      */
-    private Connection getConnection() throws LdapException {
+    private Connection getConnection() throws LdapException, LDAPUtilException {
         synchronized(this) {
             if (cPool == null) {
                 initializeConnection();
@@ -300,9 +302,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             conn = getConnection();
             conn.add(LDAPRequests.newAddRequest(entry));
             result = true;
-        } catch (LdapException e) {
-            // TODO
-            e.printStackTrace();
+        } catch (LdapException | LDAPUtilException e) {
+            debug.error("Unable to create an authenticator entry with {}", authenticator.getCredentialID(), e);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -318,8 +319,9 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     public Set<WebAuthnAuthenticator> getAuthenticators(byte[] userID) {
         Set<WebAuthnAuthenticator> authenticators = new HashSet<WebAuthnAuthenticator>();
         SearchScope scope = SearchScope.SINGLE_LEVEL;
+        String userIDStr = WebAuthnAuthenticator.getUserIDAsString(userID);
         Filter searchFilter = 
-                Filter.valueOf(useridAttrName + "=" + WebAuthnAuthenticator.getUserIDAsString(userID));
+                Filter.valueOf(useridAttrName + "=" + userIDStr);
         for (String className : classNames) {
             Filter objectClassFilter = Filter.valueOf("objectClass"+ "=" + className);
             searchFilter = Filter.and(searchFilter, objectClassFilter);
@@ -348,12 +350,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     reader.readReference();
                 }
             }
-        } catch (LdapException e) {
-            // TODO
-            e.printStackTrace();
-        } catch (SearchResultReferenceIOException e) {
-            // TODO
-            e.printStackTrace();
+        } catch (LdapException | LDAPUtilException | SearchResultReferenceIOException e) {
+            debug.error("Unable to search authenticator entries with {}", userIDStr, e);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -379,9 +377,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             conn = getConnection();
             conn.modify(modifyRequest);
             result = true;
-        } catch (LdapException e) {
-            // TODO
-            e.printStackTrace();
+        } catch (LdapException | LDAPUtilException e) {
+            debug.error("Unable to update the signature counter with {}", authenticator.getCredentialID(), e);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -407,9 +404,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             conn = getConnection();
             conn.modify(modifyRequest);
             result = true;
-        } catch (LdapException e) {
-            // TODO
-            e.printStackTrace();
+        } catch (LdapException | LDAPUtilException e) {
+            debug.error("Unable to update the Credential Name with {}", authenticator.getCredentialID(), e);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }

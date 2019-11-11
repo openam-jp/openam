@@ -92,7 +92,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("Webauthn module init start");
+            DEBUG.message("WebauthnAuthenticate module init start");
         }
 
         super.init(subject, sharedState, options);
@@ -100,7 +100,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         this.useMfaConfig = CollectionHelper.getMapAttr(options, USE_MFA);
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("Webauthn module parameter are " 
+            DEBUG.message("WebauthnAuthenticate module parameter are " 
                     + "authLevel = " + authLevel
                     + ", useMfa = " + useMfaConfig 
                     + ", rpName = " + rpNameConfig
@@ -117,11 +117,11 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
                 try {
                     userName = getUserSessionProperty(ISAuthConstants.USER_TOKEN);
                 } catch (AuthLoginException e) {
-                    DEBUG.message("Webauthn::init: Cannot lookup userName from shared State.");
+                    DEBUG.message("WebauthnAuthenticate.init() : Cannot lookup userName from shared State.");
                 }
             }
             if (DEBUG.messageEnabled()) {
-                DEBUG.message("userName: " + userName);
+                DEBUG.message("WebauthnAuthenticate.init() : userName is " + userName);
             }
         }
     }
@@ -129,7 +129,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("in process(), login state is " + state);
+            DEBUG.message("WebauthnAuthenticate.process() : login state is " + state);
         }
 
         int nextState;
@@ -137,21 +137,37 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         switch (state) {
         
         case STATE_LOGIN_SELECT:
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebauthnAuthenticate.process() : This state is LOGIN_SELECT.");
+            }
             nextState = selectLoginType();
             break;
         case STATE_LOGIN_START:
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebauthnAuthenticate.process() : This state is LOGIN_START.");
+            }
             nextState = handlePasswordLessLoginStartCallbacks(callbacks);
             break;
         case STATE_LOGIN_SCRIPT:
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebauthnAuthenticate.process() : This state is LOGIN_SCRIPT.");
+            }
             nextState = verifyAuthenticatorCallback(callbacks);
             break;
         case STATE_RESIDENTKEY_LOGIN_START:
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebauthnAuthenticate.process() : This state is RESIDENTKEY_LOGIN_START.");
+            }
             nextState = handleResidentKeyLoginStartCallbacks(callbacks);
             break;
         case STATE_MFA_LOGIN_START:
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebauthnAuthenticate.process() : This state is MFA_LOGIN_START.");
+            }
             nextState = handleMfaLoginStartCallbacks(callbacks);
             break;
         default:
+            DEBUG.error("WebauthnAuthenticate.process() : Invalid module state.");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
 
@@ -171,11 +187,13 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             webauthnService = webauthnServiceFactory.create(realm);
         } catch (SSOException|SMSException ex) {
+            DEBUG.error("WebauthnAuthenticate.selectLoginType() : Authenticator service exception : ", ex);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
         }
         
         if (useMfaConfig.equalsIgnoreCase("true")) {
             if (userName == null) {
+                DEBUG.error("WebauthnAuthenticate.selectLoginType() :  User name not found");
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
             nextState = STATE_MFA_LOGIN_START;
@@ -197,10 +215,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private int handlePasswordLessLoginStartCallbacks(Callback[] callbacks) 
             throws AuthLoginException {
 
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = LOGIN_START");
-        }
-
         userName = ((NameCallback) callbacks[0]).getName();
         
         getStoredCredentialId();
@@ -220,10 +234,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private int handleResidentKeyLoginStartCallbacks(Callback[] callbacks)
             throws AuthLoginException {
 
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = RESIDENTKEY_LOGIN_START");
-        }
-
         createLoginScript();
 
         return STATE_LOGIN_SCRIPT;
@@ -238,10 +248,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
      */
     private int handleMfaLoginStartCallbacks(Callback[] callbacks)
             throws AuthLoginException {
-
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = MFA_LOGIN_START");
-        }
 
         getStoredCredentialId();
         
@@ -263,6 +269,9 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             byte[] entryUUID = lookupByteData("entryUUID");
             authenticators = webauthnService.getAuthenticators(entryUUID);
             if (authenticators.isEmpty()) {
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("WebauthnAuthenticate.getStoredCredentialId() :  User authenticators not found");
+                }
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
         } catch (AuthLoginException ex) {
@@ -306,10 +315,6 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private int verifyAuthenticatorCallback(Callback[] callbacks)
             throws AuthLoginException {
         
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("ThisState = WebauthnAuthenticateModuleStat.LOGIN_SCRIPT");
-        }
-
         // if Cancel Button Return Authentication Fail
         if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
             throw new AuthLoginException("Authentication Cancel Auth Fail");
@@ -318,6 +323,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
+            DEBUG.error("WebauthnAuthenticate.verifyAuthenticatorCallback() : webauthnHiddenCallback is empty");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
@@ -336,7 +342,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
                 DEBUG.message("_responseJson.getUserHandle() = " + _responseJson.getUserHandle());
             }
         } catch (IOException e) {
-            DEBUG.error("Webauthn.process(): JSON parse error", e);
+            DEBUG.error("WebauthnAuthenticate.process(): JSON parse error", e);
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
         }
 
@@ -354,6 +360,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             userName = searchUserNameWithAttrValue(_userHandleIdStr, "entryUUID");
             authenticators = webauthnService.getAuthenticators(_userHandleBytes);
             if (authenticators.isEmpty()) {
+                DEBUG.error("WebauthnAuthenticate.verifyAuthenticatorCallback() :  User authenticators not found");
                 throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
             }
         }
@@ -366,6 +373,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             }
         }
         if (_selectedAuthenticator == null) {
+            DEBUG.error("WebauthnAuthenticate.verifyAuthenticatorCallback() :  User authenticator is not detected");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
         
@@ -381,7 +389,7 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
             validatedUserID = userName;
             return STATE_COMPLETE;
         } else {
-            DEBUG.error("updateCounter error");
+            DEBUG.error("WebauthnAuthenticate.verifyAuthenticatorCallback() :  Error updating counter");
             throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
         }
     }
@@ -397,8 +405,8 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
     private String searchUserNameWithAttrValue(String attributeValue, String attributeName) throws AuthLoginException {
  
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("serchUserNameWith attributeName= "+ attributeName 
-                    + " attributeValue= " + attributeValue );
+            DEBUG.message("WebauthnAuthenticate.searchUserNameWithAttrValue() :  attributeName={}  attributeValue={}",
+                    attributeName, attributeValue);
         }
 
         // And the search criteria
@@ -419,26 +427,31 @@ public class WebauthnAuthenticate extends AbstractWebAuthnModule {
                 Set<AMIdentity> _results = _searchResults.getSearchResults();
                 if (!_results.isEmpty()) {
                     if (DEBUG.messageEnabled()) {
-                        DEBUG.message(BUNDLE_NAME + _results.size() + " result(s) obtained");
+                        DEBUG.message("WebauthnAuthenticate.searchUserNameWithAttrValue() :  {} result(s) obtained",
+                                _results.size());
                     }
                     if (_results.size() > 1) {
+                        DEBUG.error("WebauthnAuthenticate.searchUserNameWithAttrValue() : There are multiple target users");
                         throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
                     }
                     AMIdentity _userDNId = _results.iterator().next();
                     if (_userDNId != null) {
                         if (DEBUG.messageEnabled()) {
-                             DEBUG.message(BUNDLE_NAME + "user = " + _userDNId.getUniversalId());
-                             DEBUG.message(BUNDLE_NAME + "attrs =" + _userDNId.getAttributes(
-                                     getUserAliasList()));
+                            DEBUG.error("WebauthnAuthenticate.searchUserNameWithAttrValue() : user={}",
+                                    _userDNId.getUniversalId());
                         }
                         return _userDNId.getName();
                     }
                 }
             }
         } catch (IdRepoException idrepoex) {
-            throw new AuthLoginException(BUNDLE_NAME, idrepoex);
+            DEBUG.error("WebauthnAuthenticate.searchUserNameWithAttrValue() : An exception occurred while searching for user.",
+                    idrepoex);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, idrepoex);
         } catch (SSOException ssoe) {
-            throw new AuthLoginException(BUNDLE_NAME, ssoe);
+            DEBUG.error("WebauthnAuthenticate.searchUserNameWithAttrValue() : An exception occurred while searching for user.",
+                    ssoe);
+            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ssoe);
         }
         if (DEBUG.messageEnabled()) {
             DEBUG.message(BUNDLE_NAME + " No results were found !");
