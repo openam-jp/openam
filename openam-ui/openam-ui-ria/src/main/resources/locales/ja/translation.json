@@ -325,7 +325,7 @@
             "deactivate": "非アクティブ",
             "active": "アクティブ",
             "inactive": "非アクティブ",
-            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "copyright" : "Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.",
             "build": "ビルド",
             "sessionExpired" : "セッションが有効期限切れ",
             "enableCookies" : "ログインするためには、 cookie を有効にする必要があります",

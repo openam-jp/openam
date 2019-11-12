@@ -25,6 +25,7 @@
  * $Id: Constants.java,v 1.47 2009/08/12 23:10:44 ericow Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.shared;
 
@@ -1241,7 +1242,7 @@ public interface Constants {
     /**
      * Default Root Context
      */
-    static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=forgerock,dc=org";
+    static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=jp";
 
     /**
      * Default Token Root Context, this will be used to create a Secondary Suffix during installation.

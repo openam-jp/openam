@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 /* global module, require, process */
@@ -72,7 +73,7 @@ module.exports = function (grunt) {
             "**/*.woff",
             "**/*.woff2",
             "**/*.otf",
-            "css/bootstrap-3.3.5-custom.css",
+            "css/bootstrap-3.4.1-openam-jp.css",
             "themes/**/*.*"
         ],
         serverDeployDirectory = process.env.OPENAM_HOME + "/XUI";

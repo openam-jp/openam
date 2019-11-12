@@ -21,6 +21,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                               
+   Portions copyright 2019 Open Source Solution Technology Corporation
 --%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -158,8 +159,7 @@
     </div>
     <div class="footer alt-color">
         <div class="grid_3">
-            <p>Copyright &copy; 208-2013, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
-                terms and conditions of the ForgeRock&trade; License and Subscription Agreement.</p>
+            <p>Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.</p>
         </div>
     </div>
 </div>

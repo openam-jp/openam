@@ -84,9 +84,9 @@ li {
 
 .logo /* brand logo (make sure you set the width and height too) */
 {
-    background-image:url(../images/forge-rock.png);
-    width: 226px;
-    height: 110px;
+    background-image:url(../XUI/images/login-logo.png);
+    width: 210px;
+    height: 104px;
     background-repeat:no-repeat;
     display:block;
     margin:30px 0;
@@ -105,7 +105,7 @@ li {
 
 .box /* the main content box */
 {
-    background: #ffffff url(../images/box-bg.png) 600px -300px no-repeat;
+    background: #ffffff 600px -300px no-repeat;
     padding-top: 20px;
     margin-bottom: 30px;
     border-radius: 0;
@@ -222,7 +222,7 @@ a {
 }
 
 a:hover {
-    color: #5e887f;
+    color: #00293b;
     text-decoration: none;
 }
 
@@ -312,7 +312,7 @@ input[type=submit], input[type=button] {
 }
 
 input[type=button], input[type=submit], .button {
-    background: #80b7ab;
+    background: #004d6e;
     border: 0px;
     color: #FFF;
     cursor: pointer;
@@ -349,7 +349,7 @@ input[type=button], input[type=submit], .button {
 }
 
 input[type=button]:hover, input[type=submit]:hover, .button:hover {
-    background: #5e887f;
+    background: #00293b;
 }
 
 input:-webkit-autofill {
