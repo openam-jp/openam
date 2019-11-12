@@ -28,6 +28,6 @@ public class WebAuthnGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(WebAuthnValidator.class).toInstance(new WebAuthn4JValidatorImpl());
+        bind(WebAuthnValidator.class).to(WebAuthn4JValidatorImpl.class);
     }
 }
