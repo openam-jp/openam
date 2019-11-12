@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.common;
@@ -20,6 +22,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Set;
 
 import static org.testng.Assert.*;
 
@@ -32,10 +35,22 @@ public class CaseInsensitivePropertiesTest {
         p.put("tWo", "deux");
         assertEquals(p.get("ONE"), "une");
         assertEquals(p.get("TWO"), "deux");
+        assertEquals(p.get(new CaseInsensitiveKey("ONE")), "une");
+        assertEquals(p.get(new CaseInsensitiveKey("TWO")), "deux");
+        assertTrue(p.containsKey("oNE"));
+        assertTrue(p.containsKey("Two"));
+        assertTrue(p.containsKey(new CaseInsensitiveKey("oNE")));
+        assertTrue(p.containsKey(new CaseInsensitiveKey("Two")));
         p.setProperty("oNE", "uno");
         p.setProperty("tWo", "dos");
         assertEquals(p.get("ONE"), "uno");
         assertEquals(p.get("TWO"), "dos");
+        assertEquals(p.get(new CaseInsensitiveKey("ONE")), "uno");
+        assertEquals(p.get(new CaseInsensitiveKey("TWO")), "dos");
+        assertTrue(p.containsKey("One"));
+        assertTrue(p.containsKey("tWo"));
+        assertTrue(p.containsKey("One"));
+        assertTrue(p.containsKey("tWo"));
 
         ByteArrayOutputStream pOut = new ByteArrayOutputStream();
         p.store(pOut, null);
@@ -45,6 +60,33 @@ public class CaseInsensitivePropertiesTest {
         pp.load(pIn);
         assertEquals(pp.get("ONE"), "uno");
         assertEquals(pp.get("TWO"), "dos");
+        assertEquals(p.get(new CaseInsensitiveKey("ONE")), "uno");
+        assertEquals(p.get(new CaseInsensitiveKey("TWO")), "dos");
+        
+        p.clear();
+        assertFalse(p.containsKey("One"));
+        assertFalse(p.containsKey("tWo"));
+        
+        assertEquals(pp.setProperty("one", "xxx"),"uno");
+        assertEquals(pp.get("ONE"), "xxx");
+        assertEquals(pp.put(new CaseInsensitiveKey("onE"), "une"),"xxx");
+        assertEquals(pp.get("ONE"), "une");
+        
+        Set keySet = pp.keySet();
+        assertTrue(keySet.contains("oNE"));
+        assertTrue(keySet.contains("tWo"));
+        assertTrue(keySet.contains(new CaseInsensitiveKey("ONE")));
+        assertTrue(keySet.contains(new CaseInsensitiveKey("TWO")));
+        for (Object o: keySet) {
+            assertTrue( o instanceof String);
+            assertTrue(pp.containsKey((String)o));
+        }
+        
+        assertEquals(pp.remove("OnE"),"une");
+        assertFalse(pp.containsKey("one"));
+        assertEquals(pp.get("twO"), "dos");
+        assertEquals(pp.remove(new CaseInsensitiveKey("Two")), "dos");
+        
     }
 
 }
