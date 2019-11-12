@@ -15,16 +15,7 @@
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
+import com.iplanet.sso.SSOException;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.core.rest.devices.DeviceSerialisation;
 import org.forgerock.openam.core.rest.devices.services.DeviceService;
 import org.forgerock.openam.ldap.LDAPRequests;

@@ -18,7 +18,6 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
-
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 /**

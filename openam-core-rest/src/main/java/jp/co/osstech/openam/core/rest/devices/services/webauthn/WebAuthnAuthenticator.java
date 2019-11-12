@@ -16,8 +16,6 @@
 
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
-import java.util.Base64;
-
 import org.forgerock.util.encode.Base64url;
 
 /**

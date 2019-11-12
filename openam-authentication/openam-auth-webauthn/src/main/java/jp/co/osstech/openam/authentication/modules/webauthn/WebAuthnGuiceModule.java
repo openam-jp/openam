@@ -16,9 +16,9 @@
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
-import org.forgerock.guice.core.GuiceModule;
-
 import com.google.inject.AbstractModule;
+
+import org.forgerock.guice.core.GuiceModule;
 
 /**
  * The GuiceModule class configures the guice framework for the WebAuthn Auth module.

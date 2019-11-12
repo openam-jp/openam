@@ -15,15 +15,15 @@
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfigManager;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Singleton;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.core.rest.devices.services.DeviceServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownListener;
 

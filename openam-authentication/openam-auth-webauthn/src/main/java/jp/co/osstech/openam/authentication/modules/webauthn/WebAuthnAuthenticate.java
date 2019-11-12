@@ -16,27 +16,6 @@
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
-
-import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
-
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
-import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.MessageLoginException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchOpModifier;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,9 +29,26 @@ import javax.security.auth.callback.NameCallback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.MessageLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchOpModifier;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.encode.Base64url;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 /**
  * WebAuthn (Authenticate) Authentication Module.

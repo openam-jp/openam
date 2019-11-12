@@ -16,16 +16,6 @@
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
-import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.MessageLoginException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -35,10 +25,17 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.iplanet.sso.SSOException;
-
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.MessageLoginException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 import org.forgerock.openam.utils.StringUtils;
-
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 /**
