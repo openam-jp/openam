@@ -27,6 +27,7 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.MessageLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -158,7 +159,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             break;
         default:
             DEBUG.error("WebAuthnAuthenticate.process() : Invalid module state.");
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "invalidModuleState", null);
         }
 
         return nextState;
@@ -178,13 +179,13 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             webauthnService = webauthnServiceFactory.create(realm);
         } catch (SSOException|SMSException ex) {
             DEBUG.error("WebAuthnAuthenticate.selectLoginType() : Authenticator service exception : ", ex);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            throw new AuthLoginException(BUNDLE_NAME, "deviceServiceError", null, ex);
         }
         
         if (useMfaConfig.equalsIgnoreCase("true")) {
             if (userName == null) {
                 DEBUG.error("WebAuthnAuthenticate.selectLoginType() :  User name not found");
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
             }
             nextState = STATE_MFA_LOGIN_START;
         } else if (residentKeyConfig.equalsIgnoreCase("true")) {
@@ -255,17 +256,13 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         /*
          * lookup CredentialId(Base64Url encoded) from User Data store
          */
-        try {
-            byte[] entryUUID = lookupByteData("entryUUID");
-            authenticators = webauthnService.getAuthenticators(entryUUID);
-            if (authenticators.isEmpty()) {
-                if (DEBUG.warningEnabled()) {
-                    DEBUG.warning("WebAuthnAuthenticate.getStoredCredentialId() :  User authenticators not found");
-                }
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+        byte[] entryUUID = lookupByteData("entryUUID");
+        authenticators = webauthnService.getAuthenticators(entryUUID);
+        if (authenticators.isEmpty()) {
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("WebAuthnAuthenticate.getStoredCredentialId() :  User authenticators not found");
             }
-        } catch (AuthLoginException ex) {
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, ex);
+            throw new MessageLoginException(BUNDLE_NAME, "msgNoDevice", null);
         }
     }
 
@@ -304,14 +301,14 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         
         // if Cancel Button Return Authentication Fail
         if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
-            throw new AuthLoginException("Authentication Cancel Auth Fail");
+            throw new MessageLoginException(BUNDLE_NAME, "msgAuthCancel", null);
         }
         
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
             DEBUG.error("WebAuthnAuthenticate.verifyAuthenticatorCallback() : webauthnHiddenCallback is empty");
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "emptyCallback", null);
         }
         
         if (DEBUG.messageEnabled()) {
@@ -330,7 +327,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             }
         } catch (IOException e) {
             DEBUG.error("WebAuthnAuthenticate.process(): JSON parse error", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+            throw new AuthLoginException(BUNDLE_NAME, "jsonParseError", null, e);
         }
 
         byte[] _userHandleBytes = Base64.getDecoder().decode(_responseJson.getUserHandle());
@@ -348,7 +345,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             authenticators = webauthnService.getAuthenticators(_userHandleBytes);
             if (authenticators.isEmpty()) {
                 DEBUG.error("WebAuthnAuthenticate.verifyAuthenticatorCallback() :  User authenticators not found");
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                throw new MessageLoginException(BUNDLE_NAME, "msgNoDevice", null);
             }
         }
         
@@ -361,7 +358,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         }
         if (_selectedAuthenticator == null) {
             DEBUG.error("WebAuthnAuthenticate.verifyAuthenticatorCallback() :  User authenticator is not detected");
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "noDeviceDetected", null);
         }
         
         webauthnValidator.validateGetResponse(getValidationConfig(), _responseJson,
@@ -377,7 +374,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             return STATE_COMPLETE;
         } else {
             DEBUG.error("WebAuthnAuthenticate.verifyAuthenticatorCallback() :  Error updating counter");
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
         }
     }
     
@@ -419,7 +416,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
                     }
                     if (_results.size() > 1) {
                         DEBUG.error("WebAuthnAuthenticate.searchUserNameWithAttrValue() : There are multiple target users");
-                        throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                        throw new AuthLoginException(BUNDLE_NAME, "multipleUserFound", null);
                     }
                     AMIdentity _userDNId = _results.iterator().next();
                     if (_userDNId != null) {
@@ -443,7 +440,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         if (DEBUG.messageEnabled()) {
             DEBUG.message(BUNDLE_NAME + " No results were found !");
         }
-        throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+        throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
     }
 
     @Override

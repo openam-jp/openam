@@ -23,6 +23,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.MessageLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 
 import java.io.IOException;
@@ -134,7 +135,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
             break;
         default:
             DEBUG.error("WebAuthnRegister.process() : Invalid module state.");
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "invalidModuleState", null);
         }
 
         return nextState;
@@ -155,12 +156,12 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
         if (userName != null) {
             nextState = STATE_REG_SCRIPT;
         } else {
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
         }
         
         // if Cancel Button Return Authentication Fail
         if (((ConfirmationCallback)callbacks[0]).getSelectedIndex() == 1) {
-            throw new AuthLoginException("Ragistration Cancel Auth Fail");
+            throw new MessageLoginException(BUNDLE_NAME, "msgRegCancel", null);
         }
 
         // Generate challenge
@@ -202,14 +203,14 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
         
         // if Cancel Button Return Authentication Fail
         if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
-            throw new AuthLoginException("Ragistration Cancel Auth Fail");
+            throw new MessageLoginException(BUNDLE_NAME, "msgRegCancel", null);
         }
 
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
             DEBUG.error("WebAuthnRegister.storeAuthenticator() : webauthnHiddenCallback is empty");
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "emptyCallback", null);
         }
 
         if (DEBUG.messageEnabled()) {
@@ -225,7 +226,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
             }
         } catch (IOException e) {
             DEBUG.error("WebAuthnRegister.storeAuthenticator(): JSON parse error", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null, e);
+            throw new AuthLoginException(BUNDLE_NAME, "jsonParseError", null, e);
         }
 
         attestedAuthenticator = webauthnValidator.validateCreateResponse(
@@ -243,11 +244,11 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
                 nextState = STATE_REG_KEY;
             } else {
                 DEBUG.error("WebAuthnRegister.storeAuthenticator() was Fail");
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
             }
         } catch (SSOException | SMSException e) {
             DEBUG.error("WebAuthnRegister.storeAuthenticator() : WebAuthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+            throw new AuthLoginException(BUNDLE_NAME, "deviceServiceError", null);
         }
         
         return nextState;
@@ -280,7 +281,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("WebAuthnRegister.storeCredentialName() was Fail");
                 }
-                throw new AuthLoginException(BUNDLE_NAME, "authFailed", null);
+                throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
             }
         } else {
             nextState = STATE_COMPLETE;

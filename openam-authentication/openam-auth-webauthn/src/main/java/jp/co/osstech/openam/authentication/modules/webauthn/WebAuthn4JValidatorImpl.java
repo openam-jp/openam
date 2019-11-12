@@ -105,9 +105,9 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             return amAuthenticator;
             
         } catch (Exception ex) {
-            debug.error("WebAuthn.validateCreateResponse : Error validating response. User handle is {}", 
+            debug.error("WebAuthnValidator.validateCreateResponse : Error validating response. User handle is {}", 
                     WebAuthnAuthenticator.getUserIDAsString(userHandleIdBytes), ex);
-            throw new AuthLoginException(WebAuthnRegister.BUNDLE_NAME, "authFailed", null, ex);
+            throw new AuthLoginException(WebAuthnRegister.BUNDLE_NAME, "libraryError", null, ex);
         }
     }
     
@@ -160,9 +160,9 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             amAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
         
         } catch (Exception ex) {
-            debug.error("WebAuthn.validateGetResponse : Error validating response. User handle is {}", 
+            debug.error("WebAuthnValidator.validateGetResponse : Error validating response. User handle is {}", 
                     WebAuthnAuthenticator.getUserIDAsString(amAuthenticator.getUserID()), ex);
-            throw new AuthLoginException(WebAuthnAuthenticate.BUNDLE_NAME, "authFailed", null, ex);
+            throw new AuthLoginException(WebAuthnAuthenticate.BUNDLE_NAME, "libraryError", null, ex);
         }
     }
 }

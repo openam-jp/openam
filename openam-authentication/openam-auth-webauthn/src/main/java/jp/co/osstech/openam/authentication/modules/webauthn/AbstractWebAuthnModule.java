@@ -156,15 +156,15 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         } catch (SSOException e) {
             debug.error("WebAuthn.getIdentity : Error searching Identities with username '{}' ", userName, e);
         } catch (IdRepoException e) {
-            debug.error("WebAuthn.getIdentity : Module exception", e);
+            debug.error("WebAuthn.getIdentity : Error searching Identities with username '{}' ", userName, e);
         }
 
         if (_results.isEmpty()) {
             debug.error("WebAuthn.getIdentity : User '{}' is not found", userName);
-            throw new AuthLoginException(getBundleName(), "authFailed", null);
+            throw new AuthLoginException(getBundleName(), "noUserFound", null);
         } else if (_results.size() > 1) {
             debug.error("WebAuthn.getIdentity : More than one user found for the userName '{}'", userName);
-            throw new AuthLoginException(getBundleName(), "authFailed", null);
+            throw new AuthLoginException(getBundleName(), "multipleUserFound", null);
         } else {
             return _results.iterator().next();
         }
@@ -184,11 +184,11 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         try {
             _attributes = getIdentity().getAttribute(attributeName);
         } catch (SSOException e) {
-            debug.error("WebAuthn.lookupStringData() : WebAuthn module exception", e);
-            throw new AuthLoginException(getBundleName(), "authFailed", null, e);
+            debug.error("WebAuthn.lookupStringData() : Error getting user {} attribute", userName, e);
+            throw new AuthLoginException(getBundleName(), "userAttributeError", null, e);
         } catch (IdRepoException e) {
-            debug.error("WebAuthn.lookupStringData() : error searching Identities with username {}", userName, e);
-            throw new AuthLoginException(getBundleName(), "authFailed", null, e);
+            debug.error("WebAuthn.lookupStringData() : Error getting user {} attribute", userName, e);
+            throw new AuthLoginException(getBundleName(), "userAttributeError", null, e);
         }
 
         String _attribute = "";
@@ -214,11 +214,11 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
             Map<String, byte[][]> _lookupByteData = getIdentity().getBinaryAttributes(_attribute);
             return _lookupByteData.get(attributeName)[0];
         } catch (SSOException e) {
-            debug.error("WebAuthn.lookupByteData() : WebAuthn module exception", e);
-            throw new AuthLoginException(getBundleName(), "authFailed", null, e);
+            debug.error("WebAuthn.lookupByteData() : Error getting user {} attribute", userName, e);
+            throw new AuthLoginException(getBundleName(), "userAttributeError", null, e);
         } catch (IdRepoException e) {
-            debug.error("WebAuthn.lookupByteData() : error searching Identities with username {}", userName, e);
-            throw new AuthLoginException(getBundleName(), "authFailed", null, e);
+            debug.error("WebAuthn.lookupByteData() : Error getting user {} attribute", userName, e);
+            throw new AuthLoginException(getBundleName(), "userAttributeError", null, e);
         }
     }
 
