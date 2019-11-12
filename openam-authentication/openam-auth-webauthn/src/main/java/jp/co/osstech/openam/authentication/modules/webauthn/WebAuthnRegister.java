@@ -18,6 +18,7 @@ package jp.co.osstech.openam.authentication.modules.webauthn;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -56,10 +57,13 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
     // Configuration Strings for Register
     private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
     private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
+    private static final String MAX_NUMBER = "iplanet-am-auth-Webauthn-registationMaxNumber";
+    private static final int DEFAULT_MAX_NUMBER = 3;
     
     // Configuration Parameters for Register
     private String attestationConfig = "";
     private String attachmentConfig = "";
+    private int maxNumber = DEFAULT_MAX_NUMBER;
     
     // WebAuthn
     private byte[] userHandleIdBytes;
@@ -75,6 +79,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
         
         this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
         this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
+        this.maxNumber = CollectionHelper.getIntMapAttr(options, MAX_NUMBER, DEFAULT_MAX_NUMBER, DEBUG);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message("WebAuthnRegister module parameter are " 
@@ -86,7 +91,8 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
                     + ", residentKey = " + residentKeyConfig
                     + ", userVerification = " + userVerificationConfig 
                     + ", timeoutConfig = " + timeoutConfig
-                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig);
+                    + ", displayNameAttributeName = " + displayNameAttributeNameConfig
+                    + ", maxNumber = " + maxNumber);
         }
         
         userName = (String) sharedState.get(getUserKey());
@@ -166,6 +172,22 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
 
         // Use LDAP entryUUID as userHandleId
         userHandleIdBytes = lookupByteData("entryUUID");
+        
+        // Get service instance
+        try {
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            webauthnService = webauthnServiceFactory.create(realm);
+        } catch (SSOException | SMSException e) {
+            DEBUG.error("WebAuthnRegister.createScript() : WebAuthn module exception : ", e);
+            throw new AuthLoginException(BUNDLE_NAME, "deviceServiceError", null);
+        }
+        
+        // Max number check
+        Set<WebAuthnAuthenticator> authenticators = webauthnService.getAuthenticators(userHandleIdBytes);
+        if (authenticators.size() >= maxNumber) {
+            DEBUG.error("WebAuthnRegister.createScript() : The maximum number of authenticators has been exceeded.");
+            throw new MessageLoginException(BUNDLE_NAME, "msgRegMax", null);
+        }
 
         // Replace Callback to send Generated Javascript that include create options.
         // only for nextState REG_SCRIPT
@@ -229,24 +251,18 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
         attestedAuthenticator = webauthnValidator.validateCreateResponse(
                 getValidationConfig(), _responseJson, userHandleIdBytes, DEBUG);
 
-        try {
-            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
-            webauthnService = webauthnServiceFactory.create(realm);
-            boolean _storeResult = webauthnService.createAuthenticator(attestedAuthenticator);
+        boolean _storeResult = webauthnService.createAuthenticator(attestedAuthenticator);
             
-            if (_storeResult) {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("WebAuthnRegister.storeAuthenticator() was success");
-                }
-                nextState = STATE_REG_KEY;
-            } else {
-                DEBUG.error("WebAuthnRegister.storeAuthenticator() was Fail");
-                throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
+        if (_storeResult) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebAuthnRegister.storeAuthenticator() was success");
             }
-        } catch (SSOException | SMSException e) {
-            DEBUG.error("WebAuthnRegister.storeAuthenticator() : WebAuthn module exception : ", e);
-            throw new AuthLoginException(BUNDLE_NAME, "deviceServiceError", null);
+            nextState = STATE_REG_KEY;
+        } else {
+            DEBUG.error("WebAuthnRegister.storeAuthenticator() was Fail");
+            throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
         }
+
         
         return nextState;
     }
