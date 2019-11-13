@@ -61,6 +61,10 @@
         </dependency>
         <dependency>
             <groupId>jp.openam</groupId>
+            <artifactId>openam-auth-oidc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
         </dependency>
         <dependency>

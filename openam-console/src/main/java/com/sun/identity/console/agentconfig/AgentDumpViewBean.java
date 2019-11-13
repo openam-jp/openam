@@ -25,6 +25,7 @@
  * $Id: AgentDumpViewBean.java,v 1.1 2008/12/10 18:25:14 farble1670 Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.console.agentconfig;
 
@@ -131,6 +132,9 @@ public class AgentDumpViewBean extends AMPrimaryMastHeadViewBean
                     );
             AgentDumpModel model = (AgentDumpModel)getModel();
             Map values = model.getAttributeValues(universalId);
+
+            // Remove userpassword attribute from Agent configuration export page
+            values.remove("userpassword");
 
             CCStaticTextField valuesText =
                     (CCStaticTextField)getChild(STATICTEXT_VALUES);
