@@ -24,14 +24,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WebAuthnJsonCallback {
 
-    private String id; // base64url String
-    private String rawId; // base64 or byte[]
-    private String type;
-    private String attestationObject; // base64 or byte[]
-    private String clientDataJSON; // base64 or byte[]
-    private String authenticatorData; // base64 or byte[]
-    private String signature; // base64 or byte[]
-    private String userHandle;
+    private String id;    // String
+    private String rawId; // The Base64url encoded byte array
+    private String type;  // String
+    private String attestationObject; // The Base64url encoded byte array
+    private String clientDataJSON;    // The Base64url encoded byte array
+    private String authenticatorData; // The Base64url encoded byte array
+    private String signature;         // The Base64url encoded byte array
+    private String userHandle;        // The Base64url encoded byte array
 
     /**
      * Base constructor.

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Base64;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -326,8 +325,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             throw new AuthLoginException(BUNDLE_NAME, "jsonParseError", null, e);
         }
 
-        byte[] _userHandleBytes = Base64.getDecoder().decode(_responseJson.getUserHandle());
-        byte[] _rawIdBytes = Base64.getDecoder().decode(_responseJson.getRawId());
+        byte[] _userHandleBytes = Base64url.decode(_responseJson.getUserHandle());
         
         /*
          * if residentKey = true
@@ -347,7 +345,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         
         WebAuthnAuthenticator _selectedAuthenticator = null;
         for (WebAuthnAuthenticator authenticator : authenticators) {
-            if (authenticator.isSelected(Base64url.encode(_rawIdBytes))) {
+            if (authenticator.isSelected(_responseJson.getRawId())) {
                 _selectedAuthenticator = authenticator;
                 break;
             }

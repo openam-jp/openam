@@ -16,8 +16,6 @@
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
-import java.util.Base64;
-
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
 
@@ -66,8 +64,8 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
              * flow. This time use webauthn4j library to END
              * START============================.
              */
-            byte[] _attestationObjectBytes = Base64.getDecoder().decode(responseJson.getAttestationObject());
-            byte[] _clientDataJsonBytes = Base64.getDecoder().decode(responseJson.getClientDataJSON());
+            byte[] _attestationObjectBytes = Base64UrlUtil.decode(responseJson.getAttestationObject());
+            byte[] _clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
             
             Origin _origin = new Origin(config.getOrigin());
             String _rpId = _origin.getHost();
@@ -122,10 +120,10 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
              * flow. Use webauthn4j library to END 
              * START============================.
              */
-            byte[] rawIdBytes = Base64.getDecoder().decode(responseJson.getRawId());
-            byte[] authenticatorDataBytes = Base64.getDecoder().decode(responseJson.getAuthenticatorData());
-            byte[] clientDataJsonBytes = Base64.getDecoder().decode(responseJson.getClientDataJSON());
-            byte[] signatureBytes = Base64.getDecoder().decode(responseJson.getSignature());
+            byte[] rawIdBytes = Base64UrlUtil.decode(responseJson.getRawId());
+            byte[] authenticatorDataBytes = Base64UrlUtil.decode(responseJson.getAuthenticatorData());
+            byte[] clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
+            byte[] signatureBytes = Base64UrlUtil.decode(responseJson.getSignature());
             
             Origin _origin = new Origin(config.getOrigin());
             String _rpId = _origin.getHost();

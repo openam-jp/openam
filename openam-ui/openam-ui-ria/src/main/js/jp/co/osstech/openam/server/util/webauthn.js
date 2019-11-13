@@ -20,6 +20,13 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
     var obj = {};
 
+    function toBase64Url (uint8) {
+        return btoa(String.fromCharCode.apply(null, uint8))
+            .replace(/=/g, "")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_");
+    }
+
     obj.createCredential = function (options) {
         $("#idToken3_0").hide();
 
@@ -31,10 +38,10 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
                 const jdata = {
                     id: Credential.id,
-                    rawId: btoa(String.fromCharCode.apply(null, rawId)),
+                    rawId: toBase64Url(rawId),
                     type: Credential.type,
-                    attestationObject: btoa(String.fromCharCode.apply(null, attestationObject)),
-                    clientDataJSON: btoa(String.fromCharCode.apply(null, clientDataJSON))
+                    attestationObject: toBase64Url(attestationObject),
+                    clientDataJSON: toBase64Url(clientDataJSON)
                 };
 
                 const jsonbody = JSON.stringify(jdata);
@@ -62,11 +69,11 @@ define("jp/co/osstech/openam/server/util/webauthn", [
                 const jdata = {
                     id: Credential.id,
                     type: Credential.type,
-                    rawId: btoa(String.fromCharCode.apply(null, rawId)),
-                    userHandle: btoa(String.fromCharCode.apply(null, userHandle)),
-                    authenticatorData: btoa(String.fromCharCode.apply(null, authenticatorData)),
-                    signature: btoa(String.fromCharCode.apply(null, signature)),
-                    clientDataJSON: btoa(String.fromCharCode.apply(null, clientDataJSON))
+                    rawId: toBase64Url(rawId),
+                    userHandle: toBase64Url(userHandle),
+                    authenticatorData: toBase64Url(authenticatorData),
+                    signature: toBase64Url(signature),
+                    clientDataJSON: toBase64Url(clientDataJSON)
                 };
 
                 const jsonbody = JSON.stringify(jdata);
