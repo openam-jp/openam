@@ -12,9 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.upgrade.helpers;
 
+import org.forgerock.openam.authentication.modules.oidc.JwtHandlerConfig;
 import org.forgerock.openam.upgrade.UpgradeException;
 
 import com.sun.identity.sm.AbstractUpgradeHelper;
@@ -32,10 +34,19 @@ public class OpenIdConnectAuthModuleServiceHelper extends AbstractUpgradeHelper 
     public OpenIdConnectAuthModuleServiceHelper() {
         attributes.add(PRINCIPAL_MAPPER_ATTR);
         attributes.add(ACCOUNT_PROVIDER_ATTR);
+        attributes.add(JwtHandlerConfig.CRYPTO_CONTEXT_VALUE_KEY);
     }
 
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr) throws UpgradeException {
+
+        // Remove validator from openam-auth-openidconnect-crypto-context-value
+        if (JwtHandlerConfig.CRYPTO_CONTEXT_VALUE_KEY.equals(newAttr.getName())) {
+            if (oldAttr.getValidator() != null) {
+                return newAttr;
+            }
+        }
+
         if (!newAttr.getI18NKey().equals(oldAttr.getI18NKey())) {
             return newAttr;
         }

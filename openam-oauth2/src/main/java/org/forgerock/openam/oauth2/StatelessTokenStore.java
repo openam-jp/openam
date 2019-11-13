@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -611,7 +612,7 @@ public class StatelessTokenStore implements TokenStore {
     }
 
     @Override
-    public JsonValue read(String tokenId) throws ServerException {
+    public JsonValue read(String realm, String tokenId) throws ServerException {
         try {
             SignedJwt jwt = new JwtReconstruction().reconstructJwt(tokenId, SignedJwt.class);
             if (!isBlacklisted(jwt.getClaimsSet().getJwtId())) {

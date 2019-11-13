@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.oauth2;
 
@@ -23,14 +24,6 @@ import org.forgerock.oauth2.core.OAuth2Request;
  * @since 13.5.0
  */
 public interface StatelessCheck<T> {
-
-    /**
-     * Interrogates token to ascertain the OAuth2 token is stateless or not
-     *
-     * @param tokenId The token id
-     * @return The result of the check
-     */
-    T byToken(String tokenId);
 
     /**
      * Checks the OAuth2 token is stateless or not based on the realm
