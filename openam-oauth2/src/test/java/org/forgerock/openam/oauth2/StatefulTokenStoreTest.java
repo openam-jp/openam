@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -196,30 +197,6 @@ public class StatefulTokenStoreTest {
 
         //Then
         //Expected NotFoundException
-    }
-
-    @Test
-    public void realmAgnosticTokenStoreShouldIgnoreRealmMismatch() throws Exception {
-        //Given
-        StatefulTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticStatefulTokenStore(tokenStore,
-                providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory, recoveryCodeGenerator);
-        JsonValue token = json(object(
-                field("tokenName", Collections.singleton("access_token")),
-                field("realm", Collections.singleton("/otherrealm"))));
-        given(tokenStore.read("TOKEN_ID")).willReturn(token);
-        ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-        given(request.getAttributes()).willReturn(attributes);
-        attributes.put("realm", "/testrealm");
-
-        OAuth2Request request = oAuth2RequestFactory.create(this.request);
-
-        //When
-        AccessToken accessToken = realmAgnosticTokenStore.readAccessToken(request, "TOKEN_ID");
-
-        //Then
-        assertThat(accessToken).isNotNull();
-        assertThat(request.getToken(AccessToken.class)).isSameAs(accessToken);
     }
 
     @Test
