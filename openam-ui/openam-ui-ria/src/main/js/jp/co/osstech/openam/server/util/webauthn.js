@@ -45,8 +45,6 @@ define("jp/co/osstech/openam/server/util/webauthn", [
                 };
 
                 const jsonbody = JSON.stringify(jdata);
-                console.log("NEW CREDENTIAL", Credential);
-                console.log("Json data", jsonbody);
                 $("#PublicKeyCredential").val(jsonbody);
                 $("#idToken3_0").click();
             })
@@ -77,8 +75,6 @@ define("jp/co/osstech/openam/server/util/webauthn", [
                 };
 
                 const jsonbody = JSON.stringify(jdata);
-                console.log("Assersion", Credential);
-                console.log("Json data", jsonbody);
                 $("#PublicKeyCredential").val(jsonbody);
                 $("#idToken3_0").click();
             })
