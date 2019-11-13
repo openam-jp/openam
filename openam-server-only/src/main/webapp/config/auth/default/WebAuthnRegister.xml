@@ -53,7 +53,6 @@
     </Callbacks>
     
     <Callbacks length="3" order="3" timeout="120" header="PublicKey Registration Complete. Enter Credential DisplayName(optional)">
-        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
         <NameCallback>
             <Prompt>Credential DisplayName:</Prompt>
         </NameCallback>

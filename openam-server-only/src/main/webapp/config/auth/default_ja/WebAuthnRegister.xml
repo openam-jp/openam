@@ -53,7 +53,6 @@
     </Callbacks>
     
     <Callbacks length="3" order="3" timeout="120" header="認証デバイスが登録されました識別名を入力してください（任意）">
-        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
         <NameCallback>
             <Prompt>鍵の識別名:</Prompt>
         </NameCallback>

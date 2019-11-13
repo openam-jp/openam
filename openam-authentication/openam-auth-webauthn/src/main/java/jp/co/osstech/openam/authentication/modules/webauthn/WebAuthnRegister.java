@@ -279,7 +279,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
         
         int nextState;
         
-        String credentialname = ((NameCallback) callbacks[1]).getName();
+        String credentialname = ((NameCallback) callbacks[0]).getName();
         if (StringUtils.isNotEmpty(credentialname)) {
             attestedAuthenticator.setCredentialName(credentialname);
 
