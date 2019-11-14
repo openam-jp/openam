@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.authentication;
 
@@ -83,7 +84,6 @@ public class Saml2SessionUpgradeHandler implements SessionUpgradeHandler {
                 idpSession.setSession(newSSOToken);
                 if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                     try {
-                        SAML2FailoverUtils.deleteSAML2Token(sessionIndex);
                         long expirationTime = currentTimeMillis() / 1000 + newSession.getTimeLeft();
                         SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex,
                                 new IDPSessionCopy(idpSession), expirationTime);
