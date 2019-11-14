@@ -23,6 +23,7 @@
   with the fields enclosed by brackets [] replaced by
   your own identifying information:
   "Portions Copyrighted 2012 ForgeRock AS"
+  "Portions Copyrighted 2019 Open Source Solution Technology Corporation"
 
 -->
 
@@ -180,6 +181,20 @@
                         <Value>ForgeRock</Value>
                     </ExampleValue>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-fr-oath-issue-recovery-codes-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a516"
+                                 order="1200"
+                                 resourceName="issueRecoveryCodesEnabled">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="RequiredValueValidator"
                                      type="validator"
@@ -315,6 +330,20 @@
                         <ExampleValue>
                             <Value>ForgeRock</Value>
                         </ExampleValue>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-fr-oath-issue-recovery-codes-enabled"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a516"
+                                     order="1200"
+                                     resourceName="issueRecoveryCodesEnabled">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

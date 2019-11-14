@@ -106,6 +106,7 @@ public class AuthenticatorOATH extends AMLoginModule {
             "iplanet-am-auth-fr-oath-min-secret-key-length";
     private static final String MAXIMUM_CLOCK_DRIFT = "openam-auth-fr-oath-maximum-clock-drift";
     private static final String ISSUER_NAME = "openam-auth-fr-oath-issuer-name";
+    private static final String ISSUE_RECOVERY_CODES_ENABLED = "openam-auth-fr-oath-issue-recovery-codes-enabled";
     private static final int TOTAL_ATTEMPTS = 3;
 
     //module attribute holders
@@ -123,6 +124,7 @@ public class AuthenticatorOATH extends AMLoginModule {
     private long time = 0;
     private int totpMaxClockDrift = 0;
     private int attempt = 0;
+    private boolean issueRecoveryCodesEnabled = true;
 
     private static final int HOTP = 0;
     private static final int TOTP = 1;
@@ -245,6 +247,8 @@ public class AuthenticatorOATH extends AMLoginModule {
             this.checksum = CollectionHelper.getBooleanMapAttr(options, CHECKSUM, false);
             this.totpMaxClockDrift = CollectionHelper.getIntMapAttr(options, MAXIMUM_CLOCK_DRIFT, 0, debug);
             this.issuerName = CollectionHelper.getMapAttr(options, ISSUER_NAME);
+            this.issueRecoveryCodesEnabled = CollectionHelper
+                    .getBooleanMapAttr(options, ISSUE_RECOVERY_CODES_ENABLED, true);
 
             final String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
             if ("HOTP".equalsIgnoreCase(algorithm)) {
@@ -465,10 +469,12 @@ public class AuthenticatorOATH extends AMLoginModule {
         OathDeviceSettings settings = oathDevices.createDeviceProfile(minSecretKeyLength);
         settings.setChecksumDigit(checksum);
 
-        try {
-            settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.ALPHANUMERIC, false));
-        } catch (CodeException e) {
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        if (issueRecoveryCodesEnabled) {
+            try {
+                settings.setRecoveryCodes(recoveryCodeGenerator.generateCodes(NUM_CODES, Alphabet.ALPHANUMERIC, false));
+            } catch (CodeException e) {
+                throw new AuthLoginException(amAuthOATH, "authFailed", null);
+            }
         }
 
         return settings;
