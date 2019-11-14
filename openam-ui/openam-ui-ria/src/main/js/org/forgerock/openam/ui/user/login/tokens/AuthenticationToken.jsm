@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 /**
@@ -38,9 +39,17 @@ export function set (token) {
 }
 
 export function get () {
-    return CookieHelper.getCookie(cookieName);
+    const cookie = CookieHelper.getCookie(cookieName);
+    if (cookie) {
+        Configuration.globalData.auth.authenticateWithAuthIdCookie = true;
+    }
+    return cookie;
 }
 
 export function remove () {
     return CookieHelper.deleteCookie(cookieName, "/", cookieDomains());
+}
+
+export function had () {
+    return Configuration.globalData.auth.authenticateWithAuthIdCookie;
 }
