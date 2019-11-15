@@ -28,6 +28,7 @@
 
    Portions Copyrighted 2011-2016 ForgeRock AS.
    Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -438,6 +439,20 @@
                             syntax="boolean"
                             i18nKey="a758"
                             order="26200">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="isPolicyBasedProtectionEnabled"
+                            type="single"
+                            syntax="boolean"
+                            i18nKey="a759"
+                            order="26201">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

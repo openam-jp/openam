@@ -66,6 +66,7 @@ import org.forgerock.oauth2.core.OAuth2UrisFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidatorImpl;
+import org.forgerock.oauth2.core.PolicyBasedDenyRequestValidatorImpl;
 import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
@@ -185,10 +186,12 @@ public class OAuth2GuiceModule extends AbstractModule {
         final Multibinder<ClientCredentialsRequestValidator> clientCredentialsRequestValidators =
                 Multibinder.newSetBinder(binder(), ClientCredentialsRequestValidator.class);
         clientCredentialsRequestValidators.addBinding().to(ClientCredentialsRequestValidatorImpl.class);
+        clientCredentialsRequestValidators.addBinding().to(PolicyBasedDenyRequestValidatorImpl.class);
 
         final Multibinder<PasswordCredentialsRequestValidator> passwordCredentialsRequestValidators =
                 Multibinder.newSetBinder(binder(), PasswordCredentialsRequestValidator.class);
         passwordCredentialsRequestValidators.addBinding().to(PasswordCredentialsRequestValidatorImpl.class);
+        passwordCredentialsRequestValidators.addBinding().to(PolicyBasedDenyRequestValidatorImpl.class);
 
         final MapBinder<String, GrantTypeHandler> grantTypeHandlers =
                 MapBinder.newMapBinder(binder(), String.class, GrantTypeHandler.class);
