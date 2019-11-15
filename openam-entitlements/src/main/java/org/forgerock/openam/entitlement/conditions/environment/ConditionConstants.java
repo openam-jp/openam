@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.entitlement.conditions.environment;
 
@@ -145,14 +146,6 @@ public final class ConditionConstants {
      * option is on if the string value is equal to {@code true}.
      */
     public static final String TERMINATE_SESSION = "TerminateSession";
-
-    /**
-     * Key that is passed in the <code>env</code> parameter while invoking {@code getConditionDecision} method of an
-     * {@code AMIdentityMembershipCondition}. The value specifies the uuid(s) for which the policy would apply. The
-     * value should be a {@code Set}. Each element of the {@code Set} should be a String, the uuid of the
-     * {@code AMIdentity} object.
-     */
-    public static final String INVOCATOR_PRINCIPAL_UUID = "invocatorPrincipalUuid";
 
     /**
      * <p>Key that is used in {@code SimpleTimeCondition} to define the beginning of time range during which a policy

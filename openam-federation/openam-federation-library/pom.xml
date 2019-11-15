@@ -153,6 +153,16 @@
     </build>
 
     <dependencies>
+         <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-entitlements</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>jp.openam.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>

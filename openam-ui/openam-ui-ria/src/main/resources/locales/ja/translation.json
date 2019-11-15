@@ -717,6 +717,7 @@
                 "authentication-chains": "認証 - 認証連鎖",
                 "authentication-modules": "認証 - モジュール",
                 "authorization-policySets": "認可 - ポリシーセット",
+                "authorization-provider-policySets": "認可 - プロバイダー ポリシーセット",
                 "authorization-resourceTypes": "認可 - リソースタイプ",
                 "general": "一般",
                 "security": "セキュリティ",
@@ -1074,6 +1075,7 @@
                 },
                 "list": {
                     "addNew": "新規ポリシーセット",
+                    "addNewPP": "新規プロバイダポリシーセット",
                     "description": "Web サイト、 Web アプリケーション、またはその他のリソースを保護するためのポリシーのセットを定義します。",
                     "importPolicySets": "ポリシーのインポート",
                     "exportPolicySets": "ポリシーのエクスポート",
