@@ -16,6 +16,7 @@
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -326,7 +327,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         SearchRequest searchRequest = 
                 LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter, 
-                        new String[]{credentialAttrName, keyAttrName, counterAttrName, credentialNameAttrName});
+                        new String[]{credentialAttrName, keyAttrName, counterAttrName, 
+                                credentialNameAttrName, WebAuthnAuthenticator.TIMESTAMP_ATTR_NAME});
         Connection conn = null;
         try {
             conn = getConnection();
@@ -344,6 +346,9 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     authenticator.setSignCount(Long.valueOf(attribute.firstValue().toString()));
                     attribute = entry.getAttribute(credentialNameAttrName);
                     authenticator.setCredentialName(attribute.firstValue().toString());
+                    Date timestamp = entry.parseAttribute(WebAuthnAuthenticator.TIMESTAMP_ATTR_NAME)
+                            .asGeneralizedTime().toDate();
+                    authenticator.setCreateTimestamp(timestamp);
                     authenticators.add(authenticator);
                 } else {
                     //ignore search result references

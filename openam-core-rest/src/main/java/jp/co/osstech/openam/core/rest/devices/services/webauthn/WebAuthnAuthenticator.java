@@ -16,6 +16,8 @@
 
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
+import java.util.Date;
+
 import org.forgerock.util.encode.Base64url;
 
 /**
@@ -23,11 +25,14 @@ import org.forgerock.util.encode.Base64url;
  */
 public class WebAuthnAuthenticator {
     
+    public static String TIMESTAMP_ATTR_NAME = "createTimestamp";
+    
     private String credentialID = null;
     private byte[] publicKey = null;
     private Long signCount = null;
     private byte[] userID = null;
     private String credentialName = null;
+    private Date createTimestamp = null;
     
     /**
      * Default constructor.
@@ -156,6 +161,7 @@ public class WebAuthnAuthenticator {
     public String getCredentialName() {
         return credentialName;
     }
+    
     /**
      * Set the credential display name.
      * 
@@ -163,6 +169,24 @@ public class WebAuthnAuthenticator {
      */
     public void setCredentialName(String credentialName) {
         this.credentialName = credentialName;
+    }
+
+    /**
+     * Get the time that the entry was created.
+     * 
+     * @return The time that the entry was created.
+     */
+    public Date getCreateTimestamp() {
+        return createTimestamp;
+    }
+
+    /**
+     * Set the time that the entry was created.
+     * 
+     * @param createTimestamp The time that the entry was created.
+     */
+    public void setCreateTimestamp(Date createTimestamp) {
+        this.createTimestamp = createTimestamp;
     }
 
     /**
