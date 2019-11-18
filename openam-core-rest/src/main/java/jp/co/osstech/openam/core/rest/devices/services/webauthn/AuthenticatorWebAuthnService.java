@@ -326,7 +326,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         SearchRequest searchRequest = 
                 LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter, 
-                        new String[]{credentialAttrName, keyAttrName, counterAttrName});
+                        new String[]{credentialAttrName, keyAttrName, counterAttrName, credentialNameAttrName});
         Connection conn = null;
         try {
             conn = getConnection();
@@ -342,6 +342,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     authenticator.setPublicKey(attribute.firstValue().toByteArray());
                     attribute = entry.getAttribute(counterAttrName);
                     authenticator.setSignCount(Long.valueOf(attribute.firstValue().toString()));
+                    attribute = entry.getAttribute(credentialNameAttrName);
+                    authenticator.setCredentialName(attribute.firstValue().toString());
                     authenticators.add(authenticator);
                 } else {
                     //ignore search result references
