@@ -54,10 +54,4 @@
         </ConfirmationCallback>
     </Callbacks>
 
-    <Callbacks length="0" order="4" timeout="120" header="WebAuthn Authentication(Residentkey)">
-    </Callbacks>
-    
-    <Callbacks length="0" order="5" timeout="120" header="WebAuthn Authentication(MFA)">
-    </Callbacks>
-
 </ModuleProperties>

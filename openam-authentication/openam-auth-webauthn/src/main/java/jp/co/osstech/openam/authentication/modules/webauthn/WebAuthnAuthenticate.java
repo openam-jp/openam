@@ -63,8 +63,6 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
     private final int STATE_LOGIN_SELECT = 1;
     private final int STATE_LOGIN_START = 2;
     private final int STATE_LOGIN_SCRIPT = 3;
-    private final int STATE_RESIDENTKEY_LOGIN_START = 4;
-    private final int STATE_MFA_LOGIN_START = 5;
     
     // Configuration Strings for Authenticate
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
@@ -140,18 +138,6 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             }
             nextState = verifyAuthenticatorCallback(callbacks);
             break;
-        case STATE_RESIDENTKEY_LOGIN_START:
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("WebAuthnAuthenticate.process() : This state is RESIDENTKEY_LOGIN_START.");
-            }
-            nextState = handleResidentKeyLoginStartCallbacks();
-            break;
-        case STATE_MFA_LOGIN_START:
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("WebAuthnAuthenticate.process() : This state is MFA_LOGIN_START.");
-            }
-            nextState = handleMfaLoginStartCallbacks();
-            break;
         default:
             DEBUG.error("WebAuthnAuthenticate.process() : Invalid module state.");
             throw new AuthLoginException(BUNDLE_NAME, "invalidModuleState", null);
@@ -182,10 +168,30 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
                 DEBUG.error("WebAuthnAuthenticate.selectLoginType() :  User name not found");
                 throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
             }
-            nextState = STATE_MFA_LOGIN_START;
+            
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebAuthnAuthenticate.selectLoginType() : MFA Login");
+            }
+            
+            // MFA login starting.
+            getStoredCredentialId();
+            createLoginScript();
+            
+            nextState = STATE_LOGIN_SCRIPT;
         } else if (residentKeyConfig.equalsIgnoreCase("true")) {
-            nextState = STATE_RESIDENTKEY_LOGIN_START;
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebAuthnAuthenticate.selectLoginType() : Resident Key Login");
+            }
+
+            // resident key login starting.
+            createLoginScript();
+            
+            nextState = STATE_LOGIN_SCRIPT;
         } else {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WebAuthnAuthenticate.selectLoginType() : Password Less Login");
+            }
+            
             nextState = STATE_LOGIN_START;
         }
         return nextState;
@@ -207,36 +213,6 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         
         createLoginScript();
 
-        return STATE_LOGIN_SCRIPT;
-    }
-    
-    /**
-     * Handle callbacks of resident key login starting.
-     * 
-     * @return A value indicating the next state.
-     * @throws AuthLoginException
-     */
-    private int handleResidentKeyLoginStartCallbacks()
-            throws AuthLoginException {
-
-        createLoginScript();
-
-        return STATE_LOGIN_SCRIPT;
-    }
-
-    /**
-     * Handle callbacks of MFA login starting.
-     * 
-     * @return A value indicating the next state.
-     * @throws AuthLoginException
-     */
-    private int handleMfaLoginStartCallbacks()
-            throws AuthLoginException {
-
-        getStoredCredentialId();
-        
-        createLoginScript();
-        
         return STATE_LOGIN_SCRIPT;
     }
     
