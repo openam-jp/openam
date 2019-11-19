@@ -22,17 +22,7 @@
 
 <ModuleProperties moduleName="WebAuthnRegister" version="1.0" >
 
-    <Callbacks length="1" order="1" timeout="300" header="PublicKey Registration">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>Register</Value>
-                </OptionValue>
-                <OptionValue>
-                    <Value>Cancel</Value>
-                </OptionValue>
-             </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="0" order="1" timeout="300" header="PublicKey Registration">
     </Callbacks>
     
     <Callbacks length="3" order="2" timeout="120" header="Action with Your Authenticator">

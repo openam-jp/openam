@@ -144,13 +144,13 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnAuthenticate.process() : This state is RESIDENTKEY_LOGIN_START.");
             }
-            nextState = handleResidentKeyLoginStartCallbacks(callbacks);
+            nextState = handleResidentKeyLoginStartCallbacks();
             break;
         case STATE_MFA_LOGIN_START:
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnAuthenticate.process() : This state is MFA_LOGIN_START.");
             }
-            nextState = handleMfaLoginStartCallbacks(callbacks);
+            nextState = handleMfaLoginStartCallbacks();
             break;
         default:
             DEBUG.error("WebAuthnAuthenticate.process() : Invalid module state.");
@@ -213,11 +213,10 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
     /**
      * Handle callbacks of resident key login starting.
      * 
-     * @param callbacks The callbacks.
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int handleResidentKeyLoginStartCallbacks(Callback[] callbacks)
+    private int handleResidentKeyLoginStartCallbacks()
             throws AuthLoginException {
 
         createLoginScript();
@@ -228,11 +227,10 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
     /**
      * Handle callbacks of MFA login starting.
      * 
-     * @param callbacks The callbacks.
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int handleMfaLoginStartCallbacks(Callback[] callbacks)
+    private int handleMfaLoginStartCallbacks()
             throws AuthLoginException {
 
         getStoredCredentialId();
@@ -262,7 +260,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
     }
 
     /**
-     * Create logn javascript (credentials.get).
+     * Create login javascript (credentials.get).
      * 
      * @throws AuthLoginException
      */

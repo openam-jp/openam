@@ -54,24 +54,10 @@
         </ConfirmationCallback>
     </Callbacks>
 
-    <Callbacks length="1" order="4" timeout="120" header="WebAuthn Authentication(Residentkey)">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>Log In</Value>
-                </OptionValue>
-             </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="0" order="4" timeout="120" header="WebAuthn Authentication(Residentkey)">
     </Callbacks>
     
-    <Callbacks length="1" order="5" timeout="120" header="WebAuthn Authentication(MFA)">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>Log In</Value>
-                </OptionValue>
-             </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="0" order="5" timeout="120" header="WebAuthn Authentication(MFA)">
     </Callbacks>
 
 </ModuleProperties>

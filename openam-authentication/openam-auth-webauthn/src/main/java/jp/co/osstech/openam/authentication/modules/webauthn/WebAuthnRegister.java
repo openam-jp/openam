@@ -122,7 +122,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnRegister.process() : This state is REG_START.");
             }
-            nextState = createScript(callbacks);
+            nextState = createScript();
             break;
         case STATE_REG_SCRIPT:
             if (DEBUG.messageEnabled()) {
@@ -147,11 +147,10 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
     /**
      * Create javascript create.credential.
      * 
-     * @param callbacks The callbacks.
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int createScript(Callback[] callbacks) 
+    private int createScript() 
             throws AuthLoginException {
         
         int nextState;
@@ -162,11 +161,6 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
             throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
         }
         
-        // if Cancel Button Return Authentication Fail
-        if (((ConfirmationCallback)callbacks[0]).getSelectedIndex() == 1) {
-            throw new MessageLoginException(BUNDLE_NAME, "msgRegCancel", null);
-        }
-
         // Generate challenge
         byte[] _challengeBytes = webauthnValidator.generateChallenge();
 

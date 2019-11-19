@@ -22,17 +22,7 @@
 
 <ModuleProperties moduleName="WebAuthnRegister" version="1.0" >
 
-    <Callbacks length="1" order="1" timeout="300" header="認証デバイスの登録">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>登録</Value>
-                </OptionValue>
-                <OptionValue>
-                    <Value>キャンセル</Value>
-                </OptionValue>
-             </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="0" order="1" timeout="300" header="認証デバイスの登録">
     </Callbacks>
     
     <Callbacks length="3" order="2" timeout="120" header="認証デバイスを操作してください">

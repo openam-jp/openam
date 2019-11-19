@@ -54,24 +54,10 @@
         </ConfirmationCallback>
     </Callbacks>
 
-    <Callbacks length="1" order="4" timeout="120" header="認証デバイスでログイン">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>ログイン</Value>
-                </OptionValue>
-             </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="0" order="4" timeout="120" header="認証デバイスでログイン">
     </Callbacks>
     
-    <Callbacks length="1" order="5" timeout="120" header="認証デバイスでログイン">
-        <ConfirmationCallback>
-            <OptionValues>
-                <OptionValue>
-                    <Value>ログイン</Value>
-                </OptionValue>
-             </OptionValues>
-        </ConfirmationCallback>
+    <Callbacks length="0" order="5" timeout="120" header="認証デバイスでログイン">
     </Callbacks>
 
 </ModuleProperties>
