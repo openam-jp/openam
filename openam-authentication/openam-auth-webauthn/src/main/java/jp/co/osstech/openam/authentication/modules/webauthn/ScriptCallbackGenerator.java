@@ -164,7 +164,14 @@ public class ScriptCallbackGenerator {
         
         final StringBuilder _credentialGetScript = new StringBuilder();
 
-        _credentialGetScript.append("require([\'jp/co/osstech/openam/server/util/webauthn\'], function (webauthn) { ");
+        _credentialGetScript.append("require([\'jp/co/osstech/openam/server/util/webauthn\',");
+        _credentialGetScript.append("\'org/forgerock/commons/ui/common/main/Configuration\'], ");
+        _credentialGetScript.append("function (webauthn, Configuration) { ");
+        
+        if (residentKeyConfig.equalsIgnoreCase("true")) {
+            _credentialGetScript.append("Configuration.globalData.auth.forceRoutingOnFailure = true;");
+        }
+        
         _credentialGetScript.append("webauthn.getCredential(  { ");
         _credentialGetScript.append("publicKey: {");
         

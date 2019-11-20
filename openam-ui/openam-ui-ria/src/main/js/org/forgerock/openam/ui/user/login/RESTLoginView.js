@@ -231,7 +231,8 @@ define([
                     // enabled the login button if login failure
                     $(e.currentTarget).prop("disabled", false);
                     // If its not the first stage then render the Login Unavailable view with link back to login screen.
-                    if (Configuration.globalData.auth.currentStage > 1 || AuthenticationToken.had()) {
+                    if (Configuration.globalData.auth.currentStage > 1 || AuthenticationToken.had() ||
+                        Configuration.globalData.auth.forceRoutingOnFailure) {
                         let fragmentParams = URIUtils.getCurrentFragmentQueryString();
                         if (fragmentParams) {
                             fragmentParams = `&${fragmentParams}`;
