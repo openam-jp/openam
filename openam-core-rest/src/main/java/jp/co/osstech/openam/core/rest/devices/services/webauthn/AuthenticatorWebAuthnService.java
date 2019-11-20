@@ -418,6 +418,29 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     }
     
     /**
+     * Delete an authenticator.
+     * 
+     * @param credentialID The Credential ID.
+     * @return Returns true if the entry is successfully deleted.
+     */
+    public boolean deleteAuthenticator(String credentialID) {
+        boolean result = false;
+        String dn = DN.valueOf(baseDN)
+                .child(credentialAttrName, credentialID).toString();
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.delete(dn);
+            result = true;
+        } catch (LdapException | LDAPUtilException e) {
+            debug.error("Unable to delete an authenticator entry with {}", credentialID, e);
+        } finally {
+            IOUtils.closeIfNotNull(conn);
+        }
+        return result;
+    }
+    
+    /**
      * Close connection pool.
      */
     public void close() {
