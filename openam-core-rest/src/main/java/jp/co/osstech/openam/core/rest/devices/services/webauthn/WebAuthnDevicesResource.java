@@ -111,7 +111,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
             Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
             
             boolean found = false;
-            boolean delResult = false;
+            boolean delResult;
             for (WebAuthnAuthenticator authenticator : authenticators) {
                 if (authenticator.getCredentialID().equals(resourceId)) {
                     found = true;
