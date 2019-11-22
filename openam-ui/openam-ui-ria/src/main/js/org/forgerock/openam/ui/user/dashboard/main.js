@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 
@@ -22,6 +23,7 @@ define("org/forgerock/openam/ui/user/dashboard/main", [
     "./services/TrustedDevicesService",
     "./views/DashboardView",
     "./views/DeviceManagementView",
+    "./views/FIDO2DeviceManagementView",
     "./views/MyApplicationsView",
     "./views/OAuthTokensView",
     "./views/TrustedDevicesView"

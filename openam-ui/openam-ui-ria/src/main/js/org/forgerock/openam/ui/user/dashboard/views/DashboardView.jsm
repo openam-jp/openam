@@ -12,10 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 import AbstractView from "org/forgerock/commons/ui/common/main/AbstractView";
 import AuthenticationDevicesView from "org/forgerock/openam/ui/user/dashboard/views/AuthenticationDevicesView";
+import AuthenticationFIDO2DevicesView from
+    "org/forgerock/openam/ui/user/dashboard/views/AuthenticationFIDO2DevicesView";
 import MyApplicationsView from "org/forgerock/openam/ui/user/dashboard/views/MyApplicationsView";
 import OAuthTokensView from "org/forgerock/openam/ui/user/dashboard/views/OAuthTokensView";
 import TrustedDevicesView from "org/forgerock/openam/ui/user/dashboard/views/TrustedDevicesView";
@@ -31,6 +34,7 @@ class Dashboard extends AbstractView {
             TrustedDevicesView.render();
             OAuthTokensView.render();
             AuthenticationDevicesView.render();
+            AuthenticationFIDO2DevicesView.render();
         });
     }
 }

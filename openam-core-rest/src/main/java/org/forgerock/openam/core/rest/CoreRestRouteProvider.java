@@ -23,6 +23,7 @@ import static org.forgerock.openam.rest.Routers.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnDevicesResource;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
@@ -116,6 +117,11 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .toCollection(PushDevicesResource.class);
+        
+        realmRouter.route("users/{user}/devices/webauthn")
+                .auditAs(DEVICES)
+                .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
+                .toCollection(WebAuthnDevicesResource.class);
 
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))

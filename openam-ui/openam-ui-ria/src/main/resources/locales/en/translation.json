@@ -571,6 +571,21 @@
                 "deviceName": "Device name",
                 "copyRecoveryCodes": "Keep a copy of these codes in a safe place. You will need to use one of your recovery codes to authenticate to OpenAM if you lose your device."
             }
+        },
+        "fido2AuthDevices": {
+            "header": "FIDO2(WebAuthn) Authentication Devices",
+            "noneFound": "You have not registered any devices",
+            "menu": {
+                "delete": "Delete"
+            },
+            "devicesSettingDialog": {
+                "title": "Devices Settings",
+                "description": "Configure global settings across all your devices."
+            },
+            "deviceDetailsDialog": {
+                "deviceName": "Device name",
+                "createdDate": "Registered date"
+            }
         }
     },
     "uma": {
