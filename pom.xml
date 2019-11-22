@@ -1135,12 +1135,6 @@
             </dependency>
 
             <!-- Preferred JSON Data Binding API -->
-            <!-- TODO : Must move to BOM -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.dataformat</groupId>
-                <artifactId>jackson-dataformat-cbor</artifactId>
-                <version>2.9.7</version>
-            </dependency>
 
             <!-- Session HA Module Dependencies-->
 
