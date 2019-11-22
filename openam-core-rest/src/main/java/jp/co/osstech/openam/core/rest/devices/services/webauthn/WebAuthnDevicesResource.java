@@ -54,6 +54,7 @@ import org.forgerock.openam.core.rest.devices.services.AuthenticatorDeviceServic
 import static jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory.FACTORY_NAME;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import org.forgerock.openam.rest.RealmAwareResource;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -63,6 +64,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory;
     private final Debug debug;
     private static final int NO_LIMIT = 0;
+    private static final String ENTRYUUID = "entryUUID";
     
     /**
      * Constructor that sets up the data accessing object, context helpers and the factory from which to produce
@@ -96,20 +98,44 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
 
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context cntxt, String resourceId, DeleteRequest dr) {
+        final Subject subject = getContextSubject(cntxt);
+        String userName = subject.getPrincipals().iterator().next().getName();
         String realm = getRealm(cntxt);
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         try {
+            AMIdentity userIdentity = getIdentity(userName, realm);          
+            Set<String> attrSet = (Set<String>) userIdentity.getAttribute(ENTRYUUID);
+            String entryUUID = attrSet.iterator().next();
+                  
             AuthenticatorWebAuthnService realmWebAuthnService = webauthnServiceFactory.create(realm);
-            boolean delResult = realmWebAuthnService.deleteAuthenticator(resourceId);
+            Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
+            
+            boolean found = false;
+            boolean delResult = false;
+            for (WebAuthnAuthenticator authenticator : authenticators) {
+                if (authenticator.getCredentialID().equals(resourceId)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                delResult = realmWebAuthnService.deleteAuthenticator(resourceId);
+            } else {
+                return new NotFoundException("WebAuthnDevicesResource :: Delete -User device, " + resourceId + ", not found.").asPromise();
+            }
             result.put("success", delResult);
             return newResultPromise(newResourceResponse(resourceId, "0", result));
         }
         catch (SMSException ex) {
-            debug.error("OathDevicesResource :: Action - Unable to communicate with the SMS.", ex);
+            debug.error("WebAuthnDevicesResource :: Delete - Unable to communicate with the SMS.", ex);
             return new InternalServerErrorException().asPromise();
         }
-        catch (SSOException ex) {
-            debug.error("OathDevicesResource :: Action - Unable to retrieve realm data from request context", ex);
+        catch (SSOException|InternalServerErrorException ex) {
+            debug.error("WebAuthnDevicesResource :: Delete - Unable to retrieve realm or user data from request context", ex);
+            return new InternalServerErrorException().asPromise();
+        }
+        catch (IdRepoException ex) {
+            debug.error("WebAuthnDevicesResource :: Delete - Unable to retrieve identity attribute", ex);
             return new InternalServerErrorException().asPromise();
         }
     }
@@ -129,7 +155,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
             AuthenticatorWebAuthnService realmWebAuthnService = webauthnServiceFactory.create(realm);
             AMIdentity userIdentity = getIdentity(userName, realm);
             
-            Set<String> attrSet = (Set<String>) userIdentity.getAttribute("entryUUID");
+            Set<String> attrSet = (Set<String>) userIdentity.getAttribute(ENTRYUUID);
             String entryUUID = attrSet.iterator().next();
             
             Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
@@ -152,15 +178,15 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
             
         }
         catch (SMSException ex) {
-            debug.error("OathDevicesResource :: Action - Unable to communicate with the SMS.", ex);
+            debug.error("WebAuthnDevicesResource :: Query - Unable to communicate with the SMS.", ex);
             return new InternalServerErrorException().asPromise();
         }
         catch (SSOException|InternalServerErrorException ex) {
-            debug.error("OathDevicesResource :: Action - Unable to retrieve identity data from request context", ex);
+            debug.error("WebAuthnDevicesResource :: Query - Unable to retrieve identity data from request context", ex);
             return new InternalServerErrorException().asPromise();
         }
         catch (IdRepoException ex) {
-            debug.error("OathDevicesResource :: Action - Unable to retrieve identity attribute", ex);
+            debug.error("WebAuthnDevicesResource :: Query - Unable to retrieve identity attribute", ex);
             return new InternalServerErrorException().asPromise();
         }
         return newResultPromise(newQueryResponse());
