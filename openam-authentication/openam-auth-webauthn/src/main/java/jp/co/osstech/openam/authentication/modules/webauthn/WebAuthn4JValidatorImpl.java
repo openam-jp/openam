@@ -26,7 +26,7 @@ import com.webauthn4j.data.WebAuthnAuthenticationContext;
 import com.webauthn4j.data.WebAuthnRegistrationContext;
 import com.webauthn4j.data.attestation.authenticator.AAGUID;
 import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
-import com.webauthn4j.data.attestation.authenticator.CredentialPublicKey;
+import com.webauthn4j.data.attestation.authenticator.COSEKey;
 import com.webauthn4j.data.attestation.statement.AttestationStatement;
 import com.webauthn4j.data.attestation.statement.NoneAttestationStatement;
 import com.webauthn4j.data.client.Origin;
@@ -87,10 +87,10 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             byte[] attestedCredentialIdBytes = ArrayUtil.clone(response.getAttestationObject().getAuthenticatorData()
                     .getAttestedCredentialData().getCredentialId());
 
-            // PublicKey(COSE) <-- AttestedCredentialData <--AuthenticationData
+            // COSEKey <-- AttestedCredentialData <--AuthenticationData
             // <--AttestationObject
-            CredentialPublicKey attestedCredentialPublicKey = response.getAttestationObject().getAuthenticatorData()
-                    .getAttestedCredentialData().getCredentialPublicKey();
+            COSEKey coseKey = response.getAttestationObject().getAuthenticatorData()
+                    .getAttestedCredentialData().getCOSEKey();
 
             // Counter <--AuthenticationData <--AttestationObject
             long attestedCounter = response.getAttestationObject().getAuthenticatorData().getSignCount();
@@ -98,7 +98,7 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             CborConverter _cborConverter = new CborConverter();
             WebAuthnAuthenticator amAuthenticator = new WebAuthnAuthenticator(
                     Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
-                    _cborConverter.writeValueAsBytes(attestedCredentialPublicKey),
+                    _cborConverter.writeValueAsBytes(coseKey),
                     new Long(attestedCounter), userHandleIdBytes);
             
             return amAuthenticator;
@@ -139,12 +139,12 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             
             //credentialPublicKey was stored as COSEKey byte[] data at registration time.
             CborConverter _cborConverter = new CborConverter();
-            CredentialPublicKey credentialPublicKey = 
-                    _cborConverter.readValue(amAuthenticator.getPublicKey(), CredentialPublicKey.class);
+            COSEKey coseKey = 
+                    _cborConverter.readValue(amAuthenticator.getPublicKey(), COSEKey.class);
 
             final AttestedCredentialData storedAttestedCredentialData = 
                     new AttestedCredentialData(_aaguid, 
-                            Base64UrlUtil.decode(amAuthenticator.getCredentialID()), credentialPublicKey);
+                            Base64UrlUtil.decode(amAuthenticator.getCredentialID()), coseKey);
             final AttestationStatement noneAttestationStatement = new NoneAttestationStatement();
             final long storedCounter = amAuthenticator.getSignCount();
             Authenticator authenticator = new AuthenticatorImpl(storedAttestedCredentialData,
