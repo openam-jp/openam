@@ -22,6 +22,8 @@
  with the fields enclosed by brackets [] replaced by
  your own identifying information:
  "Portions Copyrighted 2012 Open Source Solution Technology Corporation"
+
+ Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -29,7 +31,8 @@
 
 
 <ModuleProperties moduleName="OATH" version="1.0">
-    <Callbacks length="2" order="1" timeout="120" header="このサーバーは OATH 認証を使用します">
+    <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
+    <Callbacks length="2" order="2" timeout="120" header="このサーバーは OATH 認証を使用します">
         <PasswordCallback>
             <Prompt>ワンタイムパスワード:</Prompt>
         </PasswordCallback>
