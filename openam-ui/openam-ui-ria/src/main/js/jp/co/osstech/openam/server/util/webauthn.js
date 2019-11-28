@@ -48,6 +48,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
             })
             .catch((err) => {
                 console.log("ERROR", err);
+                $("#idToken3_1").click();
             });
     };
 
@@ -76,6 +77,7 @@ define("jp/co/osstech/openam/server/util/webauthn", [
             })
             .catch((err) => {
                 console.log("ERROR", err);
+                $("#idToken3_1").click();
             });
     };
 
