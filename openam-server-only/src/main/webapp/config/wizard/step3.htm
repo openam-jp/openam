@@ -381,17 +381,18 @@
     YAHOO.util.Event.onDOMReady(initConfig);
 </script>
 
-<div style="margin-left:10px;">
+<div style="margin-left:10px;margin-bottom:10px;">
     <h1>$page.getLocalizedString("step3.title")<img class="pointer" 
         src="$context/assets/images/message.gif"/></h1>
     <p>$page.getLocalizedString("step3.description")</p> 
-    <input type="radio" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" $selectFirstSetup />
-        $page.getLocalizedString("create.new.instance")
-    <input type="radio" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" $selectExistingSetup />
-        $page.getLocalizedString("add.existing.instance")
+    <input type="radio" style="margin-left:1em;" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" $selectFirstSetup />
+        <span>$page.getLocalizedString("create.new.instance")</span>
+        <br>
+    <input type="radio" style="margin-left:1em;" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" $selectExistingSetup />
+        <span>$page.getLocalizedString("add.existing.instance")</span>
        
     <!-- EMBEDDED STORE PROPERTIES -->
-    <div id="configStoreProperties" style="width:620px;" >
+    <div id="configStoreProperties" style="width:100%;" >
         <p id="allfields"><em>*</em>&nbsp;
             $page.getLocalizedString("required.field.label")</p>
         <b class="xtop">
@@ -403,7 +404,7 @@
         <div class="headerBox">
             $page.getLocalizedString("step3.sub.title")
         </div>
-        <div class="bodyBox" style="height:290px;">
+        <div class="bodyBox" style="max-height:330px;">
              <span>  
              <!-- New Instances -->
              <div id="newInstanceOptions">            
@@ -548,7 +549,7 @@
                     </tr>  
                     <tr>
                         <td>&nbsp;</td>
-                        <td>
+                        <td style="padding-left:1em;">
                             <small>$page.getLocalizedString("url.server.help")</small>                    
                         </td>
                     </tr>              
