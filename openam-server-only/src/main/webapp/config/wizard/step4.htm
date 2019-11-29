@@ -273,14 +273,14 @@
 
     <label for="userStoreDefault" style="float:none">
         <input type="radio" id="userStoreDefault" name="userStoreCustom"
-            style="margin-left:1em" value="false" $selectEmbeddedUM
+            style="margin-left:1em;" value="false" $selectEmbeddedUM
             $radioDataTypeDisabled onclick="enableEmbeddedConfig();"/>
-        <span>$page.getLocalizedString("configurator.embedded")</span><br/>
+        <span>$page.getLocalizedString("configurator.embedded")</span>
     </label>
-
+    <br>
     <label for="userStoreCustom" style="float:none">
         <input type="radio" id="userStoreCustom" name="userStoreCustom"
-            value="true" $selectExternalUM
+            style="margin-left:1em;" value="true" $selectExternalUM
             $radioDataTypeDisabled onclick="enableExternalConfig();"/>
         <span>$page.getLocalizedString("configurator.remote")</span>
     </label>
