@@ -267,25 +267,25 @@
     YAHOO.util.Event.onDOMReady(initUserStorePage);
 </script>
 
-<div style="margin-left:10px;">
+<div style="margin-left:10px;margin-bottom:10px;">
     <h1>$page.getLocalizedString("step4.title")<img class="pointer" src="$context/assets/images/message.gif"/></h1>
     <p>$page.getLocalizedString("step4.description")</p>
 
     <label for="userStoreDefault" style="float:none">
         <input type="radio" id="userStoreDefault" name="userStoreCustom"
-            style="margin-left:1em" value="false" $selectEmbeddedUM
+            style="margin-left:1em;" value="false" $selectEmbeddedUM
             $radioDataTypeDisabled onclick="enableEmbeddedConfig();"/>
-        <span>$page.getLocalizedString("configurator.embedded")</span><br/>
+        <span>$page.getLocalizedString("configurator.embedded")</span>
     </label>
-
+    <br>
     <label for="userStoreCustom" style="float:none">
         <input type="radio" id="userStoreCustom" name="userStoreCustom"
-            style="margin-left:1em" value="true" $selectExternalUM
+            style="margin-left:1em;" value="true" $selectExternalUM
             $radioDataTypeDisabled onclick="enableExternalConfig();"/>
         <span>$page.getLocalizedString("configurator.remote")</span>
     </label>
     
-    <div id="userStoreModule" style="width:610px;">
+    <div id="userStoreModule" style="width:100%;">
         <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
         <b class="xtop">
             <b class="xt1"></b>
@@ -294,7 +294,7 @@
             <b class="xt4"></b>
         </b>
         <div class="headerBox">$page.getLocalizedString("step4.sub.title")</div>
-        <div class="bodyBox" style="height:270px;">
+        <div class="bodyBox" style="max-height:300px;">
             <div id="embeddedConfigSettings"
                 style="margin-left:10px; display:none">
                 <br>
@@ -303,21 +303,21 @@
             </div>
             <span id="externalConfigSettings" style="display:none">
                 <table class="temp" style="margin-bottom: 0">
+                    <tr><td valign="top"><em>*&nbsp;</em>$page.getLocalizedString("store.type.label")</td></tr>
                     <tr>
-                        <td valign="top"><em>*&nbsp;</em>$page.getLocalizedString("store.type.label")</td>
                         <td>
                             <table id="userStoreCustomTypes">
                                 <tr>
-                                    <td><label for="ldapv3opends" style="float:none"><input type="radio" id="ldapv3opends" name="userStoreType" value="LDAPv3ForOpenDS" $selectLDAPv3opends onclick="setOpenDS();"/>&nbsp;$page.getLocalizedString("opends.ldap.schema")</label></td>
-                                    <td><label for="ldapv3odsee" style="float:none"><input type="radio" id="ldapv3odsee" name="userStoreType" value="LDAPv3ForODSEE" $selectLDAPv3odsee onclick="setODSEE();"/>&nbsp;$page.getLocalizedString("odsee.ldap.schema")</label></td>
+                                    <td style="padding-left:2em;"><label for="ldapv3opends" style="float:none"><input type="radio" id="ldapv3opends" name="userStoreType" value="LDAPv3ForOpenDS" $selectLDAPv3opends onclick="setOpenDS();"/>&nbsp;$page.getLocalizedString("opends.ldap.schema")</label></td>
+                                    <td style="padding-left:2em;"><label for="ldapv3odsee" style="float:none"><input type="radio" id="ldapv3odsee" name="userStoreType" value="LDAPv3ForODSEE" $selectLDAPv3odsee onclick="setODSEE();"/>&nbsp;$page.getLocalizedString("odsee.ldap.schema")</label></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="ldapv3adforDomainName" style="float:none"><input type="radio" id="ldapv3adforDomainName" name="userStoreType" value="LDAPv3ForADDC" $selectLDAPv3addc onclick="setADforDomainName();"/>&nbsp;$page.getLocalizedString("activedirectoryfordomainname.ldap.schema")</label></td>
-                                    <td><label for="ldapv3ad" style="float:none"><input type="radio" id="ldapv3ad" name="userStoreType" value="LDAPv3ForAD" $selectLDAPv3ad onclick="setAD();"/>&nbsp;$page.getLocalizedString("activedirectory.ldap.schema")</label><br></td>
+                                    <td style="padding-left:2em;"><label for="ldapv3adforDomainName" style="float:none"><input type="radio" id="ldapv3adforDomainName" name="userStoreType" value="LDAPv3ForADDC" $selectLDAPv3addc onclick="setADforDomainName();"/>&nbsp;$page.getLocalizedString("activedirectoryfordomainname.ldap.schema")</label></td>
+                                    <td style="padding-left:2em;"><label for="ldapv3ad" style="float:none"><input type="radio" id="ldapv3ad" name="userStoreType" value="LDAPv3ForAD" $selectLDAPv3ad onclick="setAD();"/>&nbsp;$page.getLocalizedString("activedirectory.ldap.schema")</label><br></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="ldapv3tivoli" style="float:none"><input type="radio" id="ldapv3tivoli" name="userStoreType" value="LDAPv3ForTivoli" $selectLDAPv3tivoli onclick="setTivoli();"/>&nbsp;$page.getLocalizedString("tivoli.ldap.schema")</label></td>
-                                    <td><label for="ldapv3adam" style="float:none"><input type="radio" id="ldapv3adam" name="userStoreType" value="LDAPv3ForADAM" $selectLDAPv3adam onclick="setADAM();"/>&nbsp;$page.getLocalizedString("adam.ldap.schema")</label></td>
+                                    <td style="padding-left:2em;"><label for="ldapv3tivoli" style="float:none"><input type="radio" id="ldapv3tivoli" name="userStoreType" value="LDAPv3ForTivoli" $selectLDAPv3tivoli onclick="setTivoli();"/>&nbsp;$page.getLocalizedString("tivoli.ldap.schema")</label></td>
+                                    <td style="padding-left:2em;"><label for="ldapv3adam" style="float:none"><input type="radio" id="ldapv3adam" name="userStoreType" value="LDAPv3ForADAM" $selectLDAPv3adam onclick="setADAM();"/>&nbsp;$page.getLocalizedString("adam.ldap.schema")</label></td>
                                 </tr>
                             </table>
                         </td>

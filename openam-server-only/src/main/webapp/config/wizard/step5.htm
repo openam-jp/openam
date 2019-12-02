@@ -123,17 +123,17 @@
 
 </script>
 
-<div style="margin-left:10px;">
+<div style="margin-left:10px;margin-bottom:10px;">
     <h1>$page.getLocalizedString("step5.title")<img class="pointer" alt="info" src="$context/assets/images/message.gif"/></h1>
     <p>$page.getLocalizedString("step5.description")</p>
-    <input type="radio" id="loadBalancerDisable" #if (!$host && !$port) checked="checked"#{end}/><span>&nbsp;$page.getLocalizedString("no.label")</span><br/>
-    <input type="radio" id="loadBalancerEnable" #if ($host || $port) checked="checked"#{end}/><span>&nbsp;$page.getLocalizedString("yes.label")</span>
+    <input type="radio" style="margin-left:1em;" id="loadBalancerDisable" #if (!$host && !$port) checked="checked"#{end}/><span>&nbsp;$page.getLocalizedString("no.label")</span><br/>
+    <input type="radio" style="margin-left:1em;" id="loadBalancerEnable" #if ($host || $port) checked="checked"#{end}/><span>&nbsp;$page.getLocalizedString("yes.label")</span>
 
-    <div id="loadBalancerModule" style="width:500px;">
+    <div id="loadBalancerModule" style="width:100%;">
         <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
         <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
             <div class="headerBox">$page.getLocalizedString("step5.sub.title")</div>
-        <div class="bodyBox" style="height:180px">
+        <div class="bodyBox" style="max-height:330px;">
             $page.getLocalizedString("step5.help.message")
             <span>
                 <table class="temp">

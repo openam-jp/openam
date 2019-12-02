@@ -562,6 +562,9 @@ div.borderPopUpGray{
     /* border: 1px solid #0094d4; */
     border: 1px solid #0094d4;
     border-bottom: none;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 input.text, input[type="text"], input[type="checkbox"] {
     padding: 2px;
