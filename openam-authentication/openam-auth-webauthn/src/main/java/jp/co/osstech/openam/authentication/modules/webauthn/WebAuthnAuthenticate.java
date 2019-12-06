@@ -57,13 +57,13 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
     public static final String BUNDLE_NAME = "amAuthWebAuthnAuthenticate";
     private static final Debug DEBUG = Debug.getInstance(WebAuthnAuthenticate.class.getSimpleName());
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
+
     // Module States
     private final int STATE_COMPLETE = -1;
     private final int STATE_LOGIN_SELECT = 1;
     private final int STATE_LOGIN_START = 2;
     private final int STATE_LOGIN_SCRIPT = 3;
-    
+
     // Configuration Strings for Authenticate
     private static final String USE_MFA = "iplanet-am-auth-Webauthn-useMfa";
 
@@ -80,21 +80,21 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         }
 
         super.init(subject, sharedState, options);
-        
+
         this.useMfaConfig = CollectionHelper.getMapAttr(options, USE_MFA);
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("WebAuthnAuthenticate module parameter are " 
+            DEBUG.message("WebAuthnAuthenticate module parameter are "
                     + "authLevel = " + authLevel
-                    + ", useMfa = " + useMfaConfig 
+                    + ", useMfa = " + useMfaConfig
                     + ", rpName = " + rpNameConfig
-                    + ", origin = " + originConfig 
+                    + ", origin = " + originConfig
                     + ", residentKey = " + residentKeyConfig
-                    + ", userVerification = " + userVerificationConfig 
+                    + ", userVerification = " + userVerificationConfig
                     + ", timeoutConfig = " + timeoutConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig);
         }
-        
+
         if(useMfaConfig.equalsIgnoreCase("true")) {
             userName = (String) sharedState.get(getUserKey());
             if (StringUtils.isEmpty(userName)) {
@@ -109,7 +109,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             }
         }
     }
-    
+
     @Override
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
         if (DEBUG.messageEnabled()) {
@@ -119,7 +119,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         int nextState;
 
         switch (state) {
-        
+
         case STATE_LOGIN_SELECT:
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnAuthenticate.process() : This state is LOGIN_SELECT.");
@@ -152,9 +152,9 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
      * @throws AuthLoginException
      */
     private int selectLoginType() throws AuthLoginException {
-        
+
         int nextState;
-        
+
         try {
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
             webauthnService = webauthnServiceFactory.create(realm);
@@ -162,21 +162,21 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             DEBUG.error("WebAuthnAuthenticate.selectLoginType() : Authenticator service exception : ", ex);
             throw new AuthLoginException(BUNDLE_NAME, "deviceServiceError", null, ex);
         }
-        
+
         if (useMfaConfig.equalsIgnoreCase("true")) {
             if (userName == null) {
                 DEBUG.error("WebAuthnAuthenticate.selectLoginType() :  User name not found");
                 throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
             }
-            
+
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnAuthenticate.selectLoginType() : MFA Login");
             }
-            
+
             // MFA login starting.
             getStoredCredentialId();
             createLoginScript();
-            
+
             nextState = STATE_LOGIN_SCRIPT;
         } else if (residentKeyConfig.equalsIgnoreCase("true")) {
             if (DEBUG.messageEnabled()) {
@@ -185,13 +185,13 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
 
             // resident key login starting.
             createLoginScript();
-            
+
             nextState = STATE_LOGIN_SCRIPT;
         } else {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnAuthenticate.selectLoginType() : Password Less Login");
             }
-            
+
             nextState = STATE_LOGIN_START;
         }
         return nextState;
@@ -204,18 +204,18 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int handlePasswordLessLoginStartCallbacks(Callback[] callbacks) 
+    private int handlePasswordLessLoginStartCallbacks(Callback[] callbacks)
             throws AuthLoginException {
 
         userName = ((NameCallback) callbacks[0]).getName();
-        
+
         getStoredCredentialId();
-        
+
         createLoginScript();
 
         return STATE_LOGIN_SCRIPT;
     }
-    
+
     /**
      * Get user authenticators.
      * 
@@ -248,7 +248,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         // Replace Callback to send Generated Javascript that include get options.
         // only for nextState LOGIN_SCRIPT
         // redidentkey dosn't need stored credentialid(authenticators = null).
-        Callback creadentialsGetCallback = 
+        Callback creadentialsGetCallback =
                 ScriptCallbackGenerator.generateCredntialsGetScriptCallback(
                         authenticators,
                         residentKeyConfig,
@@ -267,19 +267,19 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
      */
     private int verifyAuthenticatorCallback(Callback[] callbacks)
             throws AuthLoginException {
-        
+
         // if Cancel Button Return Authentication Fail
         if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
             throw new MessageLoginException(BUNDLE_NAME, "msgAuthCancel", null);
         }
-        
+
         // read HiddenValueCallback from Authenticator posted
         String _webauthnHiddenCallback = ((HiddenValueCallback) callbacks[1]).getValue();
         if (StringUtils.isEmpty(_webauthnHiddenCallback)) {
             DEBUG.error("WebAuthnAuthenticate.verifyAuthenticatorCallback() : webauthnHiddenCallback is empty");
             throw new AuthLoginException(BUNDLE_NAME, "emptyCallback", null);
         }
-        
+
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Posted webauthnHiddenCallback = " + _webauthnHiddenCallback);
         }
@@ -300,7 +300,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
         }
 
         byte[] _userHandleBytes = Base64url.decode(_responseJson.getUserHandle());
-        
+
         /*
          * if residentKey = true
          * get UserHandle in Client Response
@@ -316,7 +316,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
                 throw new MessageLoginException(BUNDLE_NAME, "msgNoDevice", null);
             }
         }
-        
+
         WebAuthnAuthenticator _selectedAuthenticator = null;
         for (WebAuthnAuthenticator authenticator : authenticators) {
             if (authenticator.isSelected(_responseJson.getRawId())) {
@@ -328,10 +328,10 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             DEBUG.error("WebAuthnAuthenticate.verifyAuthenticatorCallback() :  User authenticator is not detected");
             throw new AuthLoginException(BUNDLE_NAME, "noDeviceDetected", null);
         }
-        
+
         webauthnValidator.validateGetResponse(getValidationConfig(), _responseJson,
                 _selectedAuthenticator, DEBUG);
-        
+
         boolean _storeResult = webauthnService.updateCounter(_selectedAuthenticator);
         if (_storeResult) {
             setAuthLevel(authLevel);
@@ -345,7 +345,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
             throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
         }
     }
-    
+
     /**
      * Searches for an account with userHandle userID in the organization organization.
      * 
@@ -355,7 +355,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
      * @throws AuthLoginException
      */
     private String searchUserNameWithAttrValue(String attributeValue, String attributeName) throws AuthLoginException {
- 
+
         if (DEBUG.messageEnabled()) {
             DEBUG.message("WebAuthnAuthenticate.searchUserNameWithAttrValue() :  attributeName={}  attributeValue={}",
                     attributeName, attributeValue);
@@ -415,7 +415,7 @@ public class WebAuthnAuthenticate extends AbstractWebAuthnModule {
     protected Debug getDebugInstance() {
         return DEBUG;
     }
-    
+
     @Override
     protected String getBundleName() {
         return BUNDLE_NAME;

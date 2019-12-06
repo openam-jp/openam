@@ -53,18 +53,18 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
     private final int STATE_REG_START = 1;
     private final int STATE_REG_SCRIPT = 2;
     private final int STATE_REG_KEY = 3;
-    
+
     // Configuration Strings for Register
     private static final String ATTESTATION = "iplanet-am-auth-Webauthn-attestation";
     private static final String ATTACHMENT = "iplanet-am-auth-Webauthn-attachment";
     private static final String MAX_NUMBER = "iplanet-am-auth-Webauthn-registationMaxNumber";
     private static final int DEFAULT_MAX_NUMBER = 3;
-    
+
     // Configuration Parameters for Register
     private String attestationConfig = "";
     private String attachmentConfig = "";
     private int maxNumber = DEFAULT_MAX_NUMBER;
-    
+
     // WebAuthn
     private byte[] userHandleIdBytes;
     private WebAuthnAuthenticator attestedAuthenticator;
@@ -74,27 +74,27 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("WebAuthnRegister module init start");
         }
-        
+
         super.init(subject, sharedState, options);
-        
+
         this.attestationConfig = CollectionHelper.getMapAttr(options, ATTESTATION);
         this.attachmentConfig = CollectionHelper.getMapAttr(options, ATTACHMENT);
         this.maxNumber = CollectionHelper.getIntMapAttr(options, MAX_NUMBER, DEFAULT_MAX_NUMBER, DEBUG);
 
         if (DEBUG.messageEnabled()) {
-            DEBUG.message("WebAuthnRegister module parameter are " 
+            DEBUG.message("WebAuthnRegister module parameter are "
                     + "authLevel = " + authLevel
                     + ", rpName = " + rpNameConfig
-                    + ", origin = " + originConfig 
+                    + ", origin = " + originConfig
                     + ", attestation = " + attestationConfig
-                    + ", attachment = " + attachmentConfig 
+                    + ", attachment = " + attachmentConfig
                     + ", residentKey = " + residentKeyConfig
-                    + ", userVerification = " + userVerificationConfig 
+                    + ", userVerification = " + userVerificationConfig
                     + ", timeoutConfig = " + timeoutConfig
                     + ", displayNameAttributeName = " + displayNameAttributeNameConfig
                     + ", maxNumber = " + maxNumber);
         }
-        
+
         userName = (String) sharedState.get(getUserKey());
         if (StringUtils.isEmpty(userName)) {
             try {
@@ -143,30 +143,30 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
 
         return nextState;
     }
-    
+
     /**
      * Create javascript create.credential.
      * 
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int createScript() 
+    private int createScript()
             throws AuthLoginException {
-        
+
         int nextState;
-        
+
         if (userName != null) {
             nextState = STATE_REG_SCRIPT;
         } else {
             throw new AuthLoginException(BUNDLE_NAME, "noUserIdentified", null);
         }
-        
+
         // Generate challenge
         byte[] _challengeBytes = webauthnValidator.generateChallenge();
 
         // Use LDAP entryUUID as userHandleId
         userHandleIdBytes = lookupByteData("entryUUID");
-        
+
         // Get service instance
         try {
             String realm = DNMapper.orgNameToRealmName(getRequestOrg());
@@ -175,7 +175,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
             DEBUG.error("WebAuthnRegister.createScript() : WebAuthn module exception : ", e);
             throw new AuthLoginException(BUNDLE_NAME, "deviceServiceError", null);
         }
-        
+
         // Max number check
         Set<WebAuthnAuthenticator> authenticators = webauthnService.getAuthenticators(userHandleIdBytes);
         if (authenticators.size() >= maxNumber) {
@@ -185,7 +185,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
 
         // Replace Callback to send Generated Javascript that include create options.
         // only for nextState REG_SCRIPT
-        Callback creadentialsCreateCallback = 
+        Callback creadentialsCreateCallback =
                 ScriptCallbackGenerator.generateCredntialsCreateScriptCallback(
                         rpNameConfig,
                         userHandleIdBytes,
@@ -198,7 +198,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
                         timeoutConfig,
                         _challengeBytes);
         replaceCallback(STATE_REG_SCRIPT, 0, creadentialsCreateCallback);
-        
+
         return nextState;
     }
 
@@ -209,11 +209,11 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int storeAuthenticator(Callback[] callbacks) 
+    private int storeAuthenticator(Callback[] callbacks)
             throws AuthLoginException {
-        
+
         int nextState;
-        
+
         // if Cancel Button Return Authentication Fail
         if (((ConfirmationCallback)callbacks[2]).getSelectedIndex() == 1) {
             throw new MessageLoginException(BUNDLE_NAME, "msgRegCancel", null);
@@ -246,7 +246,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
                 getValidationConfig(), _responseJson, userHandleIdBytes, DEBUG);
 
         boolean _storeResult = webauthnService.createAuthenticator(attestedAuthenticator);
-            
+
         if (_storeResult) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WebAuthnRegister.storeAuthenticator() was success");
@@ -257,10 +257,9 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
             throw new AuthLoginException(BUNDLE_NAME, "storeError", null);
         }
 
-        
         return nextState;
     }
-    
+
     /**
      * Store CredentialName.
      * 
@@ -268,11 +267,11 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
      * @return A value indicating the next state.
      * @throws AuthLoginException
      */
-    private int storeCredentialName(Callback[] callbacks) 
+    private int storeCredentialName(Callback[] callbacks)
             throws AuthLoginException {
-        
+
         int nextState;
-        
+
         String credentialname = ((NameCallback) callbacks[0]).getName();
         if (StringUtils.isNotEmpty(credentialname)) {
             attestedAuthenticator.setCredentialName(credentialname);
@@ -300,7 +299,7 @@ public class WebAuthnRegister extends AbstractWebAuthnModule {
     protected Debug getDebugInstance() {
         return DEBUG;
     }
-    
+
     @Override
     protected String getBundleName() {
         return BUNDLE_NAME;

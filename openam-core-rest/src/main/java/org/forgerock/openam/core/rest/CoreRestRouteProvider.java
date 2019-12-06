@@ -117,7 +117,7 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .toCollection(PushDevicesResource.class);
-        
+
         realmRouter.route("users/{user}/devices/webauthn")
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)

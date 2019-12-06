@@ -24,7 +24,7 @@
 
     <Callbacks length="0" order="1" timeout="300" header="PublicKey Registration">
     </Callbacks>
-    
+
     <Callbacks length="3" order="2" timeout="120" header="Action with Your Authenticator">
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
         <HiddenValueCallback>
@@ -41,7 +41,7 @@
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    
+
     <Callbacks length="2" order="3" timeout="120" header="PublicKey Registration Complete. Enter Credential DisplayName(optional)">
         <NameCallback>
             <Prompt>Credential DisplayName:</Prompt>

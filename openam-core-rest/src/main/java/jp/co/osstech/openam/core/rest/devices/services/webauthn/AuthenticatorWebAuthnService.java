@@ -63,8 +63,8 @@ import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.time.Duration;
 
 /**
- * Implementation of the WebAuthn Authenticator Service. 
- * Provides all necessary configuration information at a realm-wide level to 
+ * Implementation of the WebAuthn Authenticator Service.
+ * Provides all necessary configuration information at a realm-wide level to
  * WebAuthn authentication modules underneath it.
  */
 public class AuthenticatorWebAuthnService implements DeviceService {
@@ -76,58 +76,58 @@ public class AuthenticatorWebAuthnService implements DeviceService {
 
     private static final String DEBUG_LOCATION = "AuthenticatorWebAuthnService";
 
-    private static final String WEBAUTHN_CLASS_NAMES = 
+    private static final String WEBAUTHN_CLASS_NAMES =
             "openam-auth-webauthn-objectclass-names";
-    private static final String WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME = 
+    private static final String WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME =
             "openam-auth-webauthn-credentialid-attribute-name";
-    private static final String WEBAUTHN_KEY_ATTRIBUTE_NAME = 
+    private static final String WEBAUTHN_KEY_ATTRIBUTE_NAME =
             "openam-auth-webauthn-key-attribute-name";
-    private static final String WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME = 
+    private static final String WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME =
             "openam-auth-webauthn-credentialname-attribute-name";
-    private static final String WEBAUTHN_COUNTER_ATTRIBUTE_NAME = 
+    private static final String WEBAUTHN_COUNTER_ATTRIBUTE_NAME =
             "openam-auth-webauthn-counter-attribute-name";
-    private static final String WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME = 
+    private static final String WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME =
             "openam-auth-webauthn-user-handle-id-attribute-name";
-    
-    private static final String WEBAUTHN_PRIMARY_LDAP_SERVER = 
+
+    private static final String WEBAUTHN_PRIMARY_LDAP_SERVER =
             "openam-auth-webauthn-ldap-server";
-    private static final String WEBAUTHN_SECONDARY_LDAP_SERVER = 
+    private static final String WEBAUTHN_SECONDARY_LDAP_SERVER =
             "openam-auth-wbauthn-ldap-server2";
-    private static final String WEBAUTHN_LDAP_BASE_DN = 
+    private static final String WEBAUTHN_LDAP_BASE_DN =
             "openam-auth-webauthn-ldap-base-dn";
-    private static final String WEBAUTHN_LDAP_BIND_DN = 
+    private static final String WEBAUTHN_LDAP_BIND_DN =
             "openam-auth-webauthn-ldap-bind-dn";
-    private static final String WEBAUTHN_LDAP_BIND_PASSWORD = 
+    private static final String WEBAUTHN_LDAP_BIND_PASSWORD =
             "openam-auth-webauthn-ldap-bind-passwd";
-    private static final String WEBAUTHN_LDAP_CONNECTION_MODE = 
+    private static final String WEBAUTHN_LDAP_CONNECTION_MODE =
             "openam-auth-webauthn-ldap-connection-mode";
-    private static final String WEBAUTHN_LDAP_TLS_VERSION = 
+    private static final String WEBAUTHN_LDAP_TLS_VERSION =
             "openam-auth-webauthn-ldap-secure-protocol-version";
-    private static final String WEBAUTHN_LDAP_TLS_TRUST_ALL = 
+    private static final String WEBAUTHN_LDAP_TLS_TRUST_ALL =
             "openam-auth-webauthn-ldap-ssl-trust-all";
-    private static final String WEBAUTHN_LDAP_HEARTBEAT_INTERVAL = 
+    private static final String WEBAUTHN_LDAP_HEARTBEAT_INTERVAL =
             "openam-auth-webauthn-ldap-heartbeat-interval";
-    private static final String WEBAUTHN_LDAP_HEARTBEAT_TIMEUNIT = 
+    private static final String WEBAUTHN_LDAP_HEARTBEAT_TIMEUNIT =
             "openam-auth-webauthn-ldap-heartbeat-timeunit";
-    private static final String WEBAUTHN_LDAP_OPERATION_TIMEOUT = 
+    private static final String WEBAUTHN_LDAP_OPERATION_TIMEOUT =
             "openam-auth-webauthn-ldap-operation-timeout";
-    private static final String WEBAUTHN_LDAP_CON_POOL_MAX_SIZE = 
+    private static final String WEBAUTHN_LDAP_CON_POOL_MAX_SIZE =
             "openam-auth-webauthn-ldap-connection-pool-max-size";
 
-    private static final Set<String> DEFAULT_WEBAUTHN_CLASS_NAMES = 
+    private static final Set<String> DEFAULT_WEBAUTHN_CLASS_NAMES =
             CollectionUtils.asSet("top", "fido2Credential");
-    private static final String DEFAULT_WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME = 
+    private static final String DEFAULT_WEBAUTHN_CREDENTIAL_ATTRIBUTE_NAME =
             "fido2CredentialID";
-    private static final String DEFAULT_WEBAUTHN_KEY_ATTRIBUTE_NAME = 
+    private static final String DEFAULT_WEBAUTHN_KEY_ATTRIBUTE_NAME =
             "fido2PublicKey";
-    private static final String DEFAULT_WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME = 
+    private static final String DEFAULT_WEBAUTHN_CREDENTIALNAME_ATTRIBUTE_NAME =
             "fido2CredentialName";
-    private static final String DEFAULT_WEBAUTHN_COUNTER_ATTRIBUTE_NAME = 
+    private static final String DEFAULT_WEBAUTHN_COUNTER_ATTRIBUTE_NAME =
             "fido2SignCount";
-    private static final String DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME = 
+    private static final String DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME =
             "fido2UserID";
     private final static int DEFAULT_CON_POOL_MAX_SIZE = 10;
-    
+
     final private Debug debug;
     private Map<String, Set<?>> options;
     private Set<String> classNames = null;
@@ -138,7 +138,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     private String useridAttrName = null;
     private String baseDN = null;
     private ConnectionFactory cPool = null;
-    
+
     /**
      * Basic constructor for the AuthenticatorWebAuthnService.
      *
@@ -173,54 +173,54 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     DEFAULT_WEBAUTHN_COUNTER_ATTRIBUTE_NAME);
             useridAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME,
                     DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME);
-            
+
         } catch (SMSException | SSOException e) {
             debug.error("Error connecting to SMS to retrieve config for AuthenticatorWebAuthnService.", e);
             throw e;
         }
     }
-    
+
     /**
      * Initialize the LDAP connection pool.
      * 
-     * @throws LDAPUtilException 
+     * @throws LDAPUtilException
      */
     private void initializeConnection() throws LDAPUtilException {
         debug.message("LDAP initialize()");
-            
+
         Set<String> primaryServers =
                 CollectionHelper.getServerMapAttrs(options, WEBAUTHN_PRIMARY_LDAP_SERVER);
         Set<String> secondaryServers =
                 CollectionHelper.getServerMapAttrs(options, WEBAUTHN_SECONDARY_LDAP_SERVER);
-        
-        String bindDN = 
+
+        String bindDN =
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_BIND_DN, "");
-        char[] bindPassword = 
+        char[] bindPassword =
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_BIND_PASSWORD, "").toCharArray();
-        String connectionMode = 
+        String connectionMode =
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_CONNECTION_MODE, "LDAP");
         boolean useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
         boolean isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
-        String protocolVersion = 
+        String protocolVersion =
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_TLS_VERSION, "TLSv1");
 
         boolean sslTrustAll = Boolean.valueOf(
                     CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_TLS_TRUST_ALL, "false")).booleanValue();
-        int heartBeatInterval = 
+        int heartBeatInterval =
                 CollectionHelper.getIntMapAttr(options, WEBAUTHN_LDAP_HEARTBEAT_INTERVAL, 10, debug);
-        String heartBeatTimeUnit = 
+        String heartBeatTimeUnit =
                 CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_HEARTBEAT_TIMEUNIT, "SECONDS");
-        int operationTimeout = 
+        int operationTimeout =
                 CollectionHelper.getIntMapAttr(options, WEBAUTHN_LDAP_OPERATION_TIMEOUT , 0 , debug);
-        int maxPoolSize = 
+        int maxPoolSize =
                 CollectionHelper.getIntMapAttr(options, WEBAUTHN_LDAP_CON_POOL_MAX_SIZE,
                         DEFAULT_CON_POOL_MAX_SIZE, debug);
-        
+
         try {
             Options options = Options.defaultOptions()
-                    .set(LDAPConnectionFactory.REQUEST_TIMEOUT, 
+                    .set(LDAPConnectionFactory.REQUEST_TIMEOUT,
                             new Duration((long) operationTimeout, TimeUnit.SECONDS));
-        
+
             Set<LDAPURL> primaryUrls = LDAPUtils.convertToLDAPURLs(primaryServers);
             Set<LDAPURL> secondaryUrls = LDAPUtils.convertToLDAPURLs(secondaryServers);
 
@@ -237,7 +237,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     options.set(LDAPConnectionFactory.SSL_USE_STARTTLS, true);
                 }
             }
-            
+
             ConnectionFactory primaryCf = LDAPUtils.newFailoverConnectionPool(primaryUrls, bindDN,
                     bindPassword, maxPoolSize, heartBeatInterval, heartBeatTimeUnit, options);
             if (secondaryServers.isEmpty()) {
@@ -254,19 +254,19 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     cPool.close();
                 }
             });
-            
+
         } catch (GeneralSecurityException e) {
             debug.error("Unable to create connection pool", e);
             throw new LDAPUtilException(e);
         }
     }
-    
+
     /**
      * Get a connection from the connection pool.
      * 
      * @return The LDAP connection.
      * @throws LdapException If the connection request failed for some reason.
-     * @throws LDAPUtilException 
+     * @throws LDAPUtilException
      */
     private Connection getConnection() throws LdapException, LDAPUtilException {
         synchronized(this) {
@@ -295,7 +295,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         entry.addAttribute(counterAttrName, authenticator.getSignCount());
         entry.addAttribute(credentialNameAttrName, authenticator.getCredentialName());
         entry.addAttribute(useridAttrName, authenticator.getUserID());
-        
+
         Connection conn = null;
         try {
             conn = getConnection();
@@ -308,7 +308,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         return result;
     }
-    
+
     /**
      * Get authenticators associated with userID.
      * 
@@ -319,15 +319,15 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         Set<WebAuthnAuthenticator> authenticators = new HashSet<WebAuthnAuthenticator>();
         SearchScope scope = SearchScope.SINGLE_LEVEL;
         String userIDStr = WebAuthnAuthenticator.getUserIDAsString(userID);
-        Filter searchFilter = 
+        Filter searchFilter =
                 Filter.valueOf(useridAttrName + "=" + userIDStr);
         for (String className : classNames) {
             Filter objectClassFilter = Filter.valueOf("objectClass"+ "=" + className);
             searchFilter = Filter.and(searchFilter, objectClassFilter);
         }
-        SearchRequest searchRequest = 
-                LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter, 
-                        new String[]{credentialAttrName, keyAttrName, counterAttrName, 
+        SearchRequest searchRequest =
+                LDAPRequests.newSearchRequest(DN.valueOf(baseDN), scope, searchFilter,
+                        new String[]{credentialAttrName, keyAttrName, counterAttrName,
                                 credentialNameAttrName, WebAuthnAuthenticator.TIMESTAMP_ATTR_NAME});
         Connection conn = null;
         try {
@@ -362,7 +362,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         return authenticators;
     }
-    
+
     /**
      * Update the signature counter.
      * 
@@ -389,7 +389,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         return result;
     }
-    
+
     /**
      * Update the Credential Name.
      * 
@@ -416,7 +416,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         return result;
     }
-    
+
     /**
      * Delete an authenticator.
      * 
@@ -439,7 +439,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         }
         return result;
     }
-    
+
     /**
      * Close connection pool.
      */
@@ -451,7 +451,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
             }
         }
     }
-    
+
     @Override
     public String getConfigStorageAttributeName() {
         return null;

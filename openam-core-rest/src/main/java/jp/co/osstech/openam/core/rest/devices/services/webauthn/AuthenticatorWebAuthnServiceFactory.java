@@ -37,7 +37,7 @@ public class AuthenticatorWebAuthnServiceFactory implements DeviceServiceFactory
     public static final String FACTORY_NAME = "AuthenticatorWebAuthnServiceFactory";
 
     private final Map<String, AuthenticatorWebAuthnService> serviceSettingsMap = new HashMap<>();
-    
+
     /**
      * Default constructor.
      */
@@ -53,7 +53,7 @@ public class AuthenticatorWebAuthnServiceFactory implements DeviceServiceFactory
             }
         });
     }
-    
+
     @Override
     public AuthenticatorWebAuthnService create(ServiceConfigManager serviceConfigManager, String realm)
             throws SSOException, SMSException {

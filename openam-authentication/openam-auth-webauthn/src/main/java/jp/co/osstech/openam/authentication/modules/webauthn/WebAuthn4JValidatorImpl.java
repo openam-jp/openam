@@ -46,18 +46,18 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
  * The Implementation class for WebAuthn Validation using WebAuthn4J.
  */
 public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
-    
+
     private Challenge generatedChallenge = new DefaultChallenge();
-    
+
     @Override
     public byte[] generateChallenge() {
         return ArrayUtil.clone(generatedChallenge.getValue());
     }
-    
+
     @Override
     public WebAuthnAuthenticator validateCreateResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
             byte[] userHandleIdBytes, Debug debug) throws AuthLoginException {
-        
+
         try {
             /*
              * Validation authenticator response This must be change to W3C verification
@@ -66,7 +66,7 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
              */
             byte[] _attestationObjectBytes = Base64UrlUtil.decode(responseJson.getAttestationObject());
             byte[] _clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
-            
+
             Origin _origin = new Origin(config.getOrigin());
             String _rpId = _origin.getHost();
 
@@ -94,37 +94,37 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
             // Counter <--AuthenticationData <--AttestationObject
             long attestedCounter = response.getAttestationObject().getAuthenticatorData().getSignCount();
-            
+
             CborConverter _cborConverter = new CborConverter();
             WebAuthnAuthenticator amAuthenticator = new WebAuthnAuthenticator(
                     Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
                     _cborConverter.writeValueAsBytes(coseKey),
                     new Long(attestedCounter), userHandleIdBytes);
-            
+
             return amAuthenticator;
-            
+
         } catch (Exception ex) {
-            debug.error("WebAuthnValidator.validateCreateResponse : Error validating response. User handle is {}", 
+            debug.error("WebAuthnValidator.validateCreateResponse : Error validating response. User handle is {}",
                     WebAuthnAuthenticator.getUserIDAsString(userHandleIdBytes), ex);
             throw new AuthLoginException(WebAuthnRegister.BUNDLE_NAME, "libraryError", null, ex);
         }
     }
-    
+
     @Override
     public void validateGetResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
             WebAuthnAuthenticator amAuthenticator, Debug debug) throws AuthLoginException {
-        
+
         try {
             /*
              * Validation authenticator response This must be change to W3C verification
-             * flow. Use webauthn4j library to END 
+             * flow. Use webauthn4j library to END
              * START============================.
              */
             byte[] rawIdBytes = Base64UrlUtil.decode(responseJson.getRawId());
             byte[] authenticatorDataBytes = Base64UrlUtil.decode(responseJson.getAuthenticatorData());
             byte[] clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
             byte[] signatureBytes = Base64UrlUtil.decode(responseJson.getSignature());
-            
+
             Origin _origin = new Origin(config.getOrigin());
             String _rpId = _origin.getHost();
             byte[] _tokenBindingId = null; /* now set tokenBindingId null */
@@ -136,14 +136,14 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
             // OpenAM didn't store aaguid now. Use ZERO AAGUID.
             AAGUID _aaguid = AAGUID.ZERO;
-            
+
             //credentialPublicKey was stored as COSEKey byte[] data at registration time.
             CborConverter _cborConverter = new CborConverter();
-            COSEKey coseKey = 
+            COSEKey coseKey =
                     _cborConverter.readValue(amAuthenticator.getPublicKey(), COSEKey.class);
 
-            final AttestedCredentialData storedAttestedCredentialData = 
-                    new AttestedCredentialData(_aaguid, 
+            final AttestedCredentialData storedAttestedCredentialData =
+                    new AttestedCredentialData(_aaguid,
                             Base64UrlUtil.decode(amAuthenticator.getCredentialID()), coseKey);
             final AttestationStatement noneAttestationStatement = new NoneAttestationStatement();
             final long storedCounter = amAuthenticator.getSignCount();
@@ -154,12 +154,12 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
             WebAuthnAuthenticationContextValidationResponse response = webAuthnAuthenticationContextValidator
                     .validate(authenticationContext, authenticator);
-            
+
             // Update counter
             amAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
-        
+
         } catch (Exception ex) {
-            debug.error("WebAuthnValidator.validateGetResponse : Error validating response. User handle is {}", 
+            debug.error("WebAuthnValidator.validateGetResponse : Error validating response. User handle is {}",
                     WebAuthnAuthenticator.getUserIDAsString(amAuthenticator.getUserID()), ex);
             throw new AuthLoginException(WebAuthnAuthenticate.BUNDLE_NAME, "libraryError", null, ex);
         }

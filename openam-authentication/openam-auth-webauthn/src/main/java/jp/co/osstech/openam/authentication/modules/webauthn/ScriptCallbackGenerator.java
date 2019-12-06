@@ -23,7 +23,7 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
 /**
- * The class generate ScriptCallback for WebAuthn API. 
+ * The class generate ScriptCallback for WebAuthn API.
  */
 public class ScriptCallbackGenerator {
 
@@ -53,10 +53,10 @@ public class ScriptCallbackGenerator {
             String userVerificationConfig,
             String timeoutConfig,
             byte[] challengeBytesArray) {
-        
+
         String _userHandleIdBytesArrayStr = convBytesArrayToStr(userHandleIdBytesArray);
         String _challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
-        
+
         final StringBuilder _credentialCreateScript = new StringBuilder();
 
         // function (webauthn) start
@@ -107,7 +107,7 @@ public class ScriptCallbackGenerator {
         _credentialCreateScript.append("attestation: \'");
         _credentialCreateScript.append(attestationConfig);
         _credentialCreateScript.append("\', ");
-        
+
         // Authenticator Selection
         _credentialCreateScript.append("authenticatorSelection: { ");
         if (!attachmentConfig.equalsIgnoreCase("undefined")) {
@@ -142,7 +142,7 @@ public class ScriptCallbackGenerator {
         _credentialCreateScript.append("});");
         return new ScriptTextOutputCallback(_credentialCreateScript.toString());
     }
-    
+
     /**
      * This function provide ScriptCallback for WebAuthn credentials.get().
      * 
@@ -159,22 +159,22 @@ public class ScriptCallbackGenerator {
             String userVerificationConfig,
             String timeoutConfig,
             byte[] challengeBytesArray) {
-        
+
         String _challengeBytesArrayStr = convBytesArrayToStr(challengeBytesArray);
-        
+
         final StringBuilder _credentialGetScript = new StringBuilder();
 
         _credentialGetScript.append("require([\'jp/co/osstech/openam/server/util/webauthn\',");
         _credentialGetScript.append("\'org/forgerock/commons/ui/common/main/Configuration\'], ");
         _credentialGetScript.append("function (webauthn, Configuration) { ");
-        
+
         if (residentKeyConfig.equalsIgnoreCase("true")) {
             _credentialGetScript.append("Configuration.globalData.auth.forceRoutingOnFailure = true;");
         }
-        
+
         _credentialGetScript.append("webauthn.getCredential(  { ");
         _credentialGetScript.append("publicKey: {");
-        
+
         if (residentKeyConfig.equalsIgnoreCase("false")) {
             // AllowCredentials
             _credentialGetScript.append("allowCredentials: [ ");
@@ -223,7 +223,7 @@ public class ScriptCallbackGenerator {
         _credentialGetScript.append("});");
         return new ScriptTextOutputCallback(_credentialGetScript.toString());
     }
-    
+
     /**
      * Get hex string from byte array.
      *

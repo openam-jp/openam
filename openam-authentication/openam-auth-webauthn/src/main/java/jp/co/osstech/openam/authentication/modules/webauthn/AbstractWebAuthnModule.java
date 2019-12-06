@@ -49,7 +49,7 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWeb
  * Abstract Class for WebAuthnRegister / WebAuthnAuthenticate
  */
 public abstract class AbstractWebAuthnModule extends AMLoginModule {
-    
+
     // Common Configuration Strings
     protected static final String RP_NAME = "iplanet-am-auth-Webauthn-rp";
     protected static final String ORIGIN = "iplanet-am-auth-Webauthn-origin";
@@ -58,10 +58,10 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     protected static final String TIMEOUT = "iplanet-am-auth-Webauthn-timeout";
     protected static final String DISPLAY_NAME_ATTRIBUTE_NAME = "iplanet-am-auth-Webauthn-displayNameAttributeName";
     protected static final String AUTH_LEVEL = "iplanet-am-auth-Webauthn-auth-level";
-    
+
     // Default Values.
     private static final int DEFAULT_AUTH_LEVEL = 0;
-    
+
     // Common Configuration Parameters
     protected String rpNameConfig = "";
     protected String originConfig = "";
@@ -69,7 +69,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     protected String userVerificationConfig = "";
     protected String timeoutConfig = "";
     protected String displayNameAttributeNameConfig = "";
-    
+
     // Common
     protected ResourceBundle bundle;
     protected String userName;
@@ -78,7 +78,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     // user's valid ID and principal
     protected String validatedUserID;
     protected WebAuthnPrincipal userPrincipal;
-    
+
     // WebAuthn
     protected final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory =
             InjectorHolder.getInstance(Key.get(
@@ -90,7 +90,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         Debug debug = getDebugInstance();
-        
+
         java.util.Locale locale = getLoginLocale();
         bundle = amCache.getResBundle(getBundleName(), locale);
         if (debug.messageEnabled()) {
@@ -103,7 +103,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         this.userVerificationConfig = CollectionHelper.getMapAttr(options, USER_VERIFICATION);
         this.timeoutConfig = CollectionHelper.getMapAttr(options, TIMEOUT);
         this.displayNameAttributeNameConfig = CollectionHelper.getMapAttr(options, DISPLAY_NAME_ATTRIBUTE_NAME);
-        
+
         this.authLevel = CollectionHelper.getIntMapAttr(options, AUTH_LEVEL, DEFAULT_AUTH_LEVEL, debug);
 
     }
@@ -119,7 +119,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
             return null;
         }
     }
-    
+
     @Override
     public void destroyModuleState() {
         validatedUserID = null;
@@ -131,16 +131,16 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         bundle = null;
         userName = null;
     }
-    
+
     /**
      * Get user identity object.
      * 
      * @return user identity object.
-     * @throws AuthLoginException 
+     * @throws AuthLoginException
      */
     protected AMIdentity getIdentity() throws AuthLoginException {
         Debug debug = getDebugInstance();
-        
+
         AMIdentityRepository _amIdRepo = getAMIdentityRepository(getRequestOrg());
 
         IdSearchControl _idsc = new IdSearchControl();
@@ -194,10 +194,10 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
 
         if (CollectionUtils.isNotEmpty(_attributes)) {
             _attribute = _attributes.iterator().next();
-        } 
+        }
         return _attribute;
     }
-    
+
     /**
      * Lookup Byte data from user data store.
      * 
@@ -222,7 +222,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
     }
 
     /**
-     * Convert byte array to ASCII String. This method is used to convert 
+     * Convert byte array to ASCII String. This method is used to convert
      * entryUUID for search user(userHandle=entryUUID).
      * 
      * @param bytes The byte array.
@@ -250,7 +250,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         }
         return new WebAuthnValidatorConfig(originConfig, verificationRequired);
     }
-    
+
     /**
      * Get debug instance.
      * @return The debug instance.

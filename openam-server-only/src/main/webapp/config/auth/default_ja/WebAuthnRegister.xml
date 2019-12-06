@@ -24,7 +24,7 @@
 
     <Callbacks length="0" order="1" timeout="300" header="認証デバイスの登録">
     </Callbacks>
-    
+
     <Callbacks length="3" order="2" timeout="120" header="認証デバイスを操作してください">
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
         <HiddenValueCallback>
@@ -41,7 +41,7 @@
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    
+
     <Callbacks length="2" order="3" timeout="120" header="認証デバイスが登録されました識別名を入力してください（任意）">
         <NameCallback>
             <Prompt>鍵の識別名:</Prompt>

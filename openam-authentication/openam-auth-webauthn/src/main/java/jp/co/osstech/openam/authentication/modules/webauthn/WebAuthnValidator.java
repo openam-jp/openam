@@ -24,7 +24,7 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
  * Interface for WebAuthn Validation.
  */
 public interface WebAuthnValidator {
-    
+
     /**
      * Generate challenge byte.
      * @return The challenge byte.

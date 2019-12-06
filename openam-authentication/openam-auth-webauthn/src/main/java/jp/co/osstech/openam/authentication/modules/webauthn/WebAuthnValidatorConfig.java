@@ -23,11 +23,11 @@ public class WebAuthnValidatorConfig {
 
     private String origin = null;
     private boolean verificationRequired = false;
-    
+
     /**
      * Base constructor.
      * @param origin The origin.
-     * @param verificationRequired 
+     * @param verificationRequired
      */
     public WebAuthnValidatorConfig(String origin, boolean verificationRequired) {
         this.origin = origin;
@@ -48,5 +48,5 @@ public class WebAuthnValidatorConfig {
      */
     public boolean isVerificationRequired() {
         return verificationRequired;
-    }    
+    }
 }

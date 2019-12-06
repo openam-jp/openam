@@ -58,14 +58,14 @@ import org.forgerock.json.resource.NotFoundException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import org.forgerock.openam.rest.RealmAwareResource;
 import static org.forgerock.util.promise.Promises.newResultPromise;
-        
+
 public class WebAuthnDevicesResource extends RealmAwareResource {
-    
+
     private final AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory;
     private final Debug debug;
     private static final int NO_LIMIT = 0;
     private static final String ENTRYUUID = "entryUUID";
-    
+
     /**
      * Constructor that sets up the data accessing object, context helpers and the factory from which to produce
      * services appropriate to each realm.
@@ -103,13 +103,13 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
         String realm = getRealm(cntxt);
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         try {
-            AMIdentity userIdentity = getIdentity(userName, realm);          
+            AMIdentity userIdentity = getIdentity(userName, realm);
             Set<String> attrSet = (Set<String>) userIdentity.getAttribute(ENTRYUUID);
             String entryUUID = attrSet.iterator().next();
-                  
+
             AuthenticatorWebAuthnService realmWebAuthnService = webauthnServiceFactory.create(realm);
             Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
-            
+
             boolean found = false;
             boolean delResult;
             for (WebAuthnAuthenticator authenticator : authenticators) {
@@ -150,16 +150,16 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
         final Subject subject = getContextSubject(cntxt);
         String userName = subject.getPrincipals().iterator().next().getName();
         String realm = getRealm(cntxt);
-        
+
         try {
             AuthenticatorWebAuthnService realmWebAuthnService = webauthnServiceFactory.create(realm);
             AMIdentity userIdentity = getIdentity(userName, realm);
-            
+
             Set<String> attrSet = (Set<String>) userIdentity.getAttribute(ENTRYUUID);
             String entryUUID = attrSet.iterator().next();
-            
+
             Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
-            
+
             for (WebAuthnAuthenticator authenticator : authenticators) {
 
                 String CredentialID = authenticator.getCredentialID();
@@ -171,11 +171,11 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
                 map.put("deviceName", CredentialName);
                 map.put("type", "fido2");
                 map.put("createdDate", CreatedDate.getTime());
-                
+
                 qrh.handleResource(newResourceResponse(CredentialID, "0",
                         new JsonValue(map)));
             }
-            
+
         }
         catch (SMSException ex) {
             debug.error("WebAuthnDevicesResource :: Query - Unable to communicate with the SMS.", ex);
@@ -201,7 +201,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
     public Promise<ResourceResponse, ResourceException> updateInstance(Context cntxt, String string, UpdateRequest ur) {
         return new NotSupportedException("Not supported.").asPromise();
     }
-    
+
      /**
      * Gets the {@code AMIdentity} for the authenticated user.
      *
@@ -239,5 +239,5 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
 
         return amIdentity;
     }
-    
+
 }

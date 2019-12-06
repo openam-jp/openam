@@ -24,22 +24,22 @@ import org.forgerock.util.encode.Base64url;
  * The WebAuthn Authenticator class.
  */
 public class WebAuthnAuthenticator {
-    
+
     public static String TIMESTAMP_ATTR_NAME = "createTimestamp";
-    
+
     private String credentialID = null;
     private byte[] publicKey = null;
     private Long signCount = null;
     private byte[] userID = null;
     private String credentialName = null;
     private Date createTimestamp = null;
-    
+
     /**
      * Default constructor.
      */
     public WebAuthnAuthenticator() {
     }
-    
+
     /**
      * Basic constructor for WebAuthnAuthenticator.
      * 
@@ -52,7 +52,7 @@ public class WebAuthnAuthenticator {
             byte[] userID) {
         this(credentialID, publicKey, signCount, userID, "Default Credential");
     }
-    
+
     /**
      * Basic constructor for WebAuthnAuthenticator.
      * 
@@ -80,7 +80,7 @@ public class WebAuthnAuthenticator {
     public String getCredentialID() {
         return credentialID;
     }
-    
+
     /**
      * Get hex string of the Credential ID.
      * 
@@ -152,7 +152,7 @@ public class WebAuthnAuthenticator {
     public void setUserID(byte[] userID) {
         this.userID = userID;
     }
-    
+
     /**
      * Get the credential display name.
      * 
@@ -161,7 +161,7 @@ public class WebAuthnAuthenticator {
     public String getCredentialName() {
         return credentialName;
     }
-    
+
     /**
      * Set the credential display name.
      * 
@@ -198,7 +198,7 @@ public class WebAuthnAuthenticator {
     public boolean isSelected(String credentialID) {
         return this.credentialID.equals(credentialID);
     }
-    
+
     /**
      * Get the userID as a string.
      * 
@@ -212,7 +212,7 @@ public class WebAuthnAuthenticator {
         }
         return _sb.toString();
     }
-    
+
     /**
      * Get hex string from byte array.
      * 

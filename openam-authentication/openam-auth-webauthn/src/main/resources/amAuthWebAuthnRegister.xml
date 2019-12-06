@@ -33,28 +33,28 @@
 
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-rp"
-                    type="single"   
-                    syntax="string"    
+                    type="single"
+                    syntax="string"
                     i18nKey="a616"
                     order="100"
                     resourceName="rp">
                     <DefaultValues>
-                        <Value>OpenAM RP </Value> 
+                        <Value>OpenAM RP </Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-origin"
-                    type="single"   
-                    syntax="string"    
+                    type="single"
+                    syntax="string"
                     i18nKey="a617"
                     order="101"
                     resourceName="origin">
                     <DefaultValues>
-                        <Value>https://@SERVER_HOST@:443</Value> 
+                        <Value>https://@SERVER_HOST@:443</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-attestation"
-                    type="single_choice"   
-                    syntax="string"    
+                    type="single_choice"
+                    syntax="string"
                     i18nKey="a618"
                     order="200"
                     resourceName="attestation">
@@ -64,12 +64,12 @@
                         <ChoiceValue i18nKey="indirect">indirect</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>none</Value> 
+                        <Value>none</Value>
                     </DefaultValues>
-                </AttributeSchema>             
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-attachment"
-                    type="single_choice"   
-                    syntax="string"    
+                    type="single_choice"
+                    syntax="string"
                     i18nKey="a619"
                     order="300"
                     resourceName="attachment">
@@ -79,12 +79,12 @@
                         <ChoiceValue i18nKey="undefined">undefined</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>undefined</Value> 
+                        <Value>undefined</Value>
                     </DefaultValues>
-                </AttributeSchema>             
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-residentKey"
-                    type="single_choice"   
-                    syntax="string"    
+                    type="single_choice"
+                    syntax="string"
                     i18nKey="a620"
                     order="400"
                     resourceName="residentKey">
@@ -93,12 +93,12 @@
                         <ChoiceValue i18nKey="true">true</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>false</Value> 
+                        <Value>false</Value>
                     </DefaultValues>
-                </AttributeSchema>             
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-userVerification"
-                    type="single_choice"   
-                    syntax="string"    
+                    type="single_choice"
+                    syntax="string"
                     i18nKey="a621"
                     order="401"
                     resourceName="userVerification">
@@ -108,37 +108,37 @@
                         <ChoiceValue i18nKey="discouraged">discouraged</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>preferred</Value> 
+                        <Value>preferred</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-timeout"
-                    type="single"   
-                    syntax="string"    
+                    type="single"
+                    syntax="string"
                     i18nKey="a622"
                     order="402"
                     resourceName="timeout">
                     <DefaultValues>
-                        <Value>60000</Value> 
+                        <Value>60000</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-displayNameAttributeName"
-                    type="single"   
-                    syntax="string"    
+                    type="single"
+                    syntax="string"
                     i18nKey="a650"
                     order="800"
                     resourceName="displayNameAttributeName">
                     <DefaultValues>
-                        <Value>cn</Value> 
+                        <Value>cn</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-registationMaxNumber"
-                    type="single"   
+                    type="single"
                     syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                     i18nKey="a623"
                     order="900"
                     resourceName="registationMaxNumber">
                     <DefaultValues>
-                        <Value>3</Value> 
+                        <Value>3</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"
@@ -150,31 +150,31 @@
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
-                </AttributeSchema>     
-                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT"> 
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-Webauthn-rp"
-                        type="single"   
-                        syntax="string"    
+                        type="single"
+                        syntax="string"
                         i18nKey="a616"
                         order="100"
                         resourceName="rp">
                         <DefaultValues>
-                            <Value>Default RP </Value> 
+                            <Value>Default RP </Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-origin"
-                        type="single"   
-                        syntax="string"    
+                        type="single"
+                        syntax="string"
                         i18nKey="a617"
                         order="101"
                         resourceName="origin">
                         <DefaultValues>
-                            <Value>https://@SERVER_HOST@:443</Value> 
+                            <Value>https://@SERVER_HOST@:443</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-attestation"
-                        type="single_choice"   
-                        syntax="string"    
+                        type="single_choice"
+                        syntax="string"
                         i18nKey="a618"
                         order="200"
                         resourceName="attestation">
@@ -184,12 +184,12 @@
                             <ChoiceValue i18nKey="indirect">indirect</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>none</Value> 
+                            <Value>none</Value>
                         </DefaultValues>
-                    </AttributeSchema>             
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-attachment"
-                        type="single_choice"   
-                        syntax="string"    
+                        type="single_choice"
+                        syntax="string"
                         i18nKey="a619"
                         order="300"
                         resourceName="attachment">
@@ -199,12 +199,12 @@
                             <ChoiceValue i18nKey="undefined">undefined</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>undefined</Value> 
+                            <Value>undefined</Value>
                         </DefaultValues>
-                    </AttributeSchema>             
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-residentKey"
-                        type="single_choice"   
-                        syntax="string"    
+                        type="single_choice"
+                        syntax="string"
                         i18nKey="a620"
                         order="400"
                         resourceName="residentKey">
@@ -213,12 +213,12 @@
                             <ChoiceValue i18nKey="true">true</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value> 
+                            <Value>false</Value>
                         </DefaultValues>
-                    </AttributeSchema>             
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-userVerification"
-                        type="single_choice"   
-                        syntax="string"    
+                        type="single_choice"
+                        syntax="string"
                         i18nKey="a621"
                         order="401"
                         resourceName="userVerification">
@@ -228,37 +228,37 @@
                             <ChoiceValue i18nKey="discouraged">discouraged</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>preferred</Value> 
+                            <Value>preferred</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-timeout"
-                        type="single"   
-                        syntax="string"    
+                        type="single"
+                        syntax="string"
                         i18nKey="a622"
                         order="402"
                         resourceName="timeout">
                         <DefaultValues>
-                            <Value>60000</Value> 
+                            <Value>60000</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-displayNameAttributeName"
-                        type="single"   
-                        syntax="string"    
+                        type="single"
+                        syntax="string"
                         i18nKey="a650"
                         order="800"
                         resourceName="displayNameAttributeName">
                         <DefaultValues>
-                            <Value>cn</Value> 
+                            <Value>cn</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-registationMaxNumber"
-                        type="single"   
+                        type="single"
                         syntax="number_range" rangeStart="1" rangeEnd="2147483647"
                         i18nKey="a623"
                         order="900"
                         resourceName="registationMaxNumber">
                         <DefaultValues>
-                            <Value>3</Value> 
+                            <Value>3</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-Webauthn-auth-level"
@@ -270,8 +270,8 @@
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
-                    </AttributeSchema>   
-                </SubSchema>         
+                    </AttributeSchema>
+                </SubSchema>
             </Organization>
         </Schema>
     </Service>
