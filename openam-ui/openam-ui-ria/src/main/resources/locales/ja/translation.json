@@ -571,6 +571,21 @@
                 "deviceName": "デバイス名",
                 "copyRecoveryCodes": "安全な場所にこれらのコードのコピーを保管してください。デバイスを紛失した場合 OpenAM に認証するためにあなたのリカバリーコードのいずれかを使用する必要があります。"
             }
+        },
+        "fido2AuthDevices": {
+            "header": "FIDO2(WebAuthn) 認証デバイス",
+            "noneFound": "デバイスが登録されていません。",
+            "menu": {
+                "delete": "削除"
+            },
+            "devicesSettingDialog": {
+                "title": "デバイス設定",
+                "description": "すべてのデバイスに対するグローバル設定を設定します。"
+            },
+            "deviceDetailsDialog": {
+                "deviceName": "デバイス名",
+                "createdDate": "登録日時"
+            }
         }
     },
     "uma": {

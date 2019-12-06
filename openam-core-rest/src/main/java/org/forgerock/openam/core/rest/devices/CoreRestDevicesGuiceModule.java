@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest.devices;
@@ -40,6 +41,8 @@ import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathSer
 import org.forgerock.openam.core.rest.devices.services.oath.AuthenticatorOathServiceFactory;
 import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushService;
 import org.forgerock.openam.core.rest.devices.services.push.AuthenticatorPushServiceFactory;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnService;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.AuthenticatorWebAuthnServiceFactory;
 
 /**
  * Guice module for binding the device REST endpoints.
@@ -95,6 +98,13 @@ public class CoreRestDevicesGuiceModule extends AbstractModule {
     }
 
     @Provides
+    @Named(AuthenticatorWebAuthnService.SERVICE_NAME)
+    ServiceConfigManager getAuthenticatorWebAuthnServiceManager() throws SMSException, SSOException {
+        return new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                AuthenticatorWebAuthnService.SERVICE_NAME, AuthenticatorWebAuthnService.SERVICE_VERSION);
+    }
+
+    @Provides
     @Named(AuthenticatorOathServiceFactory.FACTORY_NAME)
     @Inject
     @Singleton
@@ -123,4 +133,16 @@ public class CoreRestDevicesGuiceModule extends AbstractModule {
             @Named("frRest") Debug debug) {
         return new AuthenticatorDeviceServiceFactory<>(debug, null, new TrustedDeviceServiceFactory());
     }
+
+    @Provides
+    @Named(AuthenticatorWebAuthnServiceFactory.FACTORY_NAME)
+    @Inject
+    @Singleton
+    AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> getAuthenticatorWebAuthnServiceFactory(
+            @Named("frRest") Debug debug,
+            @Named(AuthenticatorWebAuthnService.SERVICE_NAME) ServiceConfigManager serviceConfigManager) {
+        return new AuthenticatorDeviceServiceFactory<>(debug, serviceConfigManager,
+                new AuthenticatorWebAuthnServiceFactory());
+    }
+
 }

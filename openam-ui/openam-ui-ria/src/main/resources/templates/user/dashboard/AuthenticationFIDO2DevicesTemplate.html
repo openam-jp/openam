@@ -1,0 +1,37 @@
+<div class="panel panel-default">
+    <div class="panel-heading fr-panel-heading-with-button" role="tab" id="fido2DeviceManagementCollapseHeading">
+        <h4 class="panel-title collapse-title">
+            <a data-toggle="collapse" href="#fido2DeviceManagementCollapse" aria-expanded="true" aria-controls="fido2DeviceManagementCollapseHeading" class="">{{t "openam.fido2AuthDevices.header"}}</a>
+        </h4>
+    </div>
+    <div id="fido2DeviceManagementCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="fido2DeviceManagementCollapse" aria-expanded="true">
+        <div class="panel-body">
+            {{#if devices}}
+                {{#each devices}}
+                    <div class="col-sm-6 col-md-3">
+                        <div class="panel-default panel am-panel-card am-device-card" data-device-uuid="{{uuid}}" data-device-type="{{type}}">
+                            <div class="btn-group card-menu" role="group">
+                                <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-v fa-lg"></i>
+                                </button>
+                                <ul class="dropdown-menu pull-left" role="menu">
+                                    <li><a data-delete href="#" role="button" aria-haspopup="true"><i class="fa fa-times"></i> {{ t "common.form.delete" }}</a></li>
+                                </ul>
+                            </div>
+                            <a data-details href="#">
+                                <div class="card-body card-body-with-menu">
+                                    <div class="card-icon-circle bg-primary">
+                                        <i class="fa fa-{{icon}}"></i>
+                                    </div>
+                                    <h3 class="card-name text-primary">{{deviceName}}</h3>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                {{t "openam.authDevices.noneFound"}}
+            {{/if}}
+        </div>
+    </div>
+</div>
