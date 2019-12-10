@@ -62,6 +62,10 @@ This project is licensed under the Common Development and Distribution License (
 * ForgeRock.
 * The good things in life.
 
+## Languages
+
+* [日本語](README_ja.md)
+
 [mail_openam_dev]: mailto:openam-dev@OpenAM.jp
 [github_issues]: https://github.com/openam-jp/openam/issues
 [github_wiki]: https://github.com/openam-jp/openam/wiki

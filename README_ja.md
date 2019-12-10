@@ -61,6 +61,10 @@ OpenAM のビルドプロセスと依存関係は、Maven で管理されてい�
 * ForgeRock.
 * The good things in life.
 
+## 他言語版
+
+* [English](README.md)
+
 [mail_openam_dev]: mailto:openam-dev@OpenAM.jp
 [github_issues]: https://github.com/openam-jp/openam/issues
 [github_wiki]: https://github.com/openam-jp/openam/wiki
