@@ -27,7 +27,9 @@ The OpenAM build process and dependencies are managed by Maven.
 
 At this time, OpenAM and related products are not registered in the Maven repository, so it is necessary to build all projects until the Maven local repository is ready.
 
-Please, check out the following projects and run `mvn install` in order.
+Please, check out the following projects and run `mvn clean install` in order.
+
+In addition, don't forget to execute the commands as a non-root user.
 
 * [forgerock-parent](https://github.com/openam-jp/forgerock-parent)
 * [forgerock-bom](https://github.com/openam-jp/forgerock-bom)
@@ -50,7 +52,7 @@ Finally, Maven builds the binary in `openam/openam-server/target`. The file name
 This project welcomes your contributions.
 
 If you find a bug or have an improvement idea, please open an [issue][github_issues] as the first step.
-However, if it contains security problems, please contact [us][mail_openam_dev] without opening an issue.
+However, if it contains security problems, please [email us][mail_openam_dev] without opening an issue.
 
 ## License
 

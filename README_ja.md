@@ -26,7 +26,9 @@ OpenAM のビルドプロセスと依存関係は、Maven で管理されてい�
 
 現時点では、OpenAMおよび関連製品はMavenリポジトリに登録されていないため、Maven ローカルリポジトリができるまではすべてのプロジェクトをビルドする必要があります。
 
-以下のプロジェクトをチェックアウトし、`mvn install` を順番に実行してください。
+以下のプロジェクトをチェックアウトし、`mvn clean install` を順番に実行してください。
+
+なお、コマンドは 非 root ユーザーで実行してください。
 
 * [forgerock-parent](https://github.com/openam-jp/forgerock-parent)
 * [forgerock-bom](https://github.com/openam-jp/forgerock-bom)
@@ -49,7 +51,7 @@ OpenAM のビルドプロセスと依存関係は、Maven で管理されてい�
 このプロジェクトはあなたのコントリビューションを歓迎します。
 
 バグを見つけたり、改善のアイデアをお持ちの場合は、最初のステップとして [Issue][github_issues] をオープンしてください。
-ただし、セキュリティ上の問題が含まれている場合は、[Issue][github_issues] をオープンせずに[ご連絡ください][mail_openam_dev]。
+ただし、セキュリティ上の問題が含まれている場合は、Issue をオープンせずに[メールでご連絡ください][mail_openam_dev]。
 
 ## ライセンス
 
