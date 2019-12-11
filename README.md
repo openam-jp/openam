@@ -11,6 +11,8 @@ This project provides documentation on [GitHub wiki pages][github_wiki].
 
 You can obtain the OpenAM WAR file from [GitHub releases pages][github_releases].
 
+Please read the [license](#License) before using them.
+
 ## Build from Source Code
 
 ### Prerequisites
@@ -57,6 +59,9 @@ However, if it contains security problems, please [email us][mail_openam_dev] wi
 ## License
 
 This project is licensed under the Common Development and Distribution License (CDDL).
+
+The binaries provided by this project are also based on CDDL.
+Although it does not restrict commercial use, all risks concerning the quality and performance of the target software are in the user as described in `5. DISCLAIMER OF WARRANTY` of the license terms.
 
 ## Acknowledgments
 
