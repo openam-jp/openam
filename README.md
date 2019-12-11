@@ -27,7 +27,7 @@ The OpenAM build process and dependencies are managed by Maven.
 
 At this time, OpenAM and related products are not registered in the Maven repository, so it is necessary to build all projects until the Maven local repository is ready.
 
-Please, check out the following projects and run `mvn clean install` in order.
+Please, clone the following projects and run `mvn clean install` in order.
 
 In addition, don't forget to execute the commands as a non-root user.
 
