@@ -1046,31 +1046,31 @@
                 "noItems": "アイテムがありません...",
 
                 "weekdays": {
-                    "Monday": {
+                    "mon": {
                         "short": "月",
                         "full": "月曜日"
                     },
-                    "Tuesday": {
+                    "tue": {
                         "short": "火",
                         "full": "火曜日"
                     },
-                    "Wednesday": {
+                    "wed": {
                         "short": "水",
                         "full": "水曜日"
                     },
-                    "Thursday": {
+                    "thu": {
                         "short": "木",
                         "full": "木曜日"
                     },
-                    "Friday": {
+                    "fri": {
                         "short": "金",
                         "full": "金曜日"
                     },
-                    "Saturday": {
+                    "sat": {
                         "short": "土",
                         "full": "土曜日"
                     },
-                    "Sunday": {
+                    "sun": {
                         "short": "日",
                         "full": "日曜日"
                     }

@@ -1046,31 +1046,31 @@
                 "noItems": "There are no items ...",
 
                 "weekdays": {
-                    "Monday": {
+                    "mon": {
                         "short": "mon",
                         "full": "Monday"
                     },
-                    "Tuesday": {
+                    "tue": {
                         "short": "tue",
                         "full": "Tuesday"
                     },
-                    "Wednesday": {
+                    "wed": {
                         "short": "wed",
                         "full": "Wednesday"
                     },
-                    "Thursday": {
+                    "thu": {
                         "short": "thu",
                         "full": "Thursday"
                     },
-                    "Friday": {
+                    "fri": {
                         "short": "fri",
                         "full": "Friday"
                     },
-                    "Saturday": {
+                    "sat": {
                         "short": "sat",
                         "full": "Saturday"
                     },
-                    "Sunday": {
+                    "sun": {
                         "short": "sun",
                         "full": "Sunday"
                     }
