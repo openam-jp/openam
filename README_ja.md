@@ -57,9 +57,11 @@ OpenAM のビルドプロセスと依存関係は、Maven で管理されてい�
 
 ## ライセンス
 
-このプロジェクトは、Common Development and Distribution License（CDDL）でライセンスされています。
+このプロジェクトは、[Common Development and Distribution License（CDDL）](LICENSE.md)が適用されます。
 
-このプロジェクトのバイナリーについては、CDDL ライセンス条項の `5. DISCLAIMER OF WARRANTY （保証の免責）` が適用されます。
+利用する前に、CDDL ライセンスの全ての条項を確認ください。
+
+特に下記の「5. DISCLAIMER OF WARRANTY（保証の免責）」にご留意ください。
 
 ```
 5. DISCLAIMER OF WARRANTY（保証の免責）
@@ -69,6 +71,8 @@ OpenAM のビルドプロセスと依存関係は、Maven で管理されてい�
 対象ソフトウェアの品質および性能に関するリスクはすべて使用者が負うものと
 します。
 ```
+
+[Open Source Group Japan 日本語参考訳からの引用](https://osdn.net/projects/opensource/wiki/licenses%2FCommon_Development_and_Distribution_License)
 
 ## 謝辞
 

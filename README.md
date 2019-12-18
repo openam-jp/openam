@@ -58,9 +58,11 @@ However, if it contains security problems, please [email us][mail_openam_dev] wi
 
 ## License
 
-This project is licensed under the Common Development and Distribution License (CDDL).
+This project is subject to [the Common Development and Distribution License (CDDL)](LICENSE.md).
 
-The binaries provided by this project are subject to the CDDL license terms `5. DISCLAIMER OF WARRANTY`.
+Please check all the terms of the CDDL license before using it.
+
+Pay particular attention to the following `5. DISCLAIMER OF WARRANTY`.
 
 ```
 5. DISCLAIMER OF WARRANTY.
