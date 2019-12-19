@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define([
@@ -117,6 +118,9 @@ define([
                         if (key === "type") {
                             itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
                                 self.i18n.condition.title);
+                        } else if (type === "SimpleTime" && (key === "startDay" || key === "endDay")) {
+                            itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] =
+                                $.t(`console.authorization.common.weekdays.${val}.short`);
                         } else {
                             itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = val;
                         }
