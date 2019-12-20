@@ -59,7 +59,7 @@ If you would like to deploy OpenAM under OpenJDK11 environment, please do additi
 
     After running the command, Maven builds the binary in `jdk8-compat/target`. The file name format is `jdk8-compat-<version>.jar`.
 
-3. Place OpenAM and `jdk8-compat` binary to following directory.
+3. Place `OpenAM` and `jdk8-compat` binary to following directory.
 
        ./OpenAM-<version>.war
        ./WEB-INF/lib/jdk8-compat-<version>.jar
