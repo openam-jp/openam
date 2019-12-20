@@ -49,6 +49,30 @@ In addition, don't forget to execute the commands as a non-root user.
 
 Finally, Maven builds the binary in `openam/openam-server/target`. The file name format is `OpenAM-<version>.war`.
 
+### Additional steps to run in OpenJDK11 environment
+
+If you would like to deploy OpenAM under OpenJDK11 environment, please do additional procedure. 
+
+1. Complete Build seciton and get `OpenAM-<version>-SNAPSHOT.war`
+2. Please clone the following project and run `mvn clean install`. 
+* [jdk8-compat](https://github.com/openam-jp/jdk8-compat)
+
+    After running the command, Maven builds the binary in `jdk8-compat/target`. The file name format is `jdk8-compat-<version>.jar`.
+
+3. Place OpenAM and jdk8-compat binary to following directory.
+
+       ./OpenAM-<version>-SNAPSHOT.war
+       ./WEB-INF/lib### Build for OpenJDK11
+       ### Build for OpenJDK11
+       /jdk8-compat-<version>.jar
+
+
+4. Add `jdk8-compat-<version>.jar` to `OpenAM-<version>-SNAPSHOT.war`
+
+       jar uf OpenAM-<version>-SNAPSHOT.war WEB-INF/lib/jdk8-compat-<version>.jar
+
+5. The procedure for supporting OpenJDK11 environment is complete.
+
 ## Contributing
 
 This project welcomes your contributions.
