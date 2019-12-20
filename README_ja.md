@@ -61,7 +61,7 @@ OpenJDK11 環境で OpenAM を使用する場合は、追加の手順を実施�
 
    コマンドの実行後、`jdk8-compat/target` にバイナリが作成されます。ファイル名の形式は、`jdk8-compat-<バージョン>.jar` です。
 
-3. 以下のフォルダ構成になるようにOpenAMと`jdk8-compat`のバイナリファイルを配置します。
+3. 以下のフォルダ構成になるように`OpenAM`と`jdk8-compat`のバイナリファイルを配置します。
 
        ./OpenAM-<バージョン>.war
        ./WEB-INF/lib/jdk8-compat-<バージョン>.jar
