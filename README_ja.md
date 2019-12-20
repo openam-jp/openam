@@ -55,9 +55,7 @@ OpenJDK11 環境で OpenAM を使用する場合は、追加の手順を実施�
 
 1. OpenAMのビルドを完了し、`OpenAM-<バージョン>.war` を取得します。
 2. 以下のプロジェクトをクローンし、`mvn clean install` を実行してください。 
-
-<li><a href="https://github.com/openam-jp/jdk8-
-   ">jdk8-compat</a></li>
+* [jdk8-compat](https://github.com/openam-jp/jdk8-compat)
 
    コマンドの実行後、`jdk8-compat/target` にバイナリが作成されます。ファイル名の形式は、`jdk8-compat-<バージョン>.jar` です。
 
