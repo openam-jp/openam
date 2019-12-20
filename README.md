@@ -62,9 +62,7 @@ If you would like to deploy OpenAM under OpenJDK11 environment, please do additi
 3. Place OpenAM and jdk8-compat binary to following directory.
 
        ./OpenAM-<version>-SNAPSHOT.war
-       ./WEB-INF/lib### Build for OpenJDK11
-       ### Build for OpenJDK11
-       /jdk8-compat-<version>.jar
+       ./WEB-INF/lib/jdk8-compat-<version>.jar
 
 
 4. Add `jdk8-compat-<version>.jar` to `OpenAM-<version>-SNAPSHOT.war`
