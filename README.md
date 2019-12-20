@@ -67,7 +67,7 @@ If you would like to deploy OpenAM under OpenJDK11 environment, please do additi
 
 4. Add `jdk8-compat-<version>.jar` to `OpenAM-<version>.war`
 
-       jar uf OpenAM-<version>-SNAPSHOT.war WEB-INF/lib/jdk8-compat-<version>.jar
+       jar uf OpenAM-<version>.war WEB-INF/lib/jdk8-compat-<version>.jar
 
 5. The procedure for supporting OpenJDK11 environment is complete.
 
