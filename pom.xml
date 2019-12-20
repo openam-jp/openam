@@ -381,9 +381,6 @@
 
         <module>openam-external-libs</module>
 
-        <!-- add jdk11 -->
-        <module>openam-internal</module>
-
     </modules>
 
     <!-- Maven Repositories -->

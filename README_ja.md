@@ -48,6 +48,30 @@ OpenAM のビルドプロセスと依存関係は、Maven で管理されてい�
 
 最後に、`openam/openam-server/target` にバイナリが作成されます。ファイル名の形式は `OpenAM-<バージョン>.war` です。
 
+
+### OpenJDK11 環境で動作させるための追加手順
+
+OpenJDK11 環境で OpenAM を使用する場合は、追加の手順を実施して下さい。
+
+1. OpenAMのビルドを完了し、`OpenAM-<バージョン>.war` を取得します。
+2. 以下のプロジェクトをクローンし、`mvn clean install` を実行してください。 
+* [jdk8-compat](https://github.com/openam-jp/jdk8-compat)
+
+   コマンドの実行後、`jdk8-compat/target` にバイナリが作成されます。ファイル名の形式は、`jdk8-compat-<バージョン>.jar` です。
+
+3. 以下のフォルダ構成になるように`OpenAM-<バージョン>.war`と`jdk8-compat-<バージョン>.jar`のバイナリファイルを配置します。
+
+       ./OpenAM-<バージョン>.war
+       ./WEB-INF/lib/jdk8-compat-<バージョン>.jar
+
+
+4. `OpenAM-<バージョン>.war` に `jdk8-compat-<バージョン>.jar` を追加します。
+
+       jar uf OpenAM-<バージョン>.war WEB-INF/lib/jdk8-compat-<バージョン>.jar
+
+5. 以上で OpenJDK11 環境への対応は完了となります。
+
+
 ## コントリビューション
 
 このプロジェクトはあなたのコントリビューションを歓迎します。
