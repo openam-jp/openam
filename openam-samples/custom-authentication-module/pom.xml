@@ -30,11 +30,11 @@
 
     <groupId>jp.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
-    <version>14.0.0-SNAPSHOT</version>
+    <version>14.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
-        <openam.version>14.0.0-SNAPSHOT</openam.version>
+        <openam.version>14.0.0</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
