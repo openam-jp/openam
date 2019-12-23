@@ -390,8 +390,8 @@
         <connection>scm:git:https://github.com/openam-jp/openam.git</connection>
         <developerConnection>scm:git:git@github.com:openam-jp/openam.git</developerConnection>
         <url>https://github.com/openam-jp/openam</url>
-      <tag>14.0.0</tag>
-  </scm>
+        <tag>14.0.0</tag>
+    </scm>
 
     <!-- Dependency Management -->
     <dependencyManagement>
