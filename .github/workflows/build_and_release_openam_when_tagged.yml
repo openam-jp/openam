@@ -1,0 +1,132 @@
+name: Build and release OpenAM when tagged
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    strategy:
+      matrix:
+        java: [ '8' ]
+
+    env:
+      GIT_ORIGIN:           https://github.com/openam-jp
+      GIT_BRANCH:           master
+      ARTIFACT_DIR:         /tmp/target
+      REPO_NAMES: |
+                            forgerock-parent
+                            forgerock-bom
+                            forgerock-build-tools
+                            forgerock-i18n-framework
+                            forgerock-guice
+                            forgerock-guava
+                            forgerock-ui
+                            forgerock-commons
+                            forgerock-persistit
+                            forgerock-bloomfilter
+                            opendj-sdk
+                            opendj
+                            openam
+
+    steps:
+
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+        architecture: x64
+    
+    - name: Clone source codes
+      run: |
+    
+        for REPO in ${REPO_NAMES}; do
+          git clone \
+            ${GIT_ORIGIN}/${REPO} \
+            -b ${GIT_BRANCH}
+        done
+
+    - name: Build in order
+      run: |
+    
+        mkdir -p ${ARTIFACT_DIR}
+        LOG_FILE=${ARTIFACT_DIR}/.build.log
+    
+        BASE_DIR=$(pwd)
+        for REPO in ${REPO_NAMES}; do
+          cd ${BASE_DIR}/${REPO}
+          mvn clean install \
+              -DskipTests=true \
+              -Dmaven.test.failure.ignore=true \
+            | tee -a ${LOG_FILE}
+        done
+
+    - name: Get the version
+      id: extract_version
+      run: |
+
+        echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+        ## usage: ${{ steps.extract_version.outputs.VERSION }}
+
+    - name: Collect release artifact
+      id: collect_artifact
+      env:
+        OPENAM_CONFIGURATOR_TOOL: openam-configurator-tool-${{ steps.extract_version.outputs.VERSION }}
+      run: |
+
+        ## openam-<version>war
+        find ./openam/openam-server -name *.war \
+          | xargs -I% mv % ${ARTIFACT_DIR}/openam-${{ steps.extract_version.outputs.VERSION }}.war
+
+    - name: Create the Release
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "${{ steps.extract_version.outputs.VERSION }}"
+        release_name: "${{ steps.extract_version.outputs.VERSION }}"
+        draft: false
+        prerelease: false
+
+    - name: Build GitHub-API URL
+      id: api_url
+      run: |
+
+        echo ::set-output name=RELEASE::https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}
+        echo ::set-output name=UPLOAD::https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets
+        ## usage: ${{ steps.api_url.outputs.RELEASE }}
+        ## usage: ${{ steps.api_url.outputs.UPLOAD }}
+
+    - name: Edit release description
+      run: |
+
+        JSON="{
+          \"body\": \"This project is subject to [the Common Development and Distribution License (CDDL)](LICENSE.md). Please check all the terms of the license before using these artifacts.\"
+        }"
+        curl -sS \
+          --request PATCH  \
+          --url "${{ steps.api_url.outputs.RELEASE }}" \
+          --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          --header "content-type: application/json" \
+          --data "${JSON}"
+
+    - name: Upload assets
+      id: upload-release-asset 
+      run: |
+
+        cd ${ARTIFACT_DIR}
+        for ARTIFACT in $(ls .); do
+          echo "uploading: ${ARTIFACT}"
+          curl -sS \
+            --request PUT \
+            --url "${{ steps.api_url.outputs.UPLOAD }}?name=${ARTIFACT}" \
+            --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            --header "content-type: application/octet-stream" \
+            --data-binary @${ARTIFACT}
+        done
