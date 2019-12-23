@@ -79,7 +79,7 @@ jobs:
         OPENAM_CONFIGURATOR_TOOL: openam-configurator-tool-${{ steps.extract_version.outputs.VERSION }}
       run: |
 
-        ## openam-<version>war
+        ## openam-<version>.war
         find ./openam/openam-server -name *.war \
           | xargs -I% mv % ${ARTIFACT_DIR}/openam-${{ steps.extract_version.outputs.VERSION }}.war
 
