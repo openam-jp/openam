@@ -30,7 +30,7 @@
     <parent>
         <groupId>jp.openam</groupId>
         <artifactId>openam-tools</artifactId>
-        <version>14.0.0-SNAPSHOT</version>
+        <version>14.0.0</version>
     </parent>
 
     <!-- Component Definition -->
@@ -98,8 +98,7 @@
                         <phase>validate</phase>
                         <configuration>
                             <target>
-                                <copy file="${project.basedir}/../../legal/CDDLv1.0.txt" 
-                                      tofile="${project.build.outputDirectory}/license.txt" />
+                                <copy file="${project.basedir}/../../legal/CDDLv1.0.txt" tofile="${project.build.outputDirectory}/license.txt" />
                             </target>
                         </configuration>
                         <goals>
