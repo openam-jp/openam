@@ -200,7 +200,13 @@ public class CookieUtils {
         return cookieHttpOnly;
     }
 
-    private static SameSite getSameSite(String cookieName) {
+    /**
+     * Get SameSite attribute value for specified cookie.
+     * 
+     * @param cookieName The cookie name,
+     * @return The SameSite attribute value.
+     */
+    public static SameSite getSameSite(String cookieName) {
         SameSite ret = cookieSameSiteSettings.get(cookieName);
         if (ret == null) {
             ret = cookieSameSiteDefault;
