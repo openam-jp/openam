@@ -25,7 +25,7 @@
  * $Id: Constants.java,v 1.47 2009/08/12 23:10:44 ericow Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.shared;
 
@@ -205,6 +205,16 @@ public interface Constants {
      * Property string for cookie encoding.
      */
     static final String AM_COOKIE_ENCODE = "com.iplanet.am.cookie.encode";
+
+    /**
+     * Property string for default value of cookie SameSite.
+     */
+    static final String AM_COOKIE_SAMESITE_DEFAULT = "jp.openam.cookie.samesite.default";
+
+    /**
+     * Property string for cookie SameSite list.
+     */
+    static final String AM_COOKIE_SAMESITE_SETTING_LIST = "jp.openam.cookie.samesite.setting.list";
 
     /**
      * Property string for <code>pcookie</code> name.

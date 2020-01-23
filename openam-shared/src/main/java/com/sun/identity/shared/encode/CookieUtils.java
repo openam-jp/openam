@@ -25,6 +25,7 @@
  * $Id: CookieUtils.java,v 1.6 2009/10/02 00:08:26 ericow Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.shared.encode;
@@ -34,6 +35,8 @@ import static org.forgerock.openam.utils.Time.*;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+
+import jp.co.osstech.openam.shared.cookie.SameSite;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -52,6 +55,8 @@ import java.util.TimeZone;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Implements utility methods for handling Cookie.
@@ -87,6 +92,10 @@ public class CookieUtils {
     static Debug debug = Debug.getInstance("amCookieUtils");
     private static final Method setHttpOnlyMethod;
 
+    private static SameSite cookieSameSiteDefault =
+        SameSite.get(SystemPropertiesManager.get(Constants.AM_COOKIE_SAMESITE_DEFAULT));
+    private static Map<String, SameSite> cookieSameSiteSettings;
+    
     static {
         Method method = null;
         try {
@@ -95,6 +104,29 @@ public class CookieUtils {
             debug.message("This is not a Java EE 6+ container, Cookie#setHttpOnly(boolean) is not available");
         }
         setHttpOnlyMethod = method;
+        
+        parseSameSiteSettings();
+    }
+    
+    private static void parseSameSiteSettings() {
+        String sameSiteSettings = SystemPropertiesManager.get(Constants.AM_COOKIE_SAMESITE_SETTING_LIST);
+        if (StringUtils.isEmpty(sameSiteSettings)) {
+            cookieSameSiteSettings = Collections.emptyMap();
+        } else {
+            cookieSameSiteSettings = new HashMap<String, SameSite>();
+            String[] settings = sameSiteSettings.split(Constants.COMMA);
+            for (String setting : settings) {
+                String[] keyValue = setting.split(Constants.EQUALS);
+                if (keyValue.length == 2) {
+                    SameSite value = SameSite.get(keyValue[1]);
+                    if (value != null) {
+                        cookieSameSiteSettings.put(keyValue[0], value);
+                    } else {
+                        debug.error("jp.openam.cookie.samesite.setting.list contains invalid value.");
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -168,6 +200,18 @@ public class CookieUtils {
         return cookieHttpOnly;
     }
 
+    private static SameSite getSameSite(String cookieName) {
+        SameSite ret = cookieSameSiteSettings.get(cookieName);
+        if (ret == null) {
+            ret = cookieSameSiteDefault;
+        }
+        // Set None only when there is a secure flag.
+        if (ret == SameSite.NONE && !isCookieSecure()) {
+            ret = null;
+        }
+        return ret;
+    }
+    
     /**
      * Returns value of cookie that has mached name in servlet request
      * 
@@ -408,6 +452,13 @@ public class CookieUtils {
         if (cookie == null) {
             return;
         }
+        
+        SameSite samesite = getSameSite(cookie.getName());
+        if (samesite != null) {
+            addCookieToResponseLegacy(response, cookie, samesite);
+            return;
+        }
+        
         if (!isCookieHttpOnly()) {
             response.addCookie(cookie);
             return;
@@ -425,37 +476,55 @@ public class CookieUtils {
             }
         }
 
+        addCookieToResponseLegacy(response, cookie, samesite);
+    }
+
+    /**
+     * Add a cookie as custom header to HttpServletResponse with legacy way.
+     * 
+     * @param response
+     * @param cookie
+     * @param samesite
+     */
+    public static void addCookieToResponseLegacy(HttpServletResponse response, 
+            Cookie cookie, SameSite samesite) {
+
         StringBuilder sb = new StringBuilder(150);
         sb.append(cookie.getName()).append("=").append(cookie.getValue());
         String path = cookie.getPath();
         if (path != null && path.length() > 0) {
-            sb.append(";path=").append(path);
+            sb.append("; Path=").append(path);
         } else {
-            sb.append(";path=/");
+            sb.append("; Path=/");
         }
         String domain = cookie.getDomain();
         if (domain != null && domain.length() > 0) {
-            sb.append(";domain=").append(domain);
+            sb.append("; Domain=").append(domain);
         }
         int age = cookie.getMaxAge();
         if (age > -1) {
             Date date = new Date(currentTimeMillis() + age * 1000l);
             SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz", Locale.UK);
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-            sb.append(";max-age=").append(age);
+            sb.append("; Max-Age=").append(age);
             // set Expires as < IE 8 does not support max-age
-            sb.append(";Expires=").append(sdf.format(date));
+            sb.append("; Expires=").append(sdf.format(date));
         }
         if (CookieUtils.isCookieSecure() || cookie.getSecure()) {
-            sb.append(";secure");
+            sb.append("; Secure");
         }
-        sb.append(";httponly");
+        if (isCookieHttpOnly()) {
+            sb.append("; HttpOnly");
+        }
+        if (samesite != null) {
+            sb.append("; SameSite=").append(samesite.getValue());
+        }
         if (debug.messageEnabled()) {
             debug.message("CookieUtils:addCookieToResponse adds " + sb);
         }
         response.addHeader("Set-Cookie", sb.toString());
     }
-
+    
     /**
      * Matches the provided cookie domains against the current request's domain and returns the resulting set of
      * matching cookie domains if the 'com.sun.identity.authentication.setCookieToAllDomains' advanced property is set
