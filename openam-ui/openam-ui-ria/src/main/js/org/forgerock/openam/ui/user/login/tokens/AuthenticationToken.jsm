@@ -21,6 +21,7 @@
  * @module org/forgerock/openam/ui/user/login/tokens/AuthenticationToken
  */
 
+import _ from "lodash";
 import CookieHelper from "org/forgerock/commons/ui/common/util/CookieHelper";
 import Configuration from "org/forgerock/commons/ui/common/main/Configuration";
 
@@ -35,7 +36,9 @@ function secureCookie () {
 }
 
 function cookieSameSite () {
-    return Configuration.globalData.cookieSamesiteMap[cookieName];
+    if (_.has(Configuration, `globalData.cookieSamesiteMap[${cookieName}]`)) {
+        return Configuration.globalData.cookieSamesiteMap[cookieName];
+    }
 }
 
 export function set (token) {
