@@ -451,16 +451,18 @@ public class CookieUtils {
     /**
      * Add cookie to HttpServletResponse as custom header
      * 
+     * @param request
      * @param response
      * @param cookie 
      */
-    public static void addCookieToResponse(HttpServletResponse response, Cookie cookie) {
+    public static void addCookieToResponse(HttpServletRequest request,
+            HttpServletResponse response, Cookie cookie) {
         if (cookie == null) {
             return;
         }
         
         SameSite samesite = getSameSite(cookie.getName());
-        if (samesite != null) {
+        if (samesite != null && SameSite.isSupportedClient(request)) {
             addCookieToResponseLegacy(response, cookie, samesite);
             return;
         }

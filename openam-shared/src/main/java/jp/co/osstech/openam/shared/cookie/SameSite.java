@@ -16,6 +16,19 @@
 
 package jp.co.osstech.openam.shared.cookie;
 
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.sun.identity.shared.debug.Debug;
+
 /**
  * Enumeration that defines the Cookie SameSite attribute.
  */
@@ -24,7 +37,29 @@ public enum SameSite {
     LAX("Lax"),
     NONE("None");
     
+    private static Set<Pattern> ptternSet;
+    private static Debug DEBUG = Debug.getInstance("Configuration");
     private final String attrValue;
+    
+    static {
+        ptternSet = new HashSet<Pattern>();
+        try {
+            ResourceBundle rb =
+                    ResourceBundle.getBundle("SameSiteIncompatibleClient");
+            Enumeration<String> keys = rb.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                try {
+                    Pattern p =  Pattern.compile(rb.getString(key));
+                    ptternSet.add(p);
+                } catch (PatternSyntaxException pe) {
+                    DEBUG.error("SameSite initialize error", pe);
+                }
+            }
+        } catch (MissingResourceException me) {
+            DEBUG.error("SameSite initialize error", me);
+        }
+    }
     
     /**
      * Constructor.
@@ -57,5 +92,29 @@ public enum SameSite {
             }
         }
         return null;
+    }
+    
+    /**
+     * Returns whether client supports SameSite.
+     * 
+     * @param request The HttpServletRequest object.
+     * @return true if client supports SameSite.
+     */
+    public static boolean isSupportedClient(HttpServletRequest request) {
+        if (request == null) {
+            return false;
+        }
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent == null) {
+            return false;
+        } else {
+            for (Pattern p : ptternSet) {
+                Matcher matcher = p.matcher(userAgent);
+                if (matcher.matches()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

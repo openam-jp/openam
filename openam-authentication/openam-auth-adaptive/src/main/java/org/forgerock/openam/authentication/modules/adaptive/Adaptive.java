@@ -22,6 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -1054,19 +1055,19 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 String value = m.get("LOGINVALUE");
                 String name = m.get("LOGINNAME");
 
-                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
+                addCookieToResponse(request, response, cookieDomains, name, value, autoLoginExpire);
             }
             if (m.containsKey("COOKIENAME")) {
                 String name = m.get("COOKIENAME");
                 String value = m.get("COOKIEVALUE");
 
-                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
+                addCookieToResponse(request, response, cookieDomains, name, value, autoLoginExpire);
             }
             if (m.containsKey("DEVICENAME")) {
                 String name = m.get("DEVICENAME");
                 String value = m.get("DEVICEVALUE");
 
-                addCookieToResponse(response, cookieDomains, name, value, autoLoginExpire);
+                addCookieToResponse(request, response, cookieDomains, name, value, autoLoginExpire);
             }
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -1075,10 +1076,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
     }
 
-    private void addCookieToResponse(HttpServletResponse response, Set<String> cookieDomains, String name,
-            String value, int expire) {
+    private void addCookieToResponse(HttpServletRequest request, HttpServletResponse response,
+            Set<String> cookieDomains, String name, String value, int expire) {
         for (String domain : cookieDomains) {
-            CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(name, value, expire, "/", domain));
+            CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(name, value, expire, "/", domain));
         }
     }
 

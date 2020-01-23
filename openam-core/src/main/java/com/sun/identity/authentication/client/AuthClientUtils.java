@@ -25,7 +25,7 @@
  * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.client;
 
@@ -554,10 +554,10 @@ public class AuthClientUtils {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
                     Cookie cookie = createlbCookie(domain);
-                    CookieUtils.addCookieToResponse(response, cookie);
+                    CookieUtils.addCookieToResponse(request, response, cookie);
                 }
             } else {
-                CookieUtils.addCookieToResponse(response, createlbCookie(null));
+                CookieUtils.addCookieToResponse(request, response, createlbCookie(null));
             }
         }
     }
@@ -2814,10 +2814,10 @@ public class AuthClientUtils {
                     String domain = (String)it.next();
                     Cookie cookie = createCookie(cookieName, cookieValue,
                         domain);
-                    CookieUtils.addCookieToResponse(response, cookie);
+                    CookieUtils.addCookieToResponse(request, response, cookie);
                 }
             } else {
-                CookieUtils.addCookieToResponse(response,
+                CookieUtils.addCookieToResponse(request, response,
                         createCookie(cookieName,cookieValue,null));
             }
         }
@@ -2843,10 +2843,10 @@ public class AuthClientUtils {
                     String domain = (String)it.next();
                     Cookie cookie = createCookie(cookieName, cookieValue,
                         domain);
-                    CookieUtils.addCookieToResponse(response, cookie);
+                    CookieUtils.addCookieToResponse(request, response, cookie);
                 }
             } else {
-                CookieUtils.addCookieToResponse(response,
+                CookieUtils.addCookieToResponse(request, response,
                         createCookie(cookieName,cookieValue,null));
             }
         }
@@ -3022,7 +3022,7 @@ public class AuthClientUtils {
         }
     }
 
-    public static void setHostUrlCookie(HttpServletResponse response) {
+    public static void setHostUrlCookie(HttpServletRequest request, HttpServletResponse response) {
         if (isSessionHijackingEnabled) {
             String hostUrlCookieValue = null;
             try {
@@ -3060,7 +3060,7 @@ public class AuthClientUtils {
             try {
                 Cookie cookie = createCookie(hostUrlCookieName,
                 hostUrlCookieValue, hostUrlCookieDomain);
-                CookieUtils.addCookieToResponse(response, cookie);
+                CookieUtils.addCookieToResponse(request, response, cookie);
             } catch (Exception e) {
                 utilDebug.message("AuthClientUtils.setHostUrlCookie:", e);
             }

@@ -63,11 +63,13 @@ import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -181,7 +183,11 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("realm", realm);
             result.put("xuiUserSessionValidationEnabled", SystemProperties.getAsBoolean(Constants.XUI_USER_SESSION_VALIDATION_ENABLED, true));
 
-            Map<String, String> cookieSameSiteMap = getSameSiteMap();
+
+            AttributesContext requestContext = context.asContext(AttributesContext.class);
+            Map<String, Object> requestAttributes = requestContext.getAttributes();
+            final HttpServletRequest httpServletRequest = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
+            Map<String, String> cookieSameSiteMap = getSameSiteMap(httpServletRequest);
             if (CollectionUtils.isNotEmpty(cookieSameSiteMap)) {
                 result.put("cookieSamesiteMap", cookieSameSiteMap);
             }
@@ -200,8 +206,17 @@ public class ServerInfoResource extends RealmAwareResource {
         }
     }
 
-    private Map<String, String> getSameSiteMap() {
+    /**
+     * Get SameSite map for XUI.
+     *
+     * @param request The HttpServletRequest object.
+     * @return SameSite map.
+     */
+    private Map<String, String> getSameSiteMap(HttpServletRequest request) {
         Map<String, String> map = new HashMap<String, String>();
+        if (!SameSite.isSupportedClient(request)) {
+            return map;
+        }
         for (String cookieName : xuiCookies) {
             SameSite samesite = CookieUtils.getSameSite(cookieName);
             if (samesite != null) {

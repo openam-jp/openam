@@ -25,6 +25,7 @@
  * $Id: FSUtils.java,v 1.10 2009/11/20 23:52:57 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.federation.common;
@@ -686,7 +687,7 @@ public class FSUtils {
             Set<String> domains = SystemConfigurationUtil.getCookieDomainsForRequest(request);
             for (String domain : domains) {
                 cookie = CookieUtils.newCookie(cookieName, cookieValue, "/", domain);
-                CookieUtils.addCookieToResponse(response, cookie);
+                CookieUtils.addCookieToResponse(request, response, cookie);
             }
         }
     }
