@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2020 Open Source Solution Technology Corporation
+ * Portions copyright 2020 OGIS-RI Co., Ltd.
  */
 
 package jp.co.osstech.openam.shared.cookie;
@@ -43,6 +44,8 @@ public class SameSiteTest {
             {"Mozilla/5.0 (iPhone; CPU iPhone OS 13_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Mobile/15E148 Safari/604.1", true},
             // Safari on macOS Catalina -> SameSite compatible
             {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15", true},
+            // Google Chrome 77 on macOS Mojave -> SameSite compatible
+            {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3864.0 Safari/537.36", true},
             // Safari on iOS12 -> SameSite incompatible
             {"Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1", false},
             // Safari on macOS Mojave -> SameSite incompatible
