@@ -110,7 +110,7 @@ public enum SameSite {
         } else {
             for (Pattern p : ptternSet) {
                 Matcher matcher = p.matcher(userAgent);
-                if (matcher.matches()) {
+                if (matcher.find()) {
                     return false;
                 }
             }
