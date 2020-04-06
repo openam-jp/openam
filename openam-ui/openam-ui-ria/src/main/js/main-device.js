@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 require.config({
@@ -27,7 +28,7 @@ require.config({
         "lodash":       "libs/lodash-3.10.1-min",
         "handlebars":   "libs/handlebars-4.0.5",
         "i18next":      "libs/i18next-1.7.3-min",
-        "jquery":       "libs/jquery-2.1.1-min",
+        "jquery":       "libs/jquery-2.2.4-min",
         "text":         "libs/text-2.0.15"
     },
     shim: {

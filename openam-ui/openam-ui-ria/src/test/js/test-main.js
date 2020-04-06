@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 (function () {
@@ -32,7 +33,7 @@
         paths: {
             chai: "/base/node_modules/chai/chai",
             handlebars: "/base/target/dependencies/libs/handlebars-4.0.5",
-            jquery: "/base/target/dependencies/libs/jquery-2.1.1-min",
+            jquery: "/base/target/dependencies/libs/jquery-2.2.4-min",
             lodash: "/base/target/dependencies/libs/lodash-3.10.1-min",
             sinon: "/base/target/test-classes/libs/sinon-1.15.4",
             "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
