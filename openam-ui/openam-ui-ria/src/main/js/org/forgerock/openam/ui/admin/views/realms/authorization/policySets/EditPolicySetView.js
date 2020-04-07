@@ -16,7 +16,7 @@
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView",

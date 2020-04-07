@@ -36,7 +36,7 @@
  * @module org/forgerock/openam/ui/common/views/jsonSchema/GroupedJSONSchemaView
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/models/JSONSchema",

@@ -15,7 +15,7 @@
  */
 
 define("jp/co/osstech/openam/server/util/webauthn", [
-    "jquery"
+    "jquery-migrate"
 ], function ($) {
 
     var obj = {};

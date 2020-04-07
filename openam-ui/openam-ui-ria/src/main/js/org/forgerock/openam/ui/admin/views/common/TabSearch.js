@@ -19,7 +19,7 @@
  */
 define([
     "lodash",
-    "jquery",
+    "jquery-migrate",
     "backbone",
     "handlebars",
     "selectize"

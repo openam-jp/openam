@@ -36,7 +36,7 @@ define([
 
             injector
                 .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
-                .mock("jquery", $)
+                .mock("jquery-migrate", $)
                 .require(["org/forgerock/openam/ui/admin/views/common/navigation/createBreadcrumbs"], (obj) => {
                     createBreadcrumbs = obj;
                     done();

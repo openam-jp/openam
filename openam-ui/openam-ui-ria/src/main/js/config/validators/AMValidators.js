@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery"
+    "jquery-migrate"
 ], function ($) {
     var obj = {
         "validPhoneFormat": {

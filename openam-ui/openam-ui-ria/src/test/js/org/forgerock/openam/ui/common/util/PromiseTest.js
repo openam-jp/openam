@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "sinon",
     "org/forgerock/openam/ui/common/util/Promise"

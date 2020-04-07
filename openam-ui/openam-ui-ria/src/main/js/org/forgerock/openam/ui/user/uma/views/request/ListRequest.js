@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "backbone",
     "backbone.paginator",
     "backgrid-filter",

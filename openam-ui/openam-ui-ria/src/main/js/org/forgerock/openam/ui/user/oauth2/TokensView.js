@@ -23,7 +23,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/services/TokenService",
     "org/forgerock/commons/ui/common/main/EventManager",

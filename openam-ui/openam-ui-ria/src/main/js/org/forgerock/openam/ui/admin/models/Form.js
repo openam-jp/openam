@@ -18,7 +18,7 @@
  * @deprecated
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "jsonEditor",
     "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",

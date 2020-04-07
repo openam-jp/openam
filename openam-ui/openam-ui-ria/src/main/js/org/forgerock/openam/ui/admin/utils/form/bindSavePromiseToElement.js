@@ -18,7 +18,7 @@
   * @module org/forgerock/openam/ui/admin/utils/form/bindSavePromiseToElement
   */
  define([
-     "jquery",
+     "jquery-migrate",
      "lodash",
      "org/forgerock/commons/ui/common/components/Messages"
  ], ($, _, Messages) =>

@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "jsonEditor"
 ], ($, _, JSONEditor) => {

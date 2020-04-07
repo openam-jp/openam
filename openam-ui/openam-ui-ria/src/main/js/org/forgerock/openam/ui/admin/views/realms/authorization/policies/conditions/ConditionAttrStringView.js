@@ -16,7 +16,7 @@
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ConditionAttrBaseView"

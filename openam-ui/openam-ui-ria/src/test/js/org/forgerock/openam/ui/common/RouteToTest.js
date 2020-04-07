@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "squire",
     "sinon",
     "org/forgerock/openam/ui/common/util/Constants"

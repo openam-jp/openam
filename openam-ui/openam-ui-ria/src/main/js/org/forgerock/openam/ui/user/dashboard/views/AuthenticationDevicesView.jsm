@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-import $ from "jquery";
+import $ from "jquery-migrate";
 import _ from "lodash";
 
 import {

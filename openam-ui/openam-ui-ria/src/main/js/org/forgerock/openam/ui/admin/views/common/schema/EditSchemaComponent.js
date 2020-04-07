@@ -18,7 +18,7 @@
  * @module org/forgerock/openam/ui/admin/views/common/schema/EditSchemaComponent
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "org/forgerock/commons/ui/common/components/Messages",

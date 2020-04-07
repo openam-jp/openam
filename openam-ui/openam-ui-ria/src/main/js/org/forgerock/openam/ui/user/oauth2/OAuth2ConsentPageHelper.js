@@ -18,7 +18,7 @@
  * @module org/forgerock/openam/ui/user/oauth2/OAuth2ConsentPageHelper
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",

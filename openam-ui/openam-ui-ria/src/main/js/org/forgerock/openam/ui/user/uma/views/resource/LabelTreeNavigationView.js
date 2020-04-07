@@ -16,7 +16,7 @@
 
 define([
     "lodash",
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/user/uma/services/UMAService"

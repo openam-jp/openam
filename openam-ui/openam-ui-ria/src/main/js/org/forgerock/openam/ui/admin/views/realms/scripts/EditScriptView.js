@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/components/BootstrapDialog",
     "libs/codemirror/lib/codemirror",

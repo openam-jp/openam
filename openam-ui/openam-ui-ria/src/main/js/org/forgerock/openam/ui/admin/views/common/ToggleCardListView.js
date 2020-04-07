@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "backbone",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], ($, Backbone, UIUtils) =>

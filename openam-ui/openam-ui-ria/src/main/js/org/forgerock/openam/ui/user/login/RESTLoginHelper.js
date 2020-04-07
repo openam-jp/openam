@@ -16,7 +16,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
     "org/forgerock/openam/ui/user/services/AuthNService",

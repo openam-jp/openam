@@ -31,7 +31,7 @@
   * @module org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView
   */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "org/forgerock/openam/ui/common/models/JSONSchema",

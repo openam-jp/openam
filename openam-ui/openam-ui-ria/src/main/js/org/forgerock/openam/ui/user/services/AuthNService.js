@@ -15,7 +15,7 @@
  * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",

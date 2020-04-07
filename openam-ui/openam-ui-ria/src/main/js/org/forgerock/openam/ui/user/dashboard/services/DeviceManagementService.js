@@ -18,7 +18,7 @@
  * @module org/forgerock/openam/ui/user/dashboard/services/DeviceManagementService
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",

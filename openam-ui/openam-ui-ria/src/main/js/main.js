@@ -54,7 +54,8 @@ require.config({
         "form2js"     : "libs/form2js-2.0-769718a",
         "handlebars"  : "libs/handlebars-4.0.5",
         "i18next"     : "libs/i18next-1.7.3-min",
-        "jquery"      : "libs/jquery-2.2.4-min",
+        "jquery"      : "libs/jquery-3.0.0-min",
+        "jquery-migrate": "libs/jquery-migrate-3.1.0",
         "js2form"     : "libs/js2form-2.0-769718a",
         "jsonEditor"  : "libs/jsoneditor-0.7.23-custom",
         "lodash"      : "libs/lodash-3.10.1-min",
@@ -70,6 +71,10 @@ require.config({
         "text": "libs/text-2.0.15"
     },
     shim: {
+        "jquery-migrate": {
+            deps: ["jquery"],
+            exports: "jQuery"
+        },
         "autosizeInput": {
             deps: ["jquery"],
             exports: "autosizeInput"
@@ -163,7 +168,7 @@ require([
     "org/forgerock/commons/ui/common/main/EventManager",
 
     // other modules that are necessary to include to startup the app
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "handlebars",
