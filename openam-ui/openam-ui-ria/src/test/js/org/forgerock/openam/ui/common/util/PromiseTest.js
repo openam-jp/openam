@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
@@ -65,26 +66,36 @@ define([
                     });
                     it("resolves the returned promise when the passed in promise is resolved", () => {
                         d.resolve();
-                        expect(resolvedSpy).to.be.called;
-                        expect(rejectedSpy).to.not.be.called;
+                        p.then(() => {
+                            expect(resolvedSpy).to.be.called;
+                            expect(rejectedSpy).to.not.be.called;
+                        });
                     });
                     it("rejects the returned promise when the passed in promise is rejected", () => {
                         d.reject();
-                        expect(resolvedSpy).to.not.be.called;
-                        expect(rejectedSpy).to.be.called;
+                        p.then(() => {
+                            expect(resolvedSpy).to.not.be.called;
+                            expect(rejectedSpy).to.be.called;
+                        });
                     });
                     it("resolves the promise with an array containing the value of the resolved promise", () => {
                         d.resolve(1);
-                        expect(resolvedSpy).to.be.calledWith([1]);
+                        p.then(() => {
+                            expect(resolvedSpy).to.be.calledWith([1]);
+                        });
                     });
                     it("groups multiple resolved values into an array", () => {
                         d.resolve(1, 2, 3);
-                        expect(resolvedSpy).to.be.calledWith([[1, 2, 3]]);
+                        p.then(() => {
+                            expect(resolvedSpy).to.be.calledWith([[1, 2, 3]]);
+                        });
                     });
                     it("rejects the returned promise if the passed in promise is rejected", () => {
                         d.reject();
-                        expect(resolvedSpy).to.not.be.called;
-                        expect(rejectedSpy).to.be.called;
+                        p.then(() => {
+                            expect(resolvedSpy).to.not.be.called;
+                            expect(rejectedSpy).to.be.called;
+                        });
                     });
                 });
                 context("of 2 promises", () => {
@@ -119,28 +130,38 @@ define([
                     it("resolves the returned promise when both of the promises are resolved", () => {
                         d1.resolve();
                         d2.resolve();
-                        expect(resolvedSpy).to.be.called;
-                        expect(rejectedSpy).to.not.be.called;
+                        p.then(() => {
+                            expect(resolvedSpy).to.be.called;
+                            expect(rejectedSpy).to.not.be.called;
+                        });
                     });
                     it("resolves the promise with an array containing the value of the resolved promise", () => {
                         d1.resolve(1);
                         d2.resolve(2);
-                        expect(resolvedSpy).to.be.calledWith([1, 2]);
+                        p.then(() => {
+                            expect(resolvedSpy).to.be.calledWith([1, 2]);
+                        });
                     });
                     it("groups multiple resolved values into an array", () => {
                         d1.resolve(1, 2, 3);
                         d2.resolve(4);
-                        expect(resolvedSpy).to.be.calledWith([[1, 2, 3], 4]);
+                        p.then(() => {
+                            expect(resolvedSpy).to.be.calledWith([[1, 2, 3], 4]);
+                        });
                     });
                     it("rejects the returned promise if the first promise is rejected", () => {
                         d1.reject();
-                        expect(resolvedSpy).to.not.be.called;
-                        expect(rejectedSpy).to.be.called;
+                        p.then(() => {
+                            expect(resolvedSpy).to.not.be.called;
+                            expect(rejectedSpy).to.be.called;
+                        });
                     });
                     it("rejects the returned promise if the second promise is rejected", () => {
                         d2.reject();
-                        expect(resolvedSpy).to.not.be.called;
-                        expect(rejectedSpy).to.be.called;
+                        p.then(() => {
+                            expect(resolvedSpy).to.not.be.called;
+                            expect(rejectedSpy).to.be.called;
+                        });
                     });
                 });
             });

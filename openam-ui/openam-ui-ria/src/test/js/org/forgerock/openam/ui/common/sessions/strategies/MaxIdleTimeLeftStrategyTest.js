@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
@@ -69,26 +70,28 @@ define([
         context("on second invocation", () => {
             beforeEach(() => {
                 getMaxIdlePromise.resolve(getMaxIdlePromisePayload);
-
-                MaxIdleTimeLeftStrategy();
             });
 
             context("when session time left is greater than maximum idle time", () => {
                 it("resolves with the maximum idle time in seconds", () => {
-                    getTimeLeftPromise.resolve({ maxtime: 900 });
+                    MaxIdleTimeLeftStrategy().then(() => {
+                        getTimeLeftPromise.resolve({ maxtime: 900 });
 
-                    return MaxIdleTimeLeftStrategy().then((seconds) => {
-                        expect(seconds).to.be.eq(600);
+                        return MaxIdleTimeLeftStrategy().then((seconds) => {
+                            expect(seconds).to.be.eq(600);
+                        });
                     });
                 });
             });
 
             context("when session time left is less than maximum idle time", () => {
                 it("resolves with the session time left in seconds", () => {
-                    getTimeLeftPromise.resolve({ maxtime: 300 });
+                    MaxIdleTimeLeftStrategy().then(() => {
+                        getTimeLeftPromise.resolve({ maxtime: 300 });
 
-                    return MaxIdleTimeLeftStrategy().then((seconds) => {
-                        expect(seconds).to.be.eq(300);
+                        return MaxIdleTimeLeftStrategy().then((seconds) => {
+                            expect(seconds).to.be.eq(300);
+                        });
                     });
                 });
             });
