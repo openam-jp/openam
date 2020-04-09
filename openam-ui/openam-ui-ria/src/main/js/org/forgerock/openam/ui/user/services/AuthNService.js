@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2020 Open Source Solution Technology Corporation
  */
 define([
     "jquery-migrate",
@@ -78,7 +78,7 @@ define([
         return obj.serviceCall(serviceCall).then((requirements) => requirements,
             (jqXHR) => {
                 // some auth processes might throw an error fail immediately
-                const errorBody = $.parseJSON(jqXHR.responseText);
+                const errorBody = JSON.parse(jqXHR.responseText);
                 // if the error body contains an authId, then we might be able to
                 // continue on after this error to the next module in the chain
                 if (errorBody.hasOwnProperty("authId")) {
@@ -199,7 +199,7 @@ define([
                 }
                 Messages.addMessage({ message, type: Messages.TYPE_DANGER });
             } else { // we have a 401 unauthorized response
-                errorBody = $.parseJSON(jqXHR.responseText);
+                errorBody = JSON.parse(jqXHR.responseText);
                 // if the error body has an authId property, then we may be
                 // able to advance beyond this error
                 if (errorBody.hasOwnProperty("authId")) {

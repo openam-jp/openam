@@ -96,9 +96,9 @@ define([
                                     // The input is disabled because the value is being inherited. However we are
                                     // still able to scroll to the correct row by focusing on the inherit button
                                     // first.
-                                    input.closest(".form-group").find("button").focus().blur();
+                                    input.closest(".form-group").find("button").trigger("focus").blur();
                                 } else {
-                                    input.focus();
+                                    input.trigger("focus");
                                 }
 
                             }

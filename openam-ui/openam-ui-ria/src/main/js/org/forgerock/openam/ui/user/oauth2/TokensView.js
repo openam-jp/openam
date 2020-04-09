@@ -20,6 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
@@ -123,7 +125,7 @@ define([
                         }" >`);
                 },
                 "fnRowCallback": (row, data) => {
-                    $(row).children().not(":first").click(function () {
+                    $(row).children().not(":first").on("click", function () {
                         var id = data.id[0], htmlCode, table, temp = row, td;
                         tokensService.getTokenByID(function (tokenInfo) {
                             var output;

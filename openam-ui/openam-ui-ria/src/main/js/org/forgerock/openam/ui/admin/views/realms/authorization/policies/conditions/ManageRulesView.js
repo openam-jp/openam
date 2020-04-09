@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2020 Open Source Solution Technology Corporation
  */
 
 
@@ -172,7 +172,7 @@ define([
                     self.setInactive(self.buttons.addCondition, false);
                     self.setInactive(self.buttons.addOperator, false);
 
-                    item.focus();
+                    item.trigger("focus");
                     item.css({ width: item.width() }).addClass("dragged");
                     $("body").addClass("dragging");
 
@@ -212,7 +212,7 @@ define([
                             rule = $.extend(false, item, new OperatorRulesView());
                             rule.rebindElement();
                         }
-                        item.focus();
+                        item.trigger("focus");
                         _super(item, container);
                         self.save();
                     });
@@ -274,7 +274,7 @@ define([
             disabledConditions.addClass("editing-disabled");
             disabledConditions.find("> select").prop("disabled", true);
 
-            editRuleView.$el.find("select.type-selection:first").focus();
+            editRuleView.$el.find("select.type-selection:first").trigger("focus");
         },
 
         editStop (item) {
@@ -387,7 +387,7 @@ define([
         setFocus (e) {
             e.stopPropagation();
             var target = $(e.target).is("select") || $(e.target).is("input") ? e.target : e.currentTarget;
-            $(target).focus();
+            $(target).trigger("focus");
         },
 
         getNewRule () {

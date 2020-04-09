@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
@@ -243,7 +244,7 @@ define([
 
                     if (existing) {
                         scopes = existing.get("scopes").pluck("name");
-                        selectPermission[0].selectize.focus();
+                        selectPermission[0].selectize.trigger("focus");
                         selectPermission[0].selectize.setValue(scopes);
                     }
 

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 /**
@@ -168,7 +169,7 @@ define([
                                 properties: this.data.schema.raw.properties,
                                 onChange: (tabId, value) => {
                                     this.subview.setTabId(tabId);
-                                    this.$el.find(`[data-schemapath="root.${value}"]`).find("input").focus();
+                                    this.$el.find(`[data-schemapath="root.${value}"]`).find("input").trigger("focus");
                                 }
                             };
                             this.$el.find("[data-tab-search]").append(new TabSearch(options).render().$el);

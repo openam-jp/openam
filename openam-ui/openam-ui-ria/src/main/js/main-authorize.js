@@ -152,7 +152,7 @@ require([
                 $("#wrapper").html(baseTemplate(data));
                 $("#footer").html(footerTemplate(data));
                 $("#loginBaseLogo").html(loginHeaderTemplate(data));
-                $("#content").html(formTemplate(data)).find(".panel-heading").bind("click keyup", function (e) {
+                $("#content").html(formTemplate(data)).find(".panel-heading").on("click keyup", function (e) {
                     // keyup is required so that the collapsed panel can be opened with the keyboard alone,
                     // and without relying on a mouse click event.
                     if (e.type === "keyup" && e.keyCode !== KEY_CODE_ENTER && e.keyCode !== KEY_CODE_SPACE) {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 define([
     "jquery-migrate",
@@ -67,7 +68,7 @@ define([
                         placeholderText: $.t("console.authentication.modules.selectModuleType")
                     });
                     self.$el.find("[data-module-type]").append(selectComponent.render().el);
-                    self.$el.find("[autofocus]").focus();
+                    self.$el.find("[autofocus]").trigger("focus");
                     if (callback) {
                         callback();
                     }

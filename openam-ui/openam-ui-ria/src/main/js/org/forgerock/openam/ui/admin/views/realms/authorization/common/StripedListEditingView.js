@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
@@ -90,7 +91,7 @@ define([
                     this.updateEntity();
                 }
                 this.renderParent(() => {
-                    this.$el.find(".editing input[type=text]").focus();
+                    this.$el.find(".editing input[type=text]").trigger("focus");
                 });
             }
         },

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
@@ -114,7 +115,7 @@ define([
                                     self.$el.find("#policySetSettings").append(tpl);
                                     self.populateResourceTypes();
                                     FormHelper.setActiveTab(self);
-                                    self.$el.find("#policySetSettings [autofocus]").focus();
+                                    self.$el.find("#policySetSettings [autofocus]").trigger("focus");
                                     if (self.renderCallback) {
                                         self.renderCallback();
                                     }

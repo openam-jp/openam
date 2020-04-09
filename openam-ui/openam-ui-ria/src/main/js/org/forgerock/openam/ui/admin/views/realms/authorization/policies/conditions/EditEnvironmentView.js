@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2020 Open Source Solution Technology Corporation
  */
 
 define([
@@ -81,7 +81,7 @@ define([
                     self.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
                 }
 
-                self.$el.find("select.type-selection:first").focus();
+                self.$el.find("select.type-selection:first").trigger("focus");
 
                 self.$el.find(".info-button").hide();
 
@@ -99,7 +99,7 @@ define([
                 mergedData = _.merge({}, itemData, hiddenData),
                 type;
 
-            item.focus(); //  Required to trigger changeInput.
+            item.trigger("focus"); //  Required to trigger changeInput.
             this.data.conditions = allEnvironments;
 
             if (mergedData && mergedData.type) {

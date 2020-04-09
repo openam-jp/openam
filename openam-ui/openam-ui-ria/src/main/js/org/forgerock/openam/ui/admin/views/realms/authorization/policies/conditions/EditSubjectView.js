@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
@@ -64,7 +65,7 @@ define([
                     self.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
                 }
 
-                self.$el.find("select.type-selection:first").focus();
+                self.$el.find("select.type-selection:first").trigger("focus");
 
                 if (callback) {
                     callback();
@@ -83,7 +84,7 @@ define([
 
             mergedData = _.merge({}, itemData, hiddenData);
 
-            item.focus(); //  Required to trigger changeInput.
+            item.trigger("focus"); //  Required to trigger changeInput.
             this.data.subjects = allSubjects;
 
             if (mergedData && mergedData.type) {

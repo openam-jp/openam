@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2019-2020 Open Source Solution Technology Corporation
  */
 
 define("jp/co/osstech/openam/server/util/webauthn", [
@@ -44,11 +44,11 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
                 const jsonbody = JSON.stringify(jdata);
                 $("#PublicKeyCredential").val(jsonbody);
-                $("#idToken3_0").click();
+                $("#idToken3_0").trigger("click");
             })
             .catch((err) => {
                 console.log("ERROR", err);
-                $("#idToken3_1").click();
+                $("#idToken3_1").trigger("click");
             });
     };
 
@@ -73,11 +73,11 @@ define("jp/co/osstech/openam/server/util/webauthn", [
 
                 const jsonbody = JSON.stringify(jdata);
                 $("#PublicKeyCredential").val(jsonbody);
-                $("#idToken3_0").click();
+                $("#idToken3_0").trigger("click");
             })
             .catch((err) => {
                 console.log("ERROR", err);
-                $("#idToken3_1").click();
+                $("#idToken3_1").trigger("click");
             });
     };
 

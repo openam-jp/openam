@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
@@ -56,7 +57,7 @@ define([
                 self.select = self.$el.find("select");
                 self.delegateEvents();
 
-                self.select.focus().trigger("change");
+                self.select.trigger("focus").trigger("change");
                 self.$el.data("logical", true);
                 self.dropbox = self.$el.find(".dropbox");
 
@@ -69,7 +70,7 @@ define([
         },
 
         setValue (value) {
-            this.select.focus().val(value).trigger("change");
+            this.select.trigger("focus").val(value).trigger("change");
         },
 
         rebindElement () {
