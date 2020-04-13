@@ -62,7 +62,7 @@ define([
 
             this.data.conditions = _.sortBy(this.data.conditions, "i18nKey");
 
-            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+            return UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
                 self.setElement(`#environment_${itemID}`);
 

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2020 Open Source Solution Technology Corporation
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 
@@ -50,7 +50,7 @@ define([
 
             this.data.subjects = _.sortBy(this.data.subjects, "i18nKey");
 
-            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+            return UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
                 self.setElement(`#subject_${itemID}`);

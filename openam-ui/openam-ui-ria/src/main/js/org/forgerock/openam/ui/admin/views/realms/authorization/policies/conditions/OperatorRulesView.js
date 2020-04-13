@@ -50,7 +50,7 @@ define([
 
             this.setElement(element);
 
-            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+            return UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
                 self.setElement(`#operator${itemID}`);
