@@ -223,17 +223,21 @@ define([
                 schemaProps = schema.config.properties,
                 i18nKey,
                 attributesWrapper,
-                htmlBuiltPromise = $.Deferred();
+                htmlBuiltPromises = [];
 
             function buildScriptAttr () {
+                var defer = $.Deferred();
+                htmlBuiltPromises.push(defer.promise());
                 new ArrayAttr().render({
                     itemData, hiddenData, data: [hiddenData[itemData.type]],
                     title: "scriptId", dataSource: "scripts", multiple: false,
                     i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}scriptId`
-                }, itemDataEl, htmlBuiltPromise.resolve);
+                }, itemDataEl, defer.resolve);
             }
 
             if (itemData.type === "SimpleTime") {
+                const defer = $.Deferred();
+                htmlBuiltPromises.push(defer.promise());
                 attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
                 new TimeAttr().render({ itemData }, itemDataEl);
                 new DayAttr().render({ itemData }, itemDataEl);
@@ -246,11 +250,11 @@ define([
                     itemData,
                     data: [itemData.enforcementTimeZone],
                     title: "enforcementTimeZone",
-                    i18nKey: `${self.i18n.condition.key}${schema.title}${self.i18n.condition.props}enforcementTimeZone`,
+                    i18nKey: `${self.i18n.condition.key}${schema.title}` +
+                        `${self.i18n.condition.props}enforcementTimeZone`,
                     dataSource: "enforcementTimeZone",
                     multiple: false
-                }, itemDataEl);
-                htmlBuiltPromise.resolve();
+                }, itemDataEl, defer.resolve);
             } else if (schema.title === self.SCRIPT_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
                 if (itemData && itemData.scriptId) {
@@ -265,6 +269,8 @@ define([
                 attributesWrapper = '<div class="no-float"></div>';
 
                 _.map(schemaProps, function (value, key) {
+                    const defer = $.Deferred();
+                    htmlBuiltPromises.push(defer.promise());
                     i18nKey = self.i18n.condition.key + schema.title + self.i18n.condition.props + key;
 
                     switch (value.type) {
@@ -278,7 +284,7 @@ define([
                                 i18nKey,
                                 schema,
                                 value
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         case "boolean":
                             new BooleanAttr().render({
@@ -287,7 +293,7 @@ define([
                                 title: key,
                                 i18nKey,
                                 selected: itemData[key]
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         case "array":
                             new ArrayAttr().render({
@@ -295,7 +301,7 @@ define([
                                 data: itemData[key],
                                 title: key,
                                 i18nKey
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         case "object":
                             new ObjectAttr().render({
@@ -303,20 +309,17 @@ define([
                                 data: itemData[key],
                                 title: key,
                                 i18nKey
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         default:
                             break;
                     }
                 });
-                htmlBuiltPromise.resolve();
             }
 
-            htmlBuiltPromise.done(function () {
+            return $.when.apply($, htmlBuiltPromises).done(function () {
                 self.$el.find(".condition-attr").wrapAll(attributesWrapper);
             });
-
-            return htmlBuiltPromise;
         },
 
         setDefaultJsonValues (schema) {

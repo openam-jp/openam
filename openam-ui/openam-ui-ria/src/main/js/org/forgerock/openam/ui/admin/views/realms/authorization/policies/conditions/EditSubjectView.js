@@ -163,10 +163,12 @@ define([
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
                 i18nKey,
-                htmlBuiltPromise = $.Deferred();
+                htmlBuiltPromises = [];
 
             if (schema.title === self.IDENTITY_RESOURCE) {
                 _.each(["users", "groups"], function (identityType) {
+                    const defer = $.Deferred();
+                    htmlBuiltPromises.push(defer.promise());
                     new ArrayAttr().render({
                         itemData,
                         hiddenData,
@@ -174,10 +176,12 @@ define([
                         title: identityType,
                         i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType,
                         dataSource: identityType
-                    }, itemDataEl, htmlBuiltPromise.resolve);
+                    }, itemDataEl, defer.resolve);
                 });
             } else {
                 _.map(schemaProps, function (value, key) {
+                    const defer = $.Deferred();
+                    htmlBuiltPromises.push(defer.promise());
                     i18nKey = self.subjectI18n.key + schema.title + self.subjectI18n.props + key;
 
                     switch (value.type) {
@@ -188,7 +192,7 @@ define([
                                 data: itemData[key],
                                 title: key,
                                 i18nKey
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         case "array":
                             new ArrayAttr().render({
@@ -197,20 +201,17 @@ define([
                                 data: itemData[key],
                                 title: key,
                                 i18nKey
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         default:
                             break;
                     }
                 });
-                htmlBuiltPromise.resolve();
             }
 
-            htmlBuiltPromise.done(function () {
+            return $.when.apply($, htmlBuiltPromises).done(function () {
                 self.$el.find(".condition-attr").wrapAll("<div class='no-float'></div>");
             });
-
-            return htmlBuiltPromise;
         },
 
         setDefaultJsonValues (schema) {
