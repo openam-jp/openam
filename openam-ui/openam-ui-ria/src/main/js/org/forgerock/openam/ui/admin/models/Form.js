@@ -54,7 +54,7 @@ define([
          */
         $(element).find("input:password").attr("placeholder", $.t("common.form.passwordPlaceholder"));
 
-        $(element).find(".help-block").addClass("hidden-lg hidden-md hidden-sm").each(function () {
+        $(element).find(".help-block").each(function () {
             var group = $(this).parent(),
                 element = $('<a class="btn info-button visible-lg-inline-block' +
                     ' visible-md-inline-block visible-sm-inline-block" ' +

@@ -31,7 +31,7 @@ define([
     function convertHelpBlocksToPopOvers (element) {
         const template = "templates/common/jsonSchema/editors/_HelpPopover.html";
         UIUtils.compileTemplate(template).then((html) => {
-            $(element).find(".help-block").addClass("hidden-lg hidden-md hidden-sm").each((index, value) => {
+            $(element).find(".help-block").each((index, value) => {
                 const helpPopOver = $(html);
 
                 helpPopOver.popoverclickaway({
