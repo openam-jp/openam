@@ -34,8 +34,8 @@ define([
             "click [data-add-item]": "addItem",
             "keyup [data-add-item]": "addItem",
             "keyup [data-editing-input]": "addItem",
-            "click button[data-delete]": "deleteItem",
-            "keyup button[data-delete]": "deleteItem"
+            "click button[data-delete-item]": "deleteItem",
+            "keyup button[data-delete-item]": "deleteItem"
         },
         render (data, el, callback) {
             var self = this;

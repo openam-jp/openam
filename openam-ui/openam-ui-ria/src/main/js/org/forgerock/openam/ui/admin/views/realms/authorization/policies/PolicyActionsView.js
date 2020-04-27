@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
@@ -28,8 +29,8 @@ define([
         events: {
             "click [data-toggle-item]": "changePermission",
             "click [data-action-name]": "selectAction",
-            "click button[data-delete]": "deleteItem",
-            "keyup button[data-delete]": "deleteItem"
+            "click button[data-delete-item]": "deleteItem",
+            "keyup button[data-delete-item]": "deleteItem"
         },
 
         render (data, callback) {

@@ -34,8 +34,8 @@ define([
             "click [data-add-resource]": "addResource",
             "keyup [data-add-resource]": "addResource",
             "keyup #resourceBuilder input": "addResource",
-            "click span[data-delete]": "deleteResource",
-            "keyup span[data-delete]": "deleteResource",
+            "click span[data-delete-item]": "deleteResource",
+            "keyup span[data-delete-item]": "deleteResource",
             "click [data-remove-pending]": "removePendingResource",
             "click [data-show-editing]" : "showEditingResources"
         },

@@ -30,8 +30,8 @@ define([
             "click [data-add-item]": "addItem",
             "keyup [data-add-item]": "addItem",
             "keyup [data-editing-input]": "addItem",
-            "click span[data-delete]": "deleteItem",
-            "keyup span[data-delete]": "deleteItem"
+            "click span[data-delete-item]": "deleteItem",
+            "keyup span[data-delete-item]": "deleteItem"
         },
 
         baseRender (data, tpl, el, callback) {
