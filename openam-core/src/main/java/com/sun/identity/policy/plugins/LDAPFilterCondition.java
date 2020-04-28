@@ -575,15 +575,6 @@ public class LDAPFilterCondition implements Condition {
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
-        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
-        shutdownMan.addShutdownListener(
-                new ShutdownListener() {
-                    public void shutdown() {
-                        if (connPool != null) {
-                            connPool.close();
-                        }
-                    }
-                });
 
         policyConfigExpiresAt = currentTimeMillis() + getSubjectsResultTtl(configParams);
     }
