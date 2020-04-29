@@ -37,7 +37,6 @@ import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenListenersUnsupportedException;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyEvaluator;
@@ -75,7 +74,6 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
-import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.time.Duration;
 
 /**
