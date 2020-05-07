@@ -25,6 +25,7 @@
  * $Id: LDAPFilterCondition.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.policy.plugins;
@@ -36,7 +37,6 @@ import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenListenersUnsupportedException;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyEvaluator;
@@ -74,7 +74,6 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.forgerock.util.Options;
-import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.time.Duration;
 
 /**
@@ -575,15 +574,6 @@ public class LDAPFilterCondition implements Condition {
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
-        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
-        shutdownMan.addShutdownListener(
-                new ShutdownListener() {
-                    public void shutdown() {
-                        if (connPool != null) {
-                            connPool.close();
-                        }
-                    }
-                });
 
         policyConfigExpiresAt = currentTimeMillis() + getSubjectsResultTtl(configParams);
     }
