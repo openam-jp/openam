@@ -48,7 +48,7 @@
     "lodash": "3.10.1",
     "mocha": "2.5.3",
     "phantomjs-prebuilt": "2.1.7",
-    "requirejs": "2.2.0",
+    "requirejs": "2.3.6",
     "rimraf": "2.5.2",
     "sinon": "1.17.4",
     "sinon-chai": "2.8.0"

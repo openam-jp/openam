@@ -3309,9 +3309,9 @@
       "resolved": "https://registry.npmjs.org/require-uncached/-/require-uncached-1.0.2.tgz"
     },
     "requirejs": {
-      "version": "2.2.0",
-      "from": "requirejs@2.2.0",
-      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/requirejs/-/requirejs-2.2.0.tgz"
+      "version": "2.3.6",
+      "from": "requirejs@2.3.6",
+      "resolved": "http://maven.forgerock.org/repo/api/npm/npm-virtual/requirejs/-/requirejs-2.3.6.tgz"
     },
     "requires-port": {
       "version": "1.0.0",
