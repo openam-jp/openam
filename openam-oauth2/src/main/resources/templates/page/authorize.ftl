@@ -23,7 +23,7 @@
   ~ "Portions Copyrighted [year] [name of copyright owner]"
   ~
   ~ Portions Copyrighted 2014 Nomura Research Institute, Ltd
-  ~ Portions Copyrighted 2019 Open Source Solution Technology Corp.
+  ~ Portions Copyrighted 2019-2020 Open Source Solution Technology Corp.
   -->
 <html lang="en">
     <head>
@@ -61,6 +61,6 @@
                 }
             };
         </script>
-        <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
+        <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.3.6-min.js"></script>
     </body>
 </html>
