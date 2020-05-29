@@ -86,15 +86,17 @@ define([
                         .then((requirements) => {
                             obj.resetProcess();
                             return requirements;
-                        }, () => errorBody
+                        }, () => {
+                            throw errorBody;
+                        }
                     );
                 } else if (errorBody.code && errorBody.code === 400) {
-                    return {
+                    throw {
                         message: errorBody.message,
                         type: Messages.TYPE_DANGER
                     };
                 }
-                return errorBody;
+                throw errorBody;
             });
     };
     obj.handleRequirements = function (requirements) {
@@ -123,7 +125,7 @@ define([
         const processFailed = (reason) => {
             const failedStage = requirementList.length;
             obj.resetProcess();
-            return [failedStage, reason];
+            throw [failedStage, reason];
         };
         const goToFailureUrl = (errorBody) => {
             if (errorBody.detail && errorBody.detail.failureUrl) {
@@ -244,7 +246,9 @@ define([
                 .then((requirements) => {
                     obj.handleRequirements(requirements);
                     return requirements;
-                }, (error) => error);
+                }, (error) => {
+                    throw error;
+                });
         } else {
             return $.Deferred().resolve(requirementList[requirementList.length - 1]);
         }
