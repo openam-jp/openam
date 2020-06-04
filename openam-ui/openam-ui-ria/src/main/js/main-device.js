@@ -29,7 +29,7 @@ require.config({
         "handlebars":   "libs/handlebars-4.0.5",
         "i18next":      "libs/i18next-1.7.3-min",
         "jquery":       "libs/jquery-3.5.1-min",
-        "jquery-migrate": "libs/jquery-migrate-3.1.0",
+        "jquery-migrate": "libs/jquery-migrate-3.3.0",
         "text":         "libs/text-2.0.15"
     },
     shim: {

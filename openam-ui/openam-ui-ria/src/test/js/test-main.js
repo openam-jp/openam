@@ -34,7 +34,7 @@
             chai: "/base/node_modules/chai/chai",
             handlebars: "/base/target/dependencies/libs/handlebars-4.0.5",
             jquery: "/base/target/dependencies/libs/jquery-3.5.1-min",
-            "jquery-migrate": "/base/target/dependencies/libs/jquery-migrate-3.1.0",
+            "jquery-migrate": "/base/target/dependencies/libs/jquery-migrate-3.3.0",
             lodash: "/base/target/dependencies/libs/lodash-3.10.1-min",
             sinon: "/base/target/test-classes/libs/sinon-1.15.4",
             "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
