@@ -47,7 +47,7 @@ require.config({
         "bootstrap"               : "libs/bootstrap-3.4.1-openam-jp",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
-        "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
+        "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0-openam-jp",
 
         "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-0915edd-min",
         "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
