@@ -329,7 +329,7 @@ define([
                             redirectForm.append(
                                 `<input type='hidden' name='${k}' value='${v}' aria-hidden='true' />`);
                         });
-                        redirectForm.appendTo("body").submit();
+                        redirectForm.appendTo("body").trigger("submit");
                     } else {
                         window.location.replace(redirectCallback.redirectUrl);
                     }

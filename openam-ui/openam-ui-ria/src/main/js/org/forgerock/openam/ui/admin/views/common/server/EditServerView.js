@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 define([
@@ -96,7 +97,7 @@ define([
                                     // The input is disabled because the value is being inherited. However we are
                                     // still able to scroll to the correct row by focusing on the inherit button
                                     // first.
-                                    input.closest(".form-group").find("button").trigger("focus").blur();
+                                    input.closest(".form-group").find("button").trigger("focus").trigger("blur");
                                 } else {
                                     input.trigger("focus");
                                 }
