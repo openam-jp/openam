@@ -158,7 +158,7 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
             boolean _userVerificationRequired = config.isVerificationRequired(); 
             boolean _userPresenceRequired = true; 
-            List<String> _expectedExtensionIds = Collections.emptyList(); //OpenAM desn't use extention now.
+            List<String> _expectedExtensionIds = Collections.emptyList(); //OpenAM desn't use extension now.
 
             // OpenAM didn't store aaguid now. Use ZERO AAGUID.
             AAGUID _aaguid = AAGUID.ZERO;
