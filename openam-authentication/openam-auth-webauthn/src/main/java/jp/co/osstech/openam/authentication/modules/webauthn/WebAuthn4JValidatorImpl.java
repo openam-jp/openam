@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2020 Open Source Solution Technology Corporation
  */
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
 import com.webauthn4j.WebAuthnManager;
@@ -55,14 +54,14 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
  */
 public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
+    private WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
+
     private Challenge generatedChallenge = new DefaultChallenge();
 
     @Override
     public byte[] generateChallenge() {
         return ArrayUtil.clone(generatedChallenge.getValue());
     }
-
-    private WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
 
     @Override
     public WebAuthnAuthenticator validateCreateResponse(WebAuthnValidatorConfig config, WebAuthnJsonCallback responseJson,
@@ -87,7 +86,7 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
             boolean _userVerificationRequired = config.isVerificationRequired(); 
             boolean _userPresenceRequired = true; 
-            List<String> _expectedExtensionIds = Collections.emptyList(); //OpenAM desn't use extention now.
+            List<String> _expectedExtensionIds = Collections.emptyList(); //OpenAM desn't use extension now.
 
             RegistrationRequest _registrationRequest = new RegistrationRequest(_attestationObjectBytes, _clientDataJsonBytes, 
                     _clientExtensionJSON, _transports);
@@ -97,15 +96,11 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             RegistrationData _registrationData;
             try{
                 _registrationData = webAuthnManager.parse(_registrationRequest);
-            }
-            catch (DataConversionException e){
+                webAuthnManager.validate(_registrationData, _registrationParameters);
+            } catch (DataConversionException e){
                 // If you would like to handle WebAuthn data structure parse error, please catch DataConversionException
                 throw e;
-            }
-            try{
-                webAuthnManager.validate(_registrationData, _registrationParameters);
-            }
-            catch (ValidationException e){
+            } catch (ValidationException e){
                 // If you would like to handle WebAuthn data validation error, please catch ValidationException
                 throw e;
             }
@@ -203,15 +198,11 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
             AuthenticationData _authenticationData;
             try{
                 _authenticationData = webAuthnManager.parse(_authenticationRequest);
-            }
-            catch (DataConversionException e){
+                webAuthnManager.validate(_authenticationData, _authenticationParameters);
+            } catch (DataConversionException e){
                 // If you would like to handle WebAuthn data structure parse error, please catch DataConversionException
                 throw e;
-            }
-            try{
-                webAuthnManager.validate(_authenticationData, _authenticationParameters);
-            }
-            catch (ValidationException e){
+            } catch (ValidationException e){
                 // If you would like to handle WebAuthn data validation error, please catch ValidationException
                 throw e;
             }
