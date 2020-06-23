@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2020 Open Source Solution Technology Corporation
+ * Copyright 2019-2020 Open Source Solution Technology Corporation
  */
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
