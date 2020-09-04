@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.rest;
@@ -246,7 +247,7 @@ public class RealmContextFilter implements Filter, org.forgerock.json.resource.F
                 overrideRealm = resolveRealm(adminToken, "/", RealmUtils.cleanRealm(overrideRealmParameter.get(0)));
             }
         } catch (InternalServerErrorException e) {
-            throw new BadRequestException("Invalid realm, " + overrideRealmParameter.get(0), e);
+            throw new BadRequestException("Invalid realm", e);
         }
 
         List<String> remainingUri = requestUri.subList(consumedElementsCount, requestUri.size());
