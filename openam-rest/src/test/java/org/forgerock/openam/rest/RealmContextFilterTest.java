@@ -14,6 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  *
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.rest;
@@ -568,7 +569,7 @@ public class RealmContextFilterTest {
     private void verifyInvalidRealmResponse(Response response, String expectedInvalidRealm) throws IOException {
         assertThat(response.getStatus()).isSameAs(Status.BAD_REQUEST);
         assertThat(response.getEntity().getJson()).isEqualTo(
-                new BadRequestException("Invalid realm, " + expectedInvalidRealm).toJsonValue().getObject());
+                new BadRequestException("Invalid realm").toJsonValue().getObject());
     }
 
     private void collectCRUDPAQArguments(RequestHandler requestHandler, ArgumentCaptor<Context> contextCaptor, ArgumentCaptor<org.forgerock.json.resource.Request> requestCaptor) {
