@@ -87,6 +87,7 @@ public class OAuthConf {
     private String smtpSSLEnabled = "false";
     private String emailFrom = null;
     private String authLevel = "0";
+    private String codeChallengeMethod = null;
 
     OAuthConf() {
     }
@@ -131,6 +132,7 @@ public class OAuthConf {
         smtpSSLEnabled = CollectionHelper.getMapAttr(config, KEY_SMTP_SSL_ENABLED);
         emailFrom = CollectionHelper.getMapAttr(config, KEY_EMAIL_FROM);
         authLevel = CollectionHelper.getMapAttr(config, KEY_AUTH_LEVEL);
+        codeChallengeMethod = CollectionHelper.getMapAttr(config, KEY_CODE_CHALLENGE_METHOD);
     }
 
     public int getAuthnLevel() {
@@ -243,7 +245,7 @@ public class OAuthConf {
         return scope;
     }
 
-    public String getAuthServiceUrl(String originalUrl, String state) throws
+    public String getAuthServiceUrl(String originalUrl, String state, String codeChallenge) throws
             AuthLoginException {
 
         try {
@@ -253,6 +255,10 @@ public class OAuthConf {
             addParam(sb, PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl));
             addParam(sb, "response_type", "code");
             addParam(sb, "state", state);
+            if (!codeChallengeMethod.equalsIgnoreCase("none")){
+                addParam(sb, "code_challenge_method", codeChallengeMethod);
+                addParam(sb, "code_challenge", codeChallenge);
+            }
             return sb.toString();
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
@@ -270,7 +276,7 @@ public class OAuthConf {
         return tokenServiceUrl;
     }
 
-    public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL)
+    public Map<String, String> getTokenServicePOSTparameters(String code, String authServiceURL, String verifier)
             throws AuthLoginException {
 
         Map<String, String> postParameters = new HashMap<String, String>();
@@ -288,7 +294,9 @@ public class OAuthConf {
             postParameters.put(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL));
             postParameters.put(PARAM_CODE, OAuthUtil.oAuthEncode(code));
             postParameters.put(PARAM_GRANT_TYPE, OAuth2Constants.TokenEndpoint.AUTHORIZATION_CODE);
-
+            if (!codeChallengeMethod.equalsIgnoreCase("none")) {
+                postParameters.put(PARAM_CODE_VERIFIER, verifier);
+            }
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
                     + "and building the Token Service URL", ex);
@@ -361,6 +369,10 @@ public class OAuthConf {
     public String getBasicAuthorizaionHeader() {
         String plain = clientId + ":" + clientSecret;
         return "Basic " + Base64.encode(plain.getBytes());
+    }
+
+    public String getCodeChallengeMethod() {
+        return codeChallengeMethod;
     }
 
 }

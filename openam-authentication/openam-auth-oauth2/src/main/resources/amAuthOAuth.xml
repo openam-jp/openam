@@ -279,7 +279,16 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  type="single" syntax="string" i18nKey="oidc.crypto_context_value" order="3100"
                                  resourceName="openidConnectContextValue">
                 </AttributeSchema>
-
+                <AttributeSchema name="org-forgerock-auth-oauth-code-challenge-method-algorithm" type="single_choice" syntax="string" i18nKey="a145" order="4000" resourceName="oauth2CodeChallengeMethod">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="none">none</ChoiceValue>
+                        <ChoiceValue i18nKey="plain">plain</ChoiceValue>
+                        <ChoiceValue i18nKey="S256">S256</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>none</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-oauth-client-id"
                                      type="single" syntax="string" i18nKey="a101" order="100" resourceName="clientId">
@@ -515,6 +524,18 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
                                      type="single" syntax="string" i18nKey="oidc.crypto_context_value" order="3100"
                                      resourceName="openidConnectContextValue">
+                    </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-code-challenge-method-algorithm" 
+                                    type="single_choice" syntax="string" i18nKey="a145" order="4000" 
+                                    resourceName="oauth2CodeChallengeMethod">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="none">none</ChoiceValue>
+                            <ChoiceValue i18nKey="plain">plain</ChoiceValue>
+                            <ChoiceValue i18nKey="S256">S256</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>none</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>
