@@ -25,7 +25,7 @@
  * $Id: ServiceConfigImpl.java,v 1.15 2008/10/14 04:57:20 arviranga Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.sm;
@@ -620,8 +620,6 @@ class ServiceConfigImpl implements ServiceListener {
             if (!answer.isValid()) {
                 configImpls.remove(cn, answer);
                 answer.clear();
-                answer = null;
-            } else if (answer.smsEntry.isNewEntry()) {
                 answer = null;
             }
         }
