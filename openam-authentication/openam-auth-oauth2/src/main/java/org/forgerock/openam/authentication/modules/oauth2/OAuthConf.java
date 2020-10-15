@@ -256,8 +256,8 @@ public class OAuthConf {
             addParam(sb, "response_type", "code");
             addParam(sb, "state", state);
             if (!codeChallengeMethod.equalsIgnoreCase("none")){
-                addParam(sb, "code_challenge_method", codeChallengeMethod);
-                addParam(sb, "code_challenge", codeChallenge);
+                addParam(sb, PARAM_CODE_CHALLENGE_METHOD, codeChallengeMethod);
+                addParam(sb, PARAM_CODE_CHALLENGE, codeChallenge);
             }
             return sb.toString();
         } catch (UnsupportedEncodingException ex) {

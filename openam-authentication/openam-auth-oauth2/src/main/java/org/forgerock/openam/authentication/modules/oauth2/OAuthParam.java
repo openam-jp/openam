@@ -80,6 +80,8 @@ public class OAuthParam {
     public final static String PARAM_CLIENT_ID = "client_id";
     public final static String PARAM_ACCESS_TOKEN =  "access_token";
     public final static String PARAM_GRANT_TYPE = "grant_type";
+    public final static String PARAM_CODE_CHALLENGE = "code_challenge";
+    public final static String PARAM_CODE_CHALLENGE_METHOD = "code_challenge_method";
     public final static String PARAM_CODE_VERIFIER = "code_verifier";
 
     // oauthproxy parameters

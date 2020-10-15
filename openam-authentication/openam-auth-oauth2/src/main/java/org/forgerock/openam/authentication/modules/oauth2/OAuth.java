@@ -943,7 +943,7 @@ public class OAuth extends AMLoginModule {
         return Base64url.encode(content);
     }
 
-    private String createCodeChallenge(String alg,String value) throws AuthLoginException {
+    private String createCodeChallenge(String alg, String value) throws AuthLoginException {
         switch (alg){
             case "S256":
                 String transformedValue = "";
