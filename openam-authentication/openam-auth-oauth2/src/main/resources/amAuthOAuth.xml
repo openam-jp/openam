@@ -279,7 +279,9 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  type="single" syntax="string" i18nKey="oidc.crypto_context_value" order="3100"
                                  resourceName="openidConnectContextValue">
                 </AttributeSchema>
-                <AttributeSchema name="org-forgerock-auth-oauth-code-challenge-method-algorithm" type="single_choice" syntax="string" i18nKey="a145" order="4000" resourceName="oauth2CodeChallengeMethod">
+                <AttributeSchema name="org-forgerock-auth-oauth-code-challenge-method-algorithm" 
+                                 type="single_choice" syntax="string" i18nKey="a145" order="4000"
+                                 resourceName="oauth2CodeChallengeMethod">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="none">none</ChoiceValue>
                         <ChoiceValue i18nKey="plain">plain</ChoiceValue>
