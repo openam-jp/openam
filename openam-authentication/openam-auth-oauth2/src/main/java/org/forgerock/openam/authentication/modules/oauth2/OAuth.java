@@ -24,6 +24,7 @@
  *
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2020 i7a7467
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -288,6 +289,11 @@ public class OAuth extends AMLoginModule {
                     }
                     if (!pkceCodeChallengeMethod.equalsIgnoreCase("none")) {
                         pkceCodeVerifier = csrfStateToken.getValue(CoreTokenField.STRING_TWO);
+                        if (pkceCodeVerifier == null || pkceCodeVerifier.isEmpty()) {
+                            OAuthUtil.debugError("OAuth.process(): Authorization call-back failed "
+                                + "because the code verifier is not found");
+                            throw new AuthLoginException(BUNDLE_NAME, "notFoundCodeVerifier", null);
+                        }
                     }
 
                     // We are being redirected back from an OAuth 2 Identity Provider
