@@ -24,6 +24,7 @@
  *
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2020 i7a7467
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -111,6 +112,8 @@ public class OAuth extends AMLoginModule {
     String userPassword = "";
     String proxyURL = "";
     private final CTSPersistentStore ctsStore;
+    String pkceCodeVerifier = "";
+    String pkceCodeChallengeMethod = "";
 
     public OAuth() {
         OAuthUtil.debugMessage("OAuth()");
@@ -147,6 +150,8 @@ public class OAuth extends AMLoginModule {
 
         // The Proxy is used to return with a POST to the module
         proxyURL = config.getProxyURL();
+
+        pkceCodeChallengeMethod = config.getCodeChallengeMethod();
 
         switch (state) {
             case ISAuthConstants.LOGIN_START: {
@@ -199,6 +204,14 @@ public class OAuth extends AMLoginModule {
                 Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
                 csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
 
+                String pkceCodeChallenge = "";
+
+                if (!pkceCodeChallengeMethod.equalsIgnoreCase("none")){
+                    pkceCodeVerifier = createCodeVerifier();
+                    pkceCodeChallenge = createCodeChallenge(pkceCodeChallengeMethod,pkceCodeVerifier);
+                    csrfStateToken.setAttribute(CoreTokenField.STRING_TWO, pkceCodeVerifier);
+                }
+
                 try {
                     ctsStore.create(csrfStateToken);
                 } catch (CoreTokenException e) {
@@ -226,13 +239,12 @@ public class OAuth extends AMLoginModule {
                     }
                 }
 
-                // The Proxy is used to return with a POST to the module
                 setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL, originalUrl.toString());
 
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
 
-                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState);
+                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState, pkceCodeChallenge);
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
                 Callback[] callbacks1 = getCallback(2);
@@ -275,6 +287,14 @@ public class OAuth extends AMLoginModule {
                                 + "contained an unexpected value");
                         throw new AuthLoginException(BUNDLE_NAME, "incorrectState", null);
                     }
+                    if (!pkceCodeChallengeMethod.equalsIgnoreCase("none")) {
+                        pkceCodeVerifier = csrfStateToken.getValue(CoreTokenField.STRING_TWO);
+                        if (pkceCodeVerifier == null || pkceCodeVerifier.isEmpty()) {
+                            OAuthUtil.debugError("OAuth.process(): Authorization call-back failed "
+                                + "because the code verifier is not found");
+                            throw new AuthLoginException(BUNDLE_NAME, "notFoundCodeVerifier", null);
+                        }
+                    }
 
                     // We are being redirected back from an OAuth 2 Identity Provider
                     if (code == null || code.isEmpty()) {
@@ -289,13 +309,13 @@ public class OAuth extends AMLoginModule {
                     String tokenSvcResponse;
                     if("client_secret_basic".equals(config.getTokenServiceAuthMethod())) {
                         tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), config.getBasicAuthorizaionHeader(),
-                            null, config.getTokenServicePOSTparameters(code, proxyURL));
+                            null, config.getTokenServicePOSTparameters(code, proxyURL, pkceCodeVerifier));
                     } else if("client_secret_post".equals(config.getTokenServiceAuthMethod())) {
                         tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
-                            config.getTokenServicePOSTparameters(code, proxyURL));
+                            config.getTokenServicePOSTparameters(code, proxyURL, pkceCodeVerifier));
                     } else {
                         tokenSvcResponse = getContentUsingPOST(config.getTokenServiceUrl(), null, null,
-                            config.getTokenServicePOSTparameters(code, proxyURL));
+                            config.getTokenServicePOSTparameters(code, proxyURL, pkceCodeVerifier));
                     }
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
@@ -923,4 +943,30 @@ public class OAuth extends AMLoginModule {
         return result.toString();
     }
 
+    private String createCodeVerifier() {
+        byte[] content = new byte[64];
+        new SecureRandom().nextBytes(content);
+        return Base64url.encode(content);
+    }
+
+    private String createCodeChallenge(String alg, String value) throws AuthLoginException {
+        switch (alg){
+            case "S256":
+                String transformedValue = "";
+                try {
+                    transformedValue = Base64url.encode(MessageDigest.getInstance("SHA-256")
+                            .digest(value.getBytes(StandardCharsets.US_ASCII)));
+                } catch (NoSuchAlgorithmException nsae) {
+                    throw new AuthLoginException(
+                            "OAuth.process(): "
+                                    + "Problem when trying to transform the code verifier into the code challenge",
+                            nsae);
+                }
+                return transformedValue;
+            case "plain":
+                return value;
+            default:
+                return value;
+        }
+    }
 }
