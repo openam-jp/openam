@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2020 INTEC Inc.
  */
 package com.sun.identity.workflow;
 
@@ -70,7 +71,6 @@ public class ConfigureGoogleApps
             Object[] param = {domainIds};
             throw new WorkflowException("domain.is.empty", param);
         }
-        updateIDPMeta(realm, entityId);
 
         StringTokenizer st = new StringTokenizer(domainIds, ",");
         while (st.hasMoreTokens()) {
@@ -80,37 +80,6 @@ public class ConfigureGoogleApps
         Object[] param = {entityId};
         return MessageFormat.format(
                 getMessage("google.apps.configured.success", locale), param);
-    }
-
-    private void updateIDPMeta(String realm, String entityId)
-            throws WorkflowException {
-        try {
-            SAML2MetaManager samlManager = new SAML2MetaManager();
-            EntityConfigElement entityConfig =
-                    samlManager.getEntityConfig(realm, entityId);
-            IDPSSOConfigElement idpssoConfig =
-                    samlManager.getIDPSSOConfig(realm, entityId);
-            List attrList = idpssoConfig.getAttribute();
-            if (idpssoConfig != null) {
-                for (Iterator it = attrList.iterator(); it.hasNext();) {
-                    AttributeElement avpnew = (AttributeElement) it.next();
-                    String name = avpnew.getName();
-                    if (name.equals("nameIDFormatMap")) {
-                        for (Iterator itt = avpnew.getValue().listIterator();
-                                itt.hasNext();) {
-                            String temp = (String) itt.next();
-                            if (temp.contains("unspecified")) {
-                                itt.remove();
-                            }
-                        }
-                        avpnew.getValue().add(0, nameidMapping);
-                    }
-                }
-            }
-            samlManager.setEntityConfig(realm, entityConfig);
-        } catch (SAML2MetaException e) {
-            throw new WorkflowException(e.getMessage());
-        }
     }
 
     private void updateSPMeta(String realm, String cot, String domainId)
