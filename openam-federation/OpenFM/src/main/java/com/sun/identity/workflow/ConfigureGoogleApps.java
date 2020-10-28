@@ -33,17 +33,11 @@
 package com.sun.identity.workflow;
 
 import com.sun.identity.cot.COTException;
-import com.sun.identity.saml2.jaxb.entityconfig.AttributeElement;
-import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
-import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -54,9 +48,6 @@ import javax.xml.bind.JAXBException;
  **/
 public class ConfigureGoogleApps
         extends Task {
-
-    private static String nameidMapping =
-            "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=uid";
 
     public ConfigureGoogleApps() {
     }
