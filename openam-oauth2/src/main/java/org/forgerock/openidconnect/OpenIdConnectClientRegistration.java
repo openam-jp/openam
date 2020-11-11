@@ -120,4 +120,10 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
      * @throws ServerException If any internal server error occurs.
      */
     long getJwtTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException;
+
+    /**
+     * Gets the token_endpoint_auth_signing_alg configured for this client.
+     */
+    String getTokenEndpointAuthSigningAlg();
+
 }

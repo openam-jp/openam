@@ -22,6 +22,8 @@ import static org.forgerock.openidconnect.Client.TokenEndpointAuthMethod.*;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Set;
 import javax.inject.Inject;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Jwt;
@@ -77,7 +79,14 @@ public class ClientCredentialsReader {
         //jwt type first
         if (JWT_PROFILE_CLIENT_ASSERTION_TYPE.equalsIgnoreCase(request.<String>getParameter(CLIENT_ASSERTION_TYPE))) {
             client = verifyJwtBearer(request, basicAuth, endpoint);
-            method = PRIVATE_KEY_JWT;
+            final OAuth2Jwt clientAssertionJwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
+            final JwsAlgorithm signatureAlgorithm = clientAssertionJwt.getSignedJwt().getHeader().getAlgorithm();
+            if (signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.HMAC) {
+                method = CLIENT_SECRET_JWT;
+            } else if (signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.RSA || 
+                    signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.ECDSA) {
+                method = PRIVATE_KEY_JWT;
+            }
         } else {
             String clientId = request.getParameter(OAuth2Constants.Params.CLIENT_ID);
             String clientSecret = request.getParameter(OAuth2Constants.Params.CLIENT_SECRET);
@@ -127,13 +136,12 @@ public class ClientCredentialsReader {
         final OAuth2Jwt jwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(jwt.getSubject(), request);
-        
         if (jwt.isExpired()) {
             throw failureFactory.getException(request, "JWT has expired");
         }
 
-        if (!clientRegistration.verifyJwtIdentity(jwt)) {
-            throw failureFactory.getException(request, "JWT is not valid");
+        if (!clientRegistration.verifyJwtForClientAssertion(jwt)) {
+            throw failureFactory.getException(request, "Client assertion JWT is not valid");
         }
 
         if (basicAuth && jwt.getSubject() != null) {
@@ -143,6 +151,14 @@ public class ClientCredentialsReader {
 
         if (endpoint != null && !jwt.isIntendedForAudience(endpoint)) {
             throw failureFactory.getException(request, "Audience validation failed");
+        }
+
+        if (request.getValidatedScopes().contains(OAuth2Constants.Params.OPENID) &&
+                (jwt.getSignedJwt().getClaimsSet().getJwtId() == null ||
+                    jwt.getSignedJwt().getClaimsSet().getJwtId().isEmpty())
+            ) 
+            {
+            throw failureFactory.getException(request, "Client assertion JWT does not contain jti");
         }
 
         return new ClientCredentials(jwt.getSubject(), null, true, false);

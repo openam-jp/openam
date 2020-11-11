@@ -661,6 +661,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return subjectType;
     }
 
+    // for verify id_token in idtokeninfo endpoint
     @Override
     public boolean verifyJwtIdentity(final OAuth2Jwt jwt) {
         final JwsAlgorithm signatureAlgorithm = JwsAlgorithm.valueOf(getIDTokenSignedResponseAlgorithm());
@@ -900,6 +901,82 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
         if (set.iterator().hasNext()){
             return set.iterator().next();
+        }
+        return null;
+    }
+
+    // for verify client assertion in token endpoint
+    @Override
+    public boolean verifyJwtForClientAssertion(OAuth2Jwt jwt) {
+
+        JwsAlgorithm signatureAlgorithm;
+        // for backward compatibility
+        if (getTokenEndpointAuthSigningAlg() == null || getTokenEndpointAuthSigningAlg().isEmpty()){
+            signatureAlgorithm = JwsAlgorithm.valueOf(getIDTokenSignedResponseAlgorithm());
+        } else {
+            signatureAlgorithm = JwsAlgorithm.valueOf(getTokenEndpointAuthSigningAlg());
+        }
+        final JwsAlgorithm jwsAlgorithm = jwt.getSignedJwt().getHeader().getAlgorithm();
+
+        if(!signatureAlgorithm.getAlgorithm().equalsIgnoreCase(jwsAlgorithm.getAlgorithm())){
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                "Signing algorithm of client assertion JWT and " + 
+                "configured algorithm in oauth2 client do not match");
+        }
+
+        if (jwsAlgorithm.getAlgorithmType() == JwsAlgorithmType.HMAC) {
+            return verifyJwtBySharedSecretForClientAssertion(jwt);
+        } else if (jwsAlgorithm.getAlgorithmType() == JwsAlgorithmType.RSA || 
+            jwsAlgorithm.getAlgorithmType() == JwsAlgorithmType.ECDSA) {
+            try {
+                switch (getClientPublicKeySelector()) {
+                    case JWKS:
+                        return byJWKs(jwt);
+                    case JWKS_URI:
+                        return byJWKsURI(jwt);
+                    default:
+                        return byX509Key(jwt);
+                }
+            } catch (Exception e) {
+                logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                        "Unable to get Client Bearer Jwt Public key from repository");
+            }
+        } else {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Signing algorithm in client assertion JWT is not supported");
+        }
+    }
+
+    public boolean verifyJwtBySharedSecretForClientAssertion(final OAuth2Jwt jwt) {
+        final String issuer = jwt.getSignedJwt().getClaimsSet().getIssuer();
+        OpenIdResolver resolver = new SharedSecretOpenIdResolverImpl(issuer, getClientSecret());
+        Request req = Request.getCurrent();
+        try {
+            resolver.validateIdentity(jwt.getSignedJwt());
+            return jwt.isContentValid();
+        } catch (OpenIdConnectVerificationException e) {
+            return false;
+        }
+    }
+    
+    @Override
+    public String getTokenEndpointAuthSigningAlg() {
+        final String tokenEndpointAuthSigningAlg;
+        Set<String> signAlgSet;
+        try {
+            signAlgSet = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_SIGNING_ALG);
+        } catch (Exception e) {
+            logger.error("Unable to get {} from repository", 
+                OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_SIGNING_ALG, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get " + OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_SIGNING_ALG +
+                    " from repository");
+        }
+
+        if (CollectionUtils.isNotEmpty(signAlgSet)){
+            tokenEndpointAuthSigningAlg = signAlgSet.iterator().next();
+            return tokenEndpointAuthSigningAlg;
         }
         return null;
     }

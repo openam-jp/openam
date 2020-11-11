@@ -140,7 +140,7 @@ public interface ClientRegistration {
     String getSubjectType();
 
     /**
-     * Verifies that the supplied jwt is signed by this client.
+     * Verifies that the supplied jwt(idtoken) is signed by this client.
      */
     boolean verifyJwtIdentity(OAuth2Jwt jwt);
 
@@ -157,5 +157,10 @@ public interface ClientRegistration {
       * @return true if enabled.
       */
     boolean isPolicyBasedProtectionEnabled();
+
+    /**
+     * Verifies that the supplied jwt(client assertion) is signed by this client.
+     */
+    boolean verifyJwtForClientAssertion(OAuth2Jwt jwt);
 
 }

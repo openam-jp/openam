@@ -215,7 +215,7 @@ public class Client extends JsonValue {
         /** Client secret basic type. */
         CLIENT_SECRET_BASIC("client_secret_basic"),
         /** Client secret post type. */
-     //   CLIENT_SECRET_JWT("client_secret_jwt"), todo uncomment as we add suppot
+        CLIENT_SECRET_JWT("client_secret_jwt"),
         /** Client secret basic type. */
         PRIVATE_KEY_JWT("private_key_jwt");
         /** None type. */
@@ -342,6 +342,7 @@ public class Client extends JsonValue {
      * @param accessTokenLifeTime            The client's access token lifetime.
      * @param refreshTokenLifeTime           The client's refresh token lifetime.
      * @param jwtTokenLifeTime               The client's JWT token lifetime.
+     * @param tokenEndPointAuthSigningAlg    The client's sign algorithm for client assertion.
      */
     public Client(String clientID, String clientType, List<String> redirectionURIs, List<String> allowedGrantScopes,
                   List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
@@ -350,7 +351,8 @@ public class Client extends JsonValue {
                   String clientSecret, List<String> responseTypes, List<String> contacts, Long defaultMaxAge,
                   Boolean defaultMaxAgeEnabled, String tokenEndpointAuthMethod, String jwks,
                   String jwksUri, String x509, String selector, String sectorIdUri, Long authorizationCodeLifeTime,
-                  Long accessTokenLifeTime, Long refreshTokenLifeTime, Long jwtTokenLifeTime) {
+                  Long accessTokenLifeTime, Long refreshTokenLifeTime, Long jwtTokenLifeTime, 
+                  String tokenEndPointAuthSigningAlg) {
         super(new HashMap<String, Object>());
         setAccessToken(accessToken);
         setAllowedGrantScopes(allowedGrantScopes);
@@ -381,6 +383,7 @@ public class Client extends JsonValue {
         setAccessTokenLifeTime(accessTokenLifeTime);
         setRefreshTokenLifeTime(refreshTokenLifeTime);
         setJwtTokenLifeTime(jwtTokenLifeTime);
+        setTokenEndpointAuthSigningAlg(tokenEndPointAuthSigningAlg);
     }
 
     /**
@@ -1040,6 +1043,27 @@ public class Client extends JsonValue {
             put(OAuth2Constants.ShortClientAttributeNames.JWT_TOKEN_LIFE_TIME.getType(), jwtTokenLifeTime);
         } else {
             put(OAuth2Constants.ShortClientAttributeNames.JWT_TOKEN_LIFE_TIME.getType(), 0);
+        }
+    }
+
+    /**
+     * Gets the client assertion signing alg of the OAuth2Client.
+     *
+     * @return The client assertion signing alg.
+     */
+    public String getTokenEndpointAuthSigningAlg() {
+        return get(OAuth2Constants.ShortClientAttributeNames.TOKEN_ENDPOINT_AUTH_SIGNING_ALG.getType()).asString();
+    }
+
+    /**
+     * Sets the client assertion signing alg of the OAuth2Client.
+     *
+     * @param tokenEndpointAuthSigningAlg The client assertion signing alg.
+     */
+    public void setTokenEndpointAuthSigningAlg(String tokenEndpointAuthSigningAlg) {
+        if (tokenEndpointAuthSigningAlg != null && !tokenEndpointAuthSigningAlg.isEmpty()) {
+            put(OAuth2Constants.ShortClientAttributeNames.TOKEN_ENDPOINT_AUTH_SIGNING_ALG.getType(),
+                tokenEndpointAuthSigningAlg);
         }
     }
 }
