@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 i7a7467
  */
 package org.forgerock.openam.upgrade.helpers;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.OAuth2Client.*;
 
+import java.util.Arrays;
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.AttributeSchemaImpl;
@@ -42,6 +44,7 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
         attributes.add(FETCH_FROM_ROOT);
         attributes.add(ACTION_VALUES);
         attributes.add(IDTOKEN_SIGNED_RESPONSE_ALG);
+        attributes.add(TOKEN_ENDPOINT_AUTH_METHOD);
     }
 
     @Override
@@ -59,6 +62,9 @@ public class AgentServiceHelper extends AbstractUpgradeHelper {
             return null;
         } else if ((ACTION_VALUES.equals(newAttr.getName()) || IDTOKEN_SIGNED_RESPONSE_ALG.equals(newAttr.getName()))
                 && newAttr.getDefaultValues().equals(oldAttr.getDefaultValues())) {
+            return null;
+        } else if (TOKEN_ENDPOINT_AUTH_METHOD.equals(newAttr.getName())
+                && (Arrays.asList(oldAttr.getChoiceValues()).contains("client_secret_jwt"))) {
             return null;
         }
 
