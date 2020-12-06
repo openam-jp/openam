@@ -154,7 +154,10 @@ public class ClientCredentialsReader {
             throw failureFactory.getException(request, "Audience validation failed");
         }
 
-        if (request.getValidatedScopes().contains(OAuth2Constants.Params.OPENID) &&
+        final OpenIdConnectClientRegistration useJwtClient = clientRegistrationStore.get(jwt.getSubject(), request);
+        final Set<String> useJwtClientScopes = useJwtClient.getAllowedScopes();
+
+        if (useJwtClientScopes.contains(OAuth2Constants.Params.OPENID) &&
                 (jwt.getSignedJwt().getClaimsSet().getJwtId() == null ||
                     jwt.getSignedJwt().getClaimsSet().getJwtId().isEmpty())
             ) 
