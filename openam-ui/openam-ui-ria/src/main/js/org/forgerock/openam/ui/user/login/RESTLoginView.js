@@ -479,9 +479,13 @@ define([
 
                 // Magic number 4 is for a <script>, taken from ScriptTextOutputCallback.java
                 if (options.type.value === "4") {
-                    result += renderPartial("ScriptTextOutput", {
-                        messageValue: options.message.value
-                    });
+                    if (options.message.value === "PLACEHOLDER") {
+                        result += renderPartial("ScriptTextOutput", {});
+                    } else {
+                        result += renderPartial("ScriptTextOutput", {
+                            messageValue: options.message.value
+                        });
+                    }
                 } else {
                     result += renderPartial("TextOutput", {
                         typeValue: options.type.value,
