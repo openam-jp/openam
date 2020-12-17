@@ -25,6 +25,7 @@
  * $Id: RPSigninRequest.java,v 1.9 2009/11/03 00:48:54 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -172,7 +173,7 @@ public class RPSigninRequest extends WSFederationAction {
                 Cookie cookie = new Cookie(accountRealmCookieName,whr);
                 // Set cookie to persist for a year
                 cookie.setMaxAge(60*60*24*365);
-		CookieUtils.addCookieToResponse(response, cookie);
+		CookieUtils.addCookieToResponse(request, response, cookie);
             }
         }
         else

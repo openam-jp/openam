@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.UI;
 
@@ -1674,9 +1675,9 @@ public class LoginViewBean extends AuthViewBeanBase {
                         cookie.setMaxAge(cookieTimeToLive);
                     }
                 }
-                CookieUtils.addCookieToResponse(response, cookie);
+                CookieUtils.addCookieToResponse(request, response, cookie);
                 if ((cookie.getName()).equals(AuthUtils.getCookieName())) {
-                    AuthUtils.setHostUrlCookie(response);
+                    AuthUtils.setHostUrlCookie(request, response);
                 }
             } catch (Exception e) {
                 loginDebug.message("Cound not set Auth or AM Cookie!");
@@ -1703,9 +1704,9 @@ public class LoginViewBean extends AuthViewBeanBase {
                     loginDebug.message("cookie for new request : "
                             + cookie.toString());
                 }
-                CookieUtils.addCookieToResponse(response, cookie);
+                CookieUtils.addCookieToResponse(request, response, cookie);
                 if ((cookie.getName()).equals(AuthUtils.getCookieName())) {
-                    AuthUtils.setHostUrlCookie(response);
+                    AuthUtils.setHostUrlCookie(request, response);
                 }
             }
         }

@@ -22,6 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -133,7 +134,7 @@ public class OAuthProxy  {
         OAuthUtil.debugMessage("OAuthProxy.toPostForm: removing cookie " + COOKIE_ORIG_URL);
 
         for (String cookieDomain : AuthClientUtils.getCookieDomainsForRequest(req)) {
-            CookieUtils.addCookieToResponse(res, CookieUtils.newCookie(COOKIE_ORIG_URL, "", 0, "/", cookieDomain));
+            CookieUtils.addCookieToResponse(req, res, CookieUtils.newCookie(COOKIE_ORIG_URL, "", 0, "/", cookieDomain));
         }
         out.println(html.toString());
     }

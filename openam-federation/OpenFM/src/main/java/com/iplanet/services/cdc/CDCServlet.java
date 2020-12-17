@@ -25,6 +25,7 @@
  * $Id: CDCServlet.java,v 1.13 2009/11/13 23:43:17 dknab Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.iplanet.services.cdc;
@@ -328,12 +329,12 @@ public class CDCServlet extends HttpServlet {
                                 String domain = (String)it.next();
                                 Cookie cookie = CookieUtils.newCookie(cookieName, 
                                         cookieValue,"/", domain);
-                                CookieUtils.addCookieToResponse(response, cookie);
+                                CookieUtils.addCookieToResponse(request, response, cookie);
                             }
                         } else {
                             Cookie cookie = CookieUtils.newCookie(cookieName, 
                                     cookieValue,"/", null);
-                            CookieUtils.addCookieToResponse(response, cookie);
+                            CookieUtils.addCookieToResponse(request, response, cookie);
                         }
                     }
                 } catch (Exception e) {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 /**
@@ -19,6 +20,7 @@
  * @module org/forgerock/openam/ui/user/login/tokens/SessionToken
  */
 
+import _ from "lodash";
 import CookieHelper from "org/forgerock/commons/ui/common/util/CookieHelper";
 import Configuration from "org/forgerock/commons/ui/common/main/Configuration";
 
@@ -34,8 +36,14 @@ function secureCookie () {
     return Configuration.globalData.secureCookie;
 }
 
+function cookieSameSite () {
+    if (_.has(Configuration, `globalData.cookieSamesiteMap[${cookieName()}]`)) {
+        return Configuration.globalData.cookieSamesiteMap[cookieName()];
+    }
+}
+
 export function set (token) {
-    return CookieHelper.setCookie(cookieName(), token, "", "/", cookieDomains(), secureCookie());
+    return CookieHelper.setCookie(cookieName(), token, "", "/", cookieDomains(), secureCookie(), cookieSameSite());
 }
 
 export function get () {

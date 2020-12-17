@@ -25,6 +25,7 @@
  * $Id: FSFedTerminationHandler.java,v 1.7 2009/11/03 00:49:26 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.federation.services.termination;
@@ -619,7 +620,7 @@ public class FSFedTerminationHandler {
                     FSUtils.debug.message("Provider cookie domain list is " + domains);
                 }
                 for (String domain : domains) {
-                    CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(FEDERATE_COOKIE_NAME, cookieValue,
+                    CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(FEDERATE_COOKIE_NAME, cookieValue,
                             IFSConstants.PERSISTENT_COOKIE_AGE, "/", domain));
                 }
             }

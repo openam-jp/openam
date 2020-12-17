@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2020 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.core.rest.server;
 
@@ -35,6 +35,9 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import jp.co.osstech.openam.shared.cookie.SameSite;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -58,15 +61,19 @@ import org.forgerock.openam.rest.ServiceConfigUtils;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,6 +101,7 @@ public class ServerInfoResource extends RealmAwareResource {
     private final static String ALL_SERVER_INFO = "*";
     public static final String VALIDATE_GOTO_ACTION_ID = "validateGoto";
     private final Map<String, ActionHandler> actionHandlers;
+    private final static String[] xuiCookies = {CookieUtils.getAmCookieName(), "authId"};
 
     @Inject
     public ServerInfoResource(@Named("frRest") Debug debug, ConsoleConfigHandler configHandler, 
@@ -175,6 +183,15 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("realm", realm);
             result.put("xuiUserSessionValidationEnabled", SystemProperties.getAsBoolean(Constants.XUI_USER_SESSION_VALIDATION_ENABLED, true));
 
+
+            AttributesContext requestContext = context.asContext(AttributesContext.class);
+            Map<String, Object> requestAttributes = requestContext.getAttributes();
+            final HttpServletRequest httpServletRequest = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
+            Map<String, String> cookieSameSiteMap = getSameSiteMap(httpServletRequest);
+            if (CollectionUtils.isNotEmpty(cookieSameSiteMap)) {
+                result.put("cookieSamesiteMap", cookieSameSiteMap);
+            }
+            
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getAllServerInfo ::" +
                         " Added resource to response: " + ALL_SERVER_INFO);
@@ -189,6 +206,25 @@ public class ServerInfoResource extends RealmAwareResource {
         }
     }
 
+    /**
+     * Get SameSite map for XUI.
+     *
+     * @param request The HttpServletRequest object.
+     * @return SameSite map.
+     */
+    private Map<String, String> getSameSiteMap(HttpServletRequest request) {
+        Map<String, String> map = new HashMap<String, String>();
+        if (!SameSite.isSupportedClient(request)) {
+            return map;
+        }
+        for (String cookieName : xuiCookies) {
+            SameSite samesite = CookieUtils.getSameSite(cookieName);
+            if (samesite != null) {
+                map.put(cookieName, samesite.getValue());
+            }
+        }
+        return map;
+    }
 
     private String getJsLocale(Locale locale) {
         String jsLocale = locale.getLanguage();

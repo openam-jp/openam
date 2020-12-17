@@ -25,6 +25,7 @@
  * $Id: FSAssertionArtifactHandler.java,v 1.14 2009/11/03 00:49:49 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -1315,7 +1316,7 @@ public class FSAssertionArtifactHandler {
             String fedCookieName = SystemConfigurationUtil.getProperty(IFSConstants.FEDERATE_COOKIE_NAME);
             String fedCookieValue = "yes";
             for (String domain : SystemConfigurationUtil.getCookieDomainsForRequest(request)) {
-                CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(fedCookieName, fedCookieValue,
+                CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(fedCookieName, fedCookieValue,
                         IFSConstants.PERSISTENT_COOKIE_AGE, "/", domain));
             }
 
@@ -1678,7 +1679,7 @@ public class FSAssertionArtifactHandler {
             String fedCookieName = SystemConfigurationUtil.getProperty(IFSConstants.FEDERATE_COOKIE_NAME);
             String fedCookieValue = "yes";
             for (String domain : SystemConfigurationUtil.getCookieDomainsForRequest(request)) {
-                CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(fedCookieName, fedCookieValue,
+                CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(fedCookieName, fedCookieValue,
                         IFSConstants.PERSISTENT_COOKIE_AGE, "/", domain));
             }
         }
