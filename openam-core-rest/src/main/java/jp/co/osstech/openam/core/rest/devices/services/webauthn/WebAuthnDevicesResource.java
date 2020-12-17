@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2019-2020 Open Source Solution Technology Corporation
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
@@ -56,6 +56,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.RealmAwareResource;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -65,6 +66,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
     private final Debug debug;
     private static final int NO_LIMIT = 0;
     private static final String ENTRYUUID = "entryUUID";
+    private final ContextHelper contextHelper;
 
     /**
      * Constructor that sets up the data accessing object, context helpers and the factory from which to produce
@@ -75,10 +77,12 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
      */
     @Inject
     public WebAuthnDevicesResource(
+            ContextHelper helper,
             @Named(FACTORY_NAME) AuthenticatorDeviceServiceFactory<AuthenticatorWebAuthnService> webauthnServiceFactory,
             @Named("frRest") Debug debug) {
         this.webauthnServiceFactory = webauthnServiceFactory;
         this.debug = debug;
+        this.contextHelper = helper;
     }
 
     @Override
@@ -99,7 +103,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
     @Override
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context cntxt, String resourceId, DeleteRequest dr) {
         final Subject subject = getContextSubject(cntxt);
-        String userName = subject.getPrincipals().iterator().next().getName();
+        String userName = contextHelper.getUserId(cntxt);
         String realm = getRealm(cntxt);
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         try {
@@ -148,7 +152,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context cntxt, QueryRequest qr, QueryResourceHandler qrh) {
         final Subject subject = getContextSubject(cntxt);
-        String userName = subject.getPrincipals().iterator().next().getName();
+        String userName = contextHelper.getUserId(cntxt);
         String realm = getRealm(cntxt);
 
         try {
