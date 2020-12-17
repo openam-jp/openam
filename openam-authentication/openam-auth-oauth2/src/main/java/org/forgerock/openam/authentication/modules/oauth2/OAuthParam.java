@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2020 i7a7467
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
@@ -65,8 +66,7 @@ public class OAuthParam {
     static final String KEY_SMTP_PASSWORD = "org-forgerock-auth-oauth-smtp-password";
     static final String KEY_SMTP_SSL_ENABLED = "org-forgerock-auth-oauth-smtp-ssl_enabled";
     static final String KEY_EMAIL_FROM = "org-forgerock-auth-oauth-smtp-email-from";
-
-    public final static String CODE_CHALLENGE_METHOD = "org-forgerock-auth-oauth-code-challenge-method-algorithm";
+    static final String KEY_CODE_CHALLENGE_METHOD = "jp-openam-auth-oauth-code-challenge-method-algorithm";
 
     // openam parameters
     public final static String PARAM_GOTO = "goto";
@@ -81,6 +81,9 @@ public class OAuthParam {
     public final static String PARAM_CLIENT_ID = "client_id";
     public final static String PARAM_ACCESS_TOKEN =  "access_token";
     public final static String PARAM_GRANT_TYPE = "grant_type";
+    public final static String PARAM_CODE_CHALLENGE = "code_challenge";
+    public final static String PARAM_CODE_CHALLENGE_METHOD = "code_challenge_method";
+    public final static String PARAM_CODE_VERIFIER = "code_verifier";
 
     // oauthproxy parameters
     public final static String PARAM_ACTIVATION = "activation";
@@ -119,4 +122,3 @@ public class OAuthParam {
     public final static String OIDC_SCOPE = "openid";
     public final static String SCOPE_SEPARATOR = " ";
 }
-
