@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.oauth2;
 
@@ -154,7 +155,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public void updateAccessToken(OAuth2Request request, AccessToken accessToken) throws NotFoundException,
             ServerException {
-        if (statelessCheck.byToken(accessToken.getTokenId())) {
+        if (statelessCheck.byRequest(request)) {
             statelessTokenStore.updateAccessToken(request, accessToken);
         } else {
             statefulTokenStore.updateAccessToken(request, accessToken);
@@ -174,7 +175,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public void deleteAccessToken(OAuth2Request request, String accessTokenId) throws ServerException,
             NotFoundException {
-        if (statelessCheck.byToken(accessTokenId)) {
+        if (statelessCheck.byRequest(request)) {
             statelessTokenStore.deleteAccessToken(request, accessTokenId);
         } else {
             statefulTokenStore.deleteAccessToken(request, accessTokenId);
@@ -184,7 +185,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public void deleteRefreshToken(OAuth2Request request, String refreshTokenId) throws InvalidRequestException,
             NotFoundException, ServerException {
-        if (statelessCheck.byToken(refreshTokenId)) {
+        if (statelessCheck.byRequest(request)) {
             statelessTokenStore.deleteRefreshToken(request, refreshTokenId);
         } else {
             statefulTokenStore.deleteRefreshToken(request, refreshTokenId);
@@ -194,7 +195,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException, NotFoundException {
-        if (statelessCheck.byToken(tokenId)) {
+        if (statelessCheck.byRequest(request)) {
             return statelessTokenStore.readAccessToken(request, tokenId);
         } else {
             return statefulTokenStore.readAccessToken(request, tokenId);
@@ -204,7 +205,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Override
     public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws ServerException,
             InvalidGrantException, NotFoundException {
-        if (statelessCheck.byToken(tokenId)) {
+        if (statelessCheck.byRequest(request)) {
             return statelessTokenStore.readRefreshToken(request, tokenId);
         } else {
             return statefulTokenStore.readRefreshToken(request, tokenId);
@@ -284,11 +285,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     }
 
     @Override
-    public JsonValue read(String tokenId) throws ServerException, NotFoundException {
-        if (statelessCheck.byToken (tokenId)) {
-            return statelessTokenStore.read(tokenId);
+    public JsonValue read(String realm, String tokenId) throws ServerException, NotFoundException {
+        if (statelessCheck.byRealm(realm)) {
+            return statelessTokenStore.read(realm, tokenId);
         } else {
-            return statefulTokenStore.read(tokenId);
+            return statefulTokenStore.read(realm, tokenId);
         }
     }
 }

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 define(function () {
@@ -185,6 +186,15 @@ define(function () {
                 page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView",
                 url: scopedByRealm("authorization-policySets/new"),
                 pattern: "realms/?/authorization-policySets/new",
+                role: "ui-realm-admin",
+                navGroup: "admin",
+                forceUpdate: true
+            },
+            "realmsProviderPolicySetNew": {
+                view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
+                page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditProviderPolicySetView",
+                url: scopedByRealm("authorization-provider-policySets/new"),
+                pattern: "realms/?/authorization-provider-policySets/new",
                 role: "ui-realm-admin",
                 navGroup: "admin",
                 forceUpdate: true

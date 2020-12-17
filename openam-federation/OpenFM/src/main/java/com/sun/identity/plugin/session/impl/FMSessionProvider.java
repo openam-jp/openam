@@ -25,6 +25,7 @@
  * $Id: FMSessionProvider.java,v 1.23 2009/11/20 00:30:40 exu Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.plugin.session.impl;
@@ -310,7 +311,7 @@ public class FMSessionProvider implements SessionProvider {
             if (cookieDomains.size() == 0) {
                 Cookie cookie =
                     CookieUtils.newCookie(cookieName, value, "/");
-		CookieUtils.addCookieToResponse(response, cookie);
+		CookieUtils.addCookieToResponse(request, response, cookie);
             } else {
                 Iterator it = cookieDomains.iterator();
                 Cookie cookie = null;
@@ -325,7 +326,7 @@ public class FMSessionProvider implements SessionProvider {
                     cookie = CookieUtils.newCookie(
                         cookieName, value,
                         "/", cookieDomain);
-		    CookieUtils.addCookieToResponse(response, cookie);
+		    CookieUtils.addCookieToResponse(request, response, cookie);
                 }
             }
             if (urlRewriteEnabled && targetApplication != null) {

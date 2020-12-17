@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -54,7 +55,7 @@ public class ResourceAttributeUtilTest {
     public void shouldCatchFailureIfDeserialisationFails() throws IOException {
         // Given
         ObjectMapper mockMapper = mock(ObjectMapper.class);
-        given(mockMapper.readValue(anyString(), any(Class.class))).willThrow(new IOException());
+        given(mockMapper.readValue(anyString(), any(Class.class))).willThrow(new IllegalArgumentException());
         util = new ResourceAttributeUtil(mockMapper);
 
         // When / Then

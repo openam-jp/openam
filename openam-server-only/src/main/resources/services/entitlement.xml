@@ -27,6 +27,7 @@
    $Id: entitlement.xml,v 1.9 2010/01/07 00:19:12 veiming Exp $
 
    Portions copyright 2011-2016 ForgeRock AS.
+   Portions Copyrighted 2019 Open Source Solution Technology Corporation.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -345,6 +346,26 @@
                         <AttributeValuePair>
                             <Attribute name="resourceComparator" />
                             <Value>com.sun.identity.entitlement.URLResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="AuthProviderService"
+                        id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>IssueAssertion=true</Value>
+                            <Value>IssueToken=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSearchIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSaveIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.RegExResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="crestPolicyService" id="applicationType">

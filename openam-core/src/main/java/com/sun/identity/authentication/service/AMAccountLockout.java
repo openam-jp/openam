@@ -25,6 +25,7 @@
  * $Id: AMAccountLockout.java,v 1.10 2009/03/06 22:09:20 hengming Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package com.sun.identity.authentication.service;
 
@@ -116,14 +117,8 @@ class AMAccountLockout {
             if (!isAccountLockout.isLockoutEnabled()) {
                 DEBUG.message("Failure lockout mode disabled");
             } else {
-                String userDN;
-                AMIdentity amIdentity = null;
-                if (isAccountLockout.getStoreInvalidAttemptsInDS() || !isAccountLockout.isMemoryLocking()) {
-                    amIdentity = AuthD.getAuth().getIdentity(IdType.USER, username, loginState.getOrgDN());
-                    userDN = normalizeDN(IdUtils.getDN(amIdentity));
-                } else {
-                    userDN = normalizeDN(username);
-                }
+                AMIdentity amIdentity = AuthD.getAuth().getIdentity(IdType.USER, username, loginState.getOrgDN());
+                String userDN = normalizeDN(IdUtils.getDN(amIdentity));
                 if (acInfo == null) {
                     acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
                 }
@@ -189,13 +184,8 @@ class AMAccountLockout {
             // remove the hash entry for login failure for tokenID
             String userDN = null;
             if (token != null) {
-                AMIdentity amIdentity = null;
-                if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
-                    amIdentity = AuthD.getAuth().getIdentity(IdType.USER, token, loginState.getOrgDN());
-                    userDN = normalizeDN(IdUtils.getDN(amIdentity));
-                } else {
-                    userDN = normalizeDN(token);
-                }
+                AMIdentity amIdentity = AuthD.getAuth().getIdentity(IdType.USER, token, loginState.getOrgDN());
+                userDN = normalizeDN(IdUtils.getDN(amIdentity));
 
                 if (acInfo == null) {
                     acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
@@ -259,14 +249,8 @@ class AMAccountLockout {
     private boolean isMemoryLockout(String aUserName) {
         boolean locked = false;
         try {
-            String userDN;
-            AMIdentity amIdentity = null;
-            if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
-                amIdentity = AuthD.getAuth().getIdentity(IdType.USER, aUserName, loginState.getOrgDN());
-                userDN = normalizeDN(IdUtils.getDN(amIdentity));
-            } else {
-                userDN = aUserName;
-            }
+            AMIdentity amIdentity = AuthD.getAuth().getIdentity(IdType.USER, aUserName, loginState.getOrgDN());
+            String userDN = normalizeDN(IdUtils.getDN(amIdentity));
 
             if (acInfo == null) {
                 acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
@@ -305,10 +289,7 @@ class AMAccountLockout {
         boolean locked = false;
         try {
             AMIdentity amIdentity = AuthD.getAuth().getIdentity(IdType.USER, aUserName, loginState.getOrgDN());
-            String userDN = normalizeDN(aUserName);
-            if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
-                userDN = normalizeDN(IdUtils.getDN(amIdentity));
-            }
+            String userDN = normalizeDN(IdUtils.getDN(amIdentity));
             if (acInfo == null) {
                 acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
             }

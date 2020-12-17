@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.openidconnect;
@@ -27,6 +28,7 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.script.Bindings;
@@ -106,11 +108,14 @@ public class OidcClaimsExtensionTest {
     public void testRequestedClaims() throws Exception {
         // Given
         Map<String, Set<String>> requestedClaims = new HashMap<String, Set<String>>();
-        requestedClaims.put("given_name", asSet("fred"));
-        requestedClaims.put("family_name", asSet("flintstone"));
+        requestedClaims.put("email", new HashSet<String>());
+        requestedClaims.put("phone_number", new HashSet<String>());
         Bindings variables = testBindings(asSet("profile"), requestedClaims);
         when(identity.getAttribute("cn")).thenReturn(asSet("Joe Bloggs"));
-
+        when(identity.getAttribute("givenname")).thenReturn(asSet("fred"));
+        when(identity.getAttribute("sn")).thenReturn(asSet("flintstone"));
+        when(identity.getAttribute("mail")).thenReturn(asSet("fred@example.com"));
+        
         // When
         UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);
 
@@ -118,16 +123,21 @@ public class OidcClaimsExtensionTest {
         assertThat(result.getValues()).containsOnly(
                 entry("given_name", "fred"),
                 entry("family_name", "flintstone"),
-                entry("name", "Joe Bloggs"));
+                entry("name", "Joe Bloggs"),
+                entry("email", "fred@example.com"));
 
         assertThat(result.getCompositeScopes()).containsOnlyKeys("profile");
         ArrayList<String> hashProfile = (ArrayList<String>) result.getCompositeScopes().get("profile");
         assertThat(hashProfile).contains("zoneinfo", "name", "locale", "family_name", "given_name");
         assertThat(hashProfile).hasSize(5);
 
-        verify(identity).getAttribute("cn");
-        verify(identity).getAttribute("preferredlocale");
+        verify(identity).getAttribute("givenname");
         verify(identity).getAttribute("preferredtimezone");
+        verify(identity).getAttribute("sn");
+        verify(identity).getAttribute("preferredlocale");
+        verify(identity).getAttribute("cn");
+        verify(identity).getAttribute("mail");
+        verify(identity).getAttribute("telephonenumber");
         verifyNoMoreInteractions(identity);
     }
 
@@ -135,9 +145,11 @@ public class OidcClaimsExtensionTest {
     public void testRequestedClaimsNoScope() throws Exception {
         // Given
         Map<String, Set<String>> requestedClaims = new HashMap<String, Set<String>>();
-        requestedClaims.put("given_name", asSet("fred"));
-        requestedClaims.put("family_name", asSet("flintstone"));
+        requestedClaims.put("given_name", new HashSet<String>());
+        requestedClaims.put("family_name", new HashSet<String>());
         Bindings variables = testBindings(asSet("openid"), requestedClaims);
+        when(identity.getAttribute("givenname")).thenReturn(asSet("fred"));
+        when(identity.getAttribute("sn")).thenReturn(asSet("flintstone"));
 
         // When
         UserInfoClaims result = scriptEvaluator.evaluateScript(script, variables);

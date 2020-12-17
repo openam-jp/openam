@@ -12,13 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -73,7 +75,7 @@ public class ReadTaskTest {
         try {
             task.execute(mockConnection, mockAdapter);
         } catch (DataLayerException e) {}
-        verify(mockResultHandler).processError(any(CoreTokenException.class));
+        verify(mockResultHandler).processError(any(DataLayerException.class));
     }
 
     private void adapterWillFailOnRead() throws Exception {

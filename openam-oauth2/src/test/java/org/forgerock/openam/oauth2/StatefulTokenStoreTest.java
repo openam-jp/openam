@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -199,35 +200,12 @@ public class StatefulTokenStoreTest {
     }
 
     @Test
-    public void realmAgnosticTokenStoreShouldIgnoreRealmMismatch() throws Exception {
-        //Given
-        StatefulTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticStatefulTokenStore(tokenStore,
-                providerSettingsFactory, oAuth2UrisFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
-                cookieExtractor, auditLogger, debug, new SecureRandom(), failureFactory, recoveryCodeGenerator);
-        JsonValue token = json(object(
-                field("tokenName", Collections.singleton("access_token")),
-                field("realm", Collections.singleton("/otherrealm"))));
-        given(tokenStore.read("TOKEN_ID")).willReturn(token);
-        ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-        given(request.getAttributes()).willReturn(attributes);
-        attributes.put("realm", "/testrealm");
-
-        OAuth2Request request = oAuth2RequestFactory.create(this.request);
-
-        //When
-        AccessToken accessToken = realmAgnosticTokenStore.readAccessToken(request, "TOKEN_ID");
-
-        //Then
-        assertThat(accessToken).isNotNull();
-        assertThat(request.getToken(AccessToken.class)).isSameAs(accessToken);
-    }
-
-    @Test
     public void shouldCreateDeviceCode() throws Exception {
         // Given
         OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
         given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
+        given(providerSettings.getClaimsParameterSupported()).willReturn(true);
         given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
         final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
         given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "MY_REALM")));
@@ -252,6 +230,47 @@ public class StatefulTokenStoreTest {
         assertThat(code.getUiLocales()).isEqualTo("UI LOCALES");
         assertThat(code.getLoginHint()).isEqualTo("LOGIN HINT");
         assertThat(code.getClaims()).isEqualTo("CLAIMS");
+        assertThat(code.getCodeChallenge()).isEqualTo("CODE CHALLENGE");
+        assertThat(code.getCodeChallengeMethod()).isEqualTo("CODE METHOD");
+        assertThat(code.getMaxAge()).isEqualTo(55);
+        assertThat(code.getTokenName()).isEqualTo("device_code");
+        assertThat(code.getExpiryTime()).isCloseTo(currentTimeMillis() + 10000, offset(1000L));
+        assertThat(code.getTokenId()).matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+        assertThat(code.getUserCode()).matches("[" + StatefulTokenStore.ALPHABET + "]{8}");
+        assertThat(code.getRealm()).isEqualTo("MY_REALM");
+    }
+    
+    @Test
+    public void shouldCreateDeviceCodeWithNoClaims() throws Exception {
+        // Given
+        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
+        given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
+        given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
+        given(providerSettings.getClaimsParameterSupported()).willReturn(false);
+        given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
+        final OAuth2Request oauth2Request = oAuth2RequestFactory.create(this.request);
+        given(request.getAttributes()).willReturn(new ConcurrentHashMap<>(singletonMap("realm", (Object) "MY_REALM")));
+        given(realmNormaliser.normalise("MY_REALM")).willReturn("MY_REALM");
+        ResourceOwner resourceOwner = mock(ResourceOwner.class);
+        given(resourceOwner.getId()).willReturn("RESOURCE_OWNER_ID");
+        given(recoveryCodeGenerator.generateCode(eq(Alphabet.BASE58), anyInt())).willReturn("234567AB");
+
+        // When
+        DeviceCode code = openAMtokenStore.createDeviceCode(asSet("one", "two"), resourceOwner, "CLIENT ID", "NONCE",
+                "RESPONSE TYPE", "STATE", "ACR VALUES", "PROMPT", "UI LOCALES", "LOGIN HINT", 55, "CLAIMS",
+                oauth2Request, "CODE CHALLENGE", "CODE METHOD");
+
+        // Then
+        assertThat(code.getClaims()).isEqualTo(null);
+        assertThat(code.getScope()).containsOnly("one", "two");
+        assertThat(code.getClientId()).isEqualTo("CLIENT ID");
+        assertThat(code.getNonce()).isEqualTo("NONCE");
+        assertThat(code.getResponseType()).isEqualTo("RESPONSE TYPE");
+        assertThat(code.getState()).isEqualTo("STATE");
+        assertThat(code.getAcrValues()).isEqualTo("ACR VALUES");
+        assertThat(code.getPrompt()).isEqualTo("PROMPT");
+        assertThat(code.getUiLocales()).isEqualTo("UI LOCALES");
+        assertThat(code.getLoginHint()).isEqualTo("LOGIN HINT");
         assertThat(code.getCodeChallenge()).isEqualTo("CODE CHALLENGE");
         assertThat(code.getCodeChallengeMethod()).isEqualTo("CODE METHOD");
         assertThat(code.getMaxAge()).isEqualTo(55);

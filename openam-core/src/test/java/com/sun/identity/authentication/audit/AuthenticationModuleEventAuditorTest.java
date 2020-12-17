@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package com.sun.identity.authentication.audit;
 
@@ -53,8 +55,8 @@ public class AuthenticationModuleEventAuditorTest {
     public void setupMocks() {
         MockitoAnnotations.initMocks(this);
 
-        when(eventPublisher.isAuditing(anyString(), anyString(), any(EventName.class))).thenReturn(true);
-        when(eventFactory.authenticationEvent(anyString())).thenCallRealMethod();
+        when(eventPublisher.isAuditing(nullable(String.class), nullable(String.class), nullable(EventName.class))).thenReturn(true);
+        when(eventFactory.authenticationEvent(nullable(String.class))).thenCallRealMethod();
         auditor = new AuthenticationModuleEventAuditor(eventPublisher, eventFactory);
     }
 

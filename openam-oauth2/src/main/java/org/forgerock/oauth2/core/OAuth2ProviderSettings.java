@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -1258,6 +1259,8 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
                     attributeCache.clear();
                     jwks.clear();
                     loginUrlTemplate = null;
+                    supportedScopesWithoutTranslations = null;
+                    supportedClaimsWithoutTranslations = null;
                 }
             } else {
                 if (logger.messageEnabled()) {

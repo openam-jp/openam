@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.upgrade.steps;
@@ -163,8 +165,8 @@ public final class RemoveReferralsStepTest {
 
         // Then
         assertThat(isApplicable).isTrue();
-        assertThat(shortReport).containsSequence("applications to be cloned", "Referrals found");
-        assertThat(longReport).containsSequence("app1", "ou=test,ou=forgerock,ou=org");
+        assertThat(shortReport).containsSubsequence("applications to be cloned", "Referrals found");
+        assertThat(longReport).containsSubsequence("app1", "ou=test,ou=forgerock,ou=org");
 
         verify(resourceTypeService).saveResourceType(isA(Subject.class), eq("/a"), resourceTypeCaptor.capture());
         verify(applicationService).saveApplication(applicationCaptor.capture());

@@ -23,7 +23,8 @@
   ~ your own identifying information:
   ~ "Portions Copyrighted [year] [name of copyright owner]"
   ~
-  ~ Portions Copyrighted 2019 Open Source Solution Technology Corporation
+  ~ Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+  ~ Portions Copyrighted 2019 OGIS-RI Co., Ltd.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -32,7 +33,7 @@
     <parent>
         <groupId>jp.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.0.0-SNAPSHOT</version>
+        <version>15.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openam-oauth2</artifactId>
@@ -52,6 +53,10 @@
         <dependency>
             <groupId>jp.openam</groupId>
             <artifactId>openam-scripting</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-entitlements</artifactId>
         </dependency>
         <dependency>
             <groupId>jp.openam.http</groupId>
@@ -166,7 +171,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
         </dependency>
         <dependency>
             <groupId>jp.openam</groupId>
@@ -182,7 +187,7 @@
         <!-- Powermock -->
         <dependency>
             <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
+            <artifactId>powermock-api-mockito2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
@@ -203,6 +208,10 @@
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 

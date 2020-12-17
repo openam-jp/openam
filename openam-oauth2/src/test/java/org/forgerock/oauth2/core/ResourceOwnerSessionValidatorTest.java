@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -82,6 +83,7 @@ public class ResourceOwnerSessionValidatorTest {
         CoreGuiceModule.DNWrapper dnWrapper = mock(CoreGuiceModule.DNWrapper.class);
         ClientDAO mockClientDAO = mock(ClientDAO.class);
         ClientCredentialsReader mockClientCredentialsReader = mock(ClientCredentialsReader.class);
+        ClientRegistrationStore mockClientRegistrationStore = mock(ClientRegistrationStore.class);
 
         given(mockOAuth2Request.getRequest()).willReturn(restletRequest);
 
@@ -95,7 +97,7 @@ public class ResourceOwnerSessionValidatorTest {
 
         resourceOwnerSessionValidator =
                 new ResourceOwnerSessionValidator(dnWrapper, mockSSOTokenManager, mockProviderSettingsFactory,
-                        mockClientDAO, mockClientCredentialsReader) {
+                        mockClientDAO, mockClientCredentialsReader, mockClientRegistrationStore) {
             @Override
             HttpServletRequest getHttpServletRequest(Request req) {
                 return mockHttpServletRequest;

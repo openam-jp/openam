@@ -25,6 +25,7 @@
  * $Id: ConfigureGoogleAppsCompleteViewBean.java,v 1.7 2009/05/07 21:31:45 asyhuang Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.console.task;
 
@@ -37,6 +38,7 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMPropertySheet;
+import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
@@ -125,6 +127,7 @@ public class ConfigureGoogleAppsCompleteViewBean
             super.beginDisplay(event);
             HttpServletRequest req = getRequestContext().getRequest();
             String realm = req.getParameter("realm");
+            setPageSessionAttribute(AMAdminConstants.CURRENT_REALM, realm);
             String entityId = req.getParameter("idp");
             TaskModel model = (TaskModel) getModelInternal();
             Map values = model.getConfigureGoogleAppsURLs(realm, entityId);

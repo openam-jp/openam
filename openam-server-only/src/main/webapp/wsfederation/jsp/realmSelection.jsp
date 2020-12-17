@@ -25,6 +25,7 @@
    $Id: realmSelection.jsp,v 1.10 2009/10/29 00:00:00 exu Exp $
 
     Portions Copyrighted 2013-2016 ForgeRock AS.
+    Portions Copyrighted 2019 Open Source Solution Technology Corporation
 --%>
 
 <%@page
@@ -288,7 +289,7 @@
       <td>&nbsp;</td>
       <td>
         <div class="logCpy"><span class="logTxtCpy">
-          Copyright &copy; 2008-2016, ForgeRock AS. All Rights Reserved. Use of this software is subject to the terms and conditions of the ForgeRock&#8482; License and Subscription Agreement.
+          Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.
         </div>
       </td>
       <td>&nbsp;</td>

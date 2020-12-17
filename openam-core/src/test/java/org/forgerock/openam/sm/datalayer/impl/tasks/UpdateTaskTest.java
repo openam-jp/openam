@@ -12,13 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.sm.datalayer.impl.tasks;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -47,27 +47,27 @@ public class UpdateTaskTest {
         mockHandler = mock(ResultHandler.class);
         task = new UpdateTask(mockToken, mockHandler);
 
-        given(mockAdapter.read(any(Connection.class), anyString())).willReturn(mockToken);
+        given(mockAdapter.read(nullable(Connection.class), nullable(String.class))).willReturn(mockToken);
     }
 
     @Test
     public void shouldUpdateWhenTokenPresent() throws Exception {
         task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).update(any(Connection.class), any(Token.class), eq(mockToken));
+        verify(mockAdapter).update(nullable(Connection.class), nullable(Token.class), eq(mockToken));
     }
 
     @Test
     public void shouldCreateWhenNotPresent() throws Exception {
-        given(mockAdapter.read(any(Connection.class), anyString())).willReturn(null);
+        given(mockAdapter.read(nullable(Connection.class), nullable(String.class))).willReturn(null);
         task.execute(mockConnection, mockAdapter);
-        verify(mockAdapter).create(any(Connection.class), eq(mockToken));
+        verify(mockAdapter).create(nullable(Connection.class), eq(mockToken));
     }
 
     @Test (expectedExceptions = DataLayerException.class)
     public void shouldHandleException() throws Exception {
-        doThrow(DataLayerException.class).when(mockAdapter).read(any(Connection.class), anyString());
+        doThrow(DataLayerException.class).when(mockAdapter).read(nullable(Connection.class), nullable(String.class));
         task.execute(mockConnection, mockAdapter);
-        verify(mockHandler).processError(any(CoreTokenException.class));
+        verify(mockHandler).processError(nullable(CoreTokenException.class));
     }
 
     @Test

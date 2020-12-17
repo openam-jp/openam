@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2012-2015 ForgeRock AS.
+  Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ -->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="AuthenticatorOATH" version="1.0">
+    <!-- For determining which we are -->
+    <Callbacks length="0" order="1" timeout="120" header="OATH Authenticator">
+    </Callbacks>
+    <!-- For when we're optional and device isn't registered -->
+    <Callbacks length="1" order="2" timeout="120" header="OATH Authenticator">
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>デバイスの登録</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>登録しないでログインする</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For when we're not optional and a device isn't registered -->
+    <Callbacks length="1" order="3" timeout="120" header="OATH Authenticator">
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>デバイスの登録</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For when we're not optional and a device is registered -->
+    <Callbacks length="2" order="4" timeout="120" header="#REPLACE#">
+        <NameCallback>
+            <Prompt>ワンタイムパスワードの入力:</Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>送信</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For registration -->
+    <Callbacks length="3" order="5" timeout="120" header="デバイスの登録">
+        <TextOutputCallback>
+             お手持ちのスマートフォン等の端末でアプリを起動し、バーコードをスキャンしてください。スキャンしてアカウントが登録されたら「次へ進む」を押してください。
+             現在アプリがインストールされている端末でアクセスしている場合はスキャンせずに「スマートデバイスはこちら」を押すとアカウントを登録することが出来ます。
+        </TextOutputCallback>
+        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>次へ進む</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For recovery code use -->
+    <Callbacks length="2" order="6" timeout="120" header="リカバリーコードの使用">
+        <TextOutputCallback>
+            リカバリーコードを使ってログインを行いました。今回入力したコードはもう使用できません。
+        </TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>次へ進む</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For when we're optional, but we just generated a device -->
+    <Callbacks length="2" order="7" timeout="120" header="#REPLACE#">
+        <NameCallback>
+            <Prompt>ワンタイムパスワードの入力:</Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>送信</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>登録しないでログインする</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+</ModuleProperties>

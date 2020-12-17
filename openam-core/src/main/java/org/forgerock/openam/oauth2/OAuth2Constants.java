@@ -13,7 +13,7 @@
  *
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2018-2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -992,6 +992,7 @@ public class OAuth2Constants {
         public static final String CLIENT_SESSION_URI = "com.forgerock.openam.oauth2provider.clientSessionURI";
         public static final String CLIENT_NAME = "com.forgerock.openam.oauth2provider.clientName";
         public static final String IS_CONSENT_IMPLIED = "isConsentImplied";
+        public static final String IS_POLICY_BASED_PROTECTION_ENABLED = "isPolicyBasedProtectionEnabled";
 
         public static final String JWKS_URI = "com.forgerock.openam.oauth2provider.jwksURI";
         public static final String JWKS = "com.forgerock.openam.oauth2provider.jwks";

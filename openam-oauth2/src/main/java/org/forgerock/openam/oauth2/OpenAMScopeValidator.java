@@ -13,11 +13,11 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.Utils.splitScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.OPENID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
@@ -184,6 +184,9 @@ public class OpenAMScopeValidator implements ScopeValidator {
             throw InvalidScopeException.create("No scope requested and no default scope configured", request);
         }
 
+        // Store scopes to use validated values instead of raw request parameters for later use.
+        request.setValidatedScopes(scopes);
+        
         return scopes;
     }
 
@@ -203,6 +206,8 @@ public class OpenAMScopeValidator implements ScopeValidator {
         Map<String, Set<String>> requestedClaimsValues = gatherRequestedClaims(providerSettings, request, token);
 
         try {
+            requestedClaimsValues = filterClaims(providerSettings.getSupportedClaims(), requestedClaimsValues);
+
             if (token != null) {
 
                 OpenIdConnectClientRegistration clientRegistration;
@@ -225,8 +230,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 //otherwise we're simply reading claims into the id_token, so grab it from the request/ssoToken
                 realm = DNMapper.orgNameToRealmName(ssoToken.getProperty(ISAuthConstants.ORGANIZATION));
                 id = identityManager.getResourceOwnerIdentity(ssoToken.getProperty(ISAuthConstants.USER_ID), realm);
-                String scopeStr = request.getParameter(OAuth2Constants.Params.SCOPE);
-                scopes = splitScope(scopeStr);
+                scopes = request.getValidatedScopes();
             }
 
             scriptVariables.put(OAuth2Constants.ScriptParams.SCOPES, getScriptFriendlyScopes(scopes));
@@ -324,6 +328,29 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
         return requestedClaims;
 
+    }
+    
+    /**
+     * Filter request claims by supported claims. And members with JSON Object are not included.
+     * 
+     * @param supportedClaims The supported claims
+     * @param requestedClaimsValues The request claims
+     * @return The filtered claims
+     */
+    private Map<String, Set<String>> filterClaims(Set<String> supportedClaims, Map<String, Set<String>> requestedClaimsValues) {
+        final Map<String, Set<String>> filteredClaims = new HashMap<String, Set<String>>();
+        if (requestedClaimsValues.isEmpty()) {
+            return filteredClaims;
+        }
+        for (String supportedClaim : supportedClaims) {
+            if (requestedClaimsValues.containsKey(supportedClaim)) {
+                // Currently only null is allowed as the value for the claims parameter member.
+                if (requestedClaimsValues.get(supportedClaim).isEmpty()) {
+                    filteredClaims.put(supportedClaim, requestedClaimsValues.get(supportedClaim));
+                }
+            }
+        }
+        return filteredClaims;
     }
 
     /**

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package com.iplanet.services.ldap.event;
@@ -39,6 +40,7 @@ import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionEventListener;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DecodeException;
@@ -55,6 +57,7 @@ import org.forgerock.opendj.ldap.controls.GenericControl;
 import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.controls.PersistentSearchRequestControl;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.ExtendedResult;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
@@ -158,6 +161,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     }
 
     private void startSearch(Connection conn) throws LdapException {
+        conn.addConnectionEventListener(new PersistentSearchConnectionEventListener());
         if (mode == null) {
             detectPersistentSearchMode(conn);
         }
@@ -320,19 +324,28 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             //ignoring references
             return true;
         }
+    }
+    
+    private class PersistentSearchConnectionEventListener implements ConnectionEventListener {
 
-        public void handleErrorResult(LdapException error) {
+        @Override
+        public void handleConnectionClosed() {
+        }
+
+        @Override
+        public void handleConnectionError(boolean isDisconnectNotification, LdapException error) {
             if (!shutdown) {
                 DEBUG.error("An error occurred while executing persistent search", error);
                 DEBUG.message("Restarting persistent search. Some changes may have been missed in the interim.");
                 clearCaches();
                 restartSearch();
             } else {
-                DEBUG.message("Persistence search has been cancelled",error);
+                DEBUG.message("Persistence search has been cancelled", error);
             }
         }
 
-        public void handleResult(Result result) {
+        @Override
+        public void handleUnsolicitedNotification(ExtendedResult notification) {
         }
     }
 

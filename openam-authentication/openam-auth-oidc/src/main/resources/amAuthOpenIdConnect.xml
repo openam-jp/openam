@@ -65,11 +65,14 @@
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
                                  type="single" syntax="string" i18nKey="crypto_context_value" order="300"
-                                 validator="RequiredValueValidator"
                                  resourceName="cryptoContextValue">
                     <DefaultValues>
                         <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                     </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
+                                 type="single" syntax="password" i18nKey="client_secret" order="301"
+                                 resourceName="clientSecret">
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
                                  type="single" syntax="string" i18nKey="account_provider_class" order="100"
@@ -165,11 +168,14 @@
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
                                      type="single" syntax="string" i18nKey="crypto_context_value" order="300"
-                                     validator="RequiredValueValidator"
                                      resourceName="cryptoContextValue">
                         <DefaultValues>
                             <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                         </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-oauth-client-secret"
+                                     type="single" syntax="password" i18nKey="client_secret" order="301"
+                                     resourceName="clientSecret">
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
                                      type="single" syntax="string" i18nKey="account_provider_class" order="100"

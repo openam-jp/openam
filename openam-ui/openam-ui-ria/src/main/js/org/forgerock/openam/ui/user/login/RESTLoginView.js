@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define([
@@ -34,11 +35,12 @@ define([
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/util/uri/query",
-    "org/forgerock/openam/ui/user/login/gotoUrl"
+    "org/forgerock/openam/ui/user/login/gotoUrl",
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
 
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
     Handlebars, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
-    URIUtils, query, gotoUrl) => {
+    URIUtils, query, gotoUrl, AuthenticationToken) => {
 
     function hasSsoRedirectOrPost (goto) {
         let decodedGoto;
@@ -229,7 +231,8 @@ define([
                     // enabled the login button if login failure
                     $(e.currentTarget).prop("disabled", false);
                     // If its not the first stage then render the Login Unavailable view with link back to login screen.
-                    if (Configuration.globalData.auth.currentStage > 1) {
+                    if (Configuration.globalData.auth.currentStage > 1 || AuthenticationToken.had() ||
+                        Configuration.globalData.auth.forceRoutingOnFailure) {
                         let fragmentParams = URIUtils.getCurrentFragmentQueryString();
                         if (fragmentParams) {
                             fragmentParams = `&${fragmentParams}`;

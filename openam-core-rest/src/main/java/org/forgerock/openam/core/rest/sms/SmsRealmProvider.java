@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.core.rest.sms;
 
@@ -163,16 +164,17 @@ public class SmsRealmProvider implements RequestHandler {
                 return newResultPromise(newActionResponse(json(object(
                         field(PATH_ATTRIBUTE_NAME, "/"), field(ACTIVE_ATTRIBUTE_NAME, true)))));
             case RestConstants.SCHEMA:
-                return newResultPromise(newActionResponse(getSchema()));
+                return newResultPromise(newActionResponse(getSchema(request)));
             default:
             return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
         }
     }
 
-    private JsonValue getSchema() {
-        // TODO locale
-        ResourceBundle consoleI18N = ResourceBundle.getBundle("amConsole");
-        ResourceBundle idRepoI18N = ResourceBundle.getBundle("amIdRepoService");
+    private JsonValue getSchema(ActionRequest request) {
+        ResourceBundle consoleI18N = request.getPreferredLocales()
+                .getBundleInPreferredLocale("amConsole", getClass().getClassLoader());
+        ResourceBundle idRepoI18N = request.getPreferredLocales()
+                .getBundleInPreferredLocale("amIdRepoService", getClass().getClassLoader());
         return json(object(field("type", "object"), field("properties", object(
                 field(REALM_NAME_ATTRIBUTE_NAME, object(
                         field("type", "string"),

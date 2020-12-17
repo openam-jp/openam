@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.core.rest.sms.tree;
@@ -21,7 +23,6 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.forgerockrest.utils.MatchingResourcePath.resourcePath;
 import static org.forgerock.util.promise.Promises.*;
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -50,6 +51,7 @@ import org.forgerock.json.resource.Responses;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.test.assertj.AssertJPromiseAssert;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -144,7 +146,7 @@ public class SmsRouteTreeTest {
         Promise<ResourceResponse, ResourceException> result = routeTree.handleRead(context, request);
 
         //Then
-        assertThat(result).failedWithException();
+        AssertJPromiseAssert.assertThat(result).failedWithException();
         verify(authModule).authorizeRead(any(Context.class), any(ReadRequest.class));
         verifyNoMoreInteractions(requestHandler, defaultAuthModule);
     }
@@ -167,7 +169,7 @@ public class SmsRouteTreeTest {
         Promise<ResourceResponse, ResourceException> result = routeTree.handleRead(context, request);
 
         //Then
-        assertThat(result).succeeded();
+        AssertJPromiseAssert.assertThat(result).succeeded();
         verify(defaultAuthModule).authorizeRead(any(Context.class), any(ReadRequest.class));
         verifyNoMoreInteractions(authModule);
     }
@@ -189,7 +191,7 @@ public class SmsRouteTreeTest {
         Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
 
         //Then
-        assertThat(result).succeeded();
+        AssertJPromiseAssert.assertThat(result).succeeded();
         assertThat(result.getOrThrow().getJsonContent()).hasArray("result").hasSize(3).containsOnly(
                 object(field("_id", "service1"), field("name", "one"), field("collection", false)),
                 object(field("_id", "service2"), field("name", "two"), field("collection", false)),
@@ -223,7 +225,7 @@ public class SmsRouteTreeTest {
         Promise<ActionResponse, ResourceException> result = routeTree.handleAction(context, request);
 
         //Then
-        assertThat(result).succeeded();
+        AssertJPromiseAssert.assertThat(result).succeeded();
         verifyGetTypeAction(handler1);
         verifyGetTypeAction(handler2);
         verifyGetTypeAction(handler3);

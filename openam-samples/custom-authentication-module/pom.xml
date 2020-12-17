@@ -20,7 +20,8 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   Portions Copyrighted 2019 Open Source Solution Technology Corporation
+   Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+   Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -29,11 +30,11 @@
 
     <groupId>jp.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
-    <version>14.0.0-SNAPSHOT</version>
+    <version>15.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
-        <openam.version>14.0.0-SNAPSHOT</openam.version>
+        <openam.version>15.0.0-SNAPSHOT</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -50,8 +51,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 
@@ -44,6 +45,7 @@ define([
         ],
         events: {
             "click [data-add-entity]":      "addNewPolicySet",
+            "click [data-add-pp-entity]": "addNewProviderPolicySet",
             "click [data-import-policies]": "startImportPolicies",
             "click [data-export-policies]": "exportPolicies",
             "click [data-add-resource]":    "addResource",
@@ -219,6 +221,13 @@ define([
 
         addNewPolicySet () {
             Router.routeTo(Router.configuration.routes.realmsPolicySetNew, {
+                args: [encodeURIComponent(this.realmPath)],
+                trigger: true
+            });
+        },
+
+        addNewProviderPolicySet () {
+            Router.routeTo(Router.configuration.routes.realmsProviderPolicySetNew, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });

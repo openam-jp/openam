@@ -325,7 +325,7 @@
             "deactivate": "Deactivate",
             "active": "Active",
             "inactive": "Inactive",
-            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "copyright" : "Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.",
             "build": "Build",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -571,6 +571,21 @@
                 "deviceName": "Device name",
                 "copyRecoveryCodes": "Keep a copy of these codes in a safe place. You will need to use one of your recovery codes to authenticate to OpenAM if you lose your device."
             }
+        },
+        "fido2AuthDevices": {
+            "header": "FIDO2(WebAuthn) Authentication Devices",
+            "noneFound": "You have not registered any devices",
+            "menu": {
+                "delete": "Delete"
+            },
+            "devicesSettingDialog": {
+                "title": "Devices Settings",
+                "description": "Configure global settings across all your devices."
+            },
+            "deviceDetailsDialog": {
+                "deviceName": "Device name",
+                "createdDate": "Registered date"
+            }
         }
     },
     "uma": {
@@ -717,6 +732,7 @@
                 "authentication-chains": "Authentication - Chains",
                 "authentication-modules": "Authentication - Modules",
                 "authorization-policySets": "Authorization - Policy Sets",
+                "authorization-provider-policySets": "Authorization - Provider Policy Sets",
                 "authorization-resourceTypes": "Authorization - Resource Types",
                 "general": "General",
                 "security": "Security",
@@ -1030,31 +1046,31 @@
                 "noItems": "There are no items ...",
 
                 "weekdays": {
-                    "Monday": {
+                    "mon": {
                         "short": "mon",
                         "full": "Monday"
                     },
-                    "Tuesday": {
+                    "tue": {
                         "short": "tue",
                         "full": "Tuesday"
                     },
-                    "Wednesday": {
+                    "wed": {
                         "short": "wed",
                         "full": "Wednesday"
                     },
-                    "Thursday": {
+                    "thu": {
                         "short": "thu",
                         "full": "Thursday"
                     },
-                    "Friday": {
+                    "fri": {
                         "short": "fri",
                         "full": "Friday"
                     },
-                    "Saturday": {
+                    "sat": {
                         "short": "sat",
                         "full": "Saturday"
                     },
-                    "Sunday": {
+                    "sun": {
                         "short": "sun",
                         "full": "Sunday"
                     }
@@ -1074,6 +1090,7 @@
                 },
                 "list": {
                     "addNew": "New Policy Set",
+                    "addNewPP": "New Provider Policy Set",
                     "description": "Define sets of policies for protecting web sites, web applications, or other resources.",
                     "importPolicySets": "Import Policy Sets",
                     "exportPolicySets": "Export Policy Sets",

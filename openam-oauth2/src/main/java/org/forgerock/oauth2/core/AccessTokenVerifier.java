@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.oauth2.core;
 
@@ -32,23 +33,9 @@ import javax.inject.Inject;
 public abstract class AccessTokenVerifier {
 
     public static final String HEADER = "header";
-    /**
-     * An {@link AccessTokenVerifier} that verifies the OAuth2 access token provided in a header without checking the
-     * realm corresponding to the {@link OAuth2Request}.
-     */
-    public static final String REALM_AGNOSTIC_HEADER = "realm-agnostic-header";
     public static final String FORM_BODY = "form-body";
-    /**
-     * An {@link AccessTokenVerifier} that verifies the OAuth2 access token provided in the request payload without
-     * checking the realm corresponding to the {@link OAuth2Request}.
-     */
-    public static final String REALM_AGNOSTIC_FORM_BODY = "realm-agnostic-form-body";
     public static final String QUERY_PARAM = "query-param";
-    /**
-     * An {@link AccessTokenVerifier} that verifies the OAuth2 access token provided in the query parameter without
-     * checking the realm corresponding to the {@link OAuth2Request}.
-     */
-    public static final String REALM_AGNOSTIC_QUERY_PARAM = "realm-agnostic-query-param";
+
     protected final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private static final TokenState INVALID_TOKEN = new TokenState(null);
 

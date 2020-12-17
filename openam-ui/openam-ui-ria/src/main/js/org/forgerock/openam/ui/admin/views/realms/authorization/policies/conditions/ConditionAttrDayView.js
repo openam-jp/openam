@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 
@@ -25,7 +26,7 @@ define([
         i18n: {
             "weekdays": { "key": "console.authorization.common.weekdays.", "full": ".full", "short": ".short" }
         },
-        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        days: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
 
         render (data, element, callback) {
             this.initBasic(data, element, "pull-left attr-group");
@@ -43,7 +44,7 @@ define([
             _.invoke(self.days, function () {
                 weekdays[i] = {};
                 weekdays[i].title = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.full);
-                weekdays[i].value = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.short);
+                weekdays[i].value = this;
                 i++;
             });
             return weekdays;

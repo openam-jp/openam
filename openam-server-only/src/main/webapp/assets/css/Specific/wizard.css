@@ -29,7 +29,7 @@
 }
 
 .LastTab {
-	color: #5e887f;
+	color: #0071a1;
 	font-weight: bold;
 	font-size: 123.1%;			
 }
@@ -48,8 +48,13 @@
 	vertical-align: middle;
 }
 
+.scroll {
+	padding-right:10px;
+	height: 535px;
+}
+
 .tabContents {
-	padding: 0em 1em 0em 0em;				
+	padding: 0em 0em 0em 0em;				
 }
 
 #tab1RequiredInfoPanel li {
@@ -58,9 +63,10 @@
 }
 
 .tabContent {
+	width: 620px;
 	height: 535px;
+	margin-left: 180px;
 	border-left:1px solid #999999;
-	margin-left:170px;		
 }
 
 .tabContent h1 {
@@ -72,7 +78,7 @@
 }
 
 #title{
-	background-color: #80b7ab;
+	background-color: #0094d4;
 	color:#FFFFFF;
 	font-size:1.2em;
 	font-weight:bold;
@@ -143,7 +149,7 @@
 }
 
 .summaryPanel .bodyBox {
-	height: 100px;
+	height: auto;
 }
 
 .summaryPanel ol {

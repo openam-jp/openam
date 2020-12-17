@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.cts.utils.blob;
 
@@ -44,7 +46,7 @@ public class TokenBlobStrategyTest {
         BlobStrategy second = mock(BlobStrategy.class);
         BlobStrategy third = mock(BlobStrategy.class);
 
-        given(factory.getStrategies(any(CoreTokenConfig.class)))
+        given(factory.getStrategies(nullable(CoreTokenConfig.class)))
                 .willReturn(Arrays.asList(first, second, third));
 
         byte[] data = new byte[0];
@@ -56,8 +58,8 @@ public class TokenBlobStrategyTest {
 
         // Then
         verify(first).perform(any(byte[].class));
-        verify(second).perform(any(byte[].class));
-        verify(third).perform(any(byte[].class));
+        verify(second).perform(nullable(byte[].class));
+        verify(third).perform(nullable(byte[].class));
     }
 
     @Test
@@ -78,9 +80,9 @@ public class TokenBlobStrategyTest {
         strategy.reverse(data);
 
         // Then
-        verify(first).reverse(any(byte[].class));
-        verify(second).reverse(any(byte[].class));
-        verify(third).reverse(any(byte[].class));
+        verify(first).reverse(nullable(byte[].class));
+        verify(second).reverse(nullable(byte[].class));
+        verify(third).reverse(nullable(byte[].class));
     }
 
     @Test

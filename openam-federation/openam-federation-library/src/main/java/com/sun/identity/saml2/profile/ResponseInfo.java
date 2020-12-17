@@ -25,6 +25,7 @@
  * $Id: ResponseInfo.java,v 1.6 2009/06/17 03:09:13 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 package com.sun.identity.saml2.profile;
 
@@ -49,6 +50,12 @@ public class ResponseInfo extends CacheObject {
     private String sessionIndex = null;
     private boolean isLocalLogin = false;
 
+    /**
+     * Default constructor for deserialization.
+     */
+    public ResponseInfo() {
+    }
+    
     /**
      * Constructor creates the ResponseInfo.
      * @param response the Response

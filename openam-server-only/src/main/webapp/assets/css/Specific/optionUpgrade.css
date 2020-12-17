@@ -11,11 +11,11 @@
 }
 
 h4 {
-    background: #eeea07;
+    background: #004d6e;
     border: 1px solid;
-    border-color: #eeea07;
+    border-color: #004d6e;
     font-size: 14px;
-    color: #333333;
+    color: #eaeef0;
     font-weight: bold;
     padding: 5px;
     margin-left: -5px;
@@ -25,12 +25,12 @@ p {
     text-align:justify;
 }
 
-span.yellowBlock {
-    background: #eeea07;
+span.versionDetail {
+    background: #004d6e;
     border: 1px solid;
-    border-color: #eeea07;
+    border-color: #004d6e;
     font-size: 14px;
-    color: #333333;
+    color: #eaeef0;
     font-weight: bold;
     padding: 5px;
     margin-left: -5px;
@@ -103,8 +103,6 @@ a.disabled,a.disabled:hover{
 
 #upgradeFooter{
     border-top: 1px solid #DDD;
-}
-.license-accepted #upgradeFooter{
-    border: none;
+    background:#e5e9ed;
 }
 

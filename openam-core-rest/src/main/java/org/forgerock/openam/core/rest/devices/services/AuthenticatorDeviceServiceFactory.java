@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions copyright 2019 Open Source Solution Technology Corporation
 */
 package org.forgerock.openam.core.rest.devices.services;
 
@@ -103,18 +104,19 @@ public class AuthenticatorDeviceServiceFactory<T extends DeviceService> {
         @Override
         public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
                                               String serviceComponent, int type) {
+
+            String realm = DNMapper.orgNameToRealmName(orgName);
             switch (type) {
                 case ADDED: // OR
                 case MODIFIED:
                     try {
-                        serviceCache.put(DNMapper.orgNameToRealmName(orgName),
-                                factory.create(serviceConfigManager, orgName));
+                        serviceCache.put(realm, factory.create(serviceConfigManager, realm));
                     } catch (SMSException | SSOException e) {
                         debug.error("Unknown function requested on to update preferences for organization {}", type);
                     }
                     break;
                 case REMOVED:
-                    serviceCache.remove(DNMapper.orgNameToRealmName(orgName));
+                    serviceCache.remove(realm);
                 default:
                     debug.error("Unknown function requested on to update preferences for organization {}", type);
             }

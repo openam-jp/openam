@@ -25,6 +25,7 @@
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -744,10 +745,10 @@ public class AuthUtils extends AuthClientUtils {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
                     Cookie cookie = createlbCookie(authContext, domain, false);
-                    CookieUtils.addCookieToResponse(response, cookie);
+                    CookieUtils.addCookieToResponse(request, response, cookie);
                 }
             } else {
-                CookieUtils.addCookieToResponse(response, 
+                CookieUtils.addCookieToResponse(request, response, 
                         createlbCookie(authContext, null, false));
             }
         }

@@ -12,14 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.upgrade.steps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -62,9 +63,9 @@ public class UpgradeCTSMaxConnectionsConfigurationStepTest {
         upgradeStep = new UpgradeCTSMaxConnectionsConfigurationStep(adminTokenAction, connectionFactory,
                 connectionCount, helper);
 
-        given(helper.getDefaultServerConfig(any(SSOToken.class))).willReturn(defaultServerInstanceConfig);
-        given(helper.getServerConfigs(any(SSOToken.class))).willReturn(serverInstanceConfigs);
-        given(connectionCount.getConnectionCount(anyInt(), any(ConnectionType.class)))
+        given(helper.getDefaultServerConfig(nullable(SSOToken.class))).willReturn(defaultServerInstanceConfig);
+        given(helper.getServerConfigs(nullable(SSOToken.class))).willReturn(serverInstanceConfigs);
+        given(connectionCount.getConnectionCount(anyInt(), nullable(ConnectionType.class)))
                 .willAnswer(new Answer<Integer>() {
                     @Override
                     public Integer answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -92,7 +93,7 @@ public class UpgradeCTSMaxConnectionsConfigurationStepTest {
 
         //Then
         verify(defaultServerInstanceConfig).setCTSMaxConnections(Integer.toString(5));
-        verify(serverInstance, never()).setCTSMaxConnections(anyString());
+        verify(serverInstance, never()).setCTSMaxConnections(nullable(String.class));
     }
 
     @Test
@@ -107,7 +108,7 @@ public class UpgradeCTSMaxConnectionsConfigurationStepTest {
 
         //Then
         assertThat(upgradeStep.isApplicable()).isFalse();
-        verify(serverInstance, never()).setCTSMaxConnections(anyString());
+        verify(serverInstance, never()).setCTSMaxConnections(nullable(String.class));
     }
 
     @Test
@@ -131,9 +132,9 @@ public class UpgradeCTSMaxConnectionsConfigurationStepTest {
 
         //Then
         verify(defaultServerInstanceConfig).setCTSMaxConnections(Integer.toString(5));
-        verify(serverInstanceOne, never()).setCTSMaxConnections(anyString());
+        verify(serverInstanceOne, never()).setCTSMaxConnections(nullable(String.class));
         verify(serverInstanceTwo).setCTSMaxConnections(Integer.toString(5));
-        verify(serverInstanceThree, never()).setCTSMaxConnections(anyString());
+        verify(serverInstanceThree, never()).setCTSMaxConnections(nullable(String.class));
         verify(serverInstanceFour).setCTSMaxConnections(Integer.toString(6));
     }
 
@@ -159,10 +160,10 @@ public class UpgradeCTSMaxConnectionsConfigurationStepTest {
 
         //Then
         verify(defaultServerInstanceConfig).setCTSMaxConnections(Integer.toString(5));
-        verify(serverInstanceOne, never()).setCTSMaxConnections(anyString());
+        verify(serverInstanceOne, never()).setCTSMaxConnections(nullable(String.class));
         verify(serverInstanceTwo).setCTSMaxConnections(Integer.toString(5));
-        verify(serverInstanceThree, never()).setCTSMaxConnections(anyString());
-        verify(serverInstanceFour, never()).setCTSMaxConnections(anyString());
+        verify(serverInstanceThree, never()).setCTSMaxConnections(nullable(String.class));
+        verify(serverInstanceFour, never()).setCTSMaxConnections(nullable(String.class));
     }
 
     private void setupDefaultServerConfiguration(boolean isDefaultStoreMode) {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest;
@@ -22,6 +23,7 @@ import static org.forgerock.openam.rest.Routers.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnDevicesResource;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
@@ -60,7 +62,8 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .toCollection(DashboardResource.class);
 
         realmRouter.route("serverinfo")
-                .authenticateWith(ssoToken().exceptRead())
+                .authenticateWith(ssoToken().exceptRead()
+                    .exceptActions(ServerInfoResource.VALIDATE_GOTO_ACTION_ID))
                 .auditAs(SERVER_INFO)
                 .forVersion(1, 1)
                 .toCollection(ServerInfoResource.class);
@@ -114,6 +117,11 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(DEVICES)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
                 .toCollection(PushDevicesResource.class);
+
+        realmRouter.route("users/{user}/devices/webauthn")
+                .auditAs(DEVICES)
+                .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
+                .toCollection(WebAuthnDevicesResource.class);
 
         realmRouter.route("sessions")
                 .authenticateWith(ssoToken().exceptActions("validate"))

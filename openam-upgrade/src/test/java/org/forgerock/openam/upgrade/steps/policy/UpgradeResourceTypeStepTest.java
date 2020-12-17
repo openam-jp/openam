@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.upgrade.steps.policy;
 
@@ -80,7 +82,7 @@ public class UpgradeResourceTypeStepTest {
                     }
                 };
 
-        when(document.getElementsByTagName(anyString())).thenReturn(new NodeList() {
+        when(document.getElementsByTagName(nullable(String.class))).thenReturn(new NodeList() {
             @Override
             public Node item(int i) {
                 return null;
@@ -94,15 +96,15 @@ public class UpgradeResourceTypeStepTest {
 
         // Mock global and application type service configuration
         ServiceConfig globalConfig = mock(ServiceConfig.class);
-        when(configManager.getGlobalConfig(anyString())).thenReturn(globalConfig);
+        when(configManager.getGlobalConfig(nullable(String.class))).thenReturn(globalConfig);
         ServiceConfig appTypesConfig = mock(ServiceConfig.class);
-        when(globalConfig.getSubConfig(anyString())).thenReturn(appTypesConfig);
+        when(globalConfig.getSubConfig(nullable(String.class))).thenReturn(appTypesConfig);
 
         // Mock organisation and application service configuration
         ServiceConfig orgConfig = mock(ServiceConfig.class);
-        when(configManager.getOrganizationConfig(anyString(), anyString())).thenReturn(orgConfig);
+        when(configManager.getOrganizationConfig(nullable(String.class), nullable(String.class))).thenReturn(orgConfig);
         ServiceConfig appsConfig = mock(ServiceConfig.class);
-        when(orgConfig.getSubConfig(anyString())).thenReturn(appsConfig);
+        when(orgConfig.getSubConfig(nullable(String.class))).thenReturn(appsConfig);
 
         // Mock application names
         when(appsConfig.getSubConfigNames()).thenReturn(Collections.singleton("MyApplication"));

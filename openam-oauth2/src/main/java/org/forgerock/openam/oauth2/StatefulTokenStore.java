@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.oauth2;
 
@@ -181,8 +182,9 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             throw new NotFoundException(e.getMessage());
         }
 
+        String storedClaims = providerSettings.getClaimsParameterSupported() ? getClaimsFromRequest(request) : null;
         final AuthorizationCode authorizationCode = new AuthorizationCode(code, resourceOwner.getId(), clientId,
-                redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realm,
+                redirectUri, scope, storedClaims, expiryTime, nonce, realm,
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
                 ssoTokenId, codeChallenge, codeChallengeMethod, UUID.randomUUID().toString(), auditId);
 
@@ -898,8 +900,9 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
 
         long expiryTime = currentTimeMillis() + (1000 * providerSettings.getDeviceCodeLifetime());
         String resourceOwnerId = resourceOwner == null ? null : resourceOwner.getId();
+        String storedClaims = providerSettings.getClaimsParameterSupported() ? claims : null;
         final DeviceCode code = new DeviceCode(deviceCode, userCode, resourceOwnerId, clientId, nonce,
-                responseType, state, acrValues, prompt, uiLocales, loginHint, maxAge, claims, expiryTime, scope,
+                responseType, state, acrValues, prompt, uiLocales, loginHint, maxAge, storedClaims, expiryTime, scope,
                 realm, codeChallenge, codeChallengeMethod, auditId);
 
         // Store in CTS
@@ -1021,7 +1024,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     }
 
     @Override
-    public JsonValue read(String tokenId) throws ServerException {
+    public JsonValue read(String realm, String tokenId) throws ServerException {
         try {
             return tokenStore.read(tokenId);
         } catch (CoreTokenException e) {

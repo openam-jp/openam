@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.cts.impl.queue;
 
@@ -55,7 +57,7 @@ public class DeleteOnQueryResultHandlerTest {
         handler.processResults(hits);
         for (PartialToken hit : hits) {
             verify(mockTaskDispatcher).delete(eq(hit.<String>getValue(CoreTokenField.TOKEN_ID)),
-                    any(ResultHandler.class));
+                    nullable(ResultHandler.class));
         }
     }
 
@@ -64,11 +66,11 @@ public class DeleteOnQueryResultHandlerTest {
         Collection<PartialToken> hits = getHits(5);
         handler.processResults(hits);
 
-        willThrow(new CoreTokenException("")).willNothing().given(mockTaskDispatcher)
+        willThrow(new CoreTokenException("")).willDoNothing().given(mockTaskDispatcher)
                 .delete(anyString(), any(ResultHandler.class));
         for (PartialToken hit : hits) {
             verify(mockTaskDispatcher).delete(eq(hit.<String>getValue(CoreTokenField.TOKEN_ID)),
-                    any(ResultHandler.class));
+                    nullable(ResultHandler.class));
         }
     }
 

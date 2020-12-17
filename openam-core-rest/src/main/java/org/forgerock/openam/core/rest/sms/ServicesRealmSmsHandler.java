@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -31,6 +32,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
@@ -104,7 +106,8 @@ public class ServicesRealmSmsHandler {
             services.addAll(getIdentityServices(realm, ssoToken).getAssignedServices());
             consoleNameFilter.filter(services);
 
-            final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services);
+            Locale requestLocale = queryRequest.getPreferredLocales().getPreferredLocale();
+            final Map<String, String> serviceNameMap = consoleNameFilter.mapNameToDisplayName(services, requestLocale);
 
             for (String instanceName : serviceNameMap.keySet()) {
 

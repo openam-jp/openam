@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -263,5 +264,12 @@ public class RemoteServletResponse implements ServletResponse, Serializable {
      */
     public Locale getLocale() {
 	    return response != null ? this.response.getLocale() : locale;
+    }
+
+    @Override
+    public void setContentLengthLong(long len){
+        if( response != null ){
+            response.setContentLengthLong(len);
+        }
     }
 }

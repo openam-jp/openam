@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define([
@@ -68,10 +69,6 @@ define([
                     }
                 }
             }, function (failedStage, errorMsg) {
-                if (failedStage > 1) {
-                    // re-render login form, sending back to the start of the process.
-                    ViewManager.refresh();
-                }
                 errorCallback(errorMsg);
             });
         });
@@ -127,6 +124,28 @@ define([
             }
             promise.resolve();
         }
+        return promise;
+    };
+
+    obj.setLogoutGotoURL = function (urlGoTo) {
+        var promise = $.Deferred(),
+            auth = Configuration.globalData.auth,
+            context = "";
+        AuthNService.validateLogoutGotoUrl(urlGoTo).then(function (data) {
+            if (data.validatedUrl) {
+                if (data.validatedUrl.indexOf("/") === 0 &&
+                    data.validatedUrl.indexOf(`/${Constants.context}`) !== 0) {
+                    context = `/${Constants.context}`;
+                }
+                if (!auth.urlParams) {
+                    auth.urlParams = {};
+                }
+                auth.urlParams.goto = encodeURIComponent(context + data.validatedUrl);
+            }
+            promise.resolve();
+        }, function () {
+            promise.reject();
+        });
         return promise;
     };
 

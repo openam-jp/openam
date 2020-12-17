@@ -9,7 +9,8 @@ module.exports = {
     },
     env: {
         amd: true,
-        browser: true
+        browser: true,
+        es6: true
     },
     rules: {
         /*

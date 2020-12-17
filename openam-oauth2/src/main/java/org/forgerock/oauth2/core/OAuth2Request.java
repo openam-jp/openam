@@ -12,7 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2018 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2018-2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -57,6 +58,8 @@ public class OAuth2Request {
     private final Request request;
     private final JacksonRepresentationFactory jacksonRepresentationFactory;
     private JsonValue body;
+    private String validRedirectUri = null;
+    private Set<String> validatedScopes = Collections.emptySet();
 
     /**
      * Constructs a new RestletOAuth2Request.
@@ -253,6 +256,22 @@ public class OAuth2Request {
     }
 
     /**
+     * Set scopes in the current request as valid.
+     * @param validatedScopes The validated scopes
+     */
+    public void setValidatedScopes(Set<String> validatedScopes) {
+        this.validatedScopes = validatedScopes;
+    }
+    
+    /**
+     * Get validated scopes in the current request.
+     * @return The validated scopes, If validation fails, it returns empty Set.
+     */
+    public Set<String> getValidatedScopes() {
+        return validatedScopes;
+    }
+
+    /**
      * Creates an {@code OAuth2Request} which holds the provided realm only.
      *
      * @param realm The request realm.
@@ -313,5 +332,24 @@ public class OAuth2Request {
             resourcePath = resourceUrl.substring(realmUrl.length());
         }
        return EndpointType.get(resourcePath);
+    }
+
+    /**
+     * Set RedirectUri in the current request as valid.
+     * 
+     * @param validRedirectUri
+     */
+    public void setValidRedirectUri(String validRedirectUri) {
+        this.validRedirectUri = validRedirectUri;
+    }
+
+    /**
+     * Gets RedirectUri that has been successfully verified. If validation fails,
+     * returns null.
+     * 
+     * @return RedirectUri that has been successfully verified
+     */
+    public String getValidRedirectUri() {
+        return this.validRedirectUri;
     }
 }

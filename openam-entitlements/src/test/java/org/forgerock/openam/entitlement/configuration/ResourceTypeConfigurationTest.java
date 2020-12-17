@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.entitlement.configuration;
@@ -28,8 +30,7 @@ import javax.security.auth.Subject;
 
 import java.util.*;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +53,7 @@ public class ResourceTypeConfigurationTest {
     public void setup() throws SMSException, SSOException {
         resourceTypeServiceConfig = mock(ResourceTypeServiceConfig.class);
         impl = new ResourceTypeConfigurationImpl(null, resourceTypeServiceConfig);
-        when(serviceConfig.getSubConfig(anyString())).thenReturn(subServiceConfig);
+        when(serviceConfig.getSubConfig(nullable(String.class))).thenReturn(subServiceConfig);
     }
 
     @Test
@@ -75,11 +76,11 @@ public class ResourceTypeConfigurationTest {
 
     private void setupServiceConfigMock(Set<String> names) throws SMSException, SSOException, EntitlementException {
         when(subServiceConfig.getSubConfigNames()).thenReturn(names);
-        when(subServiceConfig.getSubConfig(anyString())).thenReturn(subSubServiceConfig);
+        when(subServiceConfig.getSubConfig(nullable(String.class))).thenReturn(subSubServiceConfig);
         Map<String, Set<String>> attributes = new HashMap<>();
         attributes.put("name", names);
         when(subSubServiceConfig.getAttributes()).thenReturn(attributes);
-        when(resourceTypeServiceConfig.getOrgConfig(any(Subject.class), anyString())).thenReturn(serviceConfig);
+        when(resourceTypeServiceConfig.getOrgConfig(nullable(Subject.class), nullable(String.class))).thenReturn(serviceConfig);
     }
 
 }

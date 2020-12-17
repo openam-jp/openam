@@ -265,7 +265,7 @@
         <div id="options" align="left" style="width:600px">
             #if ( $upgrade || $upgradeCompleted)
             <h1>$page.getLocalizedString("upgrade.available")</h1>
-            <span class="yellowBlock">$page.getLocalizedString("upgrade.available.option"):<br/><span class="currentVersion">$currentVersion</span></span>
+            <span class="versionDetail">$page.getLocalizedString("upgrade.available.option"):<br/><span class="currentVersion">$currentVersion</span></span>
             #else
             <h1>$page.getLocalizedString("configuration.options.title")</h1>
             <h4>$page.getLocalizedString("configuration.options.subtitle")</h4>

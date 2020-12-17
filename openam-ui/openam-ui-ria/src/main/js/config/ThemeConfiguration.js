@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 define({
@@ -19,7 +20,7 @@ define({
         // There must be a theme named "default".
         "default": {
             // An ordered list of URLs to stylesheets that will be applied to every page.
-            stylesheets: ["css/bootstrap-3.3.5-custom.css", "css/structure.css", "css/theme.css"],
+            stylesheets: ["css/bootstrap-3.4.1-openam-jp.css", "css/structure.css", "css/theme.css"],
             // A path that is prepended to every relative URL when fetching resources (including images, stylesheets and
             // HTML template files).
             path: "",
@@ -31,9 +32,9 @@ define({
                     // The URL of the image.
                     src: "images/logo-horizontal.png",
                     // The title attribute used on <img> tags.
-                    title: "ForgeRock",
+                    title: "OpenAM",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock",
+                    alt: "OpenAM",
                     // The width of the logo as a CSS length.
                     width: "202px"
                 },
@@ -42,9 +43,9 @@ define({
                     // The URL of the image.
                     src: "images/login-logo.png",
                     // The title attribute used on <img> tags.
-                    title: "ForgeRock",
+                    title: "OpenAM",
                     // The alt attribute used on <img> tags.
-                    alt: "ForgeRock",
+                    alt: "OpenAM",
                     // The height of the logo as a CSS length.
                     height: "104px",
                     // The width of the logo as a CSS length.
@@ -53,7 +54,7 @@ define({
                 // The footer is displayed on every page.
                 footer: {
                     // A contact email address.
-                    mailto: "info@forgerock.com",
+                    mailto: "openam-dev@OpenAM.jp",
                     // A contact phone number. If empty, it will not be displayed.
                     phone: ""
                 }
@@ -69,10 +70,10 @@ define({
             settings: {
                 loginLogo: {
                     src: "themes/dark/images/login-logo-white.png",
-                    title: "ForgeRock",
-                    alt: "ForgeRock",
-                    height: "228px",
-                    width: "220px"
+                    title: "OpenAM",
+                    alt: "OpenAM",
+                    height: "104px",
+                    width: "210px"
                 }
             }
         }

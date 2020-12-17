@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2019-2020 Open Source Solution Technology Corporation
+ */
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>jp.openam</groupId>
+        <artifactId>openam-authentication</artifactId>
+        <version>15.0.0-SNAPSHOT</version>
+    </parent>
+
+    <name>OpenAM Auth WebAuthn</name>
+    <description>OpenAM Authentication WebAuthn</description>
+    <artifactId>openam-auth-webauthn</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <webauthn4j.version>0.9.14.RELEASE</webauthn4j.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM Auth WebAuthn</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>OpenAM Consortium</Specification-Vendor>
+                            <Implementation-Title>OpenAM Auth Scripted</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                            </Implementation-Version>
+                            <Implementation-Vendor>OpenAM Consortium</Implementation-Vendor>
+                            <Built-By>${user.name}</Built-By>
+                            <Build-Jdk>${java.version}</Build-Jdk>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Version>${project.version}</Version>
+                            <Create-On>${maven.build.timestamp}</Create-On>
+                            <Revision>${git.short.sha1}</Revision>
+                            <!-- TODO Add License to Manifest -->
+                            <License />
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-core-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.webauthn4j</groupId>
+            <artifactId>webauthn4j-core</artifactId>
+            <version>${webauthn4j.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

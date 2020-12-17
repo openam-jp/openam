@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2.rest;
@@ -114,7 +115,7 @@ public class TokenRevocationResource extends ServerResource {
             }
             final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request, null);
             final String clientId = clientRegistration.getClientId();
-            final JsonValue token = getToken(clientId, tokenId);
+            final JsonValue token = getToken(realm, clientId, tokenId);
             if (token != null) {
                 final String tokenName = getAttributeValue(token, TOKEN_NAME);
                 switch (tokenName) {
@@ -199,10 +200,10 @@ public class TokenRevocationResource extends ServerResource {
         return tokenStore.queryForToken(realm, allTokensQuery);
     }
 
-    private JsonValue getToken(String clientId, String tokenId)
+    private JsonValue getToken(String realm, String clientId, String tokenId)
             throws CoreTokenException, InvalidRequestException, InvalidGrantException,
             ServerException, NotFoundException {
-        JsonValue token = tokenStore.read(tokenId);
+        JsonValue token = tokenStore.read(realm, tokenId);
         if(token != null) {
             String tokenClientId = getAttributeValue(token, CLIENT_ID.getOAuthField());
             if (!clientId.equals(tokenClientId)) {

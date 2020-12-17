@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -22,7 +23,6 @@ import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.forgerock.services.context.Context;
@@ -39,6 +39,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
@@ -133,9 +134,7 @@ class CommonTasksResource implements CollectionResourceProvider {
         if (!"true".equals(request.getQueryFilter().toString())) {
             return new NotSupportedException("Query not supported: " + request.getQueryFilter()).asPromise();
         }
-        //TODO pass in locale
-        Locale locale = Locale.ROOT;
-        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(locale));
+        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(request));
         for (String key : configuration.keys()) {
             JsonValue resource = configuration.get(key);
             resource.add(ResourceResponse.FIELD_CONTENT_ID, key);
@@ -147,9 +146,7 @@ class CommonTasksResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
-        //TODO pass in locale
-        Locale locale = Locale.ROOT;
-        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(locale));
+        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(request));
         if (!configuration.isDefined(resourceId)) {
             return new BadRequestException("Invalid common task").asPromise();
         }
@@ -163,8 +160,9 @@ class CommonTasksResource implements CollectionResourceProvider {
         return new NotSupportedException().asPromise();
     }
 
-    private ResourceBundle getResourceBundle(Locale locale) {
-        return ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME, locale);
+    private ResourceBundle getResourceBundle(Request request) {
+        return request.getPreferredLocales()
+                .getBundleInPreferredLocale(RESOURCE_BUNDLE_NAME, getClass().getClassLoader());
     }
 
     private static final class CommonTasksConfigurationManager {
@@ -236,7 +234,7 @@ class CommonTasksResource implements CollectionResourceProvider {
         private JsonValue getProductDocumentationCommonTaskConfiguration(ResourceBundle resourceBundle) {
             return createTaskGroup(resourceBundle, "documentation",
                     createTaskWithAbsoluteLink(resourceBundle, "doc",
-                            "http://docs.forgerock.org/en/index.html?product=openam"));
+                            "https://github.com/openam-jp/openam/wiki"));
         }
 
         private JsonValue getCreateSoapSTSDeploymentCommonTaskConfiguration(ResourceBundle resourceBundle) {

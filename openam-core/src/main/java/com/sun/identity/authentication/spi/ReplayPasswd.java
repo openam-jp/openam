@@ -25,6 +25,7 @@
  * $Id: ReplayPasswd.java,v 1.6 2009/11/04 22:50:35 manish_rustagi Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.spi;
 
@@ -147,7 +148,7 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
                 Cookie owaAuthCookie;
                 for (String domain : AuthUtils.getCookieDomainsForRequest(request)) {
                     owaAuthCookie = CookieUtils.newCookie(OWA_AUTH_COOKIE, OWA_AUTH_COOKIE_VALUE, "/", domain);
-                    CookieUtils.addCookieToResponse(response, owaAuthCookie);
+                    CookieUtils.addCookieToResponse(request, response, owaAuthCookie);
                 }
             }
 

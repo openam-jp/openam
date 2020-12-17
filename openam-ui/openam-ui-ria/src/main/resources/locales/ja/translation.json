@@ -325,7 +325,7 @@
             "deactivate": "非アクティブ",
             "active": "アクティブ",
             "inactive": "非アクティブ",
-            "copyright" : "Copyright &copy; 2010-2016 ForgeRock AS. All rights reserved.",
+            "copyright" : "Copyright OpenAM Consortium and other contributors. Released under the Common Development and Distribution License (CDDL) license.",
             "build": "ビルド",
             "sessionExpired" : "セッションが有効期限切れ",
             "enableCookies" : "ログインするためには、 cookie を有効にする必要があります",
@@ -571,6 +571,21 @@
                 "deviceName": "デバイス名",
                 "copyRecoveryCodes": "安全な場所にこれらのコードのコピーを保管してください。デバイスを紛失した場合 OpenAM に認証するためにあなたのリカバリーコードのいずれかを使用する必要があります。"
             }
+        },
+        "fido2AuthDevices": {
+            "header": "FIDO2(WebAuthn) 認証デバイス",
+            "noneFound": "デバイスが登録されていません。",
+            "menu": {
+                "delete": "削除"
+            },
+            "devicesSettingDialog": {
+                "title": "デバイス設定",
+                "description": "すべてのデバイスに対するグローバル設定を設定します。"
+            },
+            "deviceDetailsDialog": {
+                "deviceName": "デバイス名",
+                "createdDate": "登録日時"
+            }
         }
     },
     "uma": {
@@ -717,6 +732,7 @@
                 "authentication-chains": "認証 - 認証連鎖",
                 "authentication-modules": "認証 - モジュール",
                 "authorization-policySets": "認可 - ポリシーセット",
+                "authorization-provider-policySets": "認可 - プロバイダー ポリシーセット",
                 "authorization-resourceTypes": "認可 - リソースタイプ",
                 "general": "一般",
                 "security": "セキュリティ",
@@ -1030,31 +1046,31 @@
                 "noItems": "アイテムがありません...",
 
                 "weekdays": {
-                    "Monday": {
+                    "mon": {
                         "short": "月",
                         "full": "月曜日"
                     },
-                    "Tuesday": {
+                    "tue": {
                         "short": "火",
                         "full": "火曜日"
                     },
-                    "Wednesday": {
+                    "wed": {
                         "short": "水",
                         "full": "水曜日"
                     },
-                    "Thursday": {
+                    "thu": {
                         "short": "木",
                         "full": "木曜日"
                     },
-                    "Friday": {
+                    "fri": {
                         "short": "金",
                         "full": "金曜日"
                     },
-                    "Saturday": {
+                    "sat": {
                         "short": "土",
                         "full": "土曜日"
                     },
-                    "Sunday": {
+                    "sun": {
                         "short": "日",
                         "full": "日曜日"
                     }
@@ -1074,6 +1090,7 @@
                 },
                 "list": {
                     "addNew": "新規ポリシーセット",
+                    "addNewPP": "新規プロバイダポリシーセット",
                     "description": "Web サイト、 Web アプリケーション、またはその他のリソースを保護するためのポリシーのセットを定義します。",
                     "importPolicySets": "ポリシーのインポート",
                     "exportPolicySets": "ポリシーのエクスポート",
