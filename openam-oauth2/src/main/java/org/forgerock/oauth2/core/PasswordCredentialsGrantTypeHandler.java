@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 i7a7467
  */
 
 package org.forgerock.oauth2.core;
@@ -75,6 +76,13 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
             OAuth2ProviderSettings providerSettings) throws InvalidClientException,
             InvalidRequestException, UnauthorizedClientException, InvalidGrantException, ServerException,
             InvalidScopeException, NotFoundException {
+
+        if (clientRegistration.isPasswordCredentialsGrantDisabled()) {
+            logger.error("The client is not allowed to request using this grant type.");
+            throw new UnauthorizedClientException(
+                "The client is not allowed to request using this grant type."
+            );            
+        }
 
         for (final PasswordCredentialsRequestValidator requestValidator : requestValidators) {
             requestValidator.validateRequest(request, clientRegistration);
