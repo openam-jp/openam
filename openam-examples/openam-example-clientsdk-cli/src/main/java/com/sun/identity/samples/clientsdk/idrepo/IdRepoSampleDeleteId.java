@@ -25,6 +25,7 @@
  * $Id: IdRepoSampleDeleteId.java,v 1.3 2008/06/25 05:41:13 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -77,7 +78,7 @@ public class IdRepoSampleDeleteId {
              *  for reference...
              */
             IdSearchResults adRes = idRepo.searchIdentities(
-                 idtype, "*", new IdSearchControl());
+                 idtype, "*", new IdSearchControl(), true, true);
             Set adResSet = adRes.getSearchResults();
             System.out.println("Found " + adResSet.size() +
                 " entries of type " + idtype.getName() + ".");
@@ -142,7 +143,7 @@ public class IdRepoSampleDeleteId {
              *  identities of type idtype
              */
             adRes = idRepo.searchIdentities(
-                idtype, "*", new IdSearchControl());
+                idtype, "*", new IdSearchControl(), true, true);
             adResSet = adRes.getSearchResults();
 
             System.out.print("    Current list of " + idtype.getName() + "s");

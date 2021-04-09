@@ -25,6 +25,7 @@
  * $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.server;
@@ -1440,7 +1441,8 @@ public class IdServicesImpl implements IdServices {
 
     @Override
     public IdSearchResults search(SSOToken token, IdType type, IdSearchControl ctrl, String amOrgName,
-                                 CrestQuery crestQuery)
+                                 CrestQuery crestQuery, boolean allowWildcardForId,
+                                 boolean allowWildcardForAttributes)
        throws IdRepoException, SSOException {
 
        IdRepoException origEx = null;
@@ -1506,7 +1508,8 @@ public class IdServicesImpl implements IdServices {
                RepoSearchResults results;
 
                results = idRepo.search(token, type, crestQuery, maxTime, maxResults, returnAttrs,
-                           returnAllAttrs, filterOp, avPairs, recursive);
+                           returnAllAttrs, filterOp, avPairs, recursive,
+                           allowWildcardForId, allowWildcardForAttributes);
 
                if (idRepo.getClass().getName()
                        .equals(IdConstants.AMSDK_PLUGIN)) {

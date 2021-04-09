@@ -25,6 +25,7 @@
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.delegation.plugins;
@@ -434,7 +435,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         ctrl.setMaxResults(-1);
                         ctrl.setTimeOut(-1);
                         IdSearchResults idsr = idRepo.searchIdentities(
-                                                idType, pattern, ctrl);
+                                                idType, pattern, ctrl, true, false);
                         if (idsr != null) {
                             Set searchRes = idsr.getSearchResults();
                             if ((searchRes !=null) && 
@@ -738,7 +739,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                             String subjectId = LDAPUtils.rdnValueFromDn(subject);
                             if (subjectId != null) {
                                 results = idRepo.searchIdentities(
-                                           IdType.ROLE, subjectId, ctrl);
+                                           IdType.ROLE, subjectId, ctrl, false, false);
                                 if (results != null) {
                                     Set idSet = results.getSearchResults();
                                     if ((idSet != null) && !idSet.isEmpty()) {

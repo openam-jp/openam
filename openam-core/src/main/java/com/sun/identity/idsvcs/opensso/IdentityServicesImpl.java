@@ -25,6 +25,7 @@
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idsvcs.opensso;
@@ -1009,7 +1010,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
                 searchControl.setSearchModifiers(IdSearchOpModifier.AND, searchModifiers);
             }
 
-            searchResults = repo.searchIdentities(type, crestQuery, searchControl);
+            searchResults = repo.searchIdentities(type, crestQuery, searchControl, true, false);
             resultSet = searchResults.getSearchResults();
             identities = new ArrayList<>(resultSet);
         } else {

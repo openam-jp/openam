@@ -25,6 +25,7 @@
  * $Id: IdRepoJAXRPCObjectImpl.java,v 1.13 2010/01/06 01:58:27 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.server;
@@ -613,7 +614,8 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             IdSearchOpModifier.OR : IdSearchOpModifier.AND;
         ctrl.setSearchModifiers(modifier, avPairs);
         CrestQuery crestQuery = new CrestQuery(pattern);
-        return IdSearchResultsToMap(idServices.search(ssoToken, idtype, ctrl, amOrgName, crestQuery));
+        return IdSearchResultsToMap(
+                idServices.search(ssoToken, idtype, ctrl, amOrgName, crestQuery, true, true));
     }
 
     public void setAttributes_idrepo(

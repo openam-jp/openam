@@ -24,6 +24,7 @@
  *
  * $Id: LdapSPValidator.java,v 1.6 2009/10/29 17:35:07 ericow Exp $
  *
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 /*
@@ -258,9 +259,9 @@ public class LdapSPValidator implements SPValidator {
             if ((realm != null) && (realm.trim().length() > 0)) {
                 AMIdentityRepository idRepo = new AMIdentityRepository(
                     adminToken, realm);
-                sr = idRepo.searchIdentities(IdType.AGENT, "*", idsc);
+                sr = idRepo.searchIdentities(IdType.AGENT, "*", idsc, true, false);
             } else {
-                sr = amIdRepo.searchIdentities(IdType.AGENT, "*", idsc);
+                sr = amIdRepo.searchIdentities(IdType.AGENT, "*", idsc, true, false);
             }
             return sr.getResultAttributes();
         } catch (IdRepoException ire) {

@@ -25,6 +25,7 @@
  * $Id: ConfigMonitoring.java,v 1.6 2009/12/23 23:50:21 bigfatrat Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 package com.sun.identity.common;
 
@@ -488,7 +489,7 @@ public class ConfigMonitoring {
 
             // get this realm's subrealms
             Set subRealms = (idRepo.searchIdentities(IdType.REALM,
-                "*", new IdSearchControl())).getSearchResults();
+                "*", new IdSearchControl(), true, false)).getSearchResults();
             if (subRealms.isEmpty()) {
                 if (debug.messageEnabled()) {
                     debug.message(classMethod + currentAMIdName +
@@ -658,7 +659,7 @@ public class ConfigMonitoring {
             AMIdentityRepository airepo =
                 new AMIdentityRepository(ssoToken, realm);
             IdSearchResults isr = airepo.searchIdentities(
-                IdType.AGENT, "*", isc);
+                IdType.AGENT, "*", isc, true, false);
             Set results = isr.getSearchResults(); // set of AMIdentitys
             sb = new StringBuffer("Agents for realm ");
             sb.append(realm).append("; size = ").append(results.size()).
@@ -694,7 +695,7 @@ public class ConfigMonitoring {
             AMIdentityRepository airepo =
                 new AMIdentityRepository(ssoToken, realm);
             IdSearchResults isr = airepo.searchIdentities(
-                IdType.AGENTGROUP, "*", isc);
+                IdType.AGENTGROUP, "*", isc, true, false);
             Set results = isr.getSearchResults(); // set of AMIdentitys
             sb = new StringBuffer("AgentGroups for realm ");
             sb.append(realm).append("; size = ").append(results.size()).
@@ -734,7 +735,7 @@ public class ConfigMonitoring {
             isc.setTimeOut(3000); // should use set value, but for now...
             isc.setAllReturnAttributes(false);
             IdSearchResults isr = airepo.searchIdentities(
-                IdType.AGENTONLY, "*", isc);
+                IdType.AGENTONLY, "*", isc, true, false);
             Set results = isr.getSearchResults(); // set of AMIdentitys
             sb = new StringBuffer("\n  Agents for realm ");
             if (debug.messageEnabled()) {
@@ -759,7 +760,7 @@ public class ConfigMonitoring {
             isc.setMaxResults(0);
             isc.setTimeOut(3000); // should use set value, but for now...
             isc.setAllReturnAttributes(false);
-            isr = airepo.searchIdentities(IdType.AGENTGROUP, "*", isc);
+            isr = airepo.searchIdentities(IdType.AGENTGROUP, "*", isc, true, false);
             results = isr.getSearchResults(); // set of AMIdentitys
             if (debug.messageEnabled()) {
                 sb.append("\n  Agent Groups for realm ");

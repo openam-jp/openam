@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019-2020 Open Source Solution Technology Corporation
+ * Copyright 2019-2021 Open Source Solution Technology Corporation
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
@@ -225,7 +225,7 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
 
         try {
             idsc.setMaxResults(NO_LIMIT);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

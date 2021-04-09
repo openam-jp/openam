@@ -25,6 +25,7 @@
  * $Id: AgentMigration71.java,v 1.5 2008/08/19 19:09:10 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm;
 
@@ -78,7 +79,7 @@ public class AgentMigration71 {
                 AMIdentityRepository idRepo = 
                     new AMIdentityRepository(token, realm);
                 IdSearchResults results = idRepo.searchIdentities(
-                    IdType.AGENT, "*",new IdSearchControl());
+                    IdType.AGENT, "*",new IdSearchControl(), true, false);
 
                 Iterator it = results.getSearchResults().iterator();
                 while (it.hasNext()){

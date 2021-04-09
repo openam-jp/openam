@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.idm;
@@ -175,10 +176,12 @@ public class IdServicesDecorator implements IdServices {
      */
     @Override
     public IdSearchResults search(SSOToken token, IdType type, IdSearchControl ctrl, String amOrgName,
-                                  CrestQuery crestQuery)
+                                  CrestQuery crestQuery, boolean allowWildcardForId,
+                                  boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
-        return delegate.search(token, type, ctrl, amOrgName, crestQuery);
+        return delegate.search(token, type, ctrl, amOrgName, crestQuery,
+                allowWildcardForId, allowWildcardForAttributes);
     }
 
     /**

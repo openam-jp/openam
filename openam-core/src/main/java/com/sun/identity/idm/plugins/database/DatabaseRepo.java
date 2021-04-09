@@ -25,6 +25,7 @@
  * $Id: DatabaseRepo.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.plugins.database;
 
@@ -1127,6 +1128,10 @@ public class DatabaseRepo extends IdRepo {
      *     and value 'Jones'.
      * @param recursive
      *     boolean to indicate recursive search? (Not Using)
+     * @param allowWildcardForId
+     *     Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes
+     *     Whether to allow wildcards to search for Attributes. 
      *
      * @return RepoSearchResults
      * @throws IdRepoException If there are repository related error conditions.
@@ -1135,7 +1140,8 @@ public class DatabaseRepo extends IdRepo {
     private RepoSearchResults search(SSOToken token, IdType type,
             String pattern, int maxTime, int maxResults, Set returnAttrs,
             boolean returnAllAttrs, int filterOp, Map avPairs,
-            boolean recursive) throws IdRepoException, SSOException {
+            boolean recursive, boolean allowWildcardForId,
+            boolean allowWildcardForAttributes) throws IdRepoException, SSOException {
 
         if (initializationException != null) {
             debug.error("DatabaseRepo.search: throwing"
@@ -1202,7 +1208,7 @@ public class DatabaseRepo extends IdRepo {
         // in SQL _ allows you to match on a single character
         // later consider if this case matters?
 
-        if ((pattern == null || pattern.length() == 0 || pattern.equals("*"))
+        if ((pattern == null || pattern.length() == 0 || (pattern.equals("*") && allowWildcardForId))
                 && (avPairs == null || avPairs.isEmpty())) {
             // get all users
             if (type.equals(IdType.USER)) {
@@ -1219,7 +1225,10 @@ public class DatabaseRepo extends IdRepo {
             // and those attrs/values are used to search for pattern matches
 
             // substitute % for * for sql LIKE query
-            String searchPattern = pattern.replaceAll("\\*", "%");
+            String searchPattern = pattern;
+            if (allowWildcardForId) {
+                searchPattern = pattern.replaceAll("\\*", "%");
+            }
 
             //avPairs with values having wildcard chars replaced
             Map<String, Set<String>> avPairsChanged = new HashMap<>();
@@ -1237,7 +1246,8 @@ public class DatabaseRepo extends IdRepo {
                             // modify each value to replace any wildcard chars
                             while (valSetIt.hasNext()) {
                                 String attrValue = valSetIt.next();
-                                if (attrValue != null && attrValue.contains("*")) {
+                                if (attrValue != null && attrValue.contains("*")
+                                        && allowWildcardForAttributes) {
                                     attrValue = attrValue.replaceAll("\\*", "%");
                                 }
                                 changedValues.add(attrValue);
@@ -1331,6 +1341,10 @@ public class DatabaseRepo extends IdRepo {
      *     and value 'Jones'.
      * @param recursive
      *     boolean to indicate recursive search? (Not Using)
+     * @param allowWildcardForId
+     *     Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes
+     *     Whether to allow wildcards to search for Attributes. 
      *
      * @return RepoSearchResults
      * @throws IdRepoException If there are repository related error conditions.
@@ -1340,7 +1354,9 @@ public class DatabaseRepo extends IdRepo {
     public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery,
                                     int maxTime, int maxResults, Set returnAttrs,
                                     boolean returnAllAttrs, int filterOp, Map avPairs,
-                                    boolean recursive) throws IdRepoException, SSOException {
+                                    boolean recursive, boolean allowWildcardForId,
+                                    boolean allowWildcardForAttributes)
+                                            throws IdRepoException, SSOException {
 
         if (initializationException != null) {
             debug.error("DatabaseRepo.search: throwing"
@@ -1358,7 +1374,8 @@ public class DatabaseRepo extends IdRepo {
 
         if (crestQuery.hasQueryId()) {
             return search(token, type, crestQuery.getQueryId(), maxTime, maxResults, returnAttrs,
-                            returnAllAttrs, filterOp, avPairs, recursive);
+                            returnAllAttrs, filterOp, avPairs, recursive, 
+                            allowWildcardForId, allowWildcardForAttributes);
         }
 
         // throw exception if this type user not allowed to do this
@@ -1694,7 +1711,7 @@ public class DatabaseRepo extends IdRepo {
         //need to search for name and then make the url of datasource db
 
         RepoSearchResults results = search(token, type, name, 0, 2, null, true,
-                IdRepo.NO_MOD, null, false);
+                IdRepo.NO_MOD, null, false, false, false);
 
         Set dns = results.getSearchResults();
         if (debug.messageEnabled()) {

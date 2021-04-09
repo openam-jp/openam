@@ -24,6 +24,7 @@
  *
  * $Id: SearchIdentities.java,v 1.8 2008/06/25 05:42:15 qcheng Exp $
  *
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.cli.idrepo;
@@ -93,7 +94,7 @@ public class SearchIdentities extends IdentityCommand {
                 adminSSOToken, realm);
             IdType idType = convert2IdType(type);
             IdSearchResults isr = amir.searchIdentities(idType, filter,
-                new IdSearchControl());
+                new IdSearchControl(), true, true);
             Set results = isr.getSearchResults();
 
             if ((results != null) && !results.isEmpty()) {

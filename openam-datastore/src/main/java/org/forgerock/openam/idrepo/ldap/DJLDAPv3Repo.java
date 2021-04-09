@@ -13,6 +13,7 @@
  *
  * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyright 2016 Nomura Research Institute, Ltd.
+ * Portions copyright 2021 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -1111,13 +1112,16 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
      * {@link IdRepo#AND_MOD} or {@link IdRepo#OR_MOD}.
      * @param avPairs Attribute-value pairs based on the search should be performed.
      * @param recursive Deprecated setting, not used.
+     * @param allowWildcardForId Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes Whether to allow wildcards to search for Attributes.
      * @return The search results based on the provided parameters.
      * @throws IdRepoException Shouldn't be thrown as the returned RepoSearchResults will contain the error code.
      */
     @Override
     public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery, int maxTime,
                                     int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
-                                    Map<String, Set<String>> avPairs, boolean recursive)
+                                    Map<String, Set<String>> avPairs, boolean recursive,
+                                    boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException {
 
         if (DEBUG.messageEnabled()) {
@@ -1129,7 +1133,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     + " returnAttrs: " + returnAttrs
                     + " returnAllAttrs: " + returnAllAttrs
                     + " filterOp: " + filterOp
-                    + " recursive: " + recursive);
+                    + " recursive: " + recursive
+                    + " allowWildcardForId: " + allowWildcardForId
+                    + " allowWildcardForAttributes: " + allowWildcardForAttributes);
         }
         DN baseDN = getBaseDN(type);
         // Recursive is a deprecated setting on IdSearchControl, hence we should use the searchscope defined in the
@@ -1141,13 +1147,19 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         Filter first;
 
         if (crestQuery.hasQueryId()) {
-            first = Filter.valueOf(searchAttr + "=" + crestQuery.getQueryId());
+            String pattern = crestQuery.getQueryId();
+            if (allowWildcardForId) {
+                pattern = LDAPUtils.partiallyEscapeAssertionValue(pattern);
+            } else {
+                pattern = Filter.escapeAssertionValue(pattern);
+            }
+            first = Filter.valueOf(searchAttr + "=" + pattern);
         } else {
             first = crestQuery.getQueryFilter().accept(new LdapFromJsonQueryFilterVisitor(), null);
         }
 
         Filter filter = Filter.and(first, getObjectClassFilter(type));
-        Filter tempFilter = constructFilter(filterOp, avPairs);
+        Filter tempFilter = constructFilter(filterOp, avPairs, allowWildcardForAttributes);
         if (tempFilter != null) {
             filter = Filter.and(tempFilter, filter);
         }
@@ -2424,14 +2436,21 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         return dn;
     }
 
-    protected Filter constructFilter(int operation, Map<String, Set<String>> attributes) {
+    protected Filter constructFilter(int operation, Map<String, Set<String>> attributes,
+            boolean allowWildcardForAttributes) {
         if (attributes == null || attributes.isEmpty()) {
             return null;
         }
         Set<Filter> filters = new LinkedHashSet<Filter>(attributes.size());
         for (Map.Entry<String, Set<String>> entry : attributes.entrySet()) {
             for (String value : entry.getValue()) {
-                filters.add(Filter.valueOf(entry.getKey() + "=" + partiallyEscapeAssertionValue(value)));
+                if (allowWildcardForAttributes) {
+                    filters.add(Filter.valueOf(
+                            entry.getKey() + "=" + LDAPUtils.partiallyEscapeAssertionValue(value)));
+                } else {
+                    filters.add(Filter.valueOf(
+                            entry.getKey() + "=" + Filter.escapeAssertionValue(value)));
+                }
             }
         }
         Filter filter;
@@ -2450,26 +2469,6 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             DEBUG.message("constructFilter returned filter: " + filter.toString());
         }
         return filter;
-    }
-
-    /**
-     * Escapes the provided assertion value according to the LDAP standard. As a special case this method does not
-     * escape the '*' character, in order to be able to use wildcards in filters.
-     *
-     * @param assertionValue The filter assertionValue that needs to be escaped.
-     * @return The escaped assertionValue.
-     */
-    private String partiallyEscapeAssertionValue(String assertionValue) {
-        StringBuilder sb = new StringBuilder(assertionValue.length());
-        for (int j = 0; j < assertionValue.length(); j++) {
-            char c = assertionValue.charAt(j);
-            if (c == '*') {
-                sb.append(c);
-            } else {
-                sb.append(Filter.escapeAssertionValue(String.valueOf(c)));
-            }
-        }
-        return sb.toString();
     }
 
     protected Schema getSchema() throws IdRepoException {

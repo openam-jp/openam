@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2021 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
@@ -101,7 +102,7 @@ public class ScriptIdentityRepository {
         Set<AMIdentity> results = Collections.emptySet();
 
         try {
-            IdSearchResults searchResults = identityRepository.searchIdentities(IdType.USER, userName, idsc);
+            IdSearchResults searchResults = identityRepository.searchIdentities(IdType.USER, userName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

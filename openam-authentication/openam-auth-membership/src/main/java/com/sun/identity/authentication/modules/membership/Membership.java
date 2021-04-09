@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.authentication.modules.membership;
@@ -789,7 +790,7 @@ public class Membership extends AMLoginModule {
         try {
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
-            amIdRepo.searchIdentities(IdType.USER, userID, idsc);
+            amIdRepo.searchIdentities(IdType.USER, userID, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

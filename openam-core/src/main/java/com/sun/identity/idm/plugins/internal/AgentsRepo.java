@@ -25,7 +25,7 @@
  * $Id: AgentsRepo.java,v 1.46 2009/09/21 19:47:28 goodearth Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.plugins.internal;
@@ -83,6 +83,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
 
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.opendj.ldap.Filter;
 
 public class AgentsRepo extends IdRepo implements ServiceListener {
 
@@ -914,7 +915,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
     @Override
     public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery, int maxTime,
                                     int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
-                                    Map<String, Set<String>> avPairs, boolean recursive)
+                                    Map<String, Set<String>> avPairs, boolean recursive, 
+                                    boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         if (crestQuery.hasQueryFilter()) {
@@ -922,6 +924,11 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         }
 
         String pattern = crestQuery.getQueryId();
+        if (allowWildcardForId) {
+            pattern = LDAPUtils.partiallyEscapeAssertionValue(pattern);
+        } else {
+            pattern = Filter.escapeAssertionValue(pattern);
+        }
         if (debug.messageEnabled()) {
             debug.message("AgentsRepo.search() called: " + type + ": " +
                 pattern);

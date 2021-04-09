@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd
+ * Portions copyright 2021 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -127,7 +128,7 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
             Set<AMIdentity> results = Collections.emptySet();
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.AGENT, uName, idsc);
+                    amIdRepo.searchIdentities(IdType.AGENT, uName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

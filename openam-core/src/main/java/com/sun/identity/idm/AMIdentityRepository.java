@@ -25,6 +25,7 @@
  * $Id: AMIdentityRepository.java,v 1.21 2010/01/06 01:58:26 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm;
 
@@ -233,7 +234,8 @@ public class AMIdentityRepository {
      *
      * @deprecated This method is deprecated. Use
      *             {@link #searchIdentities(IdType type,String pattern,
-     *             IdSearchControl ctrl)}
+     *             IdSearchControl ctrl, boolean allowWildcardForId,
+     *             boolean allowWildcardForAttribute)}
      * @param type
      *            Type of identity being searched for.
      * @param pattern
@@ -275,12 +277,10 @@ public class AMIdentityRepository {
 
         // Call search method that takes IdSearchControl
         CrestQuery crestQuery = new CrestQuery(pattern);
-        return searchIdentities(type, crestQuery, crtl);
+        return searchIdentities(type, crestQuery, crtl, true, true);
     }
 
     /**
-     * @supported.api
-     *
      * Searches for identities of certain types from each plugin and returns a
      * combined result.
      *
@@ -288,6 +288,11 @@ public class AMIdentityRepository {
      * used for services related operations only. The realm <code>AMIdentity
      * </code> object can be used to assign and unassign services containing
      * dynamic attributes to this realm.
+     *
+     * @deprecated This method is deprecated. Use
+     *             {@link #searchIdentities(IdType type,String pattern,
+     *             IdSearchControl ctrl, boolean allowWildcardForId,
+     *             boolean allowWildcardForAttribute)}
      *
      * @param type
      *            Type of identity being searched for.
@@ -308,7 +313,79 @@ public class AMIdentityRepository {
             throws IdRepoException, SSOException {
 
         CrestQuery crestQuery = new CrestQuery(pattern);
-        return searchIdentities(type, crestQuery, ctrl);
+        return searchIdentities(type, crestQuery, ctrl, true, true);
+    }
+
+    /**
+     * Searches for identities of certain types from each plugin and returns a
+     * combined result
+     *
+     * <b>Note:</b> The AMIdentity objects representing IdType.REALM can be
+     * used for services related operations only. The realm <code>AMIdentity
+     * </code> object can be used to assign and unassign services containing
+     * dynamic attributes to this realm.
+     *
+     * @deprecated This method is deprecated. Use
+     *             {@link #searchIdentities(IdType type,String pattern,
+     *             IdSearchControl ctrl, boolean allowWildcardForId,
+     *             boolean allowWildcardForAttribute)}
+     *
+     * @param type
+     *            Type of identity being searched for.
+     * @param crestQuery
+     *            Basically just an object which supports both _queryId and _queryFilter
+     * @param ctrl
+     *            IdSearchControl which can be used to set up various search
+     *            controls on the search to be performed.
+     * @return Returns the combined results in an object IdSearchResults.
+     * @see com.sun.identity.idm.IdSearchControl
+     * @see com.sun.identity.idm.IdSearchResults
+     * @throws IdRepoException
+     *             if there are repository related error conditions.
+     * @throws SSOException
+     *             if user's single sign on token is invalid.
+     */
+    public IdSearchResults searchIdentities(IdType type, CrestQuery crestQuery, IdSearchControl ctrl)
+            throws IdRepoException, SSOException {
+        return searchIdentities(type, crestQuery, ctrl, true, true);
+    }
+    
+    /**
+     * @supported.api
+     *
+     * Searches for identities of certain types from each plugin and returns a
+     * combined result.
+     *
+     * <b>Note:</b> The AMIdentity objects representing IdType.REALM can be
+     * used for services related operations only. The realm <code>AMIdentity
+     * </code> object can be used to assign and unassign services containing
+     * dynamic attributes to this realm.
+     *
+     * @param type
+     *            Type of identity being searched for.
+     * @param pattern
+     *            Pattern to be used when searching.
+     * @param ctrl
+     *            IdSearchControl which can be used to set up various search
+     *            controls on the search to be performed.
+     * @param allowWildcardForId
+     *            Whether to allow wildcards to search for Id (pattern).
+     * @param allowWildcardForAttributes
+     *            Whether to allow wildcards to search for Attributes.      
+     * @return Returns the combined results in an object IdSearchResults.
+     * @see com.sun.identity.idm.IdSearchControl
+     * @see com.sun.identity.idm.IdSearchResults
+     * @throws IdRepoException
+     *             if there are repository related error conditions.
+     * @throws SSOException
+     *             if user's single sign on token is invalid.
+     */
+    public IdSearchResults searchIdentities(IdType type, String pattern, IdSearchControl ctrl,
+            boolean allowWildcardForId, boolean allowWildcardForAttributes)
+            throws IdRepoException, SSOException {
+
+        CrestQuery crestQuery = new CrestQuery(pattern);
+        return searchIdentities(type, crestQuery, ctrl, allowWildcardForId, allowWildcardForAttributes);
     }
 
     /**
@@ -327,6 +404,10 @@ public class AMIdentityRepository {
      * @param ctrl
      *            IdSearchControl which can be used to set up various search
      *            controls on the search to be performed.
+     * @param allowWildcardForId
+     *            Whether to allow wildcards to search for Id (_queryId).
+     * @param allowWildcardForAttributes
+     *            Whether to allow wildcards to search for Attributes.
      * @return Returns the combined results in an object IdSearchResults.
      * @see com.sun.identity.idm.IdSearchControl
      * @see com.sun.identity.idm.IdSearchResults
@@ -335,7 +416,8 @@ public class AMIdentityRepository {
      * @throws SSOException
      *             if user's single sign on token is invalid.
      */
-    public IdSearchResults searchIdentities(IdType type, CrestQuery crestQuery, IdSearchControl ctrl)
+    public IdSearchResults searchIdentities(IdType type, CrestQuery crestQuery, IdSearchControl ctrl,
+            boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         IdSearchResults idSearchResults = null;
@@ -376,7 +458,8 @@ public class AMIdentityRepository {
         } else {
             IdServices idServices = IdServicesFactory.getDataStoreServices();
 
-            idSearchResults = idServices.search(token, type, ctrl, organizationDN, crestQuery);
+            idSearchResults = idServices.search(token, type, ctrl, organizationDN, crestQuery,
+                    allowWildcardForId, allowWildcardForAttributes);
         }
         return idSearchResults;
     }

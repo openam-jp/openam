@@ -25,6 +25,7 @@
  * $Id: IdCachedServicesImpl.java,v 1.21 2009/08/25 06:50:53 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.server;
 
@@ -554,7 +555,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
 
     @Override
     public IdSearchResults search(SSOToken token, IdType type, IdSearchControl ctrl, String orgName,
-                                  CrestQuery crestQuery)
+                                  CrestQuery crestQuery, boolean allowWildcardForId,
+                                  boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         IdSearchResults answer = new IdSearchResults(type, orgName);
@@ -620,7 +622,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServ
         }
 
         // Not in Cache.  Do a search on the server.
-        return super.search(token, type, ctrl, orgName, crestQuery);
+        return super.search(token, type, ctrl, orgName, crestQuery,
+                allowWildcardForId, allowWildcardForAttributes);
     }
 
     // Returns fully qualified names for the identity

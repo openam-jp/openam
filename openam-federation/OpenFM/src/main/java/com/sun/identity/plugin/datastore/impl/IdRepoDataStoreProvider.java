@@ -25,6 +25,7 @@
  * $Id: IdRepoDataStoreProvider.java,v 1.6 2008/08/06 17:29:26 exu Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.plugin.datastore.impl;
@@ -274,7 +275,7 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         try {
             IdSearchControl searchControl = getIdSearchControl(avPairs, IdSearchOpModifier.AND);
             AMIdentityRepository idRepo = getAMIdentityRepository(orgDN);
-            IdSearchResults searchResults = idRepo.searchIdentities(IdType.USER, "*", searchControl);
+            IdSearchResults searchResults = idRepo.searchIdentities(IdType.USER, "*", searchControl, true, false);
             amIdSet = searchResults.getSearchResults();
         } catch (IdRepoException ame) {
             debug.error("IdRepoDataStoreProvider.getUserID(): IdRepoException",

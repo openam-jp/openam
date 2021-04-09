@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2021 Open Source Solution Technology Corporation
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -646,7 +647,7 @@ public class GenericRepoTest extends IdRepoTestBase {
     public void testConstructFilterWithSpecialCharactersWithoutWildcards() throws Exception {
         Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
         attrs.put("cn", asSet("()\\\0"));
-        Filter filter = idrepo.constructFilter(IdRepo.AND_MOD, attrs);
+        Filter filter = idrepo.constructFilter(IdRepo.AND_MOD, attrs, false);
         assertThat(filter.toString()).isEqualTo("(&(cn=\\28\\29\\5C\\00))");
     }
 
@@ -654,7 +655,7 @@ public class GenericRepoTest extends IdRepoTestBase {
     public void testConstructFilterWithMultipleAssertions() throws Exception {
         Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
         attrs.put("cn", asOrderedSet("()\\\0", "hello"));
-        Filter filter = idrepo.constructFilter(IdRepo.AND_MOD, attrs);
+        Filter filter = idrepo.constructFilter(IdRepo.AND_MOD, attrs, false);
         assertThat(filter.toString()).isEqualTo("(&(cn=\\28\\29\\5C\\00)(cn=hello))");
     }
 
@@ -662,7 +663,7 @@ public class GenericRepoTest extends IdRepoTestBase {
     public void testConstructFilterWithWildcards() throws Exception {
         Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
         attrs.put("cn", asOrderedSet("()\\\0", "*w(o)rld*"));
-        Filter filter = idrepo.constructFilter(IdRepo.OR_MOD, attrs);
+        Filter filter = idrepo.constructFilter(IdRepo.OR_MOD, attrs, true);
         assertThat(filter.toString()).isEqualTo("(|(cn=\\28\\29\\5C\\00)(cn=*w\\28o\\29rld*))");
     }
 

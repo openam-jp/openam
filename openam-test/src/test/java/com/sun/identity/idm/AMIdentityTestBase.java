@@ -24,6 +24,7 @@
  *
  * $Id: AMIdentityTestBase.java,v 1.5 2008/06/25 05:44:19 qcheng Exp $
  *
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 /**
@@ -584,11 +585,12 @@ public class AMIdentityTestBase extends TestBase {
             AMIdentityRepository repo = new AMIdentityRepository(
                 getAdminSSOToken(), parentRealm);
             IdSearchResults results = repo.searchIdentities(type,
-                entityName + "exist", new IdSearchControl());
+                entityName + "exist", new IdSearchControl(), false, false);
             Set resultSets = results.getSearchResults();
             assert resultSets.size() == 1;
             deleteIdentity(parentRealm, type, entityName + "exist");
-            resultSets = repo.searchIdentities(type, entityName + "exist", new IdSearchControl()).getSearchResults();
+            resultSets = repo.searchIdentities(type, entityName + "exist",
+                new IdSearchControl(), false, false).getSearchResults();
             assert resultSets.isEmpty();
         } catch (Exception e) {
             log(Level.SEVERE, "verifyExistence", e.getMessage(), params);
@@ -690,7 +692,7 @@ public class AMIdentityTestBase extends TestBase {
         repo.deleteIdentities(getAMIdentity(
             ssoToken, entityName, idType, parentRealm));
         IdSearchResults results = repo.searchIdentities(idType, entityName,
-            new IdSearchControl());
+            new IdSearchControl(), false, false);
         Set resultSets = results.getSearchResults();
         assert resultSets.isEmpty();
     }

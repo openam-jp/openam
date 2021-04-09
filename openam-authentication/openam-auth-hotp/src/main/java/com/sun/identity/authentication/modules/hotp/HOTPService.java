@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.authentication.modules.hotp;
@@ -263,7 +264,7 @@ public class HOTPService {
 
         IdSearchResults searchResults;
         try {
-            searchResults = amIdentityRepo.searchIdentities(IdType.USER, userName, idsc);
+            searchResults = amIdentityRepo.searchIdentities(IdType.USER, userName, idsc, false, false);
             if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("HOTP.getIdentity: searching user identity " + "with alternative attributes "
@@ -272,7 +273,7 @@ public class HOTPService {
                 final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
                 // workaround as data store always adds 'user-naming-attribute' to searchfilter
-                searchResults = amIdentityRepo.searchIdentities(IdType.USER, "*", idsc);
+                searchResults = amIdentityRepo.searchIdentities(IdType.USER, "*", idsc, true, false);
             }
 
             if (searchResults != null) {

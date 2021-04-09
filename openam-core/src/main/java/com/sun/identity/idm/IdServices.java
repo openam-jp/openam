@@ -25,6 +25,7 @@
  * $Id: IdServices.java,v 1.10 2010/01/06 01:58:26 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm;
@@ -129,11 +130,14 @@ public interface IdServices {
      * @param ctrl the search control
      * @param amOrgName is the orgname.
      * @param crestQuery encapsulates _queryId or _queryFilter from the CREST endpoint.
+     * @param allowWildcardForId Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes Whether to allow wildcards to search for Attributes.
      * @throws IdRepoException if there are repository related error conditions.
      * @throws SSOException if user's single sign on token is invalid.
      */
     public IdSearchResults search(SSOToken token, IdType type,
-            IdSearchControl ctrl, String amOrgName, CrestQuery crestQuery)
+            IdSearchControl ctrl, String amOrgName, CrestQuery crestQuery,
+            boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException;
 
     public void setAttributes(SSOToken token, IdType type, String name,

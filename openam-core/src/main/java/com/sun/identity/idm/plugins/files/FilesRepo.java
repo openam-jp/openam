@@ -25,6 +25,7 @@
  * $Id: FilesRepo.java,v 1.22 2008/07/02 17:21:21 kenwho Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.plugins.files;
 
@@ -1046,7 +1047,9 @@ public class FilesRepo extends IdRepo {
      */
     public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery, int maxTime,
                                     int maxResults, Set returnAttrs, boolean returnAllAttrs, int filterOp,
-                                    Map avPairs, boolean recursive) throws IdRepoException, SSOException {
+                                    Map avPairs, boolean recursive,  boolean allowWildcardForId,
+                                    boolean allowWildcardForAttributes)
+                                            throws IdRepoException, SSOException {
 
         if (crestQuery.hasQueryId()) {
             return search(token, type, crestQuery.getQueryId(), maxTime, maxResults, returnAttrs,

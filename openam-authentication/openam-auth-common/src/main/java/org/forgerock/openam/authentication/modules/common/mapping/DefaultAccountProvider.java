@@ -22,6 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.authentication.modules.common.mapping;
@@ -79,7 +80,7 @@ public class DefaultAccountProvider implements AccountProvider {
         IdSearchControl ctrl = getSearchControl(IdSearchOpModifier.OR, attr);
         IdSearchResults results;
         try {
-            results = idrepo.searchIdentities(IdType.USER, "*", ctrl);
+            results = idrepo.searchIdentities(IdType.USER, "*", ctrl, true, false);
             Iterator<AMIdentity> iter = results.getSearchResults().iterator();
             if (iter.hasNext()) {
                 identity = iter.next();
