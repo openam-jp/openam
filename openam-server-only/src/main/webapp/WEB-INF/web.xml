@@ -1100,10 +1100,12 @@
 
     <!-- servlet declaration -->
 
+    <!--
     <servlet-mapping>
         <servlet-name>WebFinger</servlet-name>
         <url-pattern>/.well-known/*</url-pattern>
     </servlet-mapping>
+    -->
 
     <servlet>
         <servlet-name>OpenAM</servlet-name>
