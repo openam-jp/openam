@@ -1507,9 +1507,15 @@ public class IdServicesImpl implements IdServices {
                Map cMap = idRepo.getConfiguration();
                RepoSearchResults results;
 
-               results = idRepo.search(token, type, crestQuery, maxTime, maxResults, returnAttrs,
-                           returnAllAttrs, filterOp, avPairs, recursive,
+               if (hasNewSerch(idRepo)) {
+                   results = idRepo.search(token, type, crestQuery, maxTime, maxResults,
+                           returnAttrs, returnAllAttrs, filterOp, avPairs, recursive,
                            allowWildcardForId, allowWildcardForAttributes);
+               } else {
+                   // For old IdRepo
+                   results = idRepo.search(token, type, crestQuery, maxTime, maxResults,
+                           returnAttrs, returnAllAttrs, filterOp, avPairs, recursive);
+               }
 
                if (idRepo.getClass().getName()
                        .equals(IdConstants.AMSDK_PLUGIN)) {
@@ -1582,7 +1588,24 @@ public class IdServicesImpl implements IdServices {
     }
 
 
-   public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
+    private boolean hasNewSerch(IdRepo idRepo) {
+        try {
+            idRepo.getClass().getDeclaredMethod("search", SSOToken.class, IdType.class,
+                    CrestQuery.class, int.class, int.class, Set.class, boolean.class,
+                    int.class, Map.class, boolean.class, boolean.class, boolean.class);
+            return true;
+        } catch (NoSuchMethodException e) {
+            DEBUG.warning(
+                    "IdServicesImpl.hasNewSerch: {} class does not have newer search method.",
+                    idRepo.getClass().getSimpleName());
+            return false;
+        } catch (SecurityException e) {
+            DEBUG.error("IdServicesImpl.hasNewSerch: SecurityException", e);
+            return false;
+        }
+    }
+
+    public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
            String orgName) throws IdRepoException, SSOException {
 
        Set pluginClasses = new OrderedSet();
