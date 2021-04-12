@@ -12,11 +12,15 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2021 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openidconnect;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,6 +28,10 @@ import javax.inject.Singleton;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.common.AMUserPasswordValidationPlugin;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.DNMapper;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -77,8 +85,14 @@ public class OpenIDConnectProvider {
      */
     public boolean isUserValid(String userId, OAuth2Request request) {
         try {
-            identityManager.getResourceOwnerIdentity(userId,
-                    request.<String>getParameter(REALM));
+            String realm = request.<String>getParameter(REALM);
+
+            AMUserPasswordValidationPlugin plugin = new AMUserPasswordValidationPlugin();
+            Map<String, String> envParams = new HashMap<String, String>();
+            envParams.put(Constants.ORGANIZATION_NAME, DNMapper.orgNameToDN(realm));
+            plugin.validateUserID(userId, envParams);
+
+            identityManager.getResourceOwnerIdentity(userId, realm);
         } catch (Exception e) {
             return false;
         }
