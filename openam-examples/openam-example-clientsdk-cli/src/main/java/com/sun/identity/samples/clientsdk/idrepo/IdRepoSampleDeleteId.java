@@ -78,7 +78,7 @@ public class IdRepoSampleDeleteId {
              *  for reference...
              */
             IdSearchResults adRes = idRepo.searchIdentities(
-                 idtype, "*", new IdSearchControl(), true, true);
+                 idtype, "*", new IdSearchControl(), true, false);
             Set adResSet = adRes.getSearchResults();
             System.out.println("Found " + adResSet.size() +
                 " entries of type " + idtype.getName() + ".");
@@ -143,7 +143,7 @@ public class IdRepoSampleDeleteId {
              *  identities of type idtype
              */
             adRes = idRepo.searchIdentities(
-                idtype, "*", new IdSearchControl(), true, true);
+                idtype, "*", new IdSearchControl(), true, false);
             adResSet = adRes.getSearchResults();
 
             System.out.print("    Current list of " + idtype.getName() + "s");

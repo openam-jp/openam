@@ -71,7 +71,7 @@ public class IdRepoSampleSearchIds {
         String pattern = sampleUtils.getLine("    Enter search pattern", "*");
         try {
             IdSearchResults adRes = idRepo.searchIdentities(
-                idtype, pattern, isc, true, true);
+                idtype, pattern, isc, true, false);
             Set adResSet = adRes.getSearchResults();
             processType(idtype, adResSet);
         } catch (IdRepoException ire) {

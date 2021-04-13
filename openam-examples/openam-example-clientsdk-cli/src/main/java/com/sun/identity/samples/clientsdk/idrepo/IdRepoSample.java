@@ -113,7 +113,7 @@ public class IdRepoSample {
 
         System.out.println ("getting subrealms");
         try {
-            currentSubRealms = (idRepo.searchIdentities(IdType.REALM, "*", new IdSearchControl(), true, true)).getSearchResults();
+            currentSubRealms = (idRepo.searchIdentities(IdType.REALM, "*", new IdSearchControl(), true, false)).getSearchResults();
         } catch (SSOException ssoe) {
             System.err.println (
                 "doCurrentRealm: SSOException getting subrealms for '" +
