@@ -25,6 +25,7 @@
  * $Id: DaoInterface.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.plugins.database;
@@ -77,7 +78,7 @@ public interface DaoInterface {
     public Map<String, Map<String, Set<String>>>  search(
             String userIDAttributeName, int limit, String idPattern,
             Set<String> attributesToFetch, String filterOperand,
-            Map<String, Set<String>> avPairs);
+            Map<String, Set<String>> avPairs, int searchType);
 
     public Map<String, Map<String, Set<String>>>  search(
             String userIDAttributeName, int limit, QueryFilter<JsonPointer> queryFilter,

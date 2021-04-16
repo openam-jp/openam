@@ -56,6 +56,8 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SchemaType;
+
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
 
 /**
@@ -174,6 +176,13 @@ public class DatabaseRepo extends IdRepo {
      private static final String MEMBERSHIP_SEARCH_ATTRIBUTE_NAME_SCHEMA_NAME =
              "sun-opensso-database-membership-search-attribute";
 
+    // Use SELECT without a WHERE clause
+    public static final int QUERY_TYPE_SELECT_ALL = 0;
+    // Use SELECT with a WHERE clause
+    public static final int QUERY_TYPE_SELECT_EQUAL = 1;
+    // Use SELECT with LIKE operator
+    public static final int QUERY_TYPE_SELECT_LIKE = 2;
+     
     // Fields that represent the actual values that were retrieved from
     // idRepoService.xml schema element names
 
@@ -1203,69 +1212,94 @@ public class DatabaseRepo extends IdRepo {
             filterOpString = "AND";
         }
 
-        // what if pattern or values in avPairs contain wildcard chars of SQL
-        // in SQL % allows you to match any string of any length
-        // in SQL _ allows you to match on a single character
-        // later consider if this case matters?
-
-        if ((pattern == null || pattern.length() == 0 || (pattern.equals("*") && allowWildcardForId))
-                && (avPairs == null || avPairs.isEmpty())) {
-            // get all users
-            if (type.equals(IdType.USER)) {
-                users = dao.search(userIDAttributeName, maxResults, "", attributesToFetch, filterOpString, avPairs);
-            } else if (type.equals(IdType.GROUP)) {
-                users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch,
-                        filterOpString, avPairs);
-            }
-        } else {
-            // get users that match with the pattern
-            // not sure if we need to differentiate between case where
-            // avPairs==null or empty ??? vs when avPairs has attrs and values??
-            // AFAIK the searches on a pattern all include something in avPairs
-            // and those attrs/values are used to search for pattern matches
-
-            // substitute % for * for sql LIKE query
-            String searchPattern = pattern;
-            if (allowWildcardForId) {
-                searchPattern = pattern.replaceAll("\\*", "%");
-            }
-
-            //avPairs with values having wildcard chars replaced
-            Map<String, Set<String>> avPairsChanged = new HashMap<>();
-
-            // need to replace % for * in all avPairs too
-            if (avPairs != null && !avPairs.isEmpty()) {
-                Iterator KeysIt = avPairs.keySet().iterator();
-                while (KeysIt.hasNext()) {
-                    String key = (String) KeysIt.next();
-                    if (key != null) {
-                        Set<String> values = (Set<String>) avPairs.get(key);
-                        Set<String> changedValues = new HashSet<String>();
-                        if (values != null && !values.isEmpty()) {
-                            Iterator<String> valSetIt = values.iterator();
-                            // modify each value to replace any wildcard chars
-                            while (valSetIt.hasNext()) {
-                                String attrValue = valSetIt.next();
-                                if (attrValue != null && attrValue.contains("*")
-                                        && allowWildcardForAttributes) {
-                                    attrValue = attrValue.replaceAll("\\*", "%");
-                                }
-                                changedValues.add(attrValue);
-                            }
-                        }
-                        // now that Set values has each value with new wildcard
-                        // replace it in the changed avPairsMap
-                        avPairsChanged.put(key, changedValues);
+        int queryType = getQueryType(pattern, avPairs, allowWildcardForId, allowWildcardForAttributes);
+        switch (queryType) {
+            case QUERY_TYPE_SELECT_ALL:
+                {
+                    // get all users
+                    if (type.equals(IdType.USER)) {
+                        users = dao.search(userIDAttributeName, maxResults, "", attributesToFetch,
+                                filterOpString, null, QUERY_TYPE_SELECT_ALL);
+                    } else if (type.equals(IdType.GROUP)) {
+                        users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch,
+                                filterOpString, null);
                     }
                 }
-            }
-            if (type.equals(IdType.USER)) {
-                users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
-                        filterOpString, avPairsChanged);
-            } else if (type.equals(IdType.GROUP)) {
-                users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern,
-                        attributesToFetch, filterOpString, avPairsChanged);
-            }
+                break;
+            case QUERY_TYPE_SELECT_EQUAL:
+                {
+                    String searchPattern = pattern;
+                    if (pattern.equals("*") && allowWildcardForId) {
+                        searchPattern = "";
+                    }
+
+                    if (type.equals(IdType.USER)) {
+                        users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
+                                filterOpString, avPairs, QUERY_TYPE_SELECT_EQUAL);
+                    } else if (type.equals(IdType.GROUP)) {
+                        users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern, attributesToFetch,
+                                filterOpString, avPairs);
+                    }
+                }
+                break;
+            case QUERY_TYPE_SELECT_LIKE:
+                {
+                    // what if pattern or values in avPairs contain wildcard chars of SQL
+                    // in SQL % allows you to match any string of any length
+                    // in SQL _ allows you to match on a single character
+                    // later consider if this case matters?
+
+                    //avPairs with values having wildcard chars replaced
+                    Map<String, Set<String>> avPairsChanged = new HashMap<>();
+
+                    // substitute % for * for sql LIKE query
+                    String searchPattern = pattern;
+                    if (allowWildcardForId) {
+                        searchPattern = pattern.replaceAll("\\*", "%");
+                        if (pattern.contains("*") && !pattern.equals("*")
+                                && type.equals(IdType.USER)) {
+                            // Add user pattern in LIKE query
+                            avPairsChanged.put(userIDAttributeName, CollectionUtils.asSet(searchPattern));
+                        }
+                    }
+
+                    // need to replace % for * in all avPairs too
+                    if (avPairs != null && !avPairs.isEmpty()) {
+                        Iterator KeysIt = avPairs.keySet().iterator();
+                        while (KeysIt.hasNext()) {
+                            String key = (String) KeysIt.next();
+                            if (key != null) {
+                                Set<String> values = (Set<String>) avPairs.get(key);
+                                Set<String> changedValues = new HashSet<String>();
+                                if (values != null && !values.isEmpty()) {
+                                    Iterator<String> valSetIt = values.iterator();
+                                    // modify each value to replace any wildcard chars
+                                    while (valSetIt.hasNext()) {
+                                        String attrValue = valSetIt.next();
+                                        if (attrValue != null && attrValue.contains("*")
+                                                && allowWildcardForAttributes) {
+                                            attrValue = attrValue.replaceAll("\\*", "%");
+                                        }
+                                        changedValues.add(attrValue);
+                                    }
+                                }
+                                // now that Set values has each value with new wildcard
+                                // replace it in the changed avPairsMap
+                                avPairsChanged.put(key, changedValues);
+                            }
+                        }
+                    }
+                    if (type.equals(IdType.USER)) {
+                        users = dao.search(userIDAttributeName, maxResults, "%", attributesToFetch,
+                                filterOpString, avPairsChanged, QUERY_TYPE_SELECT_LIKE);
+                    } else if (type.equals(IdType.GROUP)) {
+                        users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern,
+                                attributesToFetch, filterOpString, avPairsChanged);
+                    }
+                }
+                break;
+            default:
+                break;
         }
 
         if (users == null) {
@@ -1298,6 +1332,45 @@ public class DatabaseRepo extends IdRepo {
             debug.message("DatabaseRepo.search: returning users= " + users);
         }
         return (new RepoSearchResults(allUserIds, RepoSearchResults.SUCCESS, users, type));
+    }
+
+    private int getQueryType(String pattern, Map<String, Set<String>> avPairs,
+            boolean allowWildcardForId, boolean allowWildcardForAttributes) {
+        if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+            return QUERY_TYPE_SELECT_LIKE;
+        }
+        if (pattern == null || pattern.length() == 0) {
+            if (avPairs == null || avPairs.isEmpty()) {
+                return QUERY_TYPE_SELECT_ALL;
+            }
+        } else if (pattern.equals("*")) {
+            if (!allowWildcardForId) {
+                return QUERY_TYPE_SELECT_EQUAL;
+            }
+            if (avPairs == null || avPairs.isEmpty()) {
+                return QUERY_TYPE_SELECT_ALL;
+            }
+        } else if (pattern.contains("*")) {
+            if (allowWildcardForId) {
+                return QUERY_TYPE_SELECT_LIKE;
+            } else {
+                return QUERY_TYPE_SELECT_EQUAL;
+            }            
+        }
+        return QUERY_TYPE_SELECT_EQUAL;
+    }
+
+    private boolean hasWildCard(Map<String, Set<String>> avPairs) {
+        if (avPairs != null && !avPairs.isEmpty()) {
+            for(Map.Entry<String, Set<String>> entry : avPairs.entrySet()){
+                for (String attrValue : entry.getValue()) {
+                    if ((attrValue != null) && attrValue.contains("*")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /*

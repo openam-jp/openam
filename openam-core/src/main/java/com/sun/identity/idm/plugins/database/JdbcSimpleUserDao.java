@@ -25,7 +25,7 @@
  * $Id: JdbcSimpleUserDao.java,v 1.2 2009/12/22 19:11:54 veiming Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2021 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.idm.plugins.database;
@@ -781,12 +781,14 @@ public class JdbcSimpleUserDao implements DaoInterface {
      *         WHERE id_attribute LIKE 'the_pattern_value' AND
      *           (attr_1='value1' ...filterOperand/AND/OR... attr_2='value2' )
      *                LIMIT 2
+     * @param queryType This parameter determines what kind of SELECT statement
+     *         to execute.
      * @return a set of Maps where each map is a user and their attributes
      */
     public Map<String, Map<String, Set<String>>>  search(
             String userIDAttributeName, int limit, String idPattern,
-            Set<String> attributesToFetch,
-            String filterOperand, Map<String, Set<String>> avPairs) {
+            Set<String> attributesToFetch, String filterOperand,
+            Map<String, Set<String>> avPairs, int queryType) {
 
         if(debug.messageEnabled()) {
             debug.message("JdbcSimpleUserDao.search called with: "
@@ -794,7 +796,8 @@ public class JdbcSimpleUserDao implements DaoInterface {
                     +  " limit=" + limit + " idPattern=" + idPattern
                     +  " attributesToFetch=" + attributesToFetch
                     +  " filterOperand=" + filterOperand
-                    +  " avPairs=" + avPairs);
+                    +  " avPairs=" + avPairs
+                    +  " queryType=" + queryType);
         }
 
         if(limit <= 0) {
@@ -874,23 +877,12 @@ public class JdbcSimpleUserDao implements DaoInterface {
                                             new HashMap<Integer, String>();
         int avPairsBindPosMapCount = 0;
 
-        String QUERY_NO_PATTERN_TYPE = "no_pattern";
-        String QUERY_LIKE_TYPE = "like";
-        String QUERY_LITERAL_TYPE = "literal";
-        String queryType = null;
-
         final String WHERE_ID_EQUALS_PATTERN_QUERY_STR =
                 SPACE + "WHERE" + SPACE + userIDAttributeName + SPACE
                + "=" + SPACE + "?";
 
-        if(idPattern == null || idPattern.length()==0) {
-            // no pattern so no LIKE clause, so select all users
-            queryType = QUERY_NO_PATTERN_TYPE;
-        } else if(idPattern.contains("%")) {
-            //LIKE query ...
-            queryType = QUERY_LIKE_TYPE;
-        } else { //pattern is a literal id of a user
-            queryType = QUERY_LITERAL_TYPE;
+        if (queryType == DatabaseRepo.QUERY_TYPE_SELECT_EQUAL
+            && (idPattern != null && idPattern.length() != 0)) {
             queryToRun += WHERE_ID_EQUALS_PATTERN_QUERY_STR;
             // later value needs to be set to idPattern, for preparedstatement
             //         userIDAttributeName = idPattern
@@ -930,7 +922,7 @@ public class JdbcSimpleUserDao implements DaoInterface {
                             avPairsBindPosMapCount++;
                             avPairsBindingPositionMap.put(avPairsBindPosMapCount, v);
                             //add the attr to be set attr=? for preparedstatement
-                            if (queryType.equals(QUERY_LIKE_TYPE)) {
+                            if (queryType == DatabaseRepo.QUERY_TYPE_SELECT_LIKE) {
                                 sb.append(SPACE).append(attrName).append(" LIKE ? ");
                             } else {
                                 sb.append(SPACE).append(attrName).append("= ? ");
@@ -943,12 +935,13 @@ public class JdbcSimpleUserDao implements DaoInterface {
             String s = sb.toString();
 
             if(s!=null && s.length()!=0) {
-                if (queryType.equals(QUERY_NO_PATTERN_TYPE)) {
+                if (queryType == DatabaseRepo.QUERY_TYPE_SELECT_LIKE) {
                     queryToRun += " WHERE " + s;
-                } else if (queryType.equals(QUERY_LIKE_TYPE)) {
-                    //queryToRun += " AND " + s;
+                } else if (idPattern == null || idPattern.length() == 0) {
+                    // DatabaseRepo.QUERY_TYPE_SELECT_EQUAL
                     queryToRun += " WHERE " + s;
-                } else if (queryType.equals(QUERY_LITERAL_TYPE)) {
+                } else {
+                    // DatabaseRepo.QUERY_TYPE_SELECT_EQUAL
                     queryToRun += " AND " + s;
                 }
             }
@@ -975,7 +968,8 @@ public class JdbcSimpleUserDao implements DaoInterface {
             /**if ( queryType.equals(QUERY_LIKE_TYPE)
                   || queryType.equals(QUERY_LITERAL_TYPE)) {
              ***/
-            if (queryType.equals(QUERY_LITERAL_TYPE)) {
+            if (queryType == DatabaseRepo.QUERY_TYPE_SELECT_EQUAL
+                && (idPattern != null && idPattern.length() != 0)) {
                 //set first "?" to idPattern as value
                 startingIndexPosition++;
                 stmt.setString(startingIndexPosition, idPattern);
