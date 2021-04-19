@@ -177,12 +177,16 @@ public class DatabaseRepo extends IdRepo {
              "sun-opensso-database-membership-search-attribute";
 
     // Use SELECT without a WHERE clause
-    public static final int QUERY_TYPE_SELECT_ALL = 0;
-    // Use SELECT with a WHERE clause
-    public static final int QUERY_TYPE_SELECT_EQUAL = 1;
-    // Use SELECT with LIKE operator
-    public static final int QUERY_TYPE_SELECT_LIKE = 2;
-     
+    public static final int QUERY_TYPE_ALL = 0;
+    // Use SELECT without LIKE operator
+    public static final int QUERY_TYPE_NO_LIKE = 1;
+    // Use SELECT with LIKE operator for ID
+    public static final int QUERY_TYPE_LIKE_FOR_ID = 2;
+    // Use SELECT with LIKE operator for attributes
+    public static final int QUERY_TYPE_LIKE_FOR_ATTRIBUTE = 3;
+    // Use SELECT with LIKE operator for ID and attributes
+    public static final int QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE = 4;
+    
     // Fields that represent the actual values that were retrieved from
     // idRepoService.xml schema element names
 
@@ -1214,19 +1218,19 @@ public class DatabaseRepo extends IdRepo {
 
         int queryType = getQueryType(pattern, avPairs, allowWildcardForId, allowWildcardForAttributes);
         switch (queryType) {
-            case QUERY_TYPE_SELECT_ALL:
+            case QUERY_TYPE_ALL:
                 {
                     // get all users
                     if (type.equals(IdType.USER)) {
                         users = dao.search(userIDAttributeName, maxResults, "", attributesToFetch,
-                                filterOpString, null, QUERY_TYPE_SELECT_ALL);
+                                filterOpString, null, queryType);
                     } else if (type.equals(IdType.GROUP)) {
                         users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch,
                                 filterOpString, null);
                     }
                 }
                 break;
-            case QUERY_TYPE_SELECT_EQUAL:
+            case QUERY_TYPE_NO_LIKE:
                 {
                     String searchPattern = pattern;
                     if (pattern.equals("*") && allowWildcardForId) {
@@ -1235,14 +1239,16 @@ public class DatabaseRepo extends IdRepo {
 
                     if (type.equals(IdType.USER)) {
                         users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
-                                filterOpString, avPairs, QUERY_TYPE_SELECT_EQUAL);
+                                filterOpString, avPairs, queryType);
                     } else if (type.equals(IdType.GROUP)) {
                         users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern, attributesToFetch,
                                 filterOpString, avPairs);
                     }
                 }
                 break;
-            case QUERY_TYPE_SELECT_LIKE:
+            case QUERY_TYPE_LIKE_FOR_ID:
+            case QUERY_TYPE_LIKE_FOR_ATTRIBUTE:
+            case QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE:
                 {
                     // what if pattern or values in avPairs contain wildcard chars of SQL
                     // in SQL % allows you to match any string of any length
@@ -1254,13 +1260,12 @@ public class DatabaseRepo extends IdRepo {
 
                     // substitute % for * for sql LIKE query
                     String searchPattern = pattern;
-                    if (allowWildcardForId) {
+                    if (pattern != null && pattern.equals("*") && allowWildcardForId) {
+                        // search by attribute only
+                        searchPattern = "";
+                    } else if (queryType == QUERY_TYPE_LIKE_FOR_ID
+                            || queryType == QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE) {
                         searchPattern = pattern.replaceAll("\\*", "%");
-                        if (pattern.contains("*") && !pattern.equals("*")
-                                && type.equals(IdType.USER)) {
-                            // Add user pattern in LIKE query
-                            avPairsChanged.put(userIDAttributeName, CollectionUtils.asSet(searchPattern));
-                        }
                     }
 
                     // need to replace % for * in all avPairs too
@@ -1277,7 +1282,8 @@ public class DatabaseRepo extends IdRepo {
                                     while (valSetIt.hasNext()) {
                                         String attrValue = valSetIt.next();
                                         if (attrValue != null && attrValue.contains("*")
-                                                && allowWildcardForAttributes) {
+                                                && (queryType == QUERY_TYPE_LIKE_FOR_ATTRIBUTE
+                                                    || queryType == QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE)) {
                                             attrValue = attrValue.replaceAll("\\*", "%");
                                         }
                                         changedValues.add(attrValue);
@@ -1290,8 +1296,8 @@ public class DatabaseRepo extends IdRepo {
                         }
                     }
                     if (type.equals(IdType.USER)) {
-                        users = dao.search(userIDAttributeName, maxResults, "%", attributesToFetch,
-                                filterOpString, avPairsChanged, QUERY_TYPE_SELECT_LIKE);
+                        users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
+                                filterOpString, avPairsChanged, queryType);
                     } else if (type.equals(IdType.GROUP)) {
                         users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern,
                                 attributesToFetch, filterOpString, avPairsChanged);
@@ -1336,28 +1342,46 @@ public class DatabaseRepo extends IdRepo {
 
     private int getQueryType(String pattern, Map<String, Set<String>> avPairs,
             boolean allowWildcardForId, boolean allowWildcardForAttributes) {
-        if (allowWildcardForAttributes && hasWildCard(avPairs)) {
-            return QUERY_TYPE_SELECT_LIKE;
-        }
+
+        // Suppress LIKE query as much as possible even if wildcards are allowed.
         if (pattern == null || pattern.length() == 0) {
             if (avPairs == null || avPairs.isEmpty()) {
-                return QUERY_TYPE_SELECT_ALL;
+                return QUERY_TYPE_ALL;
+            }
+            if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
             }
         } else if (pattern.equals("*")) {
-            if (!allowWildcardForId) {
-                return QUERY_TYPE_SELECT_EQUAL;
-            }
-            if (avPairs == null || avPairs.isEmpty()) {
-                return QUERY_TYPE_SELECT_ALL;
+            if (allowWildcardForId) {
+                if (avPairs == null || avPairs.isEmpty()) {
+                    return QUERY_TYPE_ALL;
+                }
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+                }
+            } else {
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+                }
             }
         } else if (pattern.contains("*")) {
             if (allowWildcardForId) {
-                return QUERY_TYPE_SELECT_LIKE;
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE;
+                } else {
+                    return QUERY_TYPE_LIKE_FOR_ID;
+                }
             } else {
-                return QUERY_TYPE_SELECT_EQUAL;
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+                }
             }            
+        } else {
+            if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+            }
         }
-        return QUERY_TYPE_SELECT_EQUAL;
+        return QUERY_TYPE_NO_LIKE;
     }
 
     private boolean hasWildCard(Map<String, Set<String>> avPairs) {
