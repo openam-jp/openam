@@ -13,6 +13,7 @@
  *
  * Copyright 2013-2016 ForgeRock AS.
  * Portions copyright 2021 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OGIS-RI Co., Ltd
  */
 package org.forgerock.openam.ldap;
 
@@ -720,6 +721,12 @@ public final class LDAPUtils {
      * @return The escaped assertionValue.
      */
     public static String partiallyEscapeAssertionValue(String assertionValue) {
+        if (assertionValue == null || assertionValue.isEmpty()) {
+            return assertionValue;
+        }
+        if (!assertionValue.contains("*")) {
+            return Filter.escapeAssertionValue(assertionValue);
+        }
         StringBuilder sb = new StringBuilder(assertionValue.length());
         for (int j = 0; j < assertionValue.length(); j++) {
             char c = assertionValue.charAt(j);
