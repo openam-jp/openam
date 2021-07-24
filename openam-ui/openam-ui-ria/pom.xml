@@ -287,8 +287,8 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v4.4.5</nodeVersion>
-                            <npmVersion>3.9.3</npmVersion>
+                            <nodeVersion>v8.17.0</nodeVersion>
+                            <npmVersion>6.13.4</npmVersion>
                         </configuration>
                     </execution>
                     <execution>
