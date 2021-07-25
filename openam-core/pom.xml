@@ -449,7 +449,7 @@
         <repository>
             <id>oracle-repository</id>
             <name>Oracle Repository</name>
-            <url>http://download.oracle.com/maven</url>
+            <url>https://download.oracle.com/maven</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
