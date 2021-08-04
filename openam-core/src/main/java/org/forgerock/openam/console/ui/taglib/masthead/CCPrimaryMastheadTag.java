@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */  
 package org.forgerock.openam.console.ui.taglib.masthead;
 
@@ -39,6 +40,11 @@ public class CCPrimaryMastheadTag extends com.sun.web.ui.taglib.masthead.CCPrima
 
     @Override
     protected void appendHelpLink(NonSyncStringBuffer buffer) throws JspException {
+        return;
+    }
+
+    @Override
+    protected void appendVersionLink(NonSyncStringBuffer arg0) throws JspException {
         return;
     }
 }
