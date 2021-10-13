@@ -25,7 +25,7 @@
  * $Id: CramMD5MechanismHandler.java,v 1.8 2008/12/16 20:54:03 hengming Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 

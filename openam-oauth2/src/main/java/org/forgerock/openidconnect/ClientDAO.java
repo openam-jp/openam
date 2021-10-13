@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
- * Portions copyright 2021 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OSSTech Corporation
  */
 
 package org.forgerock.openidconnect;

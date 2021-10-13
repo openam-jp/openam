@@ -25,7 +25,7 @@
  * $Id: IdRepo.java,v 1.8 2009/07/02 20:33:30 hengming Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.idm;
 

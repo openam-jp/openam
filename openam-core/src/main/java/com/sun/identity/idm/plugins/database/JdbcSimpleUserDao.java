@@ -25,7 +25,7 @@
  * $Id: JdbcSimpleUserDao.java,v 1.2 2009/12/22 19:11:54 veiming Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
- * Portions Copyrighted 2012-2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm.plugins.database;

@@ -24,7 +24,7 @@
  *
  * $Id: ListAgentGroups.java,v 1.4 2008/06/25 05:42:10 qcheng Exp $
  *
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.cli.agentconfig;

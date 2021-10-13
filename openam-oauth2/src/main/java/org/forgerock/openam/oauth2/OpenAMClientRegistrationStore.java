@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd
- * Portions copyright 2021 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2;

@@ -25,7 +25,7 @@
  * $Id: FilesRepo.java,v 1.22 2008/07/02 17:21:21 kenwho Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.idm.plugins.files;
 

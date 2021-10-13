@@ -13,7 +13,7 @@
  *
  * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyright 2016 Nomura Research Institute, Ltd.
- * Portions copyright 2021 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OSSTech Corporation
  */
 package org.forgerock.openam.idrepo.ldap;
 

@@ -25,7 +25,7 @@
  * $Id: SpecialRepo.java,v 1.19 2010/01/06 17:41:00 veiming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm.plugins.internal;

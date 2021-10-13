@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2021 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OSSTech Corporation
  * Portions copyright 2021 OGIS-RI Co., Ltd
  */
 package org.forgerock.openam.ldap;

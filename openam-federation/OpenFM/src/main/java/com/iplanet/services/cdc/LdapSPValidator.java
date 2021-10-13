@@ -24,12 +24,8 @@
  *
  * $Id: LdapSPValidator.java,v 1.6 2009/10/29 17:35:07 ericow Exp $
  *
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
- */
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2021 OSSTech Corporation
  */
 
 package com.iplanet.services.cdc;

@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2020-2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2020-2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;

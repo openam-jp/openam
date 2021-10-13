@@ -24,7 +24,7 @@
  *
  * $Id: IdRepoSampleCreateId.java,v 1.15 2008/09/24 19:50:10 goodearth Exp $
  *
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;

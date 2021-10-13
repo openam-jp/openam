@@ -25,7 +25,7 @@
  * $Id: DaoInterface.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm.plugins.database;

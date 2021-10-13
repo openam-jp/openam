@@ -25,7 +25,7 @@
  * $Id: IdServices.java,v 1.10 2010/01/06 01:58:26 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm;

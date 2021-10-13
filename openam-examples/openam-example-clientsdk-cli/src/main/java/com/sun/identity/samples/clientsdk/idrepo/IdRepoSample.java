@@ -25,7 +25,7 @@
  * $Id: IdRepoSample.java,v 1.2 2008/06/25 05:41:13 qcheng Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;

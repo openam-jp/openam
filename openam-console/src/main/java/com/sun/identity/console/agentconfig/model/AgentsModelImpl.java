@@ -24,7 +24,7 @@
  *
  * $Id: AgentsModelImpl.java,v 1.22 2009/12/23 00:18:20 veiming Exp $
  *
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 /**

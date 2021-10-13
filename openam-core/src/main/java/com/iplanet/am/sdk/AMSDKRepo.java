@@ -25,7 +25,7 @@
  * $Id: AMSDKRepo.java,v 1.28 2009/12/25 05:54:05 hengming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2021 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.iplanet.am.sdk;
