@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -82,7 +83,8 @@ public class IdentityManager {
             // search for the identity
             final Set<AMIdentity> results = new HashSet<AMIdentity>();
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, username, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, username, idsc,
+                    false, false);
             if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results.addAll(searchResults.getSearchResults());
             } else {
@@ -90,7 +92,7 @@ public class IdentityManager {
                 final Map<String, Set<String>> avPairs = toAvPairMap(
                         settings.getResourceOwnerAuthenticatedAttributes(), username);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
-                searchResults = amIdRepo.searchIdentities(IdType.USER, "*", idsc);
+                searchResults = amIdRepo.searchIdentities(IdType.USER, "*", idsc, true, false);
                 if (searchResults != null) {
                     results.addAll(searchResults.getSearchResults());
                 }
@@ -135,7 +137,7 @@ public class IdentityManager {
             idsc.setAllReturnAttributes(true);
             // search for the identity
             idsc.setMaxResults(0);
-            final IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.AGENTONLY, clientName, idsc);
+            final IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.AGENTONLY, clientName, idsc, false, false);
             final Set<AMIdentity> results = searchResults.getSearchResults();
 
             if (results == null || results.size() != 1) {

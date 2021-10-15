@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2021 OSSTech Corporation
  */
 
 package org.forgerock.openidconnect;
@@ -115,7 +116,7 @@ public class ClientDAO {
             Set<AMIdentity> results;
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
-                    repo.searchIdentities(IdType.AGENTONLY, clientId, idsc);
+                    repo.searchIdentities(IdType.AGENTONLY, clientId, idsc, false, false);
             results = searchResults.getSearchResults();
 
             if (results == null || results.size() != 1) {
@@ -180,7 +181,8 @@ public class ClientDAO {
             // search for the identity
             Set<AMIdentity> results;
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = repo.searchIdentities(IdType.AGENTONLY, clientId, idsc);
+            IdSearchResults searchResults =
+                repo.searchIdentities(IdType.AGENTONLY, clientId, idsc, false, false);
             results = searchResults.getSearchResults();
 
             if (results == null || results.size() != 1) {

@@ -25,6 +25,7 @@
  * $Id: EntitiesModelImpl.java,v 1.17 2009/09/05 01:30:46 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.console.idm.model;
 
@@ -192,7 +193,7 @@ public class EntitiesModelImpl
             AMIdentityRepository repo = new AMIdentityRepository(
                 getUserSSOToken(), realmName);
             IdSearchResults results = repo.searchIdentities(
-                ltype, pattern, idsc);
+                ltype, pattern, idsc, true, true);
 
             logEvent("SUCCEED_SEARCH_IDENTITY", params);
             return results;

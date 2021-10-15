@@ -24,6 +24,7 @@
  *
  * $Id: AgentsModelImpl.java,v 1.22 2009/12/23 00:18:20 veiming Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 /**
@@ -133,7 +134,7 @@ public class AgentsModelImpl
             AMIdentityRepository repo = new AMIdentityRepository(
                 getUserSSOToken(), realmName);
             IdSearchResults isr = repo.searchIdentities(
-                IdType.AGENTONLY, pattern, idsc);
+                IdType.AGENTONLY, pattern, idsc, true, true);
             Set res = isr.getSearchResults();
             
             if ((res != null) && !res.isEmpty()) {
@@ -198,7 +199,7 @@ public class AgentsModelImpl
             AMIdentityRepository repo = new AMIdentityRepository(
                 getUserSSOToken(), realmName);
             IdSearchResults isr = repo.searchIdentities(
-                IdType.AGENTGROUP, pattern, idsc);
+                IdType.AGENTGROUP, pattern, idsc, true, true);
             Set res = isr.getSearchResults();
             
             if ((res != null) && !res.isEmpty()) {

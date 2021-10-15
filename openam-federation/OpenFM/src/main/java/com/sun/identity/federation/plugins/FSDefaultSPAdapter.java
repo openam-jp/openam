@@ -24,6 +24,7 @@
  *
  * $Id: FSDefaultSPAdapter.java,v 1.6 2008/06/25 05:49:54 qcheng Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.federation.plugins;
@@ -277,7 +278,7 @@ public class FSDefaultSPAdapter implements FederationSPAdapter {
                 searchControl.setAllReturnAttributes(false);
                 searchControl.setSearchModifiers(IdSearchOpModifier.AND, map);
                 IdSearchResults searchResults = idRepo.searchIdentities(
-                    IdType.USER, "*", searchControl);
+                    IdType.USER, "*", searchControl, true, false);
                 Set amIdSet = searchResults.getSearchResults();
                 if (amIdSet.size() > 1) {
                     String univId = ((SSOToken) ssoToken).getProperty(

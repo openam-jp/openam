@@ -24,9 +24,8 @@
  *
  * $Id: IdRepoSample.java,v 1.2 2008/06/25 05:41:13 qcheng Exp $
  *
- */
-/*
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -114,7 +113,7 @@ public class IdRepoSample {
 
         System.out.println ("getting subrealms");
         try {
-            currentSubRealms = (idRepo.searchIdentities(IdType.REALM, "*", new IdSearchControl())).getSearchResults();
+            currentSubRealms = (idRepo.searchIdentities(IdType.REALM, "*", new IdSearchControl(), true, false)).getSearchResults();
         } catch (SSOException ssoe) {
             System.err.println (
                 "doCurrentRealm: SSOException getting subrealms for '" +

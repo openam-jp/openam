@@ -25,6 +25,7 @@
  * $Id: DatabaseRepo.java,v 1.1 2009/04/21 20:04:48 sean_brydon Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.idm.plugins.database;
 
@@ -55,6 +56,8 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SchemaType;
+
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.CrestQuery;
 
 /**
@@ -173,6 +176,17 @@ public class DatabaseRepo extends IdRepo {
      private static final String MEMBERSHIP_SEARCH_ATTRIBUTE_NAME_SCHEMA_NAME =
              "sun-opensso-database-membership-search-attribute";
 
+    // Use SELECT without a WHERE clause
+    public static final int QUERY_TYPE_ALL = 0;
+    // Use SELECT without LIKE operator
+    public static final int QUERY_TYPE_NO_LIKE = 1;
+    // Use SELECT with LIKE operator for ID
+    public static final int QUERY_TYPE_LIKE_FOR_ID = 2;
+    // Use SELECT with LIKE operator for attributes
+    public static final int QUERY_TYPE_LIKE_FOR_ATTRIBUTE = 3;
+    // Use SELECT with LIKE operator for ID and attributes
+    public static final int QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE = 4;
+    
     // Fields that represent the actual values that were retrieved from
     // idRepoService.xml schema element names
 
@@ -1127,6 +1141,10 @@ public class DatabaseRepo extends IdRepo {
      *     and value 'Jones'.
      * @param recursive
      *     boolean to indicate recursive search? (Not Using)
+     * @param allowWildcardForId
+     *     Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes
+     *     Whether to allow wildcards to search for Attributes. 
      *
      * @return RepoSearchResults
      * @throws IdRepoException If there are repository related error conditions.
@@ -1135,7 +1153,8 @@ public class DatabaseRepo extends IdRepo {
     private RepoSearchResults search(SSOToken token, IdType type,
             String pattern, int maxTime, int maxResults, Set returnAttrs,
             boolean returnAllAttrs, int filterOp, Map avPairs,
-            boolean recursive) throws IdRepoException, SSOException {
+            boolean recursive, boolean allowWildcardForId,
+            boolean allowWildcardForAttributes) throws IdRepoException, SSOException {
 
         if (initializationException != null) {
             debug.error("DatabaseRepo.search: throwing"
@@ -1197,65 +1216,96 @@ public class DatabaseRepo extends IdRepo {
             filterOpString = "AND";
         }
 
-        // what if pattern or values in avPairs contain wildcard chars of SQL
-        // in SQL % allows you to match any string of any length
-        // in SQL _ allows you to match on a single character
-        // later consider if this case matters?
-
-        if ((pattern == null || pattern.length() == 0 || pattern.equals("*"))
-                && (avPairs == null || avPairs.isEmpty())) {
-            // get all users
-            if (type.equals(IdType.USER)) {
-                users = dao.search(userIDAttributeName, maxResults, "", attributesToFetch, filterOpString, avPairs);
-            } else if (type.equals(IdType.GROUP)) {
-                users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch,
-                        filterOpString, avPairs);
-            }
-        } else {
-            // get users that match with the pattern
-            // not sure if we need to differentiate between case where
-            // avPairs==null or empty ??? vs when avPairs has attrs and values??
-            // AFAIK the searches on a pattern all include something in avPairs
-            // and those attrs/values are used to search for pattern matches
-
-            // substitute % for * for sql LIKE query
-            String searchPattern = pattern.replaceAll("\\*", "%");
-
-            //avPairs with values having wildcard chars replaced
-            Map<String, Set<String>> avPairsChanged = new HashMap<>();
-
-            // need to replace % for * in all avPairs too
-            if (avPairs != null && !avPairs.isEmpty()) {
-                Iterator KeysIt = avPairs.keySet().iterator();
-                while (KeysIt.hasNext()) {
-                    String key = (String) KeysIt.next();
-                    if (key != null) {
-                        Set<String> values = (Set<String>) avPairs.get(key);
-                        Set<String> changedValues = new HashSet<String>();
-                        if (values != null && !values.isEmpty()) {
-                            Iterator<String> valSetIt = values.iterator();
-                            // modify each value to replace any wildcard chars
-                            while (valSetIt.hasNext()) {
-                                String attrValue = valSetIt.next();
-                                if (attrValue != null && attrValue.contains("*")) {
-                                    attrValue = attrValue.replaceAll("\\*", "%");
-                                }
-                                changedValues.add(attrValue);
-                            }
-                        }
-                        // now that Set values has each value with new wildcard
-                        // replace it in the changed avPairsMap
-                        avPairsChanged.put(key, changedValues);
+        int queryType = getQueryType(pattern, avPairs, allowWildcardForId, allowWildcardForAttributes);
+        switch (queryType) {
+            case QUERY_TYPE_ALL:
+                {
+                    // get all users
+                    if (type.equals(IdType.USER)) {
+                        users = dao.search(userIDAttributeName, maxResults, "", attributesToFetch,
+                                filterOpString, null, queryType);
+                    } else if (type.equals(IdType.GROUP)) {
+                        users = dao.searchForGroups(membershipIdAttributeName, maxResults, "", attributesToFetch,
+                                filterOpString, null);
                     }
                 }
-            }
-            if (type.equals(IdType.USER)) {
-                users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
-                        filterOpString, avPairsChanged);
-            } else if (type.equals(IdType.GROUP)) {
-                users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern,
-                        attributesToFetch, filterOpString, avPairsChanged);
-            }
+                break;
+            case QUERY_TYPE_NO_LIKE:
+                {
+                    String searchPattern = pattern;
+                    if (pattern.equals("*") && allowWildcardForId) {
+                        searchPattern = "";
+                    }
+
+                    if (type.equals(IdType.USER)) {
+                        users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
+                                filterOpString, avPairs, queryType);
+                    } else if (type.equals(IdType.GROUP)) {
+                        users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern, attributesToFetch,
+                                filterOpString, avPairs);
+                    }
+                }
+                break;
+            case QUERY_TYPE_LIKE_FOR_ID:
+            case QUERY_TYPE_LIKE_FOR_ATTRIBUTE:
+            case QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE:
+                {
+                    // what if pattern or values in avPairs contain wildcard chars of SQL
+                    // in SQL % allows you to match any string of any length
+                    // in SQL _ allows you to match on a single character
+                    // later consider if this case matters?
+
+                    //avPairs with values having wildcard chars replaced
+                    Map<String, Set<String>> avPairsChanged = new HashMap<>();
+
+                    // substitute % for * for sql LIKE query
+                    String searchPattern = pattern;
+                    if (pattern != null && pattern.equals("*") && allowWildcardForId) {
+                        // search by attribute only
+                        searchPattern = "";
+                    } else if (queryType == QUERY_TYPE_LIKE_FOR_ID
+                            || queryType == QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE) {
+                        searchPattern = pattern.replaceAll("\\*", "%");
+                    }
+
+                    // need to replace % for * in all avPairs too
+                    if (avPairs != null && !avPairs.isEmpty()) {
+                        Iterator KeysIt = avPairs.keySet().iterator();
+                        while (KeysIt.hasNext()) {
+                            String key = (String) KeysIt.next();
+                            if (key != null) {
+                                Set<String> values = (Set<String>) avPairs.get(key);
+                                Set<String> changedValues = new HashSet<String>();
+                                if (values != null && !values.isEmpty()) {
+                                    Iterator<String> valSetIt = values.iterator();
+                                    // modify each value to replace any wildcard chars
+                                    while (valSetIt.hasNext()) {
+                                        String attrValue = valSetIt.next();
+                                        if (attrValue != null && attrValue.contains("*")
+                                                && (queryType == QUERY_TYPE_LIKE_FOR_ATTRIBUTE
+                                                    || queryType == QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE)) {
+                                            attrValue = attrValue.replaceAll("\\*", "%");
+                                        }
+                                        changedValues.add(attrValue);
+                                    }
+                                }
+                                // now that Set values has each value with new wildcard
+                                // replace it in the changed avPairsMap
+                                avPairsChanged.put(key, changedValues);
+                            }
+                        }
+                    }
+                    if (type.equals(IdType.USER)) {
+                        users = dao.search(userIDAttributeName, maxResults, searchPattern, attributesToFetch,
+                                filterOpString, avPairsChanged, queryType);
+                    } else if (type.equals(IdType.GROUP)) {
+                        users = dao.searchForGroups(membershipIdAttributeName, maxResults, searchPattern,
+                                attributesToFetch, filterOpString, avPairsChanged);
+                    }
+                }
+                break;
+            default:
+                break;
         }
 
         if (users == null) {
@@ -1288,6 +1338,63 @@ public class DatabaseRepo extends IdRepo {
             debug.message("DatabaseRepo.search: returning users= " + users);
         }
         return (new RepoSearchResults(allUserIds, RepoSearchResults.SUCCESS, users, type));
+    }
+
+    private int getQueryType(String pattern, Map<String, Set<String>> avPairs,
+            boolean allowWildcardForId, boolean allowWildcardForAttributes) {
+
+        // Suppress LIKE query as much as possible even if wildcards are allowed.
+        if (pattern == null || pattern.length() == 0) {
+            if (avPairs == null || avPairs.isEmpty()) {
+                return QUERY_TYPE_ALL;
+            }
+            if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+            }
+        } else if (pattern.equals("*")) {
+            if (allowWildcardForId) {
+                if (avPairs == null || avPairs.isEmpty()) {
+                    return QUERY_TYPE_ALL;
+                }
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+                }
+            } else {
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+                }
+            }
+        } else if (pattern.contains("*")) {
+            if (allowWildcardForId) {
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ID_ATTRIBUTE;
+                } else {
+                    return QUERY_TYPE_LIKE_FOR_ID;
+                }
+            } else {
+                if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                    return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+                }
+            }            
+        } else {
+            if (allowWildcardForAttributes && hasWildCard(avPairs)) {
+                return QUERY_TYPE_LIKE_FOR_ATTRIBUTE;
+            }
+        }
+        return QUERY_TYPE_NO_LIKE;
+    }
+
+    private boolean hasWildCard(Map<String, Set<String>> avPairs) {
+        if (avPairs != null && !avPairs.isEmpty()) {
+            for(Map.Entry<String, Set<String>> entry : avPairs.entrySet()){
+                for (String attrValue : entry.getValue()) {
+                    if ((attrValue != null) && attrValue.contains("*")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /*
@@ -1331,6 +1438,10 @@ public class DatabaseRepo extends IdRepo {
      *     and value 'Jones'.
      * @param recursive
      *     boolean to indicate recursive search? (Not Using)
+     * @param allowWildcardForId
+     *     Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes
+     *     Whether to allow wildcards to search for Attributes. 
      *
      * @return RepoSearchResults
      * @throws IdRepoException If there are repository related error conditions.
@@ -1340,7 +1451,9 @@ public class DatabaseRepo extends IdRepo {
     public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery,
                                     int maxTime, int maxResults, Set returnAttrs,
                                     boolean returnAllAttrs, int filterOp, Map avPairs,
-                                    boolean recursive) throws IdRepoException, SSOException {
+                                    boolean recursive, boolean allowWildcardForId,
+                                    boolean allowWildcardForAttributes)
+                                            throws IdRepoException, SSOException {
 
         if (initializationException != null) {
             debug.error("DatabaseRepo.search: throwing"
@@ -1358,7 +1471,8 @@ public class DatabaseRepo extends IdRepo {
 
         if (crestQuery.hasQueryId()) {
             return search(token, type, crestQuery.getQueryId(), maxTime, maxResults, returnAttrs,
-                            returnAllAttrs, filterOp, avPairs, recursive);
+                            returnAllAttrs, filterOp, avPairs, recursive, 
+                            allowWildcardForId, allowWildcardForAttributes);
         }
 
         // throw exception if this type user not allowed to do this
@@ -1694,7 +1808,7 @@ public class DatabaseRepo extends IdRepo {
         //need to search for name and then make the url of datasource db
 
         RepoSearchResults results = search(token, type, name, 0, 2, null, true,
-                IdRepo.NO_MOD, null, false);
+                IdRepo.NO_MOD, null, false, false, false);
 
         Set dns = results.getSearchResults();
         if (debug.messageEnabled()) {

@@ -20,6 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of company]"
+ *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2.rest;
@@ -67,7 +69,7 @@ public class ClientResourceManager {
         try {
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.AGENTONLY, uName, idsc);
+                    amIdRepo.searchIdentities(IdType.AGENTONLY, uName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

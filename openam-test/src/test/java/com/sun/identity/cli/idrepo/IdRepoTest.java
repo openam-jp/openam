@@ -24,6 +24,7 @@
  *
  * $Id: IdRepoTest.java,v 1.5 2008/06/25 05:44:18 qcheng Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.cli.idrepo;
@@ -744,7 +745,7 @@ public class IdRepoTest extends TestBase{
         AMIdentityRepository amir = new AMIdentityRepository(
             adminSSOToken, realm);
         IdSearchControl isCtl = new IdSearchControl();
-        IdSearchResults isr = amir.searchIdentities(IdType.USER, uid, isCtl);
+        IdSearchResults isr = amir.searchIdentities(IdType.USER, uid, isCtl, false, false);
         Set results = isr.getSearchResults();
         assert (results.isEmpty());
         exiting("deleteIdentities");

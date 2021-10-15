@@ -25,7 +25,7 @@
  * $Id: PWResetUserValidationModelImpl.java,v 1.3 2010/01/28 08:17:10 bina Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2021 OSSTech Corporation
  */
 
 package com.sun.identity.password.ui.model;
@@ -171,7 +171,7 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
             IdSearchControl isCtl = new IdSearchControl();
             isCtl.setSearchModifiers(IdSearchOpModifier.AND, searchMap);
             IdSearchResults isr = amir.searchIdentities(
-                IdType.USER, "*", isCtl);
+                IdType.USER, "*", isCtl, true, false);
             Set results = isr.getSearchResults();
             
             if ((results != null) && !results.isEmpty()) {

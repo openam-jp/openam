@@ -25,6 +25,7 @@
  * $Id: AMSDKRepo.java,v 1.28 2009/12/25 05:54:05 hengming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.iplanet.am.sdk;
@@ -773,12 +774,13 @@ public class AMSDKRepo extends IdRepo {
     public RepoSearchResults search(SSOToken token, IdType type,
                                              CrestQuery crestQuery, int maxTime, int maxResults,
                                              Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
-                                             Map<String, Set<String>> avPairs, boolean recursive)
+                                             Map<String, Set<String>> avPairs, boolean recursive,
+                                             boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         if (crestQuery.hasQueryId()) {
             return search(token, type, crestQuery.getQueryId(), avPairs, recursive, maxResults,
-                                                                                            maxTime, returnAttrs);
+                          maxTime, returnAttrs);
         }
         throw new IdRepoException("AMSDKRepo.search does not support search by query filter");
     }

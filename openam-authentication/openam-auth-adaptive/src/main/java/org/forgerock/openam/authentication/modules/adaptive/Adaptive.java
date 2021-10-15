@@ -22,6 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2020-2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -976,7 +977,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc, false, false);
 
             if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
                 if (debug.messageEnabled()) {
@@ -986,7 +987,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
                 //workaround as data store always adds 'user-naming-attribute' to searchfilter
-                searchResults = amIdRepo.searchIdentities(IdType.USER, "*", idsc);
+                searchResults = amIdRepo.searchIdentities(IdType.USER, "*", idsc, true, false);
             }
 
             if (searchResults != null) {
