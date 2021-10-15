@@ -25,6 +25,7 @@
  * $Id: IdRepoSampleSearchIds.java,v 1.4 2008/06/25 05:41:14 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -70,7 +71,7 @@ public class IdRepoSampleSearchIds {
         String pattern = sampleUtils.getLine("    Enter search pattern", "*");
         try {
             IdSearchResults adRes = idRepo.searchIdentities(
-                idtype, pattern, isc);
+                idtype, pattern, isc, true, false);
             Set adResSet = adRes.getSearchResults();
             processType(idtype, adResSet);
         } catch (IdRepoException ire) {

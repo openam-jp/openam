@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm;
@@ -858,7 +859,8 @@ public final class IdUtils {
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults =
+                    amIdRepo.searchIdentities(IdType.USER, uName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

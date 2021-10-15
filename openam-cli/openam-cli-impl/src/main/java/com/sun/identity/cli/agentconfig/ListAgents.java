@@ -24,6 +24,7 @@
  *
  * $Id: ListAgents.java,v 1.4 2008/06/25 05:42:10 qcheng Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.cli.agentconfig;
@@ -89,7 +90,7 @@ public class ListAgents extends AuthenticatedCommand {
             AMIdentityRepository amir = new AMIdentityRepository(
                 adminSSOToken, realm);
             IdSearchResults isr = amir.searchIdentities(
-                IdType.AGENTONLY, filter, new IdSearchControl());
+                IdType.AGENTONLY, filter, new IdSearchControl(), true, true);
             Set results = isr.getSearchResults();
 
             if ((results != null) && !results.isEmpty()) {

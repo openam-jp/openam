@@ -24,6 +24,7 @@
  *
  * $Id: IdentitySubjectModelImpl.java,v 1.2 2008/06/25 05:43:07 qcheng Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.console.policy.model;
@@ -86,7 +87,7 @@ public class IdentitySubjectModelImpl
 
             logEvent("ATTEMPT_SEARCH_IDENTITY", params);
             IdSearchResults results = repo.searchIdentities(
-                type, pattern, idsc);
+                type, pattern, idsc, true, true);
             logEvent("SUCCEED_SEARCH_IDENTITY", params);
             return results;
         } catch (IdRepoException e) {

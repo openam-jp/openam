@@ -25,6 +25,7 @@
  * $Id: CramMD5MechanismHandler.java,v 1.8 2008/12/16 20:54:03 hengming Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 
@@ -416,7 +417,7 @@ public class CramMD5MechanismHandler implements MechanismHandler {
 	    searchControl.setMaxResults(0);
 	    searchControl.setAllReturnAttributes(false);
 	    IdSearchResults searchResults = idRepo.searchIdentities(
-		IdType.USER, userName, searchControl);
+		IdType.USER, userName, searchControl, false, false);
 	    Set users = searchResults.getSearchResults();
 
             if (users == null || users.isEmpty()) {

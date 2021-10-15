@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -1234,7 +1235,7 @@ public class AuthD implements ConfigurationListener {
             idsc.setMaxResults(0);
             idsc.setAllReturnAttributes(false);
             IdSearchResults searchResults =
-            amIdRepo.searchIdentities(idType,idName,idsc);
+            amIdRepo.searchIdentities(idType, idName, idsc, false, false);
             Set results = Collections.EMPTY_SET;
             if (searchResults != null) {
                 results = searchResults.getSearchResults();

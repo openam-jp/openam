@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2019-2021 OSSTech Corporation
  */
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
@@ -148,7 +148,7 @@ public abstract class AbstractWebAuthnModule extends AMLoginModule {
         Set<AMIdentity> _results = Collections.emptySet();
 
         try {
-            IdSearchResults _searchResults = _amIdRepo.searchIdentities(IdType.USER, userName, _idsc);
+            IdSearchResults _searchResults = _amIdRepo.searchIdentities(IdType.USER, userName, _idsc, false, false);
             if (_searchResults != null) {
                 _results = _searchResults.getSearchResults();
             }

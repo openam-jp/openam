@@ -25,6 +25,7 @@
  * $Id: IdRemoteCachedServicesImpl.java,v 1.20 2010/01/28 00:45:25 bigfatrat Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.idm.remote;
 
@@ -580,7 +581,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
     @Override
     public IdSearchResults search (SSOToken token, IdType type, IdSearchControl ctrl, String orgName,
-                                                                                CrestQuery crestQuery)
+                                   CrestQuery crestQuery, boolean allowWildcardForId,
+                                   boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         IdSearchResults answer = new IdSearchResults(type, orgName);
@@ -649,7 +651,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
         if (!isCached) {
             // Not in Cache.  Do a search in server.
-            answer = super.search(token, type, ctrl, orgName, crestQuery);
+            answer = super.search(token, type, ctrl, orgName, crestQuery,
+                    allowWildcardForId, allowWildcardForAttributes);
         }
         return (answer);
     }

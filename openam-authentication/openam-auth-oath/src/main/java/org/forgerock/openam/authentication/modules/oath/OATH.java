@@ -21,6 +21,7 @@
  * your own identifying information:
  *
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -641,7 +642,7 @@ public class OATH extends AMLoginModule {
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

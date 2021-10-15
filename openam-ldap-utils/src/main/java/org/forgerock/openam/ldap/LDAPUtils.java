@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2021 OSSTech Corporation
+ * Portions copyright 2021 OGIS-RI Co., Ltd
  */
 package org.forgerock.openam.ldap;
 
@@ -709,5 +711,31 @@ public final class LDAPUtils {
             String authDN, String authPasswd, Options options) {
         options = options.set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(authDN, authPasswd.toCharArray()));
         return new LDAPConnectionFactory(host, port, options);
+    }
+    
+    /**
+     * Escapes the provided assertion value according to the LDAP standard. As a special case this method does not
+     * escape the '*' character, in order to be able to use wildcards in filters.
+     *
+     * @param assertionValue The filter assertionValue that needs to be escaped.
+     * @return The escaped assertionValue.
+     */
+    public static String partiallyEscapeAssertionValue(String assertionValue) {
+        if (assertionValue == null || assertionValue.isEmpty()) {
+            return assertionValue;
+        }
+        if (!assertionValue.contains("*")) {
+            return Filter.escapeAssertionValue(assertionValue);
+        }
+        StringBuilder sb = new StringBuilder(assertionValue.length());
+        for (int j = 0; j < assertionValue.length(); j++) {
+            char c = assertionValue.charAt(j);
+            if (c == '*') {
+                sb.append(c);
+            } else {
+                sb.append(Filter.escapeAssertionValue(String.valueOf(c)));
+            }
+        }
+        return sb.toString();
     }
 }

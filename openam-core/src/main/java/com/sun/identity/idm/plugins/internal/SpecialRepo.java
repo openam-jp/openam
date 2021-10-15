@@ -25,6 +25,7 @@
  * $Id: SpecialRepo.java,v 1.19 2010/01/06 17:41:00 veiming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm.plugins.internal;
@@ -82,7 +83,10 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.opendj.ldap.Filter;
 
 public class SpecialRepo extends IdRepo implements ServiceListener {
 
@@ -544,7 +548,8 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
     @Override
     public RepoSearchResults search(SSOToken token, IdType type, CrestQuery crestQuery, int maxTime,
                                     int maxResults, Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
-                                    Map<String, Set<String>> avPairs, boolean recursive)
+                                    Map<String, Set<String>> avPairs, boolean recursive,
+                                    boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         if (crestQuery.hasQueryFilter()) {
@@ -555,6 +560,11 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
         Map userAttrs = new HashMap();
         int errorCode = RepoSearchResults.SUCCESS;
         String pattern = crestQuery.getQueryId();
+        if (allowWildcardForId) {
+            pattern = LDAPUtils.partiallyEscapeAssertionValue(pattern);
+        } else {
+            pattern = Filter.escapeAssertionValue(pattern);
+        }
         try {
             if (type.equals(IdType.USER)) {
                 ServiceConfig userConfig = getUserConfig();
@@ -563,6 +573,11 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
                     Set uidVals = (Set) avPairs.get("uid");
                     if (uidVals != null && !uidVals.isEmpty()) {
                         pattern = (String) uidVals.iterator().next();
+                        if (allowWildcardForAttributes) {
+                            pattern = LDAPUtils.partiallyEscapeAssertionValue(pattern);
+                        } else {
+                            pattern = Filter.escapeAssertionValue(pattern);
+                        }
                     } else {
                         // pattern is "*" and avPairs is not empty, so return
                         // empty results

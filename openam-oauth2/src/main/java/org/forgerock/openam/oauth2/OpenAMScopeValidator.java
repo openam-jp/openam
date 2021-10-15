@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -542,7 +542,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
         final IdSearchControl searchConfig = new IdSearchControl();
         searchConfig.setReturnAttributes(new HashSet<String>(Arrays.asList(modifyTimestamp, createTimestamp)));
         searchConfig.setMaxResults(0);
-        final IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, username, searchConfig);
+        final IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, username, searchConfig, false, false);
 
         final Iterator searchResultsItr = searchResults.getResultAttributes().values().iterator();
 

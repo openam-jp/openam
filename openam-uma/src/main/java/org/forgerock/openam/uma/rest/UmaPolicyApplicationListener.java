@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.uma.rest;
@@ -230,7 +231,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         searchControl.setMaxResults(0);
         SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         IdSearchResults searchResults = idRepoFactory.create(identity.getRealm(), adminToken)
-                .searchIdentities(IdType.AGENT, identity.getName(), searchControl);
+                .searchIdentities(IdType.AGENT, identity.getName(), searchControl, false, false);
         if (searchResults.getSearchResults().size() != 1) {
             throw new IdRepoException("UmaPolicyApplicationListener.getIdentityAttributes : More than one agent found");
         }

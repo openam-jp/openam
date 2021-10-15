@@ -25,6 +25,7 @@
  * $Id: IdRepo.java,v 1.8 2009/07/02 20:33:30 hengming Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.sun.identity.idm;
 
@@ -358,6 +359,10 @@ public abstract class IdRepo {
      *     filter condition.
      * @param avPairs
      *     additional search conditions.
+     * @param allowWildcardForId
+     *     Whether to allow wildcards to search for Id.
+     * @param allowWildcardForAttributes
+     *     Whether to allow wildcards to search for Attributes. 
      * @return RepoSearchResults
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
@@ -365,8 +370,44 @@ public abstract class IdRepo {
     public abstract RepoSearchResults search(SSOToken token, IdType type,
                                              CrestQuery crestQuery, int maxTime, int maxResults,
                                              Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
-                                             Map<String, Set<String>> avPairs, boolean recursive)
+                                             Map<String, Set<String>> avPairs, boolean recursive,
+                                             boolean allowWildcardForId, boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException;
+    
+    /**
+     * Search for specific type of identities. This method is left for backward compatibility.
+     *
+     * @param token
+     *     Single sign on token of identity performing the task.
+     * @param type
+     *     Identity type of this object.
+     * @param crestQuery
+     *     pattern to search for, of type {@link CrestQuery}.
+     * @param maxTime
+     *     maximum wait time for search.
+     * @param maxResults
+     *     maximum records to return.
+     * @param returnAttrs
+     *     Set of attribute names to return.
+     * @param returnAllAttrs
+     *     return all attributes
+     * @param filterOp
+     *     filter condition.
+     * @param avPairs
+     *     additional search conditions.
+     * @return RepoSearchResults
+     * @throws IdRepoException If there are repository related error conditions.
+     * @throws SSOException If identity's single sign on token is invalid.
+     */
+    public RepoSearchResults search(SSOToken token, IdType type,
+                                             CrestQuery crestQuery, int maxTime, int maxResults,
+                                             Set<String> returnAttrs, boolean returnAllAttrs, int filterOp,
+                                             Map<String, Set<String>> avPairs, boolean recursive)
+            throws IdRepoException, SSOException {
+        return search(token, type, crestQuery, maxTime, maxResults,
+                returnAttrs, returnAllAttrs, filterOp,
+                avPairs, recursive, true, true);
+    }
 
     /**
      * Modify membership of the identity. Set of members is

@@ -25,6 +25,7 @@
  * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.3 2009/12/18 21:56:56 veiming Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.entitlement;
@@ -147,7 +148,7 @@ public class DelegationPrivilegeIdRepoAccessTest {
         try {
             AMIdentityRepository idrepo = new AMIdentityRepository(token, "/");
             IdSearchResults result = idrepo.searchIdentities(
-                IdType.USER, "*", new IdSearchControl());
+                IdType.USER, "*", new IdSearchControl(), true, false);
             result.getSearchResults();
         } catch (IdRepoException e) {
             // permission denied
@@ -157,14 +158,14 @@ public class DelegationPrivilegeIdRepoAccessTest {
         AMIdentityRepository idrepo = new AMIdentityRepository(token,
             SUB_REALM);
         IdSearchResults result = idrepo.searchIdentities(
-            IdType.USER, "*", new IdSearchControl());
+            IdType.USER, "*", new IdSearchControl(), true, false);
         result.getSearchResults();
 
         // ok to search sub realm
         idrepo = new AMIdentityRepository(token,
             SUB_REALM + "/" + SUB_SUB_REALM);
         result = idrepo.searchIdentities(IdType.USER, "*",
-            new IdSearchControl());
+            new IdSearchControl(), true, false);
         result.getSearchResults();
     }
 

@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -102,7 +103,7 @@ public class DeviceIdSave extends AMLoginModule {
 
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }

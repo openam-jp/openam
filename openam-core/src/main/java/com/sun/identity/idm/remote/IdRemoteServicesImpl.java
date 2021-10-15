@@ -25,6 +25,7 @@
  * $Id: IdRemoteServicesImpl.java,v 1.23 2010/01/06 01:58:26 veiming Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.idm.remote;
@@ -323,7 +324,8 @@ public class IdRemoteServicesImpl implements IdServices {
 
     @Override
     public IdSearchResults search(SSOToken token, IdType type, IdSearchControl ctrl, String amOrgName,
-                                  CrestQuery crestQuery)
+                                  CrestQuery crestQuery, boolean allowWildcardForId,
+                                  boolean allowWildcardForAttributes)
             throws IdRepoException, SSOException {
 
         IdSearchOpModifier modifier = ctrl.getSearchModifier();

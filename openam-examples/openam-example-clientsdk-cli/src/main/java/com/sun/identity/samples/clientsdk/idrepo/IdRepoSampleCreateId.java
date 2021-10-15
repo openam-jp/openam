@@ -24,6 +24,7 @@
  *
  * $Id: IdRepoSampleCreateId.java,v 1.15 2008/09/24 19:50:10 goodearth Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -84,7 +85,7 @@ public class IdRepoSampleCreateId {
              * for reference...
              */
             IdSearchResults adRes =
-                idRepo.searchIdentities(tmpIdtype, "*", new IdSearchControl());
+                idRepo.searchIdentities(tmpIdtype, "*", new IdSearchControl(), true, false);
             Set adResSet = adRes.getSearchResults();
             if (!adResSet.isEmpty()) {
                 System.out.println("    Current list of " +
@@ -157,7 +158,7 @@ public class IdRepoSampleCreateId {
 
                 //  now show list of the identities of type created
                 adRes = idRepo.searchIdentities(
-                        idtype, "*", new IdSearchControl());
+                        idtype, "*", new IdSearchControl(), true, false);
                 adResSet = adRes.getSearchResults();
 
                 if (!adResSet.isEmpty()) {
@@ -175,7 +176,7 @@ public class IdRepoSampleCreateId {
                 String providerName = idName;
                 WSCcontrol.setAllReturnAttributes(true);
                 IdSearchResults WSCresults = idRepo.searchIdentities(
-                    IdType.AGENTONLY, providerName, WSCcontrol);
+                    IdType.AGENTONLY, providerName, WSCcontrol, true, false);
                 Set agents = WSCresults.getSearchResults();
                 System.out.println("WSC Agents before removeMember: " + agents); 
                 if (idtype.equals(IdType.AGENTONLY) || 
@@ -232,7 +233,7 @@ public class IdRepoSampleCreateId {
                         System.out.println("\nChecking membership operations");
                         IdSearchResults res = 
                             idRepo.searchIdentities(IdType.AGENTGROUP,
-                                "myagrp", new IdSearchControl());
+                                "myagrp", new IdSearchControl(), false, false);
                         Set resSet = res.getSearchResults();
                         if (!resSet.isEmpty()) {
                             Iterator iter = resSet.iterator();
@@ -280,7 +281,7 @@ public class IdRepoSampleCreateId {
                 IdSearchControl WSCcnt = new IdSearchControl();
                 WSCcnt.setAllReturnAttributes(true);
                 IdSearchResults WSCres = idRepo.searchIdentities(
-                    IdType.AGENTONLY, providerName, WSCcnt);
+                    IdType.AGENTONLY, providerName, WSCcnt, true, false);
                 Set wscagents = WSCres.getSearchResults();
                 System.out.println("WSC Agents after removeMember: " + 
                     wscagents); 
@@ -298,7 +299,7 @@ public class IdRepoSampleCreateId {
 
                 IdSearchResults avresults = 
                     idRepo.searchIdentities(IdType.AGENTONLY,
-                        "*", avcontrol);
+                        "*", avcontrol, true, false);
                 Set avagents = avresults.getSearchResults();
                 System.out.println("WSC Agents with avpairs as filter: " + 
                     avagents); 
@@ -326,7 +327,7 @@ public class IdRepoSampleCreateId {
                 wspcontrol.setSearchModifiers(IdSearchOpModifier.OR, 
                     wspkvPairMap);
                 IdSearchResults wspresults = 
-                    idRepo.searchIdentities(IdType.AGENTONLY,"*", wspcontrol);
+                    idRepo.searchIdentities(IdType.AGENTONLY,"*", wspcontrol, true, false);
                
                 Set wspagents = wspresults.getSearchResults();
                 System.out.println("WSP Agents with avpairs as filter: " + 

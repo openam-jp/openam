@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.service;
@@ -5769,7 +5770,7 @@ public class LoginState {
         try {
             idsc.setMaxResults(0);
             searchResults =
-                    amIdRepo.searchIdentities(idType, userTokenID, idsc);
+                    amIdRepo.searchIdentities(idType, userTokenID, idsc, false, false);
             if (searchResults != null) {
                 result = searchResults.getSearchResults();
             }
@@ -5808,7 +5809,7 @@ public class LoginState {
             try {
                 idsc.setMaxResults(maxResults);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
-                searchResults = amIdRepo.searchIdentities(idType, pattern, idsc);
+                searchResults = amIdRepo.searchIdentities(idType, pattern, idsc, true, false);
                 if (searchResults != null) {
                     resultAlias = searchResults.getSearchResults();
                 }
@@ -5822,7 +5823,7 @@ public class LoginState {
                     idsc.setMaxResults(maxResults);
                     idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
                     searchResults =
-                            amIdRepo.searchIdentities(idType, pattern, idsc);
+                            amIdRepo.searchIdentities(idType, pattern, idsc, true, false);
                 }
             } catch (SSOException sso) {
                 if (DEBUG.messageEnabled()) {
