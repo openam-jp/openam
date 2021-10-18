@@ -47,10 +47,6 @@
         <param-value>../task</param-value>
     </context-param>
     <context-param>
-        <param-name>jato:com.sun.identity.console.version.*:moduleURL</param-name>
-        <param-value>../ccversion</param-value>
-    </context-param>
-    <context-param>
         <param-name>jato:com.sun.identity.console.federation.*:moduleURL</param-name>
         <param-value>../federation</param-value>
     </context-param>
@@ -175,10 +171,6 @@
     <servlet-mapping>
         <servlet-name>AgentConfigurationServlet</servlet-name>
         <url-pattern>/agentconfig/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>VersionServlet</servlet-name>
-        <url-pattern>/ccversion/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>FSServlet</servlet-name>

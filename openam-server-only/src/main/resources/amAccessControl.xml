@@ -26,6 +26,7 @@
 
    Portions Copyrighted 2013-2016 ForgeRock AS.
    Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
+   Portions Copyrighted 2021 OSSTech Corporation
 -->
 <accesscontrols>
     <!-- REALM -->
@@ -308,7 +309,6 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMAdminFrameViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMPostViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AuthenticatedViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.base.VersionViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingAddViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingEditViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingViewBean" />
