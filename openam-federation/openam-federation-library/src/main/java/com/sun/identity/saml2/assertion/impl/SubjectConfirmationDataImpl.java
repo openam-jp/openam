@@ -24,6 +24,7 @@
  *
  * $Id: SubjectConfirmationDataImpl.java,v 1.5 2008/11/10 22:57:01 veiming Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 
@@ -468,7 +469,7 @@ public class SubjectConfirmationDataImpl implements SubjectConfirmationData {
         
         if (inResponseTo != null) {
             xml.append("InResponseTo=\"");
-            xml.append(inResponseTo);        
+            xml.append(XMLUtils.escapeSpecialCharacters(inResponseTo));        
             xml.append("\" ");        
         }
         

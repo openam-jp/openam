@@ -25,6 +25,7 @@
  * $Id: CDCServlet.java,v 1.13 2009/11/13 23:43:17 dknab Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2020-2021 OSSTech Corporation
  */
 
 package com.iplanet.services.cdc;
@@ -70,6 +71,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSEntry;
 
 import java.io.IOException;
@@ -369,7 +371,9 @@ public class CDCServlet extends HttpServlet {
             try {
                 String inResponseTo = request.getParameter(REQUEST_ID);
                 String spDescriptor = request.getParameter(PROVIDER_ID);
-                
+
+                validateInResponseTo(inResponseTo);
+
                 String resTokenID = null;
                 /**
                  * validateAndGetRestriction throws an exception if an agent
@@ -419,6 +423,18 @@ public class CDCServlet extends HttpServlet {
         }
     }
     
+    private void validateInResponseTo(String inResponseTo) throws FSException {
+        if (inResponseTo == null) {
+            debug.message("CDCServlet.validateInResponseTo: null input");
+            throw new FSException(FSUtils.bundle.getString("nullInput"));
+        }
+        if (!inResponseTo.equals(XMLUtils.escapeSpecialCharacters(inResponseTo))) {
+            // inResponseTo contains special characters
+            debug.message("CDCServlet.validateInResponseTo: inResponseTo is invalid");
+            throw new FSException(FSUtils.bundle.getString("invalidInput"));
+        }
+    }
+
     private String getRedirectURL(
         HttpServletRequest request,
         HttpServletResponse response
