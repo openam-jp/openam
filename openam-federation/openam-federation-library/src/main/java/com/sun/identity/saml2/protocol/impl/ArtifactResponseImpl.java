@@ -24,6 +24,7 @@
  *
  * $Id: ArtifactResponseImpl.java,v 1.2 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 
@@ -345,9 +346,11 @@ public class ArtifactResponseImpl extends StatusResponseImpl
 
         result.append("<").append(prefix).append("ArtifactResponse").
                 append(uri).append(" ID=\"").append(responseId).append("\"");
-	if (inResponseTo != null && inResponseTo.trim().length() != 0) {
-	    result.append(" InResponseTo=\"").append(inResponseTo).append("\"");
-	}
+        if (inResponseTo != null && inResponseTo.trim().length() != 0) {
+            result.append(" InResponseTo=\"")
+                .append(XMLUtils.escapeSpecialCharacters(inResponseTo))
+                .append("\"");
+        }
 	
         result.append(" Version=\"").append(version).append("\"").
                 append(" IssueInstant=\"").
