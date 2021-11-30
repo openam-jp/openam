@@ -25,6 +25,7 @@
  * $Id: DSConfigMgr.java,v 1.18 2009/01/28 05:34:49 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 
 package com.iplanet.services.ldap;
@@ -84,7 +85,7 @@ public class DSConfigMgr implements IDSConfigMgr {
 
     private int connRetryInterval = 1000;
     private HashSet retryErrorCodes = new HashSet();
-    private String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+    private String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
 
     static Debug debugger = null;
 

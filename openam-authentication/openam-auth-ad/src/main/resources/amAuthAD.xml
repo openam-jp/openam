@@ -27,6 +27,7 @@
     $Id: amAuthAD.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
 
     Portions Copyrighted 2013-2016 ForgeRock AS.
+    Portions copyright 2021 OGIS-RI Co., Ltd.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -154,7 +155,7 @@
                         <ChoiceValue i18nKey="a110213">TLSv1.2</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>TLSv1</Value>
+                        <Value>TLSv1.2</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
@@ -353,7 +354,7 @@
                             <ChoiceValue i18nKey="a110213">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"

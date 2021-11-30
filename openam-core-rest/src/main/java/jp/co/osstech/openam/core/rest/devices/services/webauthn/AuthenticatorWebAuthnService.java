@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
@@ -202,7 +203,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
         boolean useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
         boolean isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
         String protocolVersion =
-                CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_TLS_VERSION, "TLSv1");
+                CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_TLS_VERSION, "TLS");
 
         boolean sslTrustAll = Boolean.valueOf(
                     CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_TLS_TRUST_ALL, "false")).booleanValue();

@@ -18,6 +18,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
 
   Copyright 2019 Open Source Solution Technology Corporation
+  Portions copyright 2021 OGIS-RI Co., Ltd.
 -->
 
 <ServicesConfiguration>
@@ -160,7 +161,7 @@
                         <ChoiceValue i18nKey="a2063">TLSv1.2</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>TLSv1</Value>
+                        <Value>TLSv1.2</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-webauthn-ldap-ssl-trust-all"

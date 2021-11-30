@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2013 ForgeRock AS
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 package com.sun.identity.protocol;
 
@@ -68,7 +69,7 @@ public class SSLSocketFactoryManager {
     	    
             TrustManager[] amTrustMgr = new TrustManager[] { new AMX509TrustManager() };
 	
-    	    ctx = SSLContext.getInstance("SSL");
+    	    ctx = SSLContext.getInstance("TLS");
     	    ctx.init(keyMgr, amTrustMgr, null);
         } catch (Exception e) {
             SecurityDebug.debug.error("Exception in SSLSocketFactoryManager static initializer" + e.getMessage(), e);

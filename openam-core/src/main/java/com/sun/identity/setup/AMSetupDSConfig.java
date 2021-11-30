@@ -25,6 +25,7 @@
  * $Id: AMSetupDSConfig.java,v 1.20 2009/11/20 23:52:55 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 package com.sun.identity.setup;
 
@@ -292,7 +293,7 @@ public class AMSetupDSConfig {
                         .set(AUTHN_BIND_REQUEST, request);
 
                 if (ssl) {
-                    String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+                    String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
                     options = options.set(SSL_CONTEXT,
                             new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
                 }

@@ -25,6 +25,7 @@
  * $Id: AjaxPage.java,v 1.24 2010/01/04 19:15:16 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.config.util;
@@ -170,7 +171,7 @@ public abstract class AjaxPage extends Page {
                 .set(AUTHN_BIND_REQUEST, LDAPRequests.newSimpleBindRequest(bindDN, bindPwd));
 
         if (isSSl) {
-            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+            String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
             ldapOptions = ldapOptions.set(SSL_CONTEXT,
                     new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
         }

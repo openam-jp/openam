@@ -28,6 +28,7 @@
 
    Portions Copyrighted 2012-2016 ForgeRock AS.
    Portions Copyrighted 2019 Open Source Solution Technology Corporation
+   Portions copyright 2021 OGIS-RI Co., Ltd.
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -348,7 +349,7 @@
                             <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -959,7 +960,7 @@
                             <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1711,7 +1712,7 @@
                             <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2328,7 +2329,7 @@
                             <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2943,7 +2944,7 @@
                             <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3533,7 +3534,7 @@
                             <ChoiceValue i18nKey="a2007313">TLSv1.2</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>TLSv1</Value>
+                            <Value>TLSv1.2</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

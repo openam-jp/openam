@@ -25,6 +25,7 @@
  * $Id: LDAPConnectionPools.java,v 1.7 2009/01/28 05:35:01 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 package com.sun.identity.policy.plugins;
 
@@ -117,7 +118,7 @@ public class LDAPConnectionPools {
                         debug.message("Create LDAPConnectionPool: " + host);
                     }
                     if (ssl) {
-                        String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLSv1");
+                        String defaultProtocolVersion = SystemProperties.get(Constants.LDAP_SERVER_TLS_VERSION, "TLS");
                         options.set(LDAPConnectionFactory.SSL_CONTEXT,
                                 new SSLContextBuilder().setProtocol(defaultProtocolVersion).getSSLContext());
                     }

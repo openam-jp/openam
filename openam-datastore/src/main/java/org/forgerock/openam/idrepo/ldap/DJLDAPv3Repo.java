@@ -14,6 +14,7 @@
  * Copyright 2013-2016 ForgeRock AS.
  * Portions Copyright 2016 Nomura Research Institute, Ltd.
  * Portions copyright 2021 OSSTech Corporation
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -227,7 +228,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         String connectionMode = CollectionHelper.getMapAttr(configParams, LDAP_CONNECTION_MODE);
         useStartTLS = LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode);
         isSecure = LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) || useStartTLS;
-        protocolVersion = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_SECURE_PROTOCOL_VERSION, "TLSv1");
+        protocolVersion = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_SECURE_PROTOCOL_VERSION, "TLS");
         bindConnectionFactory = createConnectionFactory(null, null, maxPoolSize);
         connectionFactory = createConnectionFactory(username, password, maxPoolSize);
 

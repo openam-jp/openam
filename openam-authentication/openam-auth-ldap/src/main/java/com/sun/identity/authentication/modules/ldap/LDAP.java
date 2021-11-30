@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2021 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -210,7 +211,7 @@ public class LDAP extends AMLoginModule {
             useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
             isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
             protocolVersion = CollectionHelper.getMapAttr(
-                    currentConfig, "openam-auth-ldap-secure-protocol-version", "TLSv1");
+                    currentConfig, "openam-auth-ldap-secure-protocol-version", "TLS");
 
             getUserCreationAttrs(currentConfig);
             String tmp = CollectionHelper.getMapAttr(currentConfig,

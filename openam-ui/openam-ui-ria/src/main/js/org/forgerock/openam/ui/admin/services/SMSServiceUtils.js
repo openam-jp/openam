@@ -109,7 +109,7 @@ define([
      * @deprecated
      */
     obj.sanitizeSchema = function (schema) {
-        console.warn("[SMSServiceUtils] \"#sanitizeSchema\" is deprecated. Use JSONSchema model instead.");
+        console.warn("[SMSServiceUtils] \"d\" is deprecated. Use JSONSchema model instead.");
         var transformedSchema = _.cloneDeep(schema);
 
         /**
