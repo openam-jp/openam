@@ -25,6 +25,7 @@
  * $Id: SessionRequestHandler.java,v 1.9 2009/04/02 04:11:44 ericow Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.iplanet.dpro.session.service;
 
@@ -468,7 +469,7 @@ public class SessionRequestHandler implements RequestHandler {
 
                 case SessionRequest.GetSessionCount:
                     String uuid = req.getUUID();
-                    Object sessions = SessionCount.getSessionsFromLocalServer(uuid);
+                    Object sessions = SessionCount.getSessionsFromLocalServer(requesterSession, uuid);
 
                     if (sessions != null) {
                         res.setSessionsForGivenUUID((Map) sessions);

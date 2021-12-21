@@ -25,6 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 package com.iplanet.dpro.session.service;
 
@@ -1318,7 +1319,7 @@ public class SessionService {
      * @throws SessionException
      * @throws SSOException
      */
-    private boolean hasTopLevelAdminRole(Session session) throws SessionException, SSOException {
+    boolean hasTopLevelAdminRole(Session session) throws SessionException, SSOException {
         SSOToken ssoSession = ssoTokenManager.createSSOToken(session.getID().toString());
         return hasTopLevelAdminRole(ssoSession, session.getClientID());
     }
