@@ -24,10 +24,8 @@
  *
  * $Id: SessionCount.java,v 1.5 2008/06/25 05:41:31 qcheng Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2021 OSSTech Corporation
  */
 
 package com.iplanet.dpro.session.service;
@@ -37,11 +35,13 @@ import static org.forgerock.openam.session.SessionConstants.*;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
 import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.configuration.SiteConfiguration;
@@ -213,10 +213,33 @@ public class SessionCount {
         return useLocalSessionsInMultiServerMode;
     }
 
+    /**
+     * Get user sessions from local server.
+     * 
+     * This method checks the requester is admin user.
+     * 
+     * @param requester The requester session.
+     * @param uuid The universal id.
+     * @return The map containing ID and expiration date.
+     * @throws SessionException
+     */
+    static Map<String, Long> getSessionsFromLocalServer(Session requester, String uuid)
+            throws SessionException {
+        
+        try {
+            if (sessionService.hasTopLevelAdminRole(requester)) {
+                return getSessionsFromLocalServer(uuid);
+            }
+        } catch (SSOException e) {
+            throw new SessionException(e);
+        }
+        return new HashMap<String, Long>();
+    }
+    
     /*
      * Get user sessions from local server
      */
-    static Map<String, Long> getSessionsFromLocalServer(String uuid) {
+    private static Map<String, Long> getSessionsFromLocalServer(String uuid) {
         Set<SessionID> sessions = (Set<SessionID>) uuidSessionMap.get(uuid);
         Map<String, Long> retSessions = new HashMap<String, Long>();
 
