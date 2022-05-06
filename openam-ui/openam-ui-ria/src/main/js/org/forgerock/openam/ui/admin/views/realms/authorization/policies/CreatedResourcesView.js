@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -33,8 +34,8 @@ define([
             "click [data-add-resource]": "addResource",
             "keyup [data-add-resource]": "addResource",
             "keyup #resourceBuilder input": "addResource",
-            "click span[data-delete]": "deleteResource",
-            "keyup span[data-delete]": "deleteResource",
+            "click span[data-delete-item]": "deleteResource",
+            "keyup span[data-delete-item]": "deleteResource",
             "click [data-remove-pending]": "removePendingResource",
             "click [data-show-editing]" : "showEditingResources"
         },
@@ -67,7 +68,7 @@ define([
                                 resources.html(content);
 
                                 resources.find("input").autosizeInput({ space: 19 });
-                                resources.find("input:eq(0)").focus().select();
+                                resources.find("input:eq(0)").trigger("focus").trigger("select");
                             });
                     }
                 });

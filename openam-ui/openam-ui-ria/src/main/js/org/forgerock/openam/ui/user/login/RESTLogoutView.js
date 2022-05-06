@@ -16,7 +16,7 @@
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",

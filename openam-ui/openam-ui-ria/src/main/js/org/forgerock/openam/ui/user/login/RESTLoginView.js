@@ -16,7 +16,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/services/AuthNService",
@@ -329,7 +329,7 @@ define([
                             redirectForm.append(
                                 `<input type='hidden' name='${k}' value='${v}' aria-hidden='true' />`);
                         });
-                        redirectForm.appendTo("body").submit();
+                        redirectForm.appendTo("body").trigger("submit");
                     } else {
                         window.location.replace(redirectCallback.redirectUrl);
                     }
@@ -404,10 +404,10 @@ define([
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
                 this.$el.find("input[type=text]:first").val(login);
                 this.$el.find("[name=loginRemember]").attr("checked", "true");
-                this.$el.find("[type=password]").focus();
+                this.$el.find("[type=password]").trigger("focus");
             } else {
                 this.$el.find(":input:not([type='radio']):not([type='checkbox'])" +
-                    ":not([type='submit']):not([type='button']):first").focus();
+                    ":not([type='submit']):not([type='button']):first").trigger("focus");
             }
         },
 

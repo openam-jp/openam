@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
 
     // jquery dependencies

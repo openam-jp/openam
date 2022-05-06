@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",

@@ -18,7 +18,7 @@
   * @module org/forgerock/openam/ui/admin/views/common/schema/SubSchemaListComponent
   */
 define("org/forgerock/openam/ui/admin/views/common/schema/SubSchemaListComponent", [
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "org/forgerock/commons/ui/common/components/Messages",

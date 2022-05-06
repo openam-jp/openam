@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
@@ -49,14 +50,14 @@ define([
 
             this.setElement(element);
 
-            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+            return UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
                 self.setElement(`#operator${itemID}`);
                 self.select = self.$el.find("select");
                 self.delegateEvents();
 
-                self.select.focus().trigger("change");
+                self.select.trigger("focus").trigger("change");
                 self.$el.data("logical", true);
                 self.dropbox = self.$el.find(".dropbox");
 
@@ -69,7 +70,7 @@ define([
         },
 
         setValue (value) {
-            this.select.focus().val(value).trigger("change");
+            this.select.trigger("focus").val(value).trigger("change");
         },
 
         rebindElement () {

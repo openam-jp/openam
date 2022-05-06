@@ -15,7 +15,7 @@
  */
 
  define([
-     "jquery",
+     "jquery-migrate",
      "org/forgerock/openam/ui/admin/views/configuration/createConfigurationListView",
      "org/forgerock/openam/ui/admin/services/global/ServicesService"
  ], ($, createConfigurationListView, ServicesService) => {

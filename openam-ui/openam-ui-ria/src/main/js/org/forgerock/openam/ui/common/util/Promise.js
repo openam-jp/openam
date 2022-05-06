@@ -18,7 +18,7 @@
   * @module org/forgerock/openam/ui/common/util/Promise
   */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash"
 ], ($, _) => ({
     /**

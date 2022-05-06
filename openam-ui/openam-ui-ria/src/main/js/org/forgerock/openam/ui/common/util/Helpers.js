@@ -17,7 +17,7 @@
 /*global define*/
 
 define([
-    "jquery",
+    "jquery-migrate",
     "handlebars",
     "lodash",
     "org/forgerock/openam/ui/common/util/ExternalLinks"

@@ -525,12 +525,13 @@
                             <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <file>${basedir}/src/main/resources/bootstrap-tabdrop-1.0.js</file>
+                            <file>${basedir}/src/main/resources/bootstrap-tabdrop-1.0-openam-jp.js</file>
                             <groupId>jp.openam.commons.ui.libs</groupId>
                             <artifactId>bootstrap-tabdrop</artifactId>
                             <version>1.0</version>
                             <packaging>js</packaging>
                             <generatePom>true</generatePom>
+                            <classifier>openam-jp</classifier>
                         </configuration>
                     </execution>
                     <execution>

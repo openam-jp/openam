@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/openam/ui/admin/views/realms/authorization/policies/conditions/ManageRulesView",
     "org/forgerock/commons/ui/common/util/Constants"
@@ -95,13 +96,14 @@ define([
                     this.buttons.addOperator.hide();
                 }
 
-                this.buildList();
-                this.initSorting();
-                this.identifyDroppableLogical();
+                this.buildList().then(() => {
+                    this.initSorting();
+                    this.identifyDroppableLogical();
 
-                if (callback) {
-                    callback();
-                }
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         }
     });

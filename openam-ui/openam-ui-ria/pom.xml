@@ -100,6 +100,7 @@
             <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>bootstrap-tabdrop</artifactId>
             <version>1.0</version>
+            <classifier>openam-jp</classifier>
             <type>js</type>
         </dependency>
         <dependency>
@@ -148,20 +149,6 @@
             <artifactId>sinon</artifactId>
             <version>1.15.4</version>
             <type>js</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jp.openam.commons.ui.libs</groupId>
-            <artifactId>qunit</artifactId>
-            <version>1.15.0</version>
-            <type>js</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jp.openam.commons.ui.libs</groupId>
-            <artifactId>qunit</artifactId>
-            <type>css</type>
-            <version>1.15.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -264,7 +251,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/test-classes/libs</outputDirectory>
-                            <includeArtifactIds>sinon,qunit,squire</includeArtifactIds>
+                            <includeArtifactIds>sinon,squire</includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>

@@ -17,7 +17,7 @@
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/commons/ui/common/util/URIUtils"

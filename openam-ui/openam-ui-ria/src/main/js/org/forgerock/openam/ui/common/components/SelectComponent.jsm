@@ -15,7 +15,7 @@
  */
 
 import "selectize";
-import $ from "jquery";
+import $ from "jquery-migrate";
 import UIUtils from "org/forgerock/commons/ui/common/util/UIUtils";
 import { View } from "backbone";
 import _ from "lodash";

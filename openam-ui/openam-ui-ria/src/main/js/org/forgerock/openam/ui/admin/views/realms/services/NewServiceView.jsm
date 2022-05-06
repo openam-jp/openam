@@ -16,7 +16,7 @@
 
 import _ from "lodash";
 import "bootstrap-tabdrop"; // jquery dependencies
-import $ from "jquery";
+import $ from "jquery-migrate";
 
 import AbstractView from "org/forgerock/commons/ui/common/main/AbstractView";
 import FlatJSONSchemaView from "org/forgerock/openam/ui/common/views/jsonSchema/FlatJSONSchemaView";

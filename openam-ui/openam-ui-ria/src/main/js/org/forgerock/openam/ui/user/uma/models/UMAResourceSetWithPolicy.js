@@ -16,7 +16,7 @@
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "backbone-relational",

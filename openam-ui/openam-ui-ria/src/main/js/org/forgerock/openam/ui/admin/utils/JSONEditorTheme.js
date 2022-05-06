@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "jsonEditor"
 ], ($, _, JSONEditor) => {
@@ -157,7 +158,8 @@ define([
                     var el = document.createElement("div"),
                         parseHtml = document.implementation.createHTMLDocument("");
 
-                    el.className = `col-sm-offset-${gridColWidth2} col-sm-${gridColWidth3} help-block`;
+                    el.className = `col-sm-offset-${gridColWidth2} col-sm-${gridColWidth3}` +
+                        " help-block hidden-lg hidden-md hidden-sm";
                     parseHtml.body.innerHTML = `<div class='wordwrap'>${text}</div>`;
                     el.appendChild(parseHtml.body.getElementsByTagName("div")[0]);
 

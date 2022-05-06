@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
@@ -399,7 +400,7 @@ define([
         editLabels () {
             var labelsSelect = this.getLabelSelectize();
             labelsSelect.enable();
-            labelsSelect.focus();
+            labelsSelect.trigger("focus");
             this.$el.find("#editLabels").hide();
             this.$el.find("#labels .selectize-control").removeClass("pull-left");
             this.$el.find("button#saveLabels").prop("disabled", true);

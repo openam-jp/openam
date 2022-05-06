@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -126,7 +127,7 @@ define([
         },
 
         focus () {
-            this.$el.find("input:first").focus();
+            this.$el.find("input:first").trigger("focus");
         },
 
         addRow (event) {

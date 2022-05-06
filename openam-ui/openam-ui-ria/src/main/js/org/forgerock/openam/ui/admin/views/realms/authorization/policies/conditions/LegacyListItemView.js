@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
@@ -31,7 +32,7 @@ define([
 
             var self = this;
 
-            UIUtils.fillTemplateWithData(
+            return UIUtils.fillTemplateWithData(
                 "templates/admin/views/realms/authorization/policies/conditions/LegacyListItem.html",
                 this.data,
                 function () {

@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "squire",
     "sinon",
     "org/forgerock/openam/ui/common/util/Constants"
@@ -126,20 +127,20 @@ define([
                 it("sends EVENT_AUTHENTICATION_DATA_CHANGED event", () => {
                     promise.resolve();
 
-                    RouteTo.logout();
-
-                    expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
-                        anonymousMode: true
+                    RouteTo.logout().then(() => {
+                        expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, {
+                            anonymousMode: true
+                        });
                     });
                 });
 
                 it("sends EVENT_CHANGE_VIEW event", () => {
                     promise.resolve();
 
-                    RouteTo.logout();
-
-                    expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_CHANGE_VIEW, {
-                        route: Router.configuration.routes.login
+                    RouteTo.logout().then(() => {
+                        expect(EventManager.sendEvent).to.be.calledWith(Constants.EVENT_CHANGE_VIEW, {
+                            route: Router.configuration.routes.login
+                        });
                     });
                 });
             });
@@ -148,9 +149,9 @@ define([
                 it("sends no events", () => {
                     promise.fail();
 
-                    RouteTo.logout();
-
-                    expect(EventManager.sendEvent).to.not.be.called;
+                    RouteTo.logout().then(() => {
+                        expect(EventManager.sendEvent).to.not.be.called;
+                    });
                 });
             });
         });

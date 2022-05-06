@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 require.config({
@@ -27,10 +28,15 @@ require.config({
         "lodash":       "libs/lodash-3.10.1-min",
         "handlebars":   "libs/handlebars-4.0.5",
         "i18next":      "libs/i18next-1.7.3-min",
-        "jquery":       "libs/jquery-2.1.1-min",
+        "jquery":       "libs/jquery-3.5.1-min",
+        "jquery-migrate": "libs/jquery-migrate-3.3.0",
         "text":         "libs/text-2.0.15"
     },
     shim: {
+        "jquery-migrate": {
+            deps: ["jquery"],
+            exports: "jQuery"
+        },
         "handlebars": {
             exports: "handlebars"
         },
@@ -45,7 +51,7 @@ require.config({
 });
 
 require([
-    "jquery",
+    "jquery-migrate",
     "handlebars",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",

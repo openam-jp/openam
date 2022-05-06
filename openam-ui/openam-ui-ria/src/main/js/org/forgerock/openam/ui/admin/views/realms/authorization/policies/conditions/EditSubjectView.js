@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -49,7 +50,7 @@ define([
 
             this.data.subjects = _.sortBy(this.data.subjects, "i18nKey");
 
-            UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
+            return UIUtils.fillTemplateWithData(this.template, this.data, function (tpl) {
                 self.$el.append(tpl);
 
                 self.setElement(`#subject_${itemID}`);
@@ -64,7 +65,7 @@ define([
                     self.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
                 }
 
-                self.$el.find("select.type-selection:first").focus();
+                self.$el.find("select.type-selection:first").trigger("focus");
 
                 if (callback) {
                     callback();
@@ -83,7 +84,7 @@ define([
 
             mergedData = _.merge({}, itemData, hiddenData);
 
-            item.focus(); //  Required to trigger changeInput.
+            item.trigger("focus"); //  Required to trigger changeInput.
             this.data.subjects = allSubjects;
 
             if (mergedData && mergedData.type) {
@@ -162,10 +163,12 @@ define([
                 itemDataEl = this.$el.find(".item-data"),
                 schemaProps = schema.config.properties,
                 i18nKey,
-                htmlBuiltPromise = $.Deferred();
+                htmlBuiltPromises = [];
 
             if (schema.title === self.IDENTITY_RESOURCE) {
                 _.each(["users", "groups"], function (identityType) {
+                    const defer = $.Deferred();
+                    htmlBuiltPromises.push(defer.promise());
                     new ArrayAttr().render({
                         itemData,
                         hiddenData,
@@ -173,10 +176,12 @@ define([
                         title: identityType,
                         i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType,
                         dataSource: identityType
-                    }, itemDataEl, htmlBuiltPromise.resolve);
+                    }, itemDataEl, defer.resolve);
                 });
             } else {
                 _.map(schemaProps, function (value, key) {
+                    const defer = $.Deferred();
+                    htmlBuiltPromises.push(defer.promise());
                     i18nKey = self.subjectI18n.key + schema.title + self.subjectI18n.props + key;
 
                     switch (value.type) {
@@ -187,7 +192,7 @@ define([
                                 data: itemData[key],
                                 title: key,
                                 i18nKey
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         case "array":
                             new ArrayAttr().render({
@@ -196,20 +201,17 @@ define([
                                 data: itemData[key],
                                 title: key,
                                 i18nKey
-                            }, itemDataEl);
+                            }, itemDataEl, defer.resolve);
                             break;
                         default:
                             break;
                     }
                 });
-                htmlBuiltPromise.resolve();
             }
 
-            htmlBuiltPromise.done(function () {
+            return $.when.apply($, htmlBuiltPromises).done(function () {
                 self.$el.find(".condition-attr").wrapAll("<div class='no-float'></div>");
             });
-
-            return htmlBuiltPromise;
         },
 
         setDefaultJsonValues (schema) {

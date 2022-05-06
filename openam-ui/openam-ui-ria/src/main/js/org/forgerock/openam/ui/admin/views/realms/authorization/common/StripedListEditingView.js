@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -29,8 +30,8 @@ define([
             "click [data-add-item]": "addItem",
             "keyup [data-add-item]": "addItem",
             "keyup [data-editing-input]": "addItem",
-            "click span[data-delete]": "deleteItem",
-            "keyup span[data-delete]": "deleteItem"
+            "click span[data-delete-item]": "deleteItem",
+            "keyup span[data-delete-item]": "deleteItem"
         },
 
         baseRender (data, tpl, el, callback) {
@@ -90,7 +91,7 @@ define([
                     this.updateEntity();
                 }
                 this.renderParent(() => {
-                    this.$el.find(".editing input[type=text]").focus();
+                    this.$el.find(".editing input[type=text]").trigger("focus");
                 });
             }
         },

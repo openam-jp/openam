@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -125,7 +126,7 @@ define([
                 this.data,
                 function (tpl) {
                     self.$el.find("#resTypeSetting").html(tpl);
-                    self.$el.find("#resTypeSetting [autofocus]").focus();
+                    self.$el.find("#resTypeSetting [autofocus]").trigger("focus");
                 });
         },
 

@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "handlebars",
     "org/forgerock/commons/ui/common/components/Messages",

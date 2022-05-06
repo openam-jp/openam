@@ -16,7 +16,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
     "backbone.paginator",

@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
     "org/forgerock/commons/ui/common/backgrid/Backgrid",

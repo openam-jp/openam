@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
@@ -65,10 +66,10 @@ define([
             if (e.type === "keyup") {
                 switch (e.keyCode) {
                     case 38: // arrow down
-                        $(e.target).prev("li").focus();
+                        $(e.target).prev("li").trigger("focus");
                         return;
                     case 40: // arrow up
-                        $(e.target).next("li").focus();
+                        $(e.target).next("li").trigger("focus");
                         return;
                     case 13:
                         break;
@@ -98,7 +99,7 @@ define([
 
         filterItems (e) {
             if (e.type === "keyup" && e.keyCode === 40) {
-                $(e.target).parent().next().find("li:first-child").focus();
+                $(e.target).parent().next().find("li:first-child").trigger("focus");
                 return;
             }
 

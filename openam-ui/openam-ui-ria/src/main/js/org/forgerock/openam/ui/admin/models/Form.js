@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
  /**
  * @deprecated
  */
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "jsonEditor",
     "org/forgerock/openam/ui/admin/utils/JSONEditorTheme",
@@ -53,7 +54,7 @@ define([
          */
         $(element).find("input:password").attr("placeholder", $.t("common.form.passwordPlaceholder"));
 
-        $(element).find(".help-block").addClass("hidden-lg hidden-md hidden-sm").each(function () {
+        $(element).find(".help-block").each(function () {
             var group = $(this).parent(),
                 element = $('<a class="btn info-button visible-lg-inline-block' +
                     ' visible-md-inline-block visible-sm-inline-block" ' +
@@ -67,7 +68,7 @@ define([
                 placement: "auto top",
                 content: this.innerHTML
             });
-            element.click(function (event) {
+            element.on("click", function (event) {
                 event.preventDefault();
             });
         });

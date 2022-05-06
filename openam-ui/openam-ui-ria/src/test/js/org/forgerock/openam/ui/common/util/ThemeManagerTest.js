@@ -15,7 +15,7 @@
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "squire",
     "sinon",
@@ -86,7 +86,7 @@ define([
             };
 
             injector
-                .mock("jquery", mock$)
+                .mock("jquery-migrate", mock$)
                 .mock("config/ThemeConfiguration", themeConfig)
                 .mock("org/forgerock/commons/ui/common/util/URIUtils", URIUtils)
                 .mock("org/forgerock/commons/ui/common/main/Configuration", Configuration)

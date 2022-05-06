@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/openam/ui/admin/models/authorization/PolicySetModel",
     "org/forgerock/openam/ui/admin/views/realms/authorization/common/StripedListView",
@@ -114,7 +115,7 @@ define([
                                     self.$el.find("#policySetSettings").append(tpl);
                                     self.populateResourceTypes();
                                     FormHelper.setActiveTab(self);
-                                    self.$el.find("#policySetSettings [autofocus]").focus();
+                                    self.$el.find("#policySetSettings [autofocus]").trigger("focus");
                                     if (self.renderCallback) {
                                         self.renderCallback();
                                     }

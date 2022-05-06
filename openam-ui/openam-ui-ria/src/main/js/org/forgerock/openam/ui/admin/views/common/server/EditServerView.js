@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -96,9 +97,9 @@ define([
                                     // The input is disabled because the value is being inherited. However we are
                                     // still able to scroll to the correct row by focusing on the inherit button
                                     // first.
-                                    input.closest(".form-group").find("button").focus().blur();
+                                    input.closest(".form-group").find("button").trigger("focus").trigger("blur");
                                 } else {
-                                    input.focus();
+                                    input.trigger("focus");
                                 }
 
                             }

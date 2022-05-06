@@ -12,10 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 define([
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "jsonEditor",
@@ -30,7 +31,7 @@ define([
     function convertHelpBlocksToPopOvers (element) {
         const template = "templates/common/jsonSchema/editors/_HelpPopover.html";
         UIUtils.compileTemplate(template).then((html) => {
-            $(element).find(".help-block").addClass("hidden-lg hidden-md hidden-sm").each((index, value) => {
+            $(element).find(".help-block").each((index, value) => {
                 const helpPopOver = $(html);
 
                 helpPopOver.popoverclickaway({
@@ -38,7 +39,7 @@ define([
                     html: true,
                     placement: "auto top",
                     content: value.innerHTML
-                }).click((event) => {
+                }).on("click", (event) => {
                     event.preventDefault();
                 });
 

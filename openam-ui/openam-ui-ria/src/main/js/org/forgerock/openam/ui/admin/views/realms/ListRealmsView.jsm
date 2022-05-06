@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  */
 
-import $ from "jquery";
+import $ from "jquery-migrate";
 import AbstractView from "org/forgerock/commons/ui/common/main/AbstractView";
 import BootstrapDialog from "org/forgerock/commons/ui/common/components/BootstrapDialog";
 import Messages from "org/forgerock/commons/ui/common/components/Messages";

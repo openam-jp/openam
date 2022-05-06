@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2020 Open Source Solution Technology Corporation
  */
 
 require.config({
@@ -47,14 +47,15 @@ require.config({
         "bootstrap"               : "libs/bootstrap-3.4.1-openam-jp",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
-        "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0",
+        "bootstrap-tabdrop"       : "libs/bootstrap-tabdrop-1.0-openam-jp",
 
         "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-0915edd-min",
         "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"     : "libs/form2js-2.0-769718a",
         "handlebars"  : "libs/handlebars-4.0.5",
         "i18next"     : "libs/i18next-1.7.3-min",
-        "jquery"      : "libs/jquery-2.1.1-min",
+        "jquery"      : "libs/jquery-3.5.1-min",
+        "jquery-migrate": "libs/jquery-migrate-3.3.0",
         "js2form"     : "libs/js2form-2.0-769718a",
         "jsonEditor"  : "libs/jsoneditor-0.7.23-custom",
         "lodash"      : "libs/lodash-3.10.1-min",
@@ -70,6 +71,10 @@ require.config({
         "text": "libs/text-2.0.15"
     },
     shim: {
+        "jquery-migrate": {
+            deps: ["jquery"],
+            exports: "jQuery"
+        },
         "autosizeInput": {
             deps: ["jquery"],
             exports: "autosizeInput"
@@ -163,7 +168,7 @@ require([
     "org/forgerock/commons/ui/common/main/EventManager",
 
     // other modules that are necessary to include to startup the app
-    "jquery",
+    "jquery-migrate",
     "lodash",
     "backbone",
     "handlebars",

@@ -19,7 +19,7 @@
  */
 define([
     "lodash",
-    "jquery",
+    "jquery-migrate",
     "org/forgerock/commons/ui/common/components/Navigation",
     "org/forgerock/commons/ui/common/main/Router"
 ], function (_, $, Navigation, Router) {
