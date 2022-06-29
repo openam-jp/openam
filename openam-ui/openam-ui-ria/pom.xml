@@ -13,7 +13,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
-* Portions Copyrighted 2019 Open Source Solution Technology Corporation
+* Portions Copyrighted 2019-2022 OSSTech Corporation
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -153,7 +153,7 @@
         <dependency>
             <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>qunit</artifactId>
-            <version>1.15.0</version>
+            <version>2.19.1</version>
             <type>js</type>
             <scope>test</scope>
         </dependency>
@@ -161,7 +161,7 @@
             <groupId>jp.openam.commons.ui.libs</groupId>
             <artifactId>qunit</artifactId>
             <type>css</type>
-            <version>1.15.0</version>
+            <version>2.19.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -287,8 +287,8 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
-                            <nodeVersion>v4.4.5</nodeVersion>
-                            <npmVersion>3.9.3</npmVersion>
+                            <nodeVersion>v16.15.1</nodeVersion>
+                            <npmVersion>8.11.0</npmVersion>
                         </configuration>
                     </execution>
                     <execution>

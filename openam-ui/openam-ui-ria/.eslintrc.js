@@ -80,6 +80,7 @@ module.exports = {
         "no-whitespace-before-property": 2,
         "object-curly-spacing": [2, "always"],
         "object-shorthand": 2,
+        "one-var": [2, { var: "always", let: "never", const: "never" }],
         "operator-linebreak": 2,
         "prefer-const": 2,
         "prefer-template": 2,
