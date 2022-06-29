@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2022 OSSTech Corporation
  */
 
 /* global module, require, process */
@@ -219,7 +219,10 @@ module.exports = function (grunt) {
                     plugins: [
                         new (require("less-plugin-clean-css"))({})
                     ],
-                    relativeUrls: true
+                    relativeUrls: true,
+                    modifyVars: {
+                        "openam-version": "${version}"
+                    }
                 }
             }
         },
