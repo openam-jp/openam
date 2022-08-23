@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2022 OSSTech Corporation
  */
 
 define([
@@ -52,15 +52,17 @@ define([
 
                 if (gotoURL) {
                     RESTLoginHelper.setLogoutGotoURL(gotoURL).then(function () {
-                        if (conf.globalData.auth.urlParams &&
-                                conf.globalData.auth.urlParams.goto) {
-                            Router.setUrl(gotoURL);
-                        }
+                        Router.setUrl(gotoURL);
+                    }, function () {
+                        EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: router.configuration.routes.loggedOut
+                        });
+                    });
+                } else {
+                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                        route: router.configuration.routes.loggedOut
                     });
                 }
-                EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                    route: router.configuration.routes.loggedOut
-                });
             }, function () {
                 conf.setProperty("loggedUser", null);
                 EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
@@ -68,11 +70,16 @@ define([
                 if (gotoURL) {
                     RESTLoginHelper.setLogoutGotoURL().then(function () {
                         Router.setUrl(gotoURL);
+                    }, function () {
+                        EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: router.configuration.routes.login
+                        });
+                    });
+                } else {
+                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                        route: router.configuration.routes.login
                     });
                 }
-                EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                    route: router.configuration.routes.login
-                });
             });
         }
     }, {
