@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2022 OSSTech Corporation
  */
 
 define([
@@ -128,21 +128,13 @@ define([
     };
 
     obj.setLogoutGotoURL = function (urlGoTo) {
-        var promise = $.Deferred(),
-            auth = Configuration.globalData.auth,
-            context = "";
+        var promise = $.Deferred();
         AuthNService.validateLogoutGotoUrl(urlGoTo).then(function (data) {
             if (data.validatedUrl) {
-                if (data.validatedUrl.indexOf("/") === 0 &&
-                    data.validatedUrl.indexOf(`/${Constants.context}`) !== 0) {
-                    context = `/${Constants.context}`;
-                }
-                if (!auth.urlParams) {
-                    auth.urlParams = {};
-                }
-                auth.urlParams.goto = encodeURIComponent(context + data.validatedUrl);
+                promise.resolve();
+            } else {
+                promise.reject();
             }
-            promise.resolve();
         }, function () {
             promise.reject();
         });
