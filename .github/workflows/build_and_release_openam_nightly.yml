@@ -1,0 +1,208 @@
+name: Build and release OpenAM nightly
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 18 * * *'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    strategy:
+      matrix:
+        java: [ '8' ]
+
+    env:
+      GIT_ORIGIN:           https://github.com/openam-jp
+      GIT_BRANCH:           master
+      RELEASE_NAME:         nightly
+      ARTIFACTS: |
+                            ./openam/openam-distribution/openam-distribution-ssoconfiguratortools/target/SSOConfiguratorTools-15.0.0-SNAPSHOT.zip
+                            ./openam/openam-distribution/openam-distribution-ssoadmintools/target/SSOAdminTools-15.0.0-SNAPSHOT.zip
+                            ./openam/openam-server/target/OpenAM-15.0.0-SNAPSHOT.war
+      LICENSE_BODY:         "This project is subject to [the Common Development and Distribution License (CDDL)](LICENSE.md). \
+                            Please check all the terms of the license before using these artifacts."
+      REPO_NAMES: |
+                            forgerock-parent
+                            forgerock-bom
+                            forgerock-build-tools
+                            forgerock-i18n-framework
+                            forgerock-guice
+                            forgerock-guava
+                            forgerock-ui
+                            forgerock-commons
+                            forgerock-persistit
+                            forgerock-bloomfilter
+                            opendj-sdk
+                            opendj
+                            openam
+
+    steps:
+
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v3.6.0
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'temurin'
+
+    - name: Build in order
+      id: build
+      run: |
+        for REPO in ${REPO_NAMES}; do
+          git clone ${GIT_ORIGIN}/${REPO} -b ${GIT_BRANCH}
+
+          #----------------------------------------
+          # Ad hoc patch for maven-default-http-blocker
+          #----------------------------------------
+          if [ "${REPO}" == 'opendj' ]; then
+            sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" opendj/opendj-server-legacy/pom.xml
+          fi
+          if [ "${REPO}" == 'openam' ]; then
+            sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" openam/openam-core/pom.xml
+            find ./openam -type f -name 'pom.xml' | xargs sed -ie "s|<url>http://maven.restlet.com|<url>https://maven.restlet.com|g"
+          fi
+          #----------------------------------------
+
+          mvn clean install -f ${REPO}
+          if [ $? -ne 0 ]; then
+            exit 1;
+          fi
+        done
+
+    - name: Delete previous releases
+      id: delete_previous_releases
+      if: ${{ steps.build.outcome == 'success' }}
+      uses: actions/github-script@v6.3.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        script: |
+          /*
+           * Delete previous 'nightly' release.
+           *   - Search all releases by name 'nightly'.
+           *   - Attempts to delete all releases by ID and aborts build if deletion fails.
+           */
+          const { RELEASE_NAME } = process.env;
+          const { owner, repo } = context.repo;
+
+          await github.rest.repos.listReleases({
+            owner,
+            repo,
+          }).then((res) => {
+            res.data.forEach(async releaseInfo => {
+              if (releaseInfo.name === RELEASE_NAME) {
+                await github.rest.repos.deleteRelease({
+                  owner: owner,
+                  repo: repo,
+                  release_id: `${releaseInfo.id}`,
+                }).then((res) => {
+                  console.log(`Deleted the previous release id: '${releaseInfo.id}'`);
+                }).catch((e) => {
+                  core.setFailed(`Cannot delete previous release ${releaseInfo.id}: ${e}`);
+                })
+              }
+            });
+          }).catch((e) => {
+            core.setFailed(`Cannot list releases: ${e}`);
+          })
+
+    - name: Delete previous tag
+      id: delete_previous_tag
+      uses: actions/github-script@v6.3.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        script: |
+          /*
+           * Delete previous 'nightly' tag.
+           *   - Delete a tag 'tags/nightly'.
+           *   - If not found, proceed to the next step.
+           */
+          const { RELEASE_NAME } = process.env;
+          const { owner, repo } = context.repo;
+
+          await github.rest.git.deleteRef({
+            owner: owner,
+            repo: repo,
+            ref: `tags/${RELEASE_NAME}`,
+          }).then((res) => {
+            console.log(`Deleted the previous tag: '${res.id}'`);
+          }).catch((e) => {
+            console.log(`Cannot delete the previous tag: ${e}`);
+          })
+
+    - name: Create the release
+      id: create_release
+      if: ${{ steps.delete_previous_releases.outcome == 'success' }}
+      uses: actions/github-script@v6.3.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        result-encoding: string
+        script: |
+          /*
+           * Create the 'nightly' release.
+           *   - Using 'github-script' because 'create-release' action is no longer maintained.
+           *   - Set the following attributes: Name, CDDL-license, pre-release indication.
+           *   - Output release id. (Usage: "${{ steps.create_release.outputs.result }}")
+           */
+          const { RELEASE_NAME } = process.env;
+          const { LICENSE_BODY } = process.env;
+          const { owner, repo } = context.repo;
+
+          const result = await github.rest.repos.createRelease({
+            owner: owner,
+            repo: repo,
+            name: RELEASE_NAME,
+            tag_name: RELEASE_NAME,
+            body: LICENSE_BODY,
+            generate_release_notes: false,
+            draft: false,
+            prerelease: true,
+          }).catch((e) => {
+            core.setFailed(`Cannot create release '${RELEASE_NAME}': ${e}`);
+          })
+          // Pass release ID to next step.
+          console.log(`Created release '${RELEASE_NAME}': ${result.data.id}`);
+          return `${result.data.id}`;
+
+    - name: Upload artifacts
+      id: upload_artifacts
+      if: ${{ steps.create_release.outcome == 'success' }}
+      uses: actions/github-script@v6.3.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        script: |
+          /*
+           * Upload artifacts to the 'nightly' release.
+           */
+          const fs = require('fs');
+          const path = require('path');
+
+          const { owner, repo } = context.repo;
+          const releaseId = `${{ steps.create_release.outputs.result }}`;
+          const artifacts = process.env.ARTIFACTS.split("\n");
+
+          if (releaseId === 'undefined') {
+            core.setFailed('Release ID is undefined.');
+            return 1;
+          }
+
+          await artifacts.forEach(async artifactPath => {
+            // Skip if the path element is empty.
+            if (artifactPath.trim() === '') {
+              return;
+            }
+            var filename = path.parse(artifactPath).base;
+            await github.rest.repos.uploadReleaseAsset({
+              owner: owner,
+              repo: repo,
+              release_id: releaseId,
+              name: filename,
+              data: await fs.readFileSync(artifactPath)
+            }).then((res) => {
+              console.log(`Uploaded: ${filename} (${artifactPath})`);
+            }).catch((e) => {
+              core.setFailed(`Cannot upload asset '${filename}': ${e}`);
+            })
+          });
