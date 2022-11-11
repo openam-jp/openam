@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openidconnect;
@@ -539,6 +540,10 @@ public class OpenIdConnectClientRegistrationService {
     public JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request)
             throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException {
         if (clientId != null) {
+            if (accessToken == null || accessToken.isEmpty()) {
+                logger.error("ConnectClientRegistration.getClient(): Invalid accessToken");
+                throw new InvalidTokenException();
+            }
             final Client client;
             try {
                 client = clientDAO.read(clientId, request);
@@ -547,7 +552,7 @@ public class OpenIdConnectClientRegistrationService {
                 throw new InvalidClientMetadata();
             }
 
-            if (!client.getAccessToken().equals(accessToken)) {
+            if (client.getAccessToken() == null || !client.getAccessToken().equals(accessToken)) {
                 //client access token doesn't match the access token supplied in the request
                 logger.error("ConnectClientRegistration.getClient(): Invalid accessToken");
                 throw new InvalidTokenException();

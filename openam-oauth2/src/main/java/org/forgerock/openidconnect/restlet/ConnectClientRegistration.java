@@ -14,6 +14,7 @@
  * Copyright 2012-2016 ForgeRock AS.
  *
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2019 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -22,11 +23,13 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
+import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Status;
@@ -111,12 +114,17 @@ public class ConnectClientRegistration extends ServerResource {
 
         final OAuth2Request request = requestFactory.create(getRequest());
         final String clientId = request.getParameter(OAuth2Constants.OAuth2Client.CLIENT_ID);
-        final String accessToken = getRequest().getChallengeResponse().getRawValue();
+        final ChallengeResponse authHeader = getRequest().getChallengeResponse();
+        final String accessToken = authHeader != null ? authHeader.getRawValue() : null;
 
         try {
             final JsonValue registration = clientRegistrationService.getRegistration(clientId, accessToken, request);
 
             return jacksonRepresentationFactory.create(registration.asMap());
+        } catch (InvalidClientMetadata | InvalidTokenException e) {
+            throw new OAuth2RestletException(401, "invalid_token",
+                    "The access token provided is expired, revoked, malformed, "
+                    + "or invalid for other reasons, or the client id provided is invalid.", null);
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }
