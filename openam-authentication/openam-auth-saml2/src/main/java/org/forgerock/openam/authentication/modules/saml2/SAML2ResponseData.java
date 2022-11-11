@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions copyright 2019 Open Source Solution Technology Corporation
 */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -46,7 +47,7 @@ public class SAML2ResponseData {
      * @param responseInfo Response Information pertaining to the authentication.
      */
     public SAML2ResponseData(String sessionIndex, Subject subject, Assertion assertion, ResponseInfo responseInfo) {
-        Reject.ifNull(sessionIndex, subject, assertion, responseInfo);
+        Reject.ifNull(subject, assertion, responseInfo);
 
         this.subject = subject;
         this.assertion = assertion;
