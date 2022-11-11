@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2020-2021 OSSTech Corporation
+ * Portions Copyrighted 2020-2022 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -1078,8 +1078,12 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
     private void addCookieToResponse(HttpServletRequest request, HttpServletResponse response,
             Set<String> cookieDomains, String name, String value, int expire) {
-        for (String domain : cookieDomains) {
-            CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(name, value, expire, "/", domain));
+        if (cookieDomains.isEmpty()) {
+            CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(name, value, expire, "/", null));
+        } else {
+            for (String domain : cookieDomains) {
+                CookieUtils.addCookieToResponse(request, response, CookieUtils.newCookie(name, value, expire, "/", domain));
+            }
         }
     }
 
