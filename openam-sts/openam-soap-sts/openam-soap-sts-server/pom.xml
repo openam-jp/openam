@@ -14,7 +14,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2022 OSSTech Corporation
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
   -->
 
@@ -159,7 +159,7 @@
         <repository>
             <id>restlet-repository</id>
             <name>Restlet Repository</name>
-            <url>http://maven.restlet.com</url>
+            <url>https://maven.restlet.talend.com</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
