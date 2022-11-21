@@ -62,7 +62,6 @@ jobs:
           fi
           if [ "${REPO}" == 'openam' ]; then
             sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" openam/openam-core/pom.xml
-            find ./openam -type f -name 'pom.xml' | xargs sed -ie "s|<url>http://maven.restlet.com|<url>https://maven.restlet.com|g"
           fi
           #----------------------------------------
 
