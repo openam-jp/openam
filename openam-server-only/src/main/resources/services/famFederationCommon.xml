@@ -178,7 +178,7 @@
                         <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#hmac-sha512">http://www.w3.org/2001/04/xmldsig-more#hmac-sha512</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>http://www.w3.org/2000/09/xmldsig#rsa-sha1</Value>
+                        <Value>http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="DigestAlgorithm"
@@ -193,7 +193,7 @@
                         <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#sha384">http://www.w3.org/2001/04/xmldsig-more#sha384</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>http://www.w3.org/2000/09/xmldsig#sha1</Value>
+                        <Value>http://www.w3.org/2001/04/xmlenc#sha256</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="QuerySignatureAlgorithmRSA"
