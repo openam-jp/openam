@@ -32,6 +32,7 @@ public class IdRepoServiceHelper extends AbstractUpgradeHelper {
     private static final String MIN_POOL_SIZE = "sun-idrepo-ldapv3-config-connection_pool_min_size";
     private static final String USER_ATTR = "sun-idrepo-ldapv3-config-user-attributes";
     private static final String USER_OBJECT_CLASS_ATTR = "sun-idrepo-ldapv3-config-user-objectclass";
+    private static final String DN_CACHE_ENABLED = "sun-idrepo-ldapv3-dncache-enabled";
 
     public IdRepoServiceHelper() {
         attributes.add(IdConstants.ID_REPO);
@@ -39,6 +40,7 @@ public class IdRepoServiceHelper extends AbstractUpgradeHelper {
         attributes.add(MIN_POOL_SIZE);
         attributes.add(USER_ATTR);
         attributes.add(USER_OBJECT_CLASS_ATTR);
+        attributes.add(DN_CACHE_ENABLED);
     }
 
     @Override
