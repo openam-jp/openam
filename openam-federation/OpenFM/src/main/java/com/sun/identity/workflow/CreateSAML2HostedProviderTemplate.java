@@ -214,7 +214,7 @@ public class CreateSAML2HostedProviderTemplate {
             "</Value>\n" +
             "        </Attribute>\n" +
             "        <Attribute name=\"" + SAML2Constants.IDP_DISABLE_NAMEID_PERSISTENCE + "\">\n" +
-            "            <Value>false</Value>\n" +
+            "            <Value>true</Value>\n" +
             "        </Attribute>\n" +
             "        <Attribute name=\"" + SAML2Constants.IDP_ATTRIBUTE_MAPPER +
             "\">\n" +
@@ -382,6 +382,9 @@ public class CreateSAML2HostedProviderTemplate {
             "\">\n" +
             "            <Value>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper" +
             "</Value>\n" +
+            "        </Attribute>\n" +
+            "        <Attribute name=\"" + SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO + "\">\n" +
+            "            <Value>true</Value>\n" +
             "        </Attribute>\n" +
             "        <Attribute name=\"" + SAML2Constants.INCLUDE_REQUESTED_AUTHN_CONTEXT + "\">\n" +
             "            <Value>true</Value>\n" +
