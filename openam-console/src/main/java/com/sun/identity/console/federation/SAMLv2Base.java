@@ -94,6 +94,7 @@ public abstract class SAMLv2Base extends EntityPropertiesBase {
         defaultContextNames.add("urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient");
         defaultContextNames.add("urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken");
         defaultContextNames.add("urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified");
+        defaultContextNames.add("urn:federation:authentication:windows");
 
         DEFAULT_AUTH_CONTEXT_REF_NAMES = Collections.unmodifiableList(defaultContextNames);
     }
