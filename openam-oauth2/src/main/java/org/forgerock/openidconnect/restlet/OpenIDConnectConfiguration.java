@@ -30,6 +30,9 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handles requests to the OpenId Connect .well-known endpoint for retrieving OpenId Connect provider configuration.
@@ -69,7 +72,12 @@ public class OpenIDConnectConfiguration extends ServerResource {
         try {
             final OAuth2Request request = requestFactory.create(getRequest());
             final JsonValue configuration = providerConfiguration.getConfiguration(request);
-            return new JsonRepresentation(configuration.asMap());
+            final Map<String, Object> map = configuration.asMap();
+            List<String> list = new ArrayList<String>();
+            list.add("plain");
+            list.add("S256");
+            map.put("code_challenge_methods_supported", list);
+            return new JsonRepresentation(map);
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }
