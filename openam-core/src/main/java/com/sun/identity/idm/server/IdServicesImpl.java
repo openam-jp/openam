@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -2435,6 +2436,12 @@ public class IdServicesImpl implements IdServices {
 
    public Set getSupportedTypes(SSOToken token, String amOrgName)
            throws IdRepoException, SSOException {
+       return getSupportedTypes(token, amOrgName, false);
+   }
+
+   public Set getSupportedTypes(SSOToken token, String amOrgName, boolean jaxrpcFlag)
+           throws IdRepoException, SSOException {
+
        Set unionSupportedTypes = new HashSet();
        Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName);
        if (configuredPluginClasses == null
@@ -2453,6 +2460,25 @@ public class IdServicesImpl implements IdServices {
        // Check if the supportedTypes is defined as supported in
        // the global schema.
        unionSupportedTypes.retainAll(IdUtils.supportedTypes);
+
+       if (jaxrpcFlag) {
+           Set answer = new HashSet();
+           for (Object type : unionSupportedTypes) {
+               try {
+                    checkPermission(token, amOrgName, null, null, IdOperation.READ, (IdType)type);
+                    answer.add(type);
+               } catch (IdRepoException e) {
+                    if(e.getErrorCode() != IdRepoErrorCode.ACCESS_DENIED) {
+                        throw e;
+                    }
+               }
+           }
+           if (answer.size() == 0) {
+               Object[] args = { IdOperation.READ.getName(), token.getPrincipal().getName()  };
+               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ACCESS_DENIED, args);
+           }
+           return answer;
+       }
        return unionSupportedTypes;
    }
 
