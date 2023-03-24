@@ -11,19 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2019-2020 Open Source Solution Technology Corporation
  */
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
-
+import com.webauthn4j.WebAuthnManager;
 import com.webauthn4j.authenticator.Authenticator;
 import com.webauthn4j.authenticator.AuthenticatorImpl;
+import com.webauthn4j.converter.exception.DataConversionException;
 import com.webauthn4j.converter.util.CborConverter;
-import com.webauthn4j.data.WebAuthnAuthenticationContext;
-import com.webauthn4j.data.WebAuthnRegistrationContext;
+import com.webauthn4j.converter.util.ObjectConverter;
+import com.webauthn4j.data.AuthenticationData;
+import com.webauthn4j.data.AuthenticationParameters;
+import com.webauthn4j.data.AuthenticationRequest;
+import com.webauthn4j.data.RegistrationData;
+import com.webauthn4j.data.RegistrationParameters;
+import com.webauthn4j.data.RegistrationRequest;
 import com.webauthn4j.data.attestation.authenticator.AAGUID;
 import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData;
 import com.webauthn4j.data.attestation.authenticator.COSEKey;
@@ -35,10 +46,7 @@ import com.webauthn4j.data.client.challenge.DefaultChallenge;
 import com.webauthn4j.server.ServerProperty;
 import com.webauthn4j.util.ArrayUtil;
 import com.webauthn4j.util.Base64UrlUtil;
-import com.webauthn4j.validator.WebAuthnAuthenticationContextValidationResponse;
-import com.webauthn4j.validator.WebAuthnAuthenticationContextValidator;
-import com.webauthn4j.validator.WebAuthnRegistrationContextValidationResponse;
-import com.webauthn4j.validator.WebAuthnRegistrationContextValidator;
+import com.webauthn4j.validator.exception.ValidationException;
 
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenticator;
 
@@ -46,6 +54,8 @@ import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnAuthenti
  * The Implementation class for WebAuthn Validation using WebAuthn4J.
  */
 public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
+
+    private WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
 
     private Challenge generatedChallenge = new DefaultChallenge();
 
@@ -64,42 +74,58 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
              * flow. This time use webauthn4j library to END
              * START============================.
              */
-            byte[] _attestationObjectBytes = Base64UrlUtil.decode(responseJson.getAttestationObject());
             byte[] _clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
+            byte[] _attestationObjectBytes = Base64UrlUtil.decode(responseJson.getAttestationObject());
+            String _clientExtensionJSON = null;
+            Set<String> _transports = null;
 
             Origin _origin = new Origin(config.getOrigin());
             String _rpId = _origin.getHost();
 
             byte[] _tokenBindingId = null;
+            ServerProperty _serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
 
-            // rp:id = origin
-            ServerProperty serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
+            boolean _userVerificationRequired = config.isVerificationRequired(); 
+            boolean _userPresenceRequired = true; 
+            List<String> _expectedExtensionIds = new ArrayList<String>();
+            _expectedExtensionIds.add("credProtect"); // Because of CTAPv2.1(draft!) Yubikey5 + GoogleChrome return "credProtect" extension when residentkey=true.
 
-            WebAuthnRegistrationContext registrationContext = new WebAuthnRegistrationContext(_clientDataJsonBytes,
-                    _attestationObjectBytes, serverProperty, config.isVerificationRequired());
-            WebAuthnRegistrationContextValidator webAuthnRegistrationContextValidator = WebAuthnRegistrationContextValidator
-                    .createNonStrictRegistrationContextValidator();
-            WebAuthnRegistrationContextValidationResponse response = webAuthnRegistrationContextValidator
-                    .validate(registrationContext);
+            RegistrationRequest _registrationRequest = new RegistrationRequest(_attestationObjectBytes, _clientDataJsonBytes, 
+                    _clientExtensionJSON, _transports);
+            RegistrationParameters _registrationParameters = new RegistrationParameters(_serverProperty, _userVerificationRequired, 
+                    _userPresenceRequired, _expectedExtensionIds);
 
-            // CredentialId <-- AttestedCredentialData <--AuthenticationData
-            // <--AttestationObject
-            byte[] attestedCredentialIdBytes = ArrayUtil.clone(response.getAttestationObject().getAuthenticatorData()
+            RegistrationData _registrationData;
+            try{
+                _registrationData = webAuthnManager.parse(_registrationRequest);
+                webAuthnManager.validate(_registrationData, _registrationParameters);
+            } catch (DataConversionException e){
+                // If you would like to handle WebAuthn data structure parse error, please catch DataConversionException
+                throw e;
+            } catch (ValidationException e){
+                // If you would like to handle WebAuthn data validation error, please catch ValidationException
+                throw e;
+            }
+
+            // CredentialId = RegistrationData --> AttestationObject --> AuthenticatorData -->
+            //    AttstedCredentialData --> CredentialId
+            byte[] _attestedCredentialIdBytes = ArrayUtil.clone(_registrationData.getAttestationObject().getAuthenticatorData()
                     .getAttestedCredentialData().getCredentialId());
 
-            // COSEKey <-- AttestedCredentialData <--AuthenticationData
-            // <--AttestationObject
-            COSEKey coseKey = response.getAttestationObject().getAuthenticatorData()
+            // COSEKey = RegistrationData --> AttestationObject --> AuthenticatorData -->
+            //    AttstedCredentialData --> COSEKey
+            COSEKey _coseKey = _registrationData.getAttestationObject().getAuthenticatorData()
                     .getAttestedCredentialData().getCOSEKey();
 
-            // Counter <--AuthenticationData <--AttestationObject
-            long attestedCounter = response.getAttestationObject().getAuthenticatorData().getSignCount();
+            // Counter = RegistrationData --> AttestationObject --> AuthenticatorData --> Counter
+            long _attestedCounter = _registrationData.getAttestationObject().getAuthenticatorData().getSignCount();
 
-            CborConverter _cborConverter = new CborConverter();
+            ObjectConverter _objectConverter = new ObjectConverter();
+            CborConverter _cborConverter = _objectConverter.getCborConverter();
             WebAuthnAuthenticator amAuthenticator = new WebAuthnAuthenticator(
-                    Base64UrlUtil.encodeToString(attestedCredentialIdBytes),
-                    _cborConverter.writeValueAsBytes(coseKey),
-                    new Long(attestedCounter), userHandleIdBytes);
+                    Base64UrlUtil.encodeToString(_attestedCredentialIdBytes),
+                    _cborConverter.writeValueAsBytes(_coseKey),
+                    new Long(_attestedCounter), userHandleIdBytes);
 
             return amAuthenticator;
 
@@ -120,43 +146,71 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
              * flow. Use webauthn4j library to END
              * START============================.
              */
-            byte[] rawIdBytes = Base64UrlUtil.decode(responseJson.getRawId());
-            byte[] authenticatorDataBytes = Base64UrlUtil.decode(responseJson.getAuthenticatorData());
-            byte[] clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
-            byte[] signatureBytes = Base64UrlUtil.decode(responseJson.getSignature());
+            byte[] _rawId = Base64UrlUtil.decode(responseJson.getRawId());
+            byte[] _userHandle = Base64UrlUtil.decode(responseJson.getUserHandle());
+            byte[] _authenticatorDataBytes = Base64UrlUtil.decode(responseJson.getAuthenticatorData());
+            byte[] _clientDataJsonBytes = Base64UrlUtil.decode(responseJson.getClientDataJSON());
+            String _clientExtensionJSON = null;
+            byte[] _signatureBytes = Base64UrlUtil.decode(responseJson.getSignature());
 
             Origin _origin = new Origin(config.getOrigin());
             String _rpId = _origin.getHost();
-            byte[] _tokenBindingId = null; /* now set tokenBindingId null */
-            ServerProperty serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
+            byte[] _tokenBindingId = null; 
+            ServerProperty _serverProperty = new ServerProperty(_origin, _rpId, generatedChallenge, _tokenBindingId);
 
-            WebAuthnAuthenticationContext authenticationContext = new WebAuthnAuthenticationContext(rawIdBytes,
-                    clientDataJsonBytes, authenticatorDataBytes, signatureBytes, serverProperty,
-                    config.isVerificationRequired());
+            boolean _userVerificationRequired = config.isVerificationRequired(); 
+            boolean _userPresenceRequired = true; 
+            List<String> _expectedExtensionIds = Collections.emptyList(); //OpenAM desn't use extension now.
 
             // OpenAM didn't store aaguid now. Use ZERO AAGUID.
             AAGUID _aaguid = AAGUID.ZERO;
 
             //credentialPublicKey was stored as COSEKey byte[] data at registration time.
-            CborConverter _cborConverter = new CborConverter();
-            COSEKey coseKey =
+            ObjectConverter _objectConverter = new ObjectConverter();
+            CborConverter _cborConverter = _objectConverter.getCborConverter();
+            COSEKey _coseKey =
                     _cborConverter.readValue(amAuthenticator.getPublicKey(), COSEKey.class);
 
-            final AttestedCredentialData storedAttestedCredentialData =
+            final AttestedCredentialData _storedAttestedCredentialData =
                     new AttestedCredentialData(_aaguid,
-                            Base64UrlUtil.decode(amAuthenticator.getCredentialID()), coseKey);
-            final AttestationStatement noneAttestationStatement = new NoneAttestationStatement();
-            final long storedCounter = amAuthenticator.getSignCount();
-            Authenticator authenticator = new AuthenticatorImpl(storedAttestedCredentialData,
-                    noneAttestationStatement, storedCounter);
+                            Base64UrlUtil.decode(amAuthenticator.getCredentialID()), _coseKey);
+            final AttestationStatement _noneAttestationStatement = new NoneAttestationStatement();
+            final long _storedCounter = amAuthenticator.getSignCount();
+            Authenticator _authenticator = new AuthenticatorImpl(_storedAttestedCredentialData,
+                    _noneAttestationStatement, _storedCounter);
 
-            WebAuthnAuthenticationContextValidator webAuthnAuthenticationContextValidator = new WebAuthnAuthenticationContextValidator();
+            AuthenticationRequest _authenticationRequest =
+                    new AuthenticationRequest(
+                            _rawId,
+                            _userHandle,
+                            _authenticatorDataBytes,
+                            _clientDataJsonBytes,
+                            _clientExtensionJSON,
+                            _signatureBytes
+                    );
+            AuthenticationParameters _authenticationParameters =
+                    new AuthenticationParameters(
+                            _serverProperty,
+                            _authenticator,
+                            _userVerificationRequired,
+                            _userPresenceRequired,
+                            _expectedExtensionIds
+                    );
 
-            WebAuthnAuthenticationContextValidationResponse response = webAuthnAuthenticationContextValidator
-                    .validate(authenticationContext, authenticator);
+            AuthenticationData _authenticationData;
+            try{
+                _authenticationData = webAuthnManager.parse(_authenticationRequest);
+                webAuthnManager.validate(_authenticationData, _authenticationParameters);
+            } catch (DataConversionException e){
+                // If you would like to handle WebAuthn data structure parse error, please catch DataConversionException
+                throw e;
+            } catch (ValidationException e){
+                // If you would like to handle WebAuthn data validation error, please catch ValidationException
+                throw e;
+            }
 
-            // Update counter
-            amAuthenticator.setSignCount(response.getAuthenticatorData().getSignCount());
+            // Update Counter = AuthenticationData --> AuthenticatorData --> Counter
+            amAuthenticator.setSignCount(_authenticationData.getAuthenticatorData().getSignCount());
 
         } catch (Exception ex) {
             debug.error("WebAuthnValidator.validateGetResponse : Error validating response. User handle is {}",
