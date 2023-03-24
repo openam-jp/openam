@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.remote;
@@ -658,6 +659,11 @@ public class IdRemoteServicesImpl implements IdServices {
         return results;
     }
 
+    public Set getSupportedOperations(SSOToken token, IdType type,
+            String amOrgName, boolean jaxrpcFlag) throws IdRepoException, SSOException {
+        return getSupportedOperations(token, type, amOrgName);
+    }
+
     public Set getSupportedTypes(SSOToken token, String amOrgName)
             throws IdRepoException, SSOException {
 
@@ -682,6 +688,11 @@ public class IdRemoteServicesImpl implements IdServices {
         }
 
         return results;
+    }
+
+    public Set getSupportedTypes(SSOToken token, String amOrgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException {
+        return getSupportedTypes(token, amOrgName);
     }
 
     public boolean isExists(SSOToken token, IdType type, String name,
@@ -783,6 +794,11 @@ public class IdRemoteServicesImpl implements IdServices {
         return (answer);
     }
 
+    public Set getFullyQualifiedNames(SSOToken token, IdType type,
+        String name, String org, boolean jaxrpcFlag) throws IdRepoException, SSOException {
+            return getFullyQualifiedNames(token, type, name, org);
+    }
+
     private IdSearchResults mapToIdSearchResults(SSOToken token, IdType type,
             String orgName, Map m) throws IdRepoException {
         IdSearchResults results = new IdSearchResults(type, orgName);
@@ -845,5 +861,14 @@ public class IdRemoteServicesImpl implements IdServices {
         }
 
         return mapToIdSearchResults(token, type, orgName, res);
+    }
+
+    public IdSearchResults getSpecialIdentities(
+        SSOToken token,
+        IdType type,
+        String orgName,
+        boolean jaxrpcFlag
+    ) throws IdRepoException, SSOException {
+        return getSpecialIdentities(token, type, orgName);
     }
 }

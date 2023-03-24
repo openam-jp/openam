@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -160,13 +161,37 @@ public class IdServicesImpl implements IdServices {
     * @throws IdRepoException If there are repository related error conditions
     * @throws SSOException If identity's single sign on token is invalid
     */
+    public Set getFullyQualifiedNames(SSOToken token,
+        IdType type, String name, String orgName)
+        throws IdRepoException, SSOException {
+            return getFullyQualifiedNames(token, type, name, orgName, false);
+    }
+
+   /**
+    * Returns the set of fully qualified names for the identity.
+    * The fully qualified names would be unique for a given datastore.
+    *
+    * @param token SSOToken that can be used by the datastore
+    *     to determine the fully qualified name
+    * @param type type of the identity
+    * @param name name of the identity
+    * @param jaxrpcFlag Call from DirectoryManagerIF
+    *
+    * @return fully qualified names for the identity
+    * @throws IdRepoException If there are repository related error conditions
+    * @throws SSOException If identity's single sign on token is invalid
+    */
    public Set getFullyQualifiedNames(SSOToken token,
-       IdType type, String name, String orgName)
+       IdType type, String name, String orgName, boolean jaxrpcFlag)
        throws IdRepoException, SSOException {
        if (DEBUG.messageEnabled()) {
            DEBUG.message("IdServicesImpl::getFullyQualifiedNames " +
                "called for type: " + type + " name: " + name +
                " org: " + orgName);
+       }
+
+       if (jaxrpcFlag) {
+           checkPermission(token, orgName, name, null, IdOperation.READ, type);
        }
 
        // Get IdRepo plugins
@@ -1606,9 +1631,18 @@ public class IdServicesImpl implements IdServices {
     }
 
     public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
-           String orgName) throws IdRepoException, SSOException {
+        String orgName) throws IdRepoException, SSOException {
+            return  getSpecialIdentities(token, type, orgName, false);
+    }
+
+    public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
+           String orgName, boolean jaxrpcFlag) throws IdRepoException, SSOException {
 
        Set pluginClasses = new OrderedSet();
+
+       if (jaxrpcFlag) {
+            checkPermission(token, orgName, null, null, IdOperation.READ, type);
+       }
 
        if (ServiceManager.isConfigMigratedTo70()
            && ServiceManager.getBaseDN().equalsIgnoreCase(orgName)) {
@@ -2435,6 +2469,12 @@ public class IdServicesImpl implements IdServices {
 
    public Set getSupportedTypes(SSOToken token, String amOrgName)
            throws IdRepoException, SSOException {
+       return getSupportedTypes(token, amOrgName, false);
+   }
+
+   public Set getSupportedTypes(SSOToken token, String amOrgName, boolean jaxrpcFlag)
+           throws IdRepoException, SSOException {
+
        Set unionSupportedTypes = new HashSet();
        Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName);
        if (configuredPluginClasses == null
@@ -2453,11 +2493,39 @@ public class IdServicesImpl implements IdServices {
        // Check if the supportedTypes is defined as supported in
        // the global schema.
        unionSupportedTypes.retainAll(IdUtils.supportedTypes);
+
+       if (jaxrpcFlag) {
+           Set answer = new HashSet();
+           for (Object type : unionSupportedTypes) {
+               try {
+                    checkPermission(token, amOrgName, null, null, IdOperation.READ, (IdType)type);
+                    answer.add(type);
+               } catch (IdRepoException e) {
+                    if(e.getErrorCode() != IdRepoErrorCode.ACCESS_DENIED) {
+                        throw e;
+                    }
+               }
+           }
+           if (answer.size() == 0) {
+               Object[] args = { IdOperation.READ.getName(), token.getPrincipal().getName()  };
+               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, IdRepoErrorCode.ACCESS_DENIED, args);
+           }
+           return answer;
+       }
        return unionSupportedTypes;
    }
 
    public Set getSupportedOperations(SSOToken token, IdType type,
            String amOrgName) throws IdRepoException, SSOException {
+       return getSupportedOperations(token, type, amOrgName, false);
+   }
+
+   public Set getSupportedOperations(SSOToken token, IdType type,
+           String amOrgName, boolean jaxrpcFlag) throws IdRepoException, SSOException {
+
+       if (jaxrpcFlag) {
+            checkPermission(token, amOrgName, null, null, IdOperation.READ, type);
+       }
 
        // First get the list of plugins that support the create operation.
        Set unionSupportedOps = new HashSet();

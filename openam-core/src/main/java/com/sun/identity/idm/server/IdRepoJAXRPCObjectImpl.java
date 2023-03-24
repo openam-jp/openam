@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -437,7 +438,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SSOToken ssoToken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
         Set opSet = idServices
-            .getSupportedOperations(ssoToken, idtype, amOrgName);
+            .getSupportedOperations(ssoToken, idtype, amOrgName, true);
         Set resSet = new HashSet();
         if (opSet != null) {
             Iterator it = opSet.iterator();
@@ -453,7 +454,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     public Set getSupportedTypes_idrepo(String token, String amOrgName)
         throws RemoteException, IdRepoException, SSOException {
         SSOToken ssoToken = getSSOToken(token);
-        Set typeSet = idServices.getSupportedTypes(ssoToken, amOrgName);
+        Set typeSet = idServices.getSupportedTypes(ssoToken, amOrgName, true);
         Set resTypes = new HashSet();
         if (typeSet != null) {
             Iterator it = typeSet.iterator();
@@ -472,7 +473,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SSOToken stoken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
         Set opSet = idServices.getFullyQualifiedNames(stoken, idtype,
-                name, amOrgName);
+                name, amOrgName, true);
         Set resSet = null;
         if (opSet != null) {
             // Convert CaseInsensitiveHashSet to HashSet
@@ -817,7 +818,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
          SSOToken ssoToken = getSSOToken(token);
          IdType idtype = IdUtils.getType(type);
          IdSearchResults result = idServices.getSpecialIdentities(
-             ssoToken, idtype, amOrgName);
+             ssoToken, idtype, amOrgName, true);
          return IdSearchResultsToMap(result);
      }
 
