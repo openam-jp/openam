@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -1606,9 +1607,18 @@ public class IdServicesImpl implements IdServices {
     }
 
     public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
-           String orgName) throws IdRepoException, SSOException {
+        String orgName) throws IdRepoException, SSOException {
+            return  getSpecialIdentities(token, type, orgName, false);
+    }
+
+    public IdSearchResults getSpecialIdentities(SSOToken token, IdType type,
+           String orgName, boolean jaxrpcFlag) throws IdRepoException, SSOException {
 
        Set pluginClasses = new OrderedSet();
+
+       if (jaxrpcFlag) {
+            checkPermission(token, orgName, null, null, IdOperation.READ, type);
+       }
 
        if (ServiceManager.isConfigMigratedTo70()
            && ServiceManager.getBaseDN().equalsIgnoreCase(orgName)) {

@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -817,7 +818,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
          SSOToken ssoToken = getSSOToken(token);
          IdType idtype = IdUtils.getType(type);
          IdSearchResults result = idServices.getSpecialIdentities(
-             ssoToken, idtype, amOrgName);
+             ssoToken, idtype, amOrgName, true);
          return IdSearchResultsToMap(result);
      }
 
