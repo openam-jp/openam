@@ -284,6 +284,12 @@ public class IdServicesDecorator implements IdServices {
         return delegate.getSupportedOperations(token, type, amOrgName);
     }
 
+    @Override
+    public Set getSupportedOperations(SSOToken token, IdType type, String amOrgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException {
+        return delegate.getSupportedOperations(token, type, amOrgName, jaxrpcFlag);
+    }
+
     /**
      * {@inheritDoc}
      */

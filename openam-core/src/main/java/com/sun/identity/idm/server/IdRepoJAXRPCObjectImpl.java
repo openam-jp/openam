@@ -438,7 +438,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SSOToken ssoToken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
         Set opSet = idServices
-            .getSupportedOperations(ssoToken, idtype, amOrgName);
+            .getSupportedOperations(ssoToken, idtype, amOrgName, true);
         Set resSet = new HashSet();
         if (opSet != null) {
             Iterator it = opSet.iterator();

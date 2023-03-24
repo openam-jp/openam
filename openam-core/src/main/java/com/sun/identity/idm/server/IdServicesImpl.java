@@ -2492,6 +2492,15 @@ public class IdServicesImpl implements IdServices {
 
    public Set getSupportedOperations(SSOToken token, IdType type,
            String amOrgName) throws IdRepoException, SSOException {
+       return getSupportedOperations(token, type, amOrgName, false);
+   }
+
+   public Set getSupportedOperations(SSOToken token, IdType type,
+           String amOrgName, boolean jaxrpcFlag) throws IdRepoException, SSOException {
+
+       if (jaxrpcFlag) {
+            checkPermission(token, amOrgName, null, null, IdOperation.READ, type);
+       }
 
        // First get the list of plugins that support the create operation.
        Set unionSupportedOps = new HashSet();

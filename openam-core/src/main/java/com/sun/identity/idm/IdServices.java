@@ -201,6 +201,9 @@ public interface IdServices {
     public Set getSupportedOperations(SSOToken token, IdType type,
             String amOrgName) throws IdRepoException, SSOException;
 
+    public Set getSupportedOperations(SSOToken token, IdType type,
+            String amOrgName, boolean jaxrpcFlag) throws IdRepoException, SSOException;
+
     public void clearIdRepoPlugins();
 
     public void clearIdRepoPlugins(String orgName, String serviceComponent,
