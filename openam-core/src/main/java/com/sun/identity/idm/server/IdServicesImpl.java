@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -160,13 +161,37 @@ public class IdServicesImpl implements IdServices {
     * @throws IdRepoException If there are repository related error conditions
     * @throws SSOException If identity's single sign on token is invalid
     */
+    public Set getFullyQualifiedNames(SSOToken token,
+        IdType type, String name, String orgName)
+        throws IdRepoException, SSOException {
+            return getFullyQualifiedNames(token, type, name, orgName, false);
+    }
+
+   /**
+    * Returns the set of fully qualified names for the identity.
+    * The fully qualified names would be unique for a given datastore.
+    *
+    * @param token SSOToken that can be used by the datastore
+    *     to determine the fully qualified name
+    * @param type type of the identity
+    * @param name name of the identity
+    * @param jaxrpcFlag Call from DirectoryManagerIF
+    *
+    * @return fully qualified names for the identity
+    * @throws IdRepoException If there are repository related error conditions
+    * @throws SSOException If identity's single sign on token is invalid
+    */
    public Set getFullyQualifiedNames(SSOToken token,
-       IdType type, String name, String orgName)
+       IdType type, String name, String orgName, boolean jaxrpcFlag)
        throws IdRepoException, SSOException {
        if (DEBUG.messageEnabled()) {
            DEBUG.message("IdServicesImpl::getFullyQualifiedNames " +
                "called for type: " + type + " name: " + name +
                " org: " + orgName);
+       }
+
+       if (jaxrpcFlag) {
+           checkPermission(token, orgName, name, null, IdOperation.READ, type);
        }
 
        // Get IdRepo plugins

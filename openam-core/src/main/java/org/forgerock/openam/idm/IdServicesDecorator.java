@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.idm;
@@ -322,6 +323,13 @@ public class IdServicesDecorator implements IdServices {
     public Set getFullyQualifiedNames(SSOToken token, IdType type, String name, String orgName)
             throws IdRepoException, SSOException {
         return delegate.getFullyQualifiedNames(token, type, name, orgName);
+    }
+
+
+    @Override
+    public Set getFullyQualifiedNames(SSOToken token, IdType type, String name, String orgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException {
+        return delegate.getFullyQualifiedNames(token, type, name, orgName, jaxrpcFlag);
     }
 
     /**
