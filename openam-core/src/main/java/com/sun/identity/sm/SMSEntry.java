@@ -25,6 +25,7 @@
  * $Id: SMSEntry.java,v 1.53 2009/12/07 19:46:47 veiming Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.sm;
@@ -1035,9 +1036,44 @@ public class SMSEntry implements Cloneable {
     public static Set<String> search(SSOToken token, String dn, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder) throws SMSException {
+            return search(token, dn, filter, numOfEntries, timeLimit, sortResults, ascendingOrder, false);
+    }
+
+    /**
+     * Returns the DNs that match the filter. The search is performed from the
+     * root suffix ie., DN. It searchs for SMS objects only.
+     *
+     * @param token Single-Sign On token.
+     * @param dn Base DN
+     * @param filter Search Filter.
+     * @param numOfEntries number of max entries, 0 means unlimited
+     * @param timeLimit maximum number of seconds for the search to spend, 0
+     * means unlimited
+     * @param sortResults <code>true</code> to have result sorted.
+     * @param ascendingOrder <code>true</code> to have result sorted in
+     * ascending order.
+     * @param jaxrpcFlag Call from SMSObjectIF.
+     */
+    public static Set<String> search(SSOToken token, String dn, String filter,
+        int numOfEntries, int timeLimit, boolean sortResults,
+        boolean ascendingOrder, boolean jaxrpcFlag) throws SMSException {
+        if (jaxrpcFlag) {
+            getDelegationPermission(token, dn, readActionSet);
+        }
+
         try {
-            return smsObject.search(token, dn, filter, numOfEntries, timeLimit,
-                sortResults, ascendingOrder);
+            Set<String> searchEntries = smsObject.search(token, dn, filter, numOfEntries,
+                timeLimit, sortResults, ascendingOrder);
+            if (jaxrpcFlag) {
+                Set<String> answer = new OrderedSet();
+                for (String searchEntry : searchEntries) {
+                    if (hasReadPermission(token, searchEntry)) {
+                        answer.add(searchEntry);
+                    }
+                }
+                return answer;
+            }
+            return searchEntries;
         } catch (SSOException ssoe) {
             debug.error("SMSEntry: Search ERROR: " + filter, ssoe);
             throw new SMSException(bundle.getString("sms-error-in-searching"),
@@ -1065,9 +1101,50 @@ public class SMSEntry implements Cloneable {
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder, Set exclude)
         throws SMSException {
+            return search(token, dn, filter, numOfEntries, timeLimit, sortResults,
+                ascendingOrder, exclude, false);
+    }
+
+    /**
+     * Returns the DNs and its attribute values that match the filter. The
+     * search is performed from the root suffix ie., DN. It searchs for SMS
+     * objects only.
+     *
+     * @param token Single-Sign On token.
+     * @param dn Base DN
+     * @param filter Search Filter.
+     * @param numOfEntries number of max entries, 0 means unlimited
+     * @param timeLimit maximum number of seconds for the search to spend, 0
+     *     means unlimited
+     * @param sortResults <code>true</code> to have result sorted.
+     * @param ascendingOrder <code>true</code> to have result sorted in
+     *     ascending order.
+     * @param exclude List of DN to exclude.
+     * @param jaxrpcFlag Call from SMSObjectIF.
+     */
+    public static Iterator search(SSOToken token, String dn, String filter,
+        int numOfEntries, int timeLimit, boolean sortResults,
+        boolean ascendingOrder, Set exclude, boolean jaxrpcFlag)
+        throws SMSException {
+        if (jaxrpcFlag) {
+            getDelegationPermission(token, dn, readActionSet);
+        }
+
         try {
-            return smsObject.search(token, dn, filter, numOfEntries, timeLimit,
+            Iterator searchEntries = smsObject.search(token, dn, filter, numOfEntries, timeLimit,
                 sortResults, ascendingOrder, exclude);
+            if (jaxrpcFlag) {
+                ArrayList<SMSDataEntry> answer = new ArrayList<SMSDataEntry>();
+                while (searchEntries.hasNext()) {
+                    SMSDataEntry searchEntry = ((SMSDataEntry) searchEntries.next());
+                    String checkDN = searchEntry.getDN();
+                    if (hasReadPermission(token, checkDN)) {
+                        answer.add(searchEntry);
+                    }
+                }
+                return answer.iterator();
+            }
+            return searchEntries;
         } catch (SSOException ssoe) {
             debug.error("SMSEntry: Search ERROR: " + filter, ssoe);
             throw new SMSException(bundle.getString("sms-error-in-searching"),
