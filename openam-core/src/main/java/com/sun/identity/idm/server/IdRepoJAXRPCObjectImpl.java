@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.server;
@@ -472,7 +473,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         SSOToken stoken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
         Set opSet = idServices.getFullyQualifiedNames(stoken, idtype,
-                name, amOrgName);
+                name, amOrgName, true);
         Set resSet = null;
         if (opSet != null) {
             // Convert CaseInsensitiveHashSet to HashSet
