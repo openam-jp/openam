@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package org.forgerock.openam.idm;
@@ -281,6 +282,12 @@ public class IdServicesDecorator implements IdServices {
     public Set getSupportedOperations(SSOToken token, IdType type, String amOrgName)
             throws IdRepoException, SSOException {
         return delegate.getSupportedOperations(token, type, amOrgName);
+    }
+
+    @Override
+    public Set getSupportedOperations(SSOToken token, IdType type, String amOrgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException {
+        return delegate.getSupportedOperations(token, type, amOrgName, jaxrpcFlag);
     }
 
     /**

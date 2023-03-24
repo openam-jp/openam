@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm.remote;
@@ -656,6 +657,11 @@ public class IdRemoteServicesImpl implements IdServices {
         }
 
         return results;
+    }
+
+    public Set getSupportedOperations(SSOToken token, IdType type,
+            String amOrgName, boolean jaxrpcFlag) throws IdRepoException, SSOException {
+        return getSupportedOperations(token, type, amOrgName);
     }
 
     public Set getSupportedTypes(SSOToken token, String amOrgName)

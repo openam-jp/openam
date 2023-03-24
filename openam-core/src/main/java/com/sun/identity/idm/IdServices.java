@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.idm;
@@ -199,6 +200,9 @@ public interface IdServices {
 
     public Set getSupportedOperations(SSOToken token, IdType type,
             String amOrgName) throws IdRepoException, SSOException;
+
+    public Set getSupportedOperations(SSOToken token, IdType type,
+            String amOrgName, boolean jaxrpcFlag) throws IdRepoException, SSOException;
 
     public void clearIdRepoPlugins();
 
