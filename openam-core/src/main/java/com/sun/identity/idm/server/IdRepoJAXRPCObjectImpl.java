@@ -818,7 +818,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
          SSOToken ssoToken = getSSOToken(token);
          IdType idtype = IdUtils.getType(type);
          IdSearchResults result = idServices.getSpecialIdentities(
-             ssoToken, idtype, amOrgName);
+             ssoToken, idtype, amOrgName, true);
          return IdSearchResultsToMap(result);
      }
 

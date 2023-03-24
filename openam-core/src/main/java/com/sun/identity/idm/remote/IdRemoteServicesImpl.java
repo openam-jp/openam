@@ -852,4 +852,13 @@ public class IdRemoteServicesImpl implements IdServices {
 
         return mapToIdSearchResults(token, type, orgName, res);
     }
+
+    public IdSearchResults getSpecialIdentities(
+        SSOToken token,
+        IdType type,
+        String orgName,
+        boolean jaxrpcFlag
+    ) throws IdRepoException, SSOException {
+        return getSpecialIdentities(token, type, orgName);
+    }
 }

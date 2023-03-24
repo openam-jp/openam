@@ -342,6 +342,12 @@ public class IdServicesDecorator implements IdServices {
     }
 
     @Override
+    public IdSearchResults getSpecialIdentities(SSOToken token, IdType type, String orgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException {
+        return delegate.getSpecialIdentities(token, type, orgName, jaxrpcFlag);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof IdServicesDecorator)) return false;
