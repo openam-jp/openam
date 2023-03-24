@@ -25,6 +25,7 @@
  * $Id: SMSJAXRPCObjectImpl.java,v 1.22 2009/10/28 04:24:27 hengming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -344,7 +345,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
                     + " filter: " + filter);
         }
         return (SMSEntry.search(getToken(tokenID), startDN, filter, 0, 0,
-            false, false));
+            false, false, true));
     }     
 
     /**
@@ -360,7 +361,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
                     + " filter: " + filter);
         }
         return (SMSEntry.search(getToken(tokenID), startDN, filter,
-            numOfEntries, timeLimit, sortResults, ascendingOrder));
+            numOfEntries, timeLimit, sortResults, ascendingOrder, true));
     }
 
     /**
@@ -377,7 +378,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         }
         
         Iterator i = SMSEntry.search(getToken(tokenID), startDN, filter,
-            numOfEntries, timeLimit, sortResults, ascendingOrder, excludes);
+            numOfEntries, timeLimit, sortResults, ascendingOrder, excludes, true);
         
         Set<String> result = new HashSet<String>();
         
