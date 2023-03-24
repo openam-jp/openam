@@ -25,6 +25,7 @@
  * $Id: SMSJAXRPCObjectImpl.java,v 1.22 2009/10/28 04:24:27 hengming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -461,7 +462,14 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
                 validatorClass + " Values: " + values);
         }
         try {
+            SSOToken ssoToken = getToken(token);
+            if( ssoToken == null ){
+                throw new SMSException("sms-validator_invalid_session");
+            }
             Class clazz = Class.forName(validatorClass);
+            if( !ServiceAttributeValidator.class.isAssignableFrom(clazz) ){
+                throw new SMSException("sms-validator_invalid_class");
+            }
             ServiceAttributeValidator v = (ServiceAttributeValidator) clazz.newInstance();
             return v.validate(values);
         } catch (InstantiationException ex) {
