@@ -12,7 +12,9 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
  */
+
 package org.forgerock.openam.radius.server.config;
 
 import java.io.PrintWriter;
@@ -125,8 +127,6 @@ public class RadiusServiceConfig {
                     + c.getIpaddr()
                     + "="
                     + c.getName()
-                    + ", "
-                    + c.getSecret()
                     + ", "
                     + c.isLogPackets()
                     + ", "
