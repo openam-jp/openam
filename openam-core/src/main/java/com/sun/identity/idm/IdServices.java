@@ -198,6 +198,9 @@ public interface IdServices {
     public Set getSupportedTypes(SSOToken token, String amOrgName)
             throws IdRepoException, SSOException;
 
+    public Set getSupportedTypes(SSOToken token, String amOrgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException;
+
     public Set getSupportedOperations(SSOToken token, IdType type,
             String amOrgName) throws IdRepoException, SSOException;
 

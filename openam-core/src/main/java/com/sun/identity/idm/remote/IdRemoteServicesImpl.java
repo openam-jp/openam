@@ -690,6 +690,11 @@ public class IdRemoteServicesImpl implements IdServices {
         return results;
     }
 
+    public Set getSupportedTypes(SSOToken token, String amOrgName, boolean jaxrpcFlag)
+            throws IdRepoException, SSOException {
+        return getSupportedTypes(token, amOrgName);
+    }
+
     public boolean isExists(SSOToken token, IdType type, String name,
         String amOrgName) throws SSOException, IdRepoException
     {

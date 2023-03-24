@@ -454,7 +454,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     public Set getSupportedTypes_idrepo(String token, String amOrgName)
         throws RemoteException, IdRepoException, SSOException {
         SSOToken ssoToken = getSSOToken(token);
-        Set typeSet = idServices.getSupportedTypes(ssoToken, amOrgName);
+        Set typeSet = idServices.getSupportedTypes(ssoToken, amOrgName, true);
         Set resTypes = new HashSet();
         if (typeSet != null) {
             Iterator it = typeSet.iterator();
