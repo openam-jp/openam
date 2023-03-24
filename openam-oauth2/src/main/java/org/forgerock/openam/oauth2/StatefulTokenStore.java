@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2023 OSSTech Corporation
  */
 package org.forgerock.openam.oauth2;
 
@@ -31,6 +31,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -961,13 +962,20 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         }
 
         try {
-            JsonValue token = tokenStore.query(equalTo(CoreTokenField.STRING_FOURTEEN, userCode));
+            JsonValue tokens = tokenStore.query(equalTo(CoreTokenField.STRING_FOURTEEN, userCode));
 
-            if (token.size() != 1) {
+            Set<DeviceCode> deviceCodes = new HashSet<DeviceCode>();
+            for (Object t : tokens.asSet()) {
+                DeviceCode dc = new DeviceCode(json(t));
+                if (userCode.equals(dc.getUserCode())) {
+                    deviceCodes.add(dc);
+                }
+            }
+            if (deviceCodes.size() != 1) {
                 throw new InvalidGrantException();
             }
 
-            DeviceCode deviceCode = new DeviceCode(json(token.asSet().iterator().next()));
+            DeviceCode deviceCode = deviceCodes.iterator().next();
             request.setToken(DeviceCode.class, deviceCode);
             return deviceCode;
         } catch (CoreTokenException e) {
