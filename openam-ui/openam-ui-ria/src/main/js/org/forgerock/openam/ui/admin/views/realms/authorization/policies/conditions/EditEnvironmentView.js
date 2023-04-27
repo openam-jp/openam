@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2023 OSSTech Corporation
  */
 
 define([
@@ -46,6 +46,7 @@ define([
             }
         },
         SCRIPT_RESOURCE: "Script",
+        MEMBERSHIP_RESOURCE: "AMIdentityMembership",
 
         render (schema, element, itemID, itemData, callback) {
             var self = this,
@@ -76,6 +77,9 @@ define([
                         hiddenData[itemData.type] = itemData.scriptId;
                         self.$el.data("hiddenData", hiddenData);
                     }
+                    if (itemData.type === self.MEMBERSHIP_RESOURCE) {
+                        self.$el.data("hiddenData", self.getUIDsFromUniversalValues(itemData.amIdentityName));
+                    }
 
                     self.$el.data("itemData", itemData);
                     self.$el.find("select.type-selection:first").val(itemData.type).trigger("change");
@@ -97,6 +101,7 @@ define([
                 itemData = item.data().itemData,
                 hiddenData = item.data().hiddenData,
                 mergedData = _.merge({}, itemData, hiddenData),
+                list,
                 type;
 
             item.focus(); //  Required to trigger changeInput.
@@ -121,6 +126,15 @@ define([
                         } else if (type === "SimpleTime" && (key === "startDay" || key === "endDay")) {
                             itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] =
                                 $.t(`console.authorization.common.weekdays.${val}.short`);
+                        } else if (type === self.MEMBERSHIP_RESOURCE) {
+                            // Do not display the amIdentityNames, but display the merged hidden data instead.
+                            if (key !== "amIdentityName") {
+                                list = "";
+                                _.forOwn(val, function (prop) {
+                                    list += `${prop} `;
+                                });
+                                itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = list;
+                            }
                         } else {
                             itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = val;
                         }
@@ -161,6 +175,9 @@ define([
             } else {
                 itemData = self.setDefaultJsonValues(schema);
                 self.$el.data("itemData", itemData);
+                if (itemData.type === self.MEMBERSHIP_RESOURCE) {
+                    hiddenData = { "users": {}, "groups": {} };
+                }
                 self.$el.data("hiddenData", hiddenData);
             }
 
@@ -261,6 +278,18 @@ define([
                 } else {
                     buildScriptAttr();
                 }
+            } else if (schema.title === self.MEMBERSHIP_RESOURCE) {
+                attributesWrapper = '<div class="no-float"></div>';
+                _.each(["users", "groups"], function (identityType) {
+                    new ArrayAttr().render({
+                        itemData,
+                        hiddenData,
+                        data: hiddenData[identityType],
+                        title: identityType,
+                        i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + identityType,
+                        dataSource: identityType
+                    }, itemDataEl, htmlBuiltPromise.resolve);
+                });
             } else {
                 attributesWrapper = '<div class="no-float"></div>';
 
@@ -351,6 +380,23 @@ define([
             });
 
             return itemData;
+        },
+
+        getUIDsFromUniversalValues (values) {
+            var returnObj = { users: {}, groups: {} },
+                endIndex = -1,
+                startIndex = String("id=").length;
+
+            _.each(values, function (universalid) {
+                endIndex = universalid.indexOf(",ou=");
+                if (universalid.indexOf(",ou=user") > -1) {
+                    returnObj.users[universalid] = universalid.substring(startIndex, endIndex);
+                } else if (universalid.indexOf(",ou=group") > -1) {
+                    returnObj.groups[universalid] = universalid.substring(startIndex, endIndex);
+                }
+            });
+
+            return returnObj;
         },
 
         animateOut () {
