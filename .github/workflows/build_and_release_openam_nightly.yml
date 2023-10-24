@@ -165,6 +165,37 @@ jobs:
           console.log(`Created release '${RELEASE_NAME}': ${result.data.id}`);
           return `${result.data.id}`;
 
+    - name: Update the release page status
+      id: update_release_status
+      if: ${{ steps.create_release.outcome == 'success' }}
+      uses: actions/github-script@v6.3.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        result-encoding: string
+        script: |
+          /*
+           * Update the 'nightly' release page status.
+           *   - Using 'github-script'.
+           *   - Set the following attributes: draft, prerelease.
+           *   - Output release id. (Usage: "${{ steps.update_release_status.outputs.result }}")
+           */
+          const { owner, repo } = context.repo;
+          const releaseId = `${{ steps.create_release.outputs.result }}`;
+
+          const result = await github.rest.repos.updateRelease({
+            owner: owner,
+            repo: repo,
+            release_id: releaseId,
+            draft: false,
+            prerelease: true,
+          }).catch((e) => {
+            core.setFailed(`Cannot update release page '${RELEASE_NAME}': ${e}`);
+          })
+          console.log(`result.data.draft : ${result.data.draft}`);
+          console.log(`result.data.prerelease : ${result.data.prerelease}`);
+          // Pass release ID to next step.
+          return `${result.data.id}`;
+
     - name: Upload artifacts
       id: upload_artifacts
       if: ${{ steps.create_release.outcome == 'success' }}
