@@ -174,10 +174,10 @@ jobs:
         result-encoding: string
         script: |
           /*
-           * Create the 'nightly' release.
-           *   - Using 'github-script' because 'create-release' action is no longer maintained.
-           *   - Set the following attributes: Name, CDDL-license, pre-release indication.
-           *   - Output release id. (Usage: "${{ steps.create_release.outputs.result }}")
+           * Update the 'nightly' release page status.
+           *   - Using 'github-script'.
+           *   - Set the following attributes: draft, prerelease.
+           *   - Output release id. (Usage: "${{ steps.update_release_status.outputs.result }}")
            */
           const { owner, repo } = context.repo;
           const releaseId = `${{ steps.create_release.outputs.result }}`;
