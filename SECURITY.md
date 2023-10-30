@@ -3,6 +3,6 @@
 https://openam-jp.github.io/Disclosure-Policy/
 
 
-# Security advisories
+# Security Advisories
 
 https://openam-jp.github.io/Advisories/
