@@ -13,13 +13,13 @@
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
   ~ Copyright 2015 ForgeRock AS.
-  ~ Portions Copyrighted 2019 Open Source Solution Technology Corporation
+  ~ Portions Copyrighted 2019-2023 OSSTech Corporation
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>openam-audit</artifactId>
         <groupId>jp.openam</groupId>
-        <version>14.0.0</version>
+        <version>14.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>openam-authentication</artifactId>
         <groupId>jp.openam</groupId>
-        <version>14.0.0</version>
+        <version>14.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

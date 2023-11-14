@@ -13,7 +13,7 @@
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
   ~ Copyright 2014-2016 ForgeRock AS.
-  ~ Portions Copyrighted 2019 Open Source Solution Technology Corporation
+  ~ Portions Copyrighted 2019-2023 OSSTech Corporation
   ~ Portions Copyrighted 2019 OGIS-RI Co., Ltd.
   -->
 
@@ -28,7 +28,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>jp.openam</groupId>
-        <version>14.0.0</version>
+        <version>14.0.1</version>
     </parent>
 
     <dependencies>
