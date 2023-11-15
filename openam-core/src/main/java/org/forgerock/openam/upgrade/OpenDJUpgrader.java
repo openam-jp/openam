@@ -20,6 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2023 OSSTech Corporation
  */
 
 package org.forgerock.openam.upgrade;
@@ -157,8 +159,7 @@ public class OpenDJUpgrader {
      * @return {@code true} if an upgrade should be performed.
      */
     public boolean isUpgradeRequired() {
-        return newVersion.isMoreRecentThan(currentVersion) ||
-                (newVersion.equals(currentVersion) && newVersion.isDifferentBuildTo(currentVersion));
+        return newVersion.isMoreRecentThan(currentVersion);
     }
 
     /**
