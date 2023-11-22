@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2020 i7a7467
  */
 
 package org.forgerock.openidconnect;
@@ -55,6 +56,7 @@ public class ClientBuilder {
     private Long accessTokenLifeTime;
     private Long refreshTokenLifeTime;
     private Long jwtTokenLifeTime;
+    private String tokenEndPointAuthSigningAlg;
 
     /**
      * Sets the client id of the OAuth2Client.
@@ -348,6 +350,16 @@ public class ClientBuilder {
     }
 
     /**
+     * Sets the client assertion sign algorithm.
+     *
+     * @param tokenEndPointAuthSigningAlg client assertion sign algorithm.
+     */
+    public ClientBuilder setTokenEndPointAuthSigningAlg(String tokenEndPointAuthSigningAlg) {
+        this.tokenEndPointAuthSigningAlg = tokenEndPointAuthSigningAlg;
+        return this;
+    }
+
+    /**
      * Creates the OAuth2 Client.
      *
      * @return The OAuth2 Client.
@@ -357,7 +369,8 @@ public class ClientBuilder {
                 displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURIs,
                 accessToken, clientSessionURI, applicationType, clientSecret, responseTypes, contacts, defaultMaxAge,
                 defaultMaxAgeEnabled, tokenEndpointAuthMethod, jwks, jwksUri, x509, selector, sectorIdentifierUri,
-                authorizationCodeLifeTime, accessTokenLifeTime, refreshTokenLifeTime, jwtTokenLifeTime);
+                authorizationCodeLifeTime, accessTokenLifeTime, refreshTokenLifeTime, jwtTokenLifeTime,
+                tokenEndPointAuthSigningAlg);
     }
 
 }

@@ -14,6 +14,7 @@
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2018-2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2020 i7a7467
  */
 
 package org.forgerock.openam.oauth2;
@@ -961,7 +962,7 @@ public class OAuth2Constants {
         public static final String CONTACTS = "com.forgerock.openam.oauth2provider.contacts";
         public static final String LOGO_URI = "com.forgerock.openam.oauth2provider.logoURI";
         public static final String TOKEN_ENDPOINT_AUTH_METHOD = "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod";
-        public static final String TOKEN_ENDPOINT_AUTH_SIGNING_ALG = "com.forgerock.openam.oauth2provider.tokenEndPointAuthSigningAlg";
+        public static final String TOKEN_ENDPOINT_AUTH_SIGNING_ALG = "jp.openam.oauth2provider.tokenEndPointAuthSigningAlg";
         public static final String POLICY_URI = "com.forgerock.openam.oauth2provider.policyURI";
         public static final String TOS_URI = "com.forgerock.openam.oauth2provider.tosURI";
         public static final String SECTOR_IDENTIFIER_URI = "com.forgerock.openam.oauth2provider.sectorIdentifierURI";
