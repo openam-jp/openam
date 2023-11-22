@@ -25,6 +25,7 @@
  * $Id: ISAccountLockout.java,v 1.15 2009/03/07 08:01:50 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.common;
 
@@ -33,12 +34,19 @@ import static org.forgerock.openam.utils.Time.*;
 import com.iplanet.am.util.AMSendMail;
 import javax.mail.MessagingException;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AMAuthCallBackImpl;
 import com.sun.identity.authentication.spi.AMAuthCallBackException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.debug.IDebug;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.SMSException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +56,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import org.forgerock.openam.services.email.MailServer;
+import org.forgerock.openam.services.email.MailServerImpl;
 
 public class ISAccountLockout {
     private static final String USER_STATUS_ATTR="inetuserstatus";
@@ -276,7 +286,7 @@ public class ISAccountLockout {
                 inactivateUserAccount(amIdentity);
             }
             try {
-                sendLockOutNotice(userName);
+                sendLockOutNotice(userName, amIdentity.getRealm());
                 /*
                  * The callback implementation instance is retrieved for
                  * the user's organization. This will be used to notify the
@@ -448,7 +458,7 @@ public class ISAccountLockout {
                             if (notifyUser == null) {
                                 notifyUser = ((AMIdentity)subject).getUniversalId();
                             }
-                            sendLockOutNotice(notifyUser);
+                            sendLockOutNotice(notifyUser, ((AMIdentity)subject).getRealm());
                         }
                     }
                 }
@@ -476,9 +486,12 @@ public class ISAccountLockout {
      *
      * @param userDN Distinguished name of the user
      */
-    public void sendLockOutNotice(String userDN)  {
+    public void sendLockOutNotice(String userDN, String realm) {
         if (lockoutNotification != null) {
-            AMSendMail sm = new AMSendMail();
+            MailServer mailServer = getMailServer(realm);
+            if (mailServer == null){
+                return;
+            }
             StringTokenizer emailTokens = new StringTokenizer(
                 lockoutNotification, SPACE_DELIM);
             
@@ -511,8 +524,9 @@ public class ISAccountLockout {
                 }
                 
                 try {
-                    sm.postMail(toAddress, emailSubject, emailMsg,
-                        fromAddress, charset);
+                    for (String emailTo: toAddress){
+                        mailServer.sendEmail(fromAddress, emailTo, emailSubject, emailMsg, null);
+                    }
                 } catch (MessagingException ex) {
                     debug.error("cannot email lockout notification:token ", ex);
                 }
@@ -774,6 +788,29 @@ public class ISAccountLockout {
             }
         }
         return (answer);
+    }
+
+    private MailServer getMailServer(String realm) {
+        try {
+            ServiceConfigManager mailmgr = new ServiceConfigManager(
+                    AccessController.doPrivileged(AdminTokenAction.getInstance()),
+                    MailServerImpl.SERVICE_NAME, MailServerImpl.SERVICE_VERSION);
+            ServiceConfig mailscm = mailmgr.getOrganizationConfig(realm, null);
+
+            if (!mailscm.exists()) {
+                debug.error("ISAccountLockout.getMailServer : EmailService is not configured for realm:[{}]", realm);
+                return null;
+            }
+
+            Map<String, Set<String>> mailattrs = mailscm.getAttributes();
+            String mailServerClass = mailattrs.get("forgerockMailServerImplClassName").iterator().next();
+            return Class.forName(mailServerClass).asSubclass(MailServer.class).getDeclaredConstructor(String.class)
+                    .newInstance(realm);
+        } catch (IllegalAccessException | SSOException | InstantiationException | ClassNotFoundException
+                | InvocationTargetException | NoSuchMethodException | SMSException e) {
+            debug.error("ISAccountLockout.getMailServer : Failed to load mail server", e);
+            return null;
+        }
     }
     
 }
