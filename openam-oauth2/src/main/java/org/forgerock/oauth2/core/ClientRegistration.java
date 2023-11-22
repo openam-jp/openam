@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions Copyrighted 2021 i7a7467
  */
 
 package org.forgerock.oauth2.core;
@@ -158,4 +159,10 @@ public interface ClientRegistration {
       */
     boolean isPolicyBasedProtectionEnabled();
 
+    /**
+     * Gets whether or not Resource Owner Password Credentials Grant is disabled.
+     *
+     * @return true if disabled.
+     */
+    boolean isPasswordCredentialsGrantDisabled();
 }
