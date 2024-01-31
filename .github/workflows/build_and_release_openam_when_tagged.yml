@@ -50,10 +50,17 @@ jobs:
       id: build
       run: |
         for REPO in ${REPO_NAMES}; do
-
           git clone ${GIT_ORIGIN}/${REPO}
-          git -C ${REPO} describe --tags --exclude nightly --abbrev=0
 
+          #----------------------------------------
+          # Get the commit hash of the latest tag of all branches, and get the name of the newest tag there, excluding nightly
+          latest_tag=refs/tags/$(git -C ${REPO} describe --tags --exclude nightly `git -C ${REPO} rev-list --tags --max-count=1`)
+          #----------------------------------------
+
+          git -C ${REPO} checkout -b ${latest_tag}
+        done
+
+        for REPO in ${REPO_NAMES}; do
           #----------------------------------------
           # Ad hoc patch for maven-default-http-blocker
           #----------------------------------------
