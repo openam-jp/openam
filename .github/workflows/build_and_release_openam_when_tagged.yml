@@ -17,8 +17,12 @@ jobs:
 
     env:
       GIT_ORIGIN:           https://github.com/openam-jp
-      GIT_BRANCH:           master
-      ARTIFACT_DIR:         /tmp/target
+      ARTIFACTS_REGEX: |
+                            ./openam/openam-distribution/openam-distribution-ssoconfiguratortools/target/SSOConfiguratorTools-\d+(\.\d+){2,}(-SNAPSHOT)?.zip
+                            ./openam/openam-distribution/openam-distribution-ssoadmintools/target/SSOAdminTools-\d+(\.\d+){2,}(-SNAPSHOT)?.zip
+                            ./openam/openam-server/target/OpenAM-\d+(\.\d+){2,}(-SNAPSHOT)?.war
+      LICENSE_BODY:         "This project is subject to [the Common Development and Distribution License (CDDL)](LICENSE.md). \
+                            Please check all the terms of the license before using these artifacts."
       REPO_NAMES: |
                             forgerock-parent
                             forgerock-bom
@@ -37,96 +41,128 @@ jobs:
     steps:
 
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3.6.0
       with:
         java-version: ${{ matrix.java }}
-        architecture: x64
-    
-    - name: Clone source codes
-      run: |
-    
-        for REPO in ${REPO_NAMES}; do
-          git clone \
-            ${GIT_ORIGIN}/${REPO} \
-            -b ${GIT_BRANCH}
-        done
+        distribution: 'temurin'
 
     - name: Build in order
+      id: build
       run: |
-    
-        mkdir -p ${ARTIFACT_DIR}
-        LOG_FILE=${ARTIFACT_DIR}/.build.log
-    
-        BASE_DIR=$(pwd)
         for REPO in ${REPO_NAMES}; do
-          cd ${BASE_DIR}/${REPO}
-          mvn clean install \
-              -DskipTests=true \
-              -Dmaven.test.failure.ignore=true \
-            | tee -a ${LOG_FILE}
+          git clone ${GIT_ORIGIN}/${REPO}
+
+          #----------------------------------------
+          # Get the commit hash of the latest tag of all branches, and get the name of the newest tag there, excluding nightly
+          latest_tag=refs/tags/$(git -C ${REPO} describe --tags --exclude nightly `git -C ${REPO} rev-list --tags --max-count=1`)
+          #----------------------------------------
+
+          git -C ${REPO} checkout -b ${latest_tag}
+        done
+
+        for REPO in ${REPO_NAMES}; do
+          #----------------------------------------
+          # Ad hoc patch for maven-default-http-blocker
+          #----------------------------------------
+          if [ "${REPO}" == 'opendj' ]; then
+            sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" opendj/opendj-server-legacy/pom.xml
+          fi
+          if [ "${REPO}" == 'openam' ]; then
+            sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" openam/openam-core/pom.xml
+          fi
+          #----------------------------------------
+
+          mvn clean install -f ${REPO}
+
+          if [ $? -ne 0 ]; then
+            exit 1;
+          fi
         done
 
     - name: Get the version
       id: extract_version
       run: |
+        echo "RELEASE_NAME=$(echo $GITHUB_REF | cut -d / -f 3)" >> "$GITHUB_ENV"
 
-        echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
-        ## usage: ${{ steps.extract_version.outputs.VERSION }}
-
-    - name: Collect release artifact
-      id: collect_artifact
-      env:
-        OPENAM_CONFIGURATOR_TOOL: openam-configurator-tool-${{ steps.extract_version.outputs.VERSION }}
-      run: |
-
-        ## openam-<version>.war
-        find ./openam/openam-server -name *.war \
-          | xargs -I% mv % ${ARTIFACT_DIR}/openam-${{ steps.extract_version.outputs.VERSION }}.war
-
-    - name: Create the Release
+    - name: Create the release
       id: create_release
-      uses: actions/create-release@v1.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ steps.build.outcome == 'success' }}
+      uses: actions/github-script@v6.3.3
       with:
-        tag_name: "${{ steps.extract_version.outputs.VERSION }}"
-        release_name: "${{ steps.extract_version.outputs.VERSION }}"
-        draft: false
-        prerelease: false
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        result-encoding: string
+        script: |
+          /*
+           * Create the release.
+           *   - Using 'github-script' because 'create-release' action is no longer maintained.
+           *   - Set the following attributes: Name, CDDL-license, pre-release indication.
+           *   - Output release id. (Usage: "${{ steps.create_release.outputs.result }}")
+           */
+          const { RELEASE_NAME } = process.env;
+          const { LICENSE_BODY } = process.env;
+          const { owner, repo } = context.repo;
 
-    - name: Build GitHub-API URL
-      id: api_url
-      run: |
+          const result = await github.rest.repos.createRelease({
+            owner: owner,
+            repo: repo,
+            name: RELEASE_NAME,
+            tag_name: RELEASE_NAME,
+            body: LICENSE_BODY,
+            generate_release_notes: false,
+            draft: false,
+            prerelease: false,
+          }).catch((e) => {
+            core.setFailed(`Cannot create release '${RELEASE_NAME}': ${e}`);
+          })
+          // Pass release ID to next step.
+          console.log(`Created release '${RELEASE_NAME}': ${result.data.id}`);
+          return `${result.data.id}`;
 
-        echo ::set-output name=RELEASE::https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}
-        echo ::set-output name=UPLOAD::https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }}/assets
-        ## usage: ${{ steps.api_url.outputs.RELEASE }}
-        ## usage: ${{ steps.api_url.outputs.UPLOAD }}
+    - name: Upload artifacts
+      id: upload_artifacts
+      if: ${{ steps.create_release.outcome == 'success' }}
+      uses: actions/github-script@v6.3.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}          
+        script: |
+          /*
+           * Upload artifacts to the release.
+           */
+          const fs = require('fs');
+          const path = require('path');
 
-    - name: Edit release description
-      run: |
+          const { owner, repo } = context.repo;
+          const releaseId = `${{ steps.create_release.outputs.result }}`;
+          const artifactRegexes = process.env.ARTIFACTS_REGEX.split("\n");
 
-        JSON="{
-          \"body\": \"This project is subject to [the Common Development and Distribution License (CDDL)](LICENSE.md). Please check all the terms of the license before using these artifacts.\"
-        }"
-        curl -sS \
-          --request PATCH  \
-          --url "${{ steps.api_url.outputs.RELEASE }}" \
-          --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          --header "content-type: application/json" \
-          --data "${JSON}"
+          if (releaseId === 'undefined') {
+            core.setFailed('Release ID is undefined.');
+            return 1;
+          }
 
-    - name: Upload assets
-      id: upload-release-asset 
-      run: |
+          await artifactRegexes.forEach(async artifactPathRegex => {
+            // Skip if the path element is empty.
+            if (artifactPathRegex.trim() === '') {
+              return;
+            }
 
-        cd ${ARTIFACT_DIR}
-        for ARTIFACT in $(ls .); do
-          echo "uploading: ${ARTIFACT}"
-          curl -sS \
-            --request PUT \
-            --url "${{ steps.api_url.outputs.UPLOAD }}?name=${ARTIFACT}" \
-            --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            --header "content-type: application/octet-stream" \
-            --data-binary @${ARTIFACT}
-        done
+            // Search target file by Regex.
+            const targetDir = path.dirname(artifactPathRegex);
+            const targetFileRegex = path.basename(artifactPathRegex);
+            const findFileRegex = new RegExp(targetFileRegex, 'g');
+            const artifactFileName = fs.readdirSync(targetDir).filter(fn => findFileRegex.test(fn))[0];
+
+            console.log(`Found artifact: ${artifactFileName} in ${targetDir}`);
+
+            await github.rest.repos.uploadReleaseAsset({
+              owner: owner,
+              repo: repo,
+              release_id: releaseId,
+              name: artifactFileName,
+              data: await fs.readFileSync(`${targetDir}/${artifactFileName}`)
+            }).then((res) => {
+              console.log(`Uploaded: ${artifactFileName}`);
+            }).catch((e) => {
+              core.setFailed(`Cannot upload asset '${artifactFileName}': ${e}`);
+            })
+          });
