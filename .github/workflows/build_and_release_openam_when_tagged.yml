@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -54,11 +55,13 @@ jobs:
 
           #----------------------------------------
           # Get the commit hash of the latest tag of all branches, and get the name of the newest tag there, excluding nightly
-          latest_tag=refs/tags/$(git -C ${REPO} describe --tags --exclude nightly `git -C ${REPO} rev-list --tags --max-count=1`)
           #----------------------------------------
-
-          git -C ${REPO} checkout -b ${latest_tag}
+          latest_tag=$(git -C ${REPO} describe --tags --exclude nightly `git -C ${REPO} rev-list --tags --max-count=1`)
+          git -C ${REPO} checkout -b ${latest_tag} refs/tags/${latest_tag}
         done
+
+        # Get the release name from tag
+        echo "RELEASE_NAME=${latest_tag}" >> "$GITHUB_ENV"
 
         for REPO in ${REPO_NAMES}; do
           #----------------------------------------
@@ -78,11 +81,6 @@ jobs:
             exit 1;
           fi
         done
-
-    - name: Get the version
-      id: extract_version
-      run: |
-        echo "RELEASE_NAME=$(echo $GITHUB_REF | cut -d / -f 3)" >> "$GITHUB_ENV"
 
     - name: Create the release
       id: create_release
