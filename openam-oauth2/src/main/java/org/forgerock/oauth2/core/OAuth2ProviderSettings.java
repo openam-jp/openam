@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2024 OSSTech Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -53,6 +54,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.forgerock.guice.core.InjectorHolder;
@@ -1169,6 +1171,7 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
             if (loginUrlTemplateString != null) {
                 loginUrlTemplate = new Template("customLoginUrlTemplate", new StringReader(loginUrlTemplateString),
                         new Configuration());
+                loginUrlTemplate.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
             }
             return loginUrlTemplate;
         } catch (SSOException | IOException | SMSException e) {
