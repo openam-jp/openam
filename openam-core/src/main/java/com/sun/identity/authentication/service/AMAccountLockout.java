@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -168,9 +169,10 @@ class AMAccountLockout {
      * Sends the lockout notice.
      *
      * @param userDN The distinguished name of the user.
+     * @param realm The realm name of the user.
      */
-    public void sendLockOutNotice(String userDN) {
-        isAccountLockout.sendLockOutNotice(userDN);
+    public void sendLockOutNotice(String userDN, String realm) {
+        isAccountLockout.sendLockOutNotice(userDN, realm);
     }
 
     /**
