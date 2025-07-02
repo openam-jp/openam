@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+* Portions Copyrighted 2019-2025 OSSTech Corporation
 * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 *
 -->
@@ -1408,7 +1408,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>net.ju-n.maven.plugins</groupId>
