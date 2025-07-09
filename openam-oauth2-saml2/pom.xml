@@ -5,7 +5,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>jp.openam</groupId>
-        <version>14.0.1</version>
+        <version>14.0.2</version>
     </parent>
 
     <artifactId>openam-oauth2-saml2</artifactId>

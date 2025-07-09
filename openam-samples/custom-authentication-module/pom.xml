@@ -20,7 +20,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   Portions Copyrighted 2019-2023 OSSTech Corporation
+   Portions Copyrighted 2019-2025 OSSTech Corporation
    Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -30,11 +30,11 @@
 
     <groupId>jp.openam.examples</groupId>
     <artifactId>custom-authentication-module</artifactId>
-    <version>14.0.1</version>
+    <version>14.0.2</version>
     <packaging>jar</packaging>
 
     <properties>
-        <openam.version>14.0.1</openam.version>
+        <openam.version>14.0.2</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

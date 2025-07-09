@@ -23,7 +23,7 @@
   ~ your own identifying information:
   ~ "Portions Copyrighted [year] [name of copyright owner]"
   ~
-  ~ Portions Copyrighted 2019-2023 OSSTech Corporation
+  ~ Portions Copyrighted 2019-2025 OSSTech Corporation
   ~ Portions Copyrighted 2019 OGIS-RI Co., Ltd.
   -->
 
@@ -33,7 +33,7 @@
     <parent>
         <groupId>jp.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.0.1</version>
+        <version>14.0.2</version>
     </parent>
 
     <artifactId>openam-oauth2</artifactId>

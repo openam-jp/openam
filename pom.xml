@@ -53,14 +53,14 @@
     <parent>
         <groupId>jp.openam</groupId>
         <artifactId>forgerock-parent</artifactId>
-        <version>2.0.7.1</version>
+        <version>2.0.7.2</version>
     </parent>
 
     <!-- Component Definition -->
     <name>OpenAM Project</name>
     <groupId>jp.openam</groupId>
     <artifactId>openam</artifactId>
-    <version>14.0.1</version>
+    <version>14.0.2</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -116,16 +116,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>3.0.1.1</opendj.server.version>
-        <opendj.sdk.version>3.0.1.1</opendj.sdk.version>
-        <opendj.server.legacy>3.0.1.1</opendj.server.legacy>
+        <opendj.server.version>3.0.1.2</opendj.server.version>
+        <opendj.sdk.version>3.0.1.2</opendj.sdk.version>
+        <opendj.server.legacy>3.0.1.2</opendj.server.legacy>
 
         <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
         <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
 
-        <forgerock.bloomfilter.version>1.0.2.1</forgerock.bloomfilter.version>
-        <forgerock.ui.version>13.0.5.1</forgerock.ui.version>
-        <forgerock.guice.version>1.1.1.1</forgerock.guice.version>
+        <forgerock.bloomfilter.version>1.0.2.2</forgerock.bloomfilter.version>
+        <forgerock.ui.version>13.0.5.2</forgerock.ui.version>
+        <forgerock.guice.version>1.1.1.2</forgerock.guice.version>
 
         <javadoc-utils.version>1.0.0</javadoc-utils.version>
         <ant.contrib.version>1.0b3</ant.contrib.version>
@@ -390,7 +390,7 @@
         <connection>scm:git:https://github.com/openam-jp/openam.git</connection>
         <developerConnection>scm:git:git@github.com:openam-jp/openam.git</developerConnection>
         <url>https://github.com/openam-jp/openam</url>
-        <tag>14.0.1</tag>
+        <tag>14.0.2</tag>
     </scm>
 
     <!-- Dependency Management -->
@@ -399,7 +399,7 @@
             <dependency>
                 <groupId>jp.openam.commons</groupId>
                 <artifactId>forgerock-bom</artifactId>
-                <version>4.1.2.1</version>
+                <version>4.1.2.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
