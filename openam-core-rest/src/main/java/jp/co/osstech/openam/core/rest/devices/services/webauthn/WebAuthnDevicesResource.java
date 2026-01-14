@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019-2021 OSSTech Corporation
+ * Copyright 2019-2026 OSSTech Corporation
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
@@ -157,27 +157,29 @@ public class WebAuthnDevicesResource extends RealmAwareResource {
 
         try {
             AuthenticatorWebAuthnService realmWebAuthnService = webauthnServiceFactory.create(realm);
-            AMIdentity userIdentity = getIdentity(userName, realm);
+            if (realmWebAuthnService.isValid()) {
+                AMIdentity userIdentity = getIdentity(userName, realm);
 
-            Set<String> attrSet = (Set<String>) userIdentity.getAttribute(ENTRYUUID);
-            String entryUUID = attrSet.iterator().next();
+                Set<String> attrSet = (Set<String>) userIdentity.getAttribute(ENTRYUUID);
+                String entryUUID = attrSet.iterator().next();
 
-            Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
+                Set<WebAuthnAuthenticator> authenticators = realmWebAuthnService.getAuthenticators(entryUUID.getBytes());
 
-            for (WebAuthnAuthenticator authenticator : authenticators) {
+                for (WebAuthnAuthenticator authenticator : authenticators) {
 
-                String CredentialID = authenticator.getCredentialID();
-                String CredentialName = authenticator.getCredentialName();
-                Date CreatedDate = authenticator.getCreateTimestamp();
+                    String CredentialID = authenticator.getCredentialID();
+                    String CredentialName = authenticator.getCredentialName();
+                    Date CreatedDate = authenticator.getCreateTimestamp();
 
-                Map<String, Object> map = new HashMap<>();
-                map.put("uuid", CredentialID);
-                map.put("deviceName", CredentialName);
-                map.put("type", "fido2");
-                map.put("createdDate", CreatedDate.getTime());
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("uuid", CredentialID);
+                    map.put("deviceName", CredentialName);
+                    map.put("type", "fido2");
+                    map.put("createdDate", CreatedDate.getTime());
 
-                qrh.handleResource(newResourceResponse(CredentialID, "0",
-                        new JsonValue(map)));
+                    qrh.handleResource(newResourceResponse(CredentialID, "0",
+                            new JsonValue(map)));
+                }
             }
 
         }
