@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2019-2026 OSSTech Corporation
  */
 package jp.co.osstech.openam.core.rest.devices.services.webauthn;
 
@@ -129,6 +129,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     private final static int DEFAULT_CON_POOL_MAX_SIZE = 10;
 
     final private Debug debug;
+    final private String realm;
     private Map<String, Set<?>> options;
     private Set<String> classNames = null;
     private String credentialAttrName = null;
@@ -138,6 +139,7 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     private String useridAttrName = null;
     private String baseDN = null;
     private ConnectionFactory cPool = null;
+    private boolean isValidService = false;
 
     /**
      * Basic constructor for the AuthenticatorWebAuthnService.
@@ -150,10 +152,15 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     public AuthenticatorWebAuthnService(ServiceConfigManager configManager, String realm)
             throws SMSException, SSOException {
         debug = Debug.getInstance(DEBUG_LOCATION);
+        this.realm = realm;
 
         try {
             ServiceConfig scm = configManager.getOrganizationConfig(realm, null);
-            options = scm.getAttributes();
+            options = scm.getAttributesWithoutDefaults();
+            if (options.isEmpty()) {
+                debug.warning("AuthenticatorWebAuthnService in {} realm does not exist.", realm);
+                return;
+            }
 
             baseDN = CollectionHelper.getMapAttr(options, WEBAUTHN_LDAP_BASE_DN);
             if (baseDN == null) {
@@ -173,6 +180,8 @@ public class AuthenticatorWebAuthnService implements DeviceService {
                     DEFAULT_WEBAUTHN_COUNTER_ATTRIBUTE_NAME);
             useridAttrName = CollectionHelper.getMapAttr(options, WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME,
                     DEFAULT_WEBAUTHN_USER_HANDLE_ID_ATTRIBUTE_NAME);
+
+            isValidService = true;
 
         } catch (SMSException | SSOException e) {
             debug.error("Error connecting to SMS to retrieve config for AuthenticatorWebAuthnService.", e);
@@ -278,6 +287,15 @@ public class AuthenticatorWebAuthnService implements DeviceService {
     }
 
     /**
+     * Returns whether AuthenticatorWebAuthnService is valid.
+     *
+     * @return true if AuthenticatorWebAuthnService is valid.
+     */
+    public boolean isValid() {
+        return isValidService;
+    }
+
+    /**
      * Create an LDAP entry for the authenticator.
      * 
      * @param authenticator The target authenticator.
@@ -285,6 +303,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      */
     public boolean createAuthenticator(WebAuthnAuthenticator authenticator) {
         boolean result = false;
+        if (!isValid()) {
+            debug.error("AuthenticatorWebAuthnService in {} realm is invalid.", realm);
+            return result;
+        }
         String dn = DN.valueOf(baseDN)
                 .child(credentialAttrName, authenticator.getCredentialID()).toString();
         Entry entry = new LinkedHashMapEntry(dn);
@@ -317,6 +339,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      */
     public Set<WebAuthnAuthenticator> getAuthenticators(byte[] userID) {
         Set<WebAuthnAuthenticator> authenticators = new HashSet<WebAuthnAuthenticator>();
+        if (!isValid()) {
+            debug.error("AuthenticatorWebAuthnService in {} realm is invalid.", realm);
+            return authenticators;
+        }
         SearchScope scope = SearchScope.SINGLE_LEVEL;
         String userIDStr = WebAuthnAuthenticator.getUserIDAsString(userID);
         Filter searchFilter =
@@ -371,6 +397,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      */
     public boolean updateCounter(WebAuthnAuthenticator authenticator) {
         boolean result = false;
+        if (!isValid()) {
+            debug.error("AuthenticatorWebAuthnService in {} realm is invalid.", realm);
+            return result;
+        }
         String dn = DN.valueOf(baseDN)
                 .child(credentialAttrName, authenticator.getCredentialID()).toString();
         ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
@@ -398,6 +428,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      */
     public boolean storeCredentialName(WebAuthnAuthenticator authenticator) {
         boolean result = false;
+        if (!isValid()) {
+            debug.error("AuthenticatorWebAuthnService in {} realm is invalid.", realm);
+            return result;
+        }
         String dn = DN.valueOf(baseDN)
                 .child(credentialAttrName, authenticator.getCredentialID()).toString();
         ModifyRequest modifyRequest = LDAPRequests.newModifyRequest(dn);
@@ -425,6 +459,10 @@ public class AuthenticatorWebAuthnService implements DeviceService {
      */
     public boolean deleteAuthenticator(String credentialID) {
         boolean result = false;
+        if (!isValid()) {
+            debug.error("AuthenticatorWebAuthnService in {} realm is invalid.", realm);
+            return result;
+        }
         String dn = DN.valueOf(baseDN)
                 .child(credentialAttrName, credentialID).toString();
         Connection conn = null;
