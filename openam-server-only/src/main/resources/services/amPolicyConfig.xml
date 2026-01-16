@@ -27,6 +27,7 @@
     $Id: amPolicyConfig.xml,v 1.9 2009/05/05 18:53:03 mrudul_uchil Exp $
 
     Portions Copyrighted 2014-2015 ForgeRock AS.
+    Portions Copyrighted 2026 OSSTech Corporation
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -358,6 +359,16 @@
                     resourceName="connectionPoolMaximumSize">
                     <DefaultValues>
                         <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-connection_time_out"
+                    type="single"
+                    syntax="number"
+                    i18nKey="connectionTimeout"
+                    order="1850"
+                    resourceName="connectionTimeout">
+                    <DefaultValues>
+                        <Value>10000</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-selected-subjects"
