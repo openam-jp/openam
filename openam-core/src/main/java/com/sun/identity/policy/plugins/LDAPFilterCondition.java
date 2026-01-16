@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2020 OGIS-RI Co., Ltd.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.policy.plugins;
@@ -125,6 +126,7 @@ public class LDAPFilterCondition implements Condition {
     private ConnectionFactory connPool;
     private String ldapServer;
     private boolean aliasEnabled;
+    private int connTimeout;
 
     /** 
      * No argument constructor 
@@ -420,6 +422,8 @@ public class LDAPFilterCondition implements Condition {
         try (Connection conn = connPool.getConnection()) {
 
             SearchRequest searchRequest = LDAPRequests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
+            searchRequest.setTimeLimit(timeLimit);
+            searchRequest.setSizeLimit(maxResults);
             ConnectionEntryReader reader = conn.search(searchRequest);
 
             if (reader.hasNext()) {
@@ -535,6 +539,10 @@ public class LDAPFilterCondition implements Condition {
             maxResults = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_SEARCH_LIMIT));
             minPoolSize = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_CONNECTION_POOL_MIN_SIZE));
             maxPoolSize = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_CONNECTION_POOL_MAX_SIZE));
+            connTimeout = 0;
+            if (configParams.get(PolicyConfig.LDAP_CONNECTION_TIME_OUT) != null) {
+                connTimeout = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_CONNECTION_TIME_OUT));
+            }
         } catch (NumberFormatException nfe) {
             throw new PolicyException(nfe);
         }
@@ -569,7 +577,7 @@ public class LDAPFilterCondition implements Condition {
 
         // initialize the connection pool for the ldap server
         Options options = Options.defaultOptions()
-                .set(CONNECT_TIMEOUT, new Duration((long) timeLimit, TimeUnit.SECONDS));
+                .set(CONNECT_TIMEOUT, new Duration((long) connTimeout, TimeUnit.MILLISECONDS));
 
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);

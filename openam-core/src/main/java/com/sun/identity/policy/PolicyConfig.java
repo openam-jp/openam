@@ -25,6 +25,7 @@
  * $Id: PolicyConfig.java,v 1.10 2009/01/28 05:35:01 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.policy;
@@ -130,6 +131,9 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
     
     public static final String LDAP_SEARCH_LIMIT =
         "iplanet-am-policy-config-search-limit";
+
+    public static final String LDAP_CONNECTION_TIME_OUT =
+        "iplanet-am-policy-config-connection_time_out";
 
     public static final String LDAP_CONNECTION_POOL_MIN_SIZE =
         "iplanet-am-policy-config-connection_pool_min_size";
