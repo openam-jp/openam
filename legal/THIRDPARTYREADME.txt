@@ -1358,9 +1358,6 @@ Copyright: Copyright (c) 2012-2015 Oracle and/or its affiliates. All rights rese
 Version: jaxb-api-2.3.0.jar
 Copyright: Copyright (c) 2003-2017 Oracle and/or its affiliates. All rights reserved.
 
-Version: jaxb-core-2.3.0.jar
-Copyright: Copyright (c) 2013-2017 Oracle and/or its affiliates. All rights reserved.
-
 Version: jaxb-impl-2.2.2.jar
 Copyright: Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
 
