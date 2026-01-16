@@ -64,17 +64,6 @@ jobs:
         echo "RELEASE_NAME=${latest_tag}" >> "$GITHUB_ENV"
 
         for REPO in ${REPO_NAMES}; do
-          #----------------------------------------
-          # Ad hoc patch for maven-default-http-blocker
-          #----------------------------------------
-          if [ "${REPO}" == 'opendj' ]; then
-            sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" opendj/opendj-server-legacy/pom.xml
-          fi
-          if [ "${REPO}" == 'openam' ]; then
-            sed -ie "s|<url>http://download.oracle.com|<url>https://download.oracle.com|g" openam/openam-core/pom.xml
-          fi
-          #----------------------------------------
-
           mvn clean install -f ${REPO}
 
           if [ $? -ne 0 ]; then
