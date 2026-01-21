@@ -45,7 +45,7 @@
     "karma-nyan-reporter": "0.2.5",
     "karma-requirejs": "1.1.0",
     "less-plugin-clean-css": "1.5.1",
-    "lodash": "3.10.1",
+    "lodash": "4.17.21",
     "mocha": "2.5.3",
     "puppeteer": "14.2.1",
     "requirejs": "2.2.0",
