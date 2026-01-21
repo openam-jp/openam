@@ -20,6 +20,7 @@
  * "Portions copyright [year] [name of copyright owner]"
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2020 Open Source Solution Technology Corporation
  */
 
 package org.forgerock.openam.services.email;
@@ -204,7 +205,9 @@ public class MailServerImpl implements MailServer {
             } else {
                 //user global settings...
                 setOptions(this.options);
-                from = this.from;
+                if(from == null || from.isEmpty()){
+                    from = this.from;
+                }
             }
             String tos[] = new String[1];
             tos[0] = to;
