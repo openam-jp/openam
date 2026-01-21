@@ -141,6 +141,12 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
     public static final String LDAP_CONNECTION_POOL_MAX_SIZE =
         "iplanet-am-policy-config-connection_pool_max_size";
 
+    public static final String LDAP_HEARTBEAT_INTERVAL =
+        "iplanet-am-policy-config-heartbeat-interval";
+
+    public static final String LDAP_HEARTBEAT_TIME_UNIT =
+        "iplanet-am-policy-config-heartbeat-timeunit";
+
     public static final String LDAP_SSL_ENABLED =
         "iplanet-am-policy-config-ldap-ssl-enabled";
 

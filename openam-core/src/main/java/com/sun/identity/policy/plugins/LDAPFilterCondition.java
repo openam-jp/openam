@@ -33,8 +33,9 @@ package com.sun.identity.policy.plugins;
 
 import static com.sun.identity.policy.PolicyConfig.*;
 import static org.forgerock.openam.utils.Time.*;
-import static org.forgerock.opendj.ldap.LDAPConnectionFactory.CONNECT_TIMEOUT;
+import static org.forgerock.opendj.ldap.LDAPConnectionFactory.*;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenListenersUnsupportedException;
@@ -48,6 +49,7 @@ import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.interfaces.Condition;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 
@@ -127,6 +129,8 @@ public class LDAPFilterCondition implements Condition {
     private String ldapServer;
     private boolean aliasEnabled;
     private int connTimeout;
+    private int heartBeatInterval;
+    private String heartBeatTimeUnit;
 
     /** 
      * No argument constructor 
@@ -543,9 +547,14 @@ public class LDAPFilterCondition implements Condition {
             if (configParams.get(PolicyConfig.LDAP_CONNECTION_TIME_OUT) != null) {
                 connTimeout = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_CONNECTION_TIME_OUT));
             }
+            heartBeatInterval = 0;
+            if (configParams.get(PolicyConfig.LDAP_HEARTBEAT_INTERVAL) != null) {
+                heartBeatInterval = Integer.parseInt((String) configParams.get(PolicyConfig.LDAP_HEARTBEAT_INTERVAL));
+            }
         } catch (NumberFormatException nfe) {
             throw new PolicyException(nfe);
         }
+        heartBeatTimeUnit = (String) configParams.get(PolicyConfig.LDAP_HEARTBEAT_TIME_UNIT);
 
         String ssl = (String) configParams.get(PolicyConfig.LDAP_SSL_ENABLED);
         if (ssl.equalsIgnoreCase("true")) {
@@ -578,6 +587,14 @@ public class LDAPFilterCondition implements Condition {
         // initialize the connection pool for the ldap server
         Options options = Options.defaultOptions()
                 .set(CONNECT_TIMEOUT, new Duration((long) connTimeout, TimeUnit.MILLISECONDS));
+        if (heartBeatInterval > 0 && heartBeatTimeUnit != null) {
+            int heartBeatTimeout =
+                SystemProperties.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, Constants.DEFAULT_HEARTBEAT_TIMEOUT);
+            TimeUnit unit = TimeUnit.valueOf(heartBeatTimeUnit.toUpperCase());
+            options.set(HEARTBEAT_ENABLED, true)
+                .set(HEARTBEAT_INTERVAL, new Duration(unit.toSeconds(heartBeatInterval), TimeUnit.SECONDS))
+                .set(HEARTBEAT_TIMEOUT, new Duration(unit.toSeconds(heartBeatTimeout), TimeUnit.SECONDS));
+        }
 
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);

@@ -361,6 +361,31 @@
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-heartbeat-interval"
+                    type="single"
+                    syntax="number"
+                    i18nKey="heartbeatInterval"
+                    order="1820"
+                    resourceName="heartbeatInterval">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-policy-config-heartbeat-timeunit"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="heartbeatTimeunit"
+                    order="1821"
+                    resourceName="heartbeatTimeunit">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="timeunitSeconds">SECONDS</ChoiceValue>
+                        <ChoiceValue i18nKey="timeunitMinutes">MINUTES</ChoiceValue>
+                        <ChoiceValue i18nKey="timeunitHours">HOURS</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SECONDS</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-policy-config-connection_time_out"
                     type="single"
                     syntax="number"
