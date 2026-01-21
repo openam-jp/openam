@@ -1395,6 +1395,11 @@ public interface Constants {
     public static final String LDAP_HEARTBEAT_TIMEOUT = "org.forgerock.openam.ldap.heartbeat.timeout";
 
     /**
+     * Default heartbeat timeout in seconds.
+     */
+    public static final int DEFAULT_HEARTBEAT_TIMEOUT = 3;
+
+    /**
      * Sets the maximum file upload size - if not set the default will be 750k.
      */
     public static final String MAX_FILE_UPLOAD_SIZE = "org.forgerock.openam.console.max.file.upload.size";
