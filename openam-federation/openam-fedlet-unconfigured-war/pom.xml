@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+* Portions Copyrighted 2019-2026 OSSTech Corporation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -200,6 +200,14 @@
                                 <include>debugconfig.properties</include>
                             </includes>
                         </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${project.basedir}/../../openam-core/src/main/resources</directory>
+                            <includes>
+                                <include>ESAPI.properties</include>
+                                <include>validation.properties</include>
+                            </includes>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
@@ -209,10 +217,29 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
         <dependency>
             <groupId>jp.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>jp.openam</groupId>
+                    <artifactId>openam-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jp.openam</groupId>
+                    <artifactId>openam-entitlements</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-slf4j</artifactId>
         </dependency>
     </dependencies>
 </project>
