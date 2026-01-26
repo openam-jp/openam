@@ -25,6 +25,7 @@
  * $Id: CreateFedlet.java,v 1.20 2010/01/08 22:41:43 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.workflow;
@@ -115,9 +116,9 @@ public class CreateFedlet extends Task {
             dir.getParentFile().mkdir();
         }
         dir.mkdir();
-        String confDir = workDir + "/conf";
+        String confDir = workDir + "/war_tmp/conf";
         dir = new File(confDir);
-        dir.mkdir();
+        dir.mkdirs();
         
         loadMetaData(params, confDir);
         exportIDPMetaData(params, confDir);
@@ -126,6 +127,7 @@ public class CreateFedlet extends Task {
         ServletContext servletCtx = (ServletContext) params.get(ParameterKeys.P_SERVLET_CONTEXT);
         copyBits(servletCtx, workDir);
         createFederationConfigProperties(servletCtx, confDir);
+        createWar(workDir);
 
         String zipFileName = createZip(workDir);
         
@@ -133,8 +135,8 @@ public class CreateFedlet extends Task {
     }
     
     private void copyBits(ServletContext servletCtx, String workDir) throws WorkflowException {
-
         copyFile(servletCtx, "/WEB-INF/fedlet/README", workDir + "/README");
+        copyFile(servletCtx, "/WEB-INF/fedlet/fedlet.war.template", workDir + "/fedlet.war");
     }
     
     private void copyFile(ServletContext servletCtx, String source, String dest)
@@ -294,6 +296,17 @@ public class CreateFedlet extends Task {
         return xml;
     }
     
+    private void createWar(String workDir) throws WorkflowException {
+        String warDir = workDir + "/fedlet.war";
+        String baseDir = workDir + "/war_tmp";
+        try {
+            final List<String> files = ZipUtils.generateZip(baseDir, warDir);
+            deleteAllFiles(baseDir, files);
+        } catch (IOException | URISyntaxException e) {
+            throw new WorkflowException(e.getMessage());
+        }
+    }
+
     private String createZip(String workDir) throws WorkflowException {
         final String zipName = workDir + "/Fedlet.zip";
         try {
