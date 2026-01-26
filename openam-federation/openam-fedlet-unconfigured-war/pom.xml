@@ -200,6 +200,14 @@
                                 <include>debugconfig.properties</include>
                             </includes>
                         </resource>
+                        <resource>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <directory>${project.basedir}/../../openam-core/src/main/resources</directory>
+                            <includes>
+                                <include>ESAPI.properties</include>
+                                <include>validation.properties</include>
+                            </includes>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
