@@ -23,6 +23,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
+* Portions Copyrighted 2026 OSSTech Corporation
 -->
 
 <!-- Parent Project -->
@@ -122,6 +123,12 @@
             <fileset dir="src/main/resources">
                 <include name="FederationConfig.properties"/>
             </fileset>
+        </copy>
+        <copy todir="${openam.temp.target}/WEB-INF/fedlet" filtering="false">
+            <fileset dir="${project.basedir}/../openam-federation/openam-fedlet-unconfigured-war/target">
+                <include name="*.war"/>
+            </fileset>
+            <mapper type="glob" from="*.war" to="fedlet.war.template"/>
         </copy>
 
         <!-- Align in auth -->
