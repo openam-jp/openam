@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019-2022 OSSTech Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 /* global module, require, process */
@@ -105,7 +105,8 @@ module.exports = function (grunt) {
                         "main-device.js",
                         "main.js",
                         "config/**/*.js",
-                        "org/forgerock/openam/**/*.js"
+                        "org/forgerock/openam/**/*.js",
+                        "jp/co/osstech/openam/**/*.js"
                     ]
                 }
             },
