@@ -25,6 +25,7 @@
    $Id: idpSingleLogoutRedirect.jsp,v 1.9 2009/06/12 22:21:42 mallas Exp $
 
    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2026 OSSTech Corporation
 --%>
 
 
@@ -69,17 +70,17 @@
     //- SAMLResponse - the LogoutResponse
 
     String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-    if (relayState != null) {
-        String tmpRs = (String) IDPCache.relayStateCache.remove(relayState);
-        if (tmpRs != null) {
-            relayState = tmpRs;
-        }
-    }
-    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
+    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "RelayState", 2000, true)) {
         relayState = null;
     }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
+        if (relayState != null) {
+            String tmpRs = (String) IDPCache.relayStateCache.remove(relayState);
+            if (tmpRs != null) {
+                relayState = tmpRs;
+            }
+        }
         boolean doRelayState = true;
         try {
         /**
