@@ -25,6 +25,7 @@
    $Id: spSingleLogoutRedirect.jsp,v 1.14 2009/06/17 03:10:28 exu Exp $
 
    Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2019-2026 OSSTech Corporation
 --%>
 
 <%@ page import="com.sun.identity.sae.api.SecureAttrs" %>
@@ -81,18 +82,18 @@
     //- SAMLResponse - the LogoutResponse
 
     String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-    if (relayState != null) {
-        CacheObject tmpRs= 
-            (CacheObject) SPCache.relayStateHash.remove(relayState);
-        if ((tmpRs != null)) {
-            relayState = (String) tmpRs.getObject();
-        }
-    }
-    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
+    if (!ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "RelayState", 2000, true)) {
         relayState = null;
     }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
+        if (relayState != null) {
+            CacheObject tmpRs=
+            (CacheObject) SPCache.relayStateHash.remove(relayState);
+            if ((tmpRs != null)) {
+                relayState = (String) tmpRs.getObject();
+            }
+        }
         boolean sloFailed = false;
         try {
         /**

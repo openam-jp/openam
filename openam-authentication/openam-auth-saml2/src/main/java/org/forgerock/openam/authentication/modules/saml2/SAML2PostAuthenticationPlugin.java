@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -59,8 +60,6 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
 import org.forgerock.openam.xui.XUIState;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.errors.EncodingException;
 
 /**
  * Plugin that gets activated for SLO for the SAML2 auth module. Supports HTTP-Redirect
@@ -246,17 +245,12 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
         try {
             final String ssOutEnabled = ssoToken.getProperty(SAML2Constants.SINGLE_LOGOUT);
             if (Boolean.parseBoolean(ssOutEnabled)) {
-                final XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
                 final StringBuilder logoutLocation = new StringBuilder();
                 logoutLocation.append(ssoToken.getProperty(SLO_SESSION_LOCATION));
-                if (xuiState.isXUIEnabled()) {
-                    logoutLocation.append(ESAPI.encoder().encodeForURL(ssoToken.getProperty(SLO_SESSION_REFERENCE)));
-                } else {
-                    logoutLocation.append(ssoToken.getProperty(SLO_SESSION_REFERENCE));
-                }
+                logoutLocation.append(ssoToken.getProperty(SLO_SESSION_REFERENCE));
                 request.setAttribute(AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL, logoutLocation.toString());
             }
-        } catch (EncodingException | SSOException e) {
+        } catch (SSOException e) {
             //debug warning and fall through
             DEBUG.warning("Error loading SAML assertion information in memory. SLO failed for this session.", e);
         }

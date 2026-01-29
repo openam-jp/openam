@@ -25,6 +25,7 @@
    $Id: spSingleLogoutPOST.jsp,v 1.8 2009/06/24 23:05:31 mrudulahg Exp $
 
    Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2026 OSSTech Corporation
 --%>
 
 
@@ -75,18 +76,18 @@
     //- SAMLResponse - the LogoutResponse
 
     String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-    if (relayState != null) {
-        CacheObject tmpRs= 
-            (CacheObject) SPCache.relayStateHash.remove(relayState);
-        if ((tmpRs != null)) {
-            relayState = (String) tmpRs.getObject();
-        }
-    }
-    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
+    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "RelayState", 2000, true)) {
         relayState = null;
     }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
+        if (relayState != null) {
+            CacheObject tmpRs=
+                (CacheObject) SPCache.relayStateHash.remove(relayState);
+            if ((tmpRs != null)) {
+                relayState = (String) tmpRs.getObject();
+            }
+        }
         try {
         /**
          * Gets and processes the Single <code>LogoutResponse</code> from IDP,
