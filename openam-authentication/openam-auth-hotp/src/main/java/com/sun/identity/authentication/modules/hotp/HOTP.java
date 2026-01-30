@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.modules.hotp;
@@ -48,6 +49,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.PasswordCallback;
 import java.security.Principal;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -80,6 +82,7 @@ public class HOTP extends AMLoginModule {
     private static final String ATTRIBUTEEMAIL = "openamEmailAttribute";
     private static final String AUTO_CLICKING = "sunAMAuthHOTPAutoClicking";
     private static final String SKIP_HOTP = "skipHOTP";
+    private static final String MAX_TOTAL_ATTEMPT = "maxTotalAttempt";
     private String gatewaySMSImplClass = null;
     private String codeValidityDuration = null;
     private String codeLength = null;
@@ -89,6 +92,9 @@ public class HOTP extends AMLoginModule {
     private String emailAttribute = null;
     private boolean skip = false;
     private boolean hotpAutoClicking = false;
+    private int maxTotalAttempt;
+    private static final int DEFAULT_MAX_TOTAL_ATTEMPT = 1;
+    private int attempt = 0;
 
     private int START_STATE = 2;
 
@@ -171,6 +177,7 @@ public class HOTP extends AMLoginModule {
                 Integer.parseInt(codeLength), bundle.getString("messageSubject"), bundle.getString("messageContent"),
                 FROM_ADDRESS, userSearchAttributes);
         hotpService = new HOTPService(getAMIdentityRepository(getRequestOrg()), userName, hotpParams);
+        maxTotalAttempt = CollectionHelper.getIntMapAttr(options, MAX_TOTAL_ATTEMPT, DEFAULT_MAX_TOTAL_ATTEMPT, debug);
     }
 
     public int process(Callback[] callbacks, int state) throws AuthLoginException {
@@ -217,16 +224,14 @@ public class HOTP extends AMLoginModule {
                             if (debug.messageEnabled()) {
                                 debug.message("HOTP.process() : " + "invalid HOTP code");
                             }
-                            setFailureID(userName); 
-                            throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                            return invalid_hotpcode(userName);
                         }
 
                         // Enforce the code validate time HOTP module config
                         if (hotpService.isValidHOTP(enteredHOTPCode)) {
                             return ISAuthConstants.LOGIN_SUCCEED;
                         } else {
-                            setFailureID(userName);
-                            throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
+                            return invalid_hotpcode(userName);
                         }
                     } else { // Send HOTP Code
                         try {
@@ -279,5 +284,20 @@ public class HOTP extends AMLoginModule {
         currentConfig = null;
         enteredHOTPCode = null;
         userSearchAttributes = Collections.emptySet();
+    }
+
+    public int invalid_hotpcode(String userName) throws AuthLoginException {
+        attempt++;
+
+        if (attempt < maxTotalAttempt) {
+            debug.message("HOTP.invalid_hotpcode(): Retry OTP Code validation");
+            // Substitute header with warning message that OTP code is incorrect.
+            String _messageFormat = bundle.getString("warning-incorrect-otp");
+            int _lastValidationFailureNumber = maxTotalAttempt - attempt;
+            substituteHeader(START_STATE, MessageFormat.format(_messageFormat, _lastValidationFailureNumber));
+            return START_STATE;
+        }
+        setFailureID(userName);
+        throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
     }
 }
