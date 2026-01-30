@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions copyright 2019-2024 OSSTech Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -1111,7 +1111,7 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
     /**
      * Whether or not to enforce the Code Verifier Parameter
      * @return Whether the Code Verifier option has been configured
-     * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-spop-12"</a>
+     * @see <a href="https://tools.ietf.org/html/rfc7636"</a>
      */
     public boolean isCodeVerifierRequired() throws ServerException {
         try {
