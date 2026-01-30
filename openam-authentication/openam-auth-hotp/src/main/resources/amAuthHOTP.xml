@@ -27,6 +27,7 @@
    $Id: amAuthHOTP.xml,v 1.2 2010/01/27 21:46:02 qcheng Exp $
    
    Portions Copyrighted 2012-2015 ForgeRock AS.
+   Portions Copyrighted 2026 OSSTech Corporation
 -->
 
 
@@ -210,6 +211,18 @@
                     <Value>mail</Value>
                   </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="maxTotalAttempt"
+                         type="single"
+                         syntax="number_range"
+                         i18nKey="a513"
+                         rangeStart="1"
+                         rangeEnd="99"
+                         order="1500"
+                         resourceName="maxTotalAttempt">
+                  <DefaultValues>
+                    <Value>1</Value>
+                  </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="sunAMAuthHOTPAuthLevel"
                         type="single"
@@ -375,6 +388,18 @@
                                   <DefaultValues>
                         <Value>mail</Value>
                                   </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="maxTotalAttempt"
+                                     type="single"
+                                     syntax="number_range"
+                                     i18nKey="a513"
+                                     rangeStart="1"
+                                     rangeEnd="99"
+                                     order="1500"
+                                     resourceName="maxTotalAttempt">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>
