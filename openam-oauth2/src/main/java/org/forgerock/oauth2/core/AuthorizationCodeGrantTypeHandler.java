@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -97,7 +98,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         }
 
         final String codeVerifier = request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER);
-        if (providerSettings.isCodeVerifierRequired()) {
+        if (providerSettings.isCodeVerifierRequired() || clientRegistration.isCodeVerifierRequired()) {
             if (codeVerifier == null) {
                 String message = "code_verifier parameter required";
                 throw new InvalidRequestException(message);
@@ -134,7 +135,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
                 throw new InvalidGrantException("Authorization code expired.");
             }
 
-            if (providerSettings.isCodeVerifierRequired()) {
+            if (providerSettings.isCodeVerifierRequired() || clientRegistration.isCodeVerifierRequired()) {
                 checkCodeVerifier(authorizationCode, codeVerifier);
             }
 
