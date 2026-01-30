@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -158,4 +158,10 @@ public interface ClientRegistration {
       */
     boolean isPolicyBasedProtectionEnabled();
 
+    /**
+     * Gets whether or Authorization Code requests will require a "code_challenge" attribute.
+     *
+     * @return true if enabled.
+     */
+    boolean isCodeVerifierRequired();
 }

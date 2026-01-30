@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
+* Portions copyright 2026 OSSTech Corporation
 */
 package org.forgerock.openidconnect;
 
@@ -20,6 +21,8 @@ import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -41,10 +44,13 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
 public class CodeVerifierValidator implements AuthorizeRequestValidator {
 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final ClientRegistrationStore clientRegistrationStore;
 
     @Inject
-    public CodeVerifierValidator(OAuth2ProviderSettingsFactory providerSettingsFactory) {
+    public CodeVerifierValidator(OAuth2ProviderSettingsFactory providerSettingsFactory,
+                                 ClientRegistrationStore clientRegistrationStore) {
         this.providerSettingsFactory = providerSettingsFactory;
+        this.clientRegistrationStore = clientRegistrationStore;
     }
 
     @Override
@@ -52,8 +58,11 @@ public class CodeVerifierValidator implements AuthorizeRequestValidator {
             RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, BadRequestException,
             InvalidScopeException, NotFoundException {
         final OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(
+                request.<String>getParameter(OAuth2Constants.Params.CLIENT_ID), request);
 
-        if (!settings.isCodeVerifierRequired() || !isAuthCodeRequest(request)) {
+        if (!(settings.isCodeVerifierRequired() || clientRegistration.isCodeVerifierRequired())
+            || !isAuthCodeRequest(request)) {
             return;
         } else {
             Reject.ifTrue(isEmpty(request.<String>getParameter(OAuth2Constants.Custom.CODE_CHALLENGE)),
