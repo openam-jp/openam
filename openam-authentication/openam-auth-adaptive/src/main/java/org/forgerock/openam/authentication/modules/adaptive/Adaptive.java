@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2013-2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2020-2023 OSSTech Corporation
+ * Portions Copyrighted 2020-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -43,6 +43,7 @@ import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.authentication.spi.MessageLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -92,12 +93,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.forgerock.openam.utils.ClientUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IPRange;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.ValidateIPaddress;
 
 public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterface {
 
     private static final String ADAPTIVE = "amAuthAdaptive";
     private static final String AUTHLEVEL = "openam-auth-adaptive-auth-level";
+    private static final String ERR_MSG_CODE = "openam-auth-adaptive-error-message-code";
     private static final String ADAPTIVETHRESHOLD = "openam-auth-adaptive-auth-threshold";
     private static final String AUTH_FAILURE_CHECK = "openam-auth-adaptive-failure-check";
     private static final String AUTH_FAILURE_SCORE = "openam-auth-adaptive-failure-score";
@@ -210,6 +213,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String IP_START = "IPStart";
     private static final String IP_END = "IPEnd";
     private static final String IP_TYPE = "Type";
+    private String errMsgCode = null;
 
     private static final String UNKNOWN_COUNTRY_CODE = "--";
 
@@ -220,6 +224,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     public void init(Subject subject, Map sharedState, Map options) {
         postAuthNMap = new HashMap<String, String>();
         String authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
+        errMsgCode = CollectionHelper.getMapAttr(options, ERR_MSG_CODE);
 
         if (authLevel != null) {
             try {
@@ -244,9 +249,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
 
         if (debug.messageEnabled()) {
+            debug.message("{}.init : errMsgCode:[{}]", ADAPTIVE, errMsgCode);
             debug.message("{}.init : resbundle locale={}, user search attributes={}", ADAPTIVE, locale,
                     userSearchAttributes);
-         }
+        }
     }
 
     @Override
@@ -384,7 +390,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             if (debug.messageEnabled()) {
                 debug.message("{}: Returning Fail. Username='{}'", ADAPTIVE, userName);
             }
-            throw new AuthLoginException(ADAPTIVE + " - Risk determined.");
+            if (StringUtils.isEmpty(errMsgCode)) {
+                throw new AuthLoginException(ADAPTIVE + " - Risk determined.");
+            } else {
+                throw new MessageLoginException(ADAPTIVE, errMsgCode, null);
+            }
         }
     }
 
