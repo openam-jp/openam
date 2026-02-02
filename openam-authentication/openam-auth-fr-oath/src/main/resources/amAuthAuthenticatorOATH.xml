@@ -23,7 +23,7 @@
   with the fields enclosed by brackets [] replaced by
   your own identifying information:
   "Portions Copyrighted 2012 ForgeRock AS"
-  "Portions Copyrighted 2019 Open Source Solution Technology Corporation"
+  "Portions Copyrighted 2019-2026 OSSTech Corporation"
 
 -->
 
@@ -87,7 +87,7 @@
                                  order="300"
                                  resourceName="minimumSecretKeyLength">
                     <DefaultValues>
-                        <Value>32</Value>
+                        <Value>40</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-fr-oath-algorithm"
@@ -238,7 +238,7 @@
                                      order="300"
                                      resourceName="minimumSecretKeyLength">
                         <DefaultValues>
-                            <Value>32</Value>
+                            <Value>40</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-fr-oath-algorithm"
