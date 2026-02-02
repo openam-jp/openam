@@ -24,6 +24,7 @@
 -->
 <!--
   Portions Copyright 2015 ForgeRock AS.
+  Portions Copyrighted 2020-2026 OSSTech Corporation
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -55,6 +56,17 @@
                 resourceName="riskThreshold">
                     <DefaultValues>
                         <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-error-message-code"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a549"
+                order="250"
+                resourceName="errMsgCode">
+                    <DefaultValues>
+                        <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-adaptive-failure-check"
@@ -662,6 +674,17 @@
                 resourceName="riskThreshold">
                     <DefaultValues>
                         <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-error-message-code"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a549"
+                order="250"
+                resourceName="errMsgCode">
+                    <DefaultValues>
+                        <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-adaptive-failure-check"
