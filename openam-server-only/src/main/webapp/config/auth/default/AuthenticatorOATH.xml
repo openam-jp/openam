@@ -14,7 +14,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
 
   Copyright 2012-2015 ForgeRock AS.
-  Portions Copyrighted 2019 Open Source Solution Technology Corporation
+  Portions copyright 2019-2026 OSSTech Corporation
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -72,6 +72,9 @@
                 <OptionValue>
                     <Value>Login using verification code</Value>
                 </OptionValue>
+                <OptionValue>
+                    <Value>Unable to scan</Value>
+                </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
@@ -101,6 +104,22 @@
                 </OptionValue>
                 <OptionValue>
                     <Value>Skip this step</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="3" order="8" timeout="120" header="Register your device with OpenAM">
+        <TextOutputCallback>
+            Open the application and enter the key.
+        </TextOutputCallback>
+        <TextOutputCallback>#REPLACE#</TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Login using verification code</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>Scan a barcode</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
