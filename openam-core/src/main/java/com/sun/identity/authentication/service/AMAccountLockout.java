@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -297,8 +298,10 @@ class AMAccountLockout {
                 DEBUG.message("userDN=" + userDN);
                 DEBUG.message("acInfo=" + acInfo);
             }
-            if (isAccountLockout.isMemoryLocking() && acInfo != null) {
-                locked = acInfo.isLockout();
+            if (isAccountLockout.isMemoryLocking()) {
+                if (acInfo != null) {
+                    locked = acInfo.isLockout();
+                }
             } else {
                 if (isAccountValid(amIdentity)) {
                     locked = isAccountLockout.isAccountLocked(amIdentity);
