@@ -14,7 +14,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
 
   Copyright 2012-2015 ForgeRock AS.
-  Portions Copyrighted 2019 Open Source Solution Technology Corporation
+  Portions copyright 2019-2026 OSSTech Corporation
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -72,6 +72,9 @@
                 <OptionValue>
                     <Value>次へ進む</Value>
                 </OptionValue>
+                <OptionValue>
+                    <Value>手動で入力(QRコードを読めない方はこちら)</Value>
+                </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
@@ -100,6 +103,22 @@
                 </OptionValue>
                 <OptionValue>
                     <Value>登録しないでログインする</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="3" order="8" timeout="120" header="手動でデバイスの登録">
+        <TextOutputCallback>
+             鍵文字列を登録してください。
+        </TextOutputCallback>
+        <TextOutputCallback>#REPLACE#</TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>次へ進む</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>QRコードを表示する</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

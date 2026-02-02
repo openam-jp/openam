@@ -13,7 +13,7 @@
  *
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.fr.oath;
@@ -42,6 +42,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +55,10 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.TextOutputCallback;
 import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.core.rest.devices.oath.OathDeviceSettings;
@@ -140,12 +144,16 @@ public class AuthenticatorOATH extends AMLoginModule {
     private static final int REGISTER_DEVICE = 5;
     private static final int RECOVERY_USED = 6;
     private static final int LOGIN_OPT_DEVICE = 7;
+    private static final int REGISTER_DEVICE_MANUAL = 8;
 
     private static final int REGISTER_DEVICE_OPTION_VALUE_INDEX = 0;
     private static final int OPT_DEVICE_SKIP_INDEX = 1;
     private static final int SKIP_OATH_INDEX = 1;
+    private static final int REGISTER_DEVICE_MANUAL_INDEX = 1;
+    private static final int REGISTER_DEVICE_RETURN_QR_INDEX = 1;
 
     private static final int SCRIPT_OUTPUT_CALLBACK_INDEX = 1;
+    private static final int MANUAL_TEXT_OUTPUT_CALLBACK_INDEX = 1;
 
     private AuthenticatorOathService realmOathService;
     private AMIdentity id;
@@ -346,13 +354,12 @@ public class AuthenticatorOATH extends AMLoginModule {
                     return doLoginSavedDevice(callbacks, state, settings);
 
                 case REGISTER_DEVICE:
-                    if (isOptional) {
-                        replaceHeader(LOGIN_OPT_DEVICE, login_header);
-                        return LOGIN_OPT_DEVICE;
-                    } else {
-                        replaceHeader(LOGIN_SAVED_DEVICE, login_header);
-                        return LOGIN_SAVED_DEVICE;
+                    selectedIndex = ((ConfirmationCallback) callbacks[2]).getSelectedIndex();
+                    if (selectedIndex == REGISTER_DEVICE_MANUAL_INDEX) {
+                        paintRegisterDeviceManualCallback(id, newDevice);
+                        return REGISTER_DEVICE_MANUAL;
                     }
+                    return checkOptionGotoNextStep();
 
                 case RECOVERY_USED:
                     if (isOptional) { //if it's optional and you log in, config not skippable
@@ -360,12 +367,30 @@ public class AuthenticatorOATH extends AMLoginModule {
                     }
                     return ISAuthConstants.LOGIN_SUCCEED;
 
+                case REGISTER_DEVICE_MANUAL:
+                    selectedIndex = ((ConfirmationCallback) callbacks[2]).getSelectedIndex();
+                    if (selectedIndex == REGISTER_DEVICE_RETURN_QR_INDEX) {
+                        paintRegisterDeviceCallback(id, newDevice);
+                        return REGISTER_DEVICE;
+                    }
+                    return checkOptionGotoNextStep();
+
                 default:
                     throw new AuthLoginException("amAuth", "invalidLoginState", new Object[]{state});
             }
         } catch (SSOException | IdRepoException | IOException e) {
             debug.error("OATH.process() : SSOException", e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+    }
+
+    private int checkOptionGotoNextStep() throws SSOException, AuthLoginException {
+        if (isOptional) {
+            replaceHeader(LOGIN_OPT_DEVICE, login_header);
+            return LOGIN_OPT_DEVICE;
+        } else {
+            replaceHeader(LOGIN_SAVED_DEVICE, login_header);
+            return LOGIN_SAVED_DEVICE;
         }
     }
 
@@ -531,6 +556,38 @@ public class AuthenticatorOATH extends AMLoginModule {
     private void paintRegisterDeviceCallback(AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
         replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(settings, id,
                 SCRIPT_OUTPUT_CALLBACK_INDEX));
+    }
+
+    private void paintRegisterDeviceManualCallback(AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
+        Object [] params = new Object[4];
+        params[0] = getSecretBase32(settings);
+        params[1] = passLen;
+        if (algorithm == HOTP) {
+            params[2] = bundle.getString("register_otp_algorithm_hotp");
+        } else if (algorithm == TOTP) {
+            params[2] = bundle.getString("register_otp_algorithm_totp");
+        } else {
+            debug.error("OATH.paintRegisterDeviceManualCallback() : No OTP algorithm selected");
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+        params[3] = totpTimeStep;
+        String fmtMsg = bundle.getString("register_otp_manual_message");
+        String Msg = MessageFormat.format(fmtMsg, params);
+        replaceCallback(REGISTER_DEVICE_MANUAL, MANUAL_TEXT_OUTPUT_CALLBACK_INDEX,
+                           new TextOutputCallback(TextOutputCallback.INFORMATION, Msg));
+    }
+
+    private String getSecretBase32(OathDeviceSettings settings) throws AuthLoginException {
+        String secretBase32 = null;
+        try {
+            byte[] secretPlainTextBytes = Hex.decodeHex(settings.getSharedSecret().toCharArray());
+            Base32 base32 = new Base32();
+            secretBase32 = new String(base32.encode(secretPlainTextBytes));
+        } catch (DecoderException de) {
+            debug.error("OATH.getSecretBase32() : Could not decode secret key from hex to plain text", de);
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+        return secretBase32;
     }
 
     /**
