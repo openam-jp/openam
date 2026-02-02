@@ -24,17 +24,18 @@
  *
  * $Id: AuthLoginException.java,v 1.4 2008/06/25 05:42:06 qcheng Exp $
  *
- */
-
-/*
  * Portions Copyright 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.authentication.spi;
 
+import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
+import com.sun.identity.shared.debug.Debug;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.security.auth.login.LoginException;
 
@@ -54,6 +55,8 @@ public class AuthLoginException extends LoginException implements L10NMessage {
     private Object[] _args = null;
 
     private ResourceBundle _bundle = null;
+
+    private final static Debug debug = AuthD.debug;
 
     /**
      * Constructs an exception with given message and the nested exception.
@@ -172,7 +175,13 @@ public class AuthLoginException extends LoginException implements L10NMessage {
 
         if (_bundleName != null && locale != null && _errorCode != null) {
             _bundle = amCache.getResBundle(_bundleName, locale);
-            String mid = _bundle.getString(_errorCode);
+            String mid;
+            try {
+                mid = _bundle.getString(_errorCode);
+            } catch (MissingResourceException e) {
+                debug.error("AuthLoginException.getL10NMessage(): errorCode not found. [{}]", _errorCode);
+                throw e;
+            }
             if (_args == null || _args.length == 0) {
                 result = mid;
             } else {
