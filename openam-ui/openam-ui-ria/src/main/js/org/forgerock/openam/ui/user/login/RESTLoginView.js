@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -36,11 +36,12 @@ define([
     "org/forgerock/commons/ui/common/util/URIUtils",
     "org/forgerock/openam/ui/common/util/uri/query",
     "org/forgerock/openam/ui/user/login/gotoUrl",
-    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken"
+    "org/forgerock/openam/ui/user/login/tokens/AuthenticationToken",
+    "org/forgerock/commons/ui/common/util/Base64"
 
 ], ($, _, AbstractView, AuthNService, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager, Form2js,
     Handlebars, Messages, RESTLoginHelper, RealmHelper, Router, SessionManager, UIUtils,
-    URIUtils, query, gotoUrl, AuthenticationToken) => {
+    URIUtils, query, gotoUrl, AuthenticationToken, Base64) => {
 
     function hasSsoRedirectOrPost (goto) {
         let decodedGoto;
@@ -218,7 +219,10 @@ define([
                 expire = new Date();
                 expire.setDate(expire.getDate() + 20);
                 // An assumption that the login name is the first text input box
-                CookieHelper.setCookie("login", this.$el.find("input[type=text]:first").val(), expire);
+                CookieHelper.setCookie("login",
+                                       Base64.encodeUTF8(this.$el.find("input[type=text]:first").val()),
+                                       expire
+                );
             } else if (this.$el.find("[name=loginRemember]").length !== 0) {
                 CookieHelper.deleteCookie("login");
             }
@@ -450,6 +454,13 @@ define([
         },
         prefillLoginData () {
             var login = CookieHelper.getCookie("login");
+            if (login) {
+                try {
+                    login = Base64.decodeUTF8(login);
+                } catch (e) {
+                    CookieHelper.deleteCookie("login");
+                }
+            }
 
             if (this.$el.find("[name=loginRemember]").length !== 0 && login) {
                 this.$el.find("input[type=text]:first").val(login);
