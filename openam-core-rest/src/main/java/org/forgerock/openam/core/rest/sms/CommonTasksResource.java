@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -39,10 +39,10 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.util.promise.Promise;
 
 /**
@@ -134,7 +134,7 @@ class CommonTasksResource implements CollectionResourceProvider {
         if (!"true".equals(request.getQueryFilter().toString())) {
             return new NotSupportedException("Query not supported: " + request.getQueryFilter()).asPromise();
         }
-        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(request));
+        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(context));
         for (String key : configuration.keys()) {
             JsonValue resource = configuration.get(key);
             resource.add(ResourceResponse.FIELD_CONTENT_ID, key);
@@ -146,7 +146,7 @@ class CommonTasksResource implements CollectionResourceProvider {
     @Override
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
-        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(request));
+        JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(context));
         if (!configuration.isDefined(resourceId)) {
             return new BadRequestException("Invalid common task").asPromise();
         }
@@ -160,9 +160,8 @@ class CommonTasksResource implements CollectionResourceProvider {
         return new NotSupportedException().asPromise();
     }
 
-    private ResourceBundle getResourceBundle(Request request) {
-        return request.getPreferredLocales()
-                .getBundleInPreferredLocale(RESOURCE_BUNDLE_NAME, getClass().getClassLoader());
+    private ResourceBundle getResourceBundle(Context context) {
+        return ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME, context.asContext(LocaleContext.class).getLocale());
     }
 
     private static final class CommonTasksConfigurationManager {

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 package org.forgerock.openam.core.rest.sms;
 
@@ -61,6 +61,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -77,6 +78,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -164,17 +166,16 @@ public class SmsRealmProvider implements RequestHandler {
                 return newResultPromise(newActionResponse(json(object(
                         field(PATH_ATTRIBUTE_NAME, "/"), field(ACTIVE_ATTRIBUTE_NAME, true)))));
             case RestConstants.SCHEMA:
-                return newResultPromise(newActionResponse(getSchema(request)));
+                return newResultPromise(newActionResponse(getSchema(context)));
             default:
             return new NotSupportedException("Action not supported: " + request.getAction()).asPromise();
         }
     }
 
-    private JsonValue getSchema(ActionRequest request) {
-        ResourceBundle consoleI18N = request.getPreferredLocales()
-                .getBundleInPreferredLocale("amConsole", getClass().getClassLoader());
-        ResourceBundle idRepoI18N = request.getPreferredLocales()
-                .getBundleInPreferredLocale("amIdRepoService", getClass().getClassLoader());
+    private JsonValue getSchema(Context context) {
+        Locale locale = context.asContext(LocaleContext.class).getLocale();
+        ResourceBundle consoleI18N = ResourceBundle.getBundle("amConsole", locale);
+        ResourceBundle idRepoI18N = ResourceBundle.getBundle("amIdRepoService", locale);
         return json(object(field("type", "object"), field("properties", object(
                 field(REALM_NAME_ATTRIBUTE_NAME, object(
                         field("type", "string"),
