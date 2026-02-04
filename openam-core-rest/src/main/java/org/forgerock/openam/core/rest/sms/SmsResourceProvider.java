@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -606,7 +606,10 @@ public abstract class SmsResourceProvider {
     protected Map<String, String> getAttributeNameToSection(ServiceSchema schema) {
         Map<String, String> result = new LinkedHashMap<>();
 
-        String serviceSectionFilename = schema.getName() != null ? schema.getName() : schema.getServiceName();
+        String serviceSectionFilename = schema.getName();
+        if (serviceSectionFilename == null || serviceSectionFilename.equals("serverconfig")) {
+            serviceSectionFilename = schema.getServiceName();
+        }
         serviceSectionFilename = serviceSectionFilename + ".section.properties";
 
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -86,6 +87,7 @@ define([
                 element = this.$el.find("#tabpanel").empty().get(0);
 
             this.data.form = new Form(element, schema, this.data.values);
+            this.$el.find("[data-header]").parent().hide();
         }
     });
 
