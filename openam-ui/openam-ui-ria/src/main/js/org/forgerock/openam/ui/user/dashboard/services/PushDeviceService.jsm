@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
@@ -21,7 +22,7 @@ import RealmHelper from "org/forgerock/openam/ui/common/util/RealmHelper";
 
 const delegate = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
 const getPath = function () {
-    return `__subrealm__/users/${Configuration.loggedUser.get("uid")}/devices/push/`;
+    return `__subrealm__/users/${Configuration.loggedUser.get("username")}/devices/push/`;
 };
 
 export function getAll () {

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2019 Open Source Solution Technology Corporation
+ * Copyright 2019-2026 OSSTech Corporation
  */
 
 import AbstractDelegate from "org/forgerock/commons/ui/common/main/AbstractDelegate";
@@ -21,7 +21,7 @@ import RealmHelper from "org/forgerock/openam/ui/common/util/RealmHelper";
 
 const delegate = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
 const getPath = function () {
-    return `__subrealm__/users/${Configuration.loggedUser.get("uid")}/devices/webauthn/`;
+    return `__subrealm__/users/${Configuration.loggedUser.get("username")}/devices/webauthn/`;
 };
 
 export function getAll () {
