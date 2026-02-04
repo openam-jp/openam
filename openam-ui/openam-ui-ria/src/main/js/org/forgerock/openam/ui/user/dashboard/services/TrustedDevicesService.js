@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -28,7 +29,7 @@ define([
     obj.getTrustedDevices = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm(`__subrealm__/users/${
-                    Configuration.loggedUser.get("uid")
+                    Configuration.loggedUser.get("username")
                     }/devices/trusted/?_queryId=*`),
             headers: { "Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0" }
         });
@@ -37,7 +38,7 @@ define([
     obj.deleteTrustedDevice = function (id) {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithSubRealm(`__subrealm__/users/${
-                Configuration.loggedUser.get("uid")
+                Configuration.loggedUser.get("username")
                 }/devices/trusted/${id}`),
             type: "DELETE",
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }

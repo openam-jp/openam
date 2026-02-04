@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -26,7 +27,7 @@ define([
 ], function ($, Configuration, Constants, AbstractDelegate, RealmHelper) {
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`),
         getPath = function () {
-            return `__subrealm__/users/${Configuration.loggedUser.get("uid")}/devices/2fa/oath/`;
+            return `__subrealm__/users/${Configuration.loggedUser.get("username")}/devices/2fa/oath/`;
         };
 
     /**
