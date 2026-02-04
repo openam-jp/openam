@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -71,7 +73,6 @@ import org.apache.commons.io.IOUtils;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -83,6 +84,7 @@ import org.forgerock.json.resource.annotations.Action;
 import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
+import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.BundleUtils;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -369,7 +371,7 @@ public class SmsServerPropertiesResource {
     }
 
     @Action
-    public Promise<ActionResponse, ResourceException> schema(ActionRequest request, Context serverContext) {
+    public Promise<ActionResponse, ResourceException> schema(Context serverContext) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
         final String serverId = uriVariables.get("serverName");
@@ -399,8 +401,7 @@ public class SmsServerPropertiesResource {
         JsonValue schema;
         boolean isServerDefault = serverUrl.equalsIgnoreCase(SERVER_DEFAULT_NAME);
 
-        ResourceBundle titleBundle = request.getPreferredLocales()
-                .getBundleInPreferredLocale("amConsole", getClass().getClassLoader());
+        ResourceBundle titleBundle = ResourceBundle.getBundle("amConsole", getLocale(serverContext));
 
         if (ADVANCED_TAB_NAME.equals(tabName)) {
             schema = getAdvancedSchema(serverContext, serverUrl);
@@ -932,8 +933,7 @@ public class SmsServerPropertiesResource {
             logger.error("Invalid property", e);
         } catch (UnknownPropertyNameException e) {
             logger.warning("Unknown property found.", e);
-            ResourceBundle bundle = request.getPreferredLocales().getBundleInPreferredLocale("amConsole",
-                    getClass().getClassLoader());
+            ResourceBundle bundle = ResourceBundle.getBundle("amConsole", getLocale(serverContext));
             return new BadRequestException(
                     format(bundle.getString(UNKNOWN_PROPS), e.getMessage())).asPromise();
         }
@@ -1147,5 +1147,9 @@ public class SmsServerPropertiesResource {
         public boolean isPasswordField() {
             return isPasswordField;
         }
+    }
+
+    private Locale getLocale(Context context) {
+        return context.asContext(LocaleContext.class).getLocale();
     }
 }
