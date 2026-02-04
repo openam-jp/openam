@@ -251,20 +251,26 @@ class AMAccountLockout {
         boolean locked = false;
         try {
             AMIdentity amIdentity = AuthD.getAuth().getIdentity(IdType.USER, aUserName, loginState.getOrgDN());
-            String userDN = normalizeDN(IdUtils.getDN(amIdentity));
 
-            if (acInfo == null) {
-                acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
-            }
+            // Memory Lockout should check lockout attribute too
+            locked = attributeLocked(amIdentity);
 
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("isLockedOut:userDN=" + userDN);
-                DEBUG.message("isLockedOut:acInfo=" + acInfo);
-            }
-            if (acInfo != null) {
-                locked = isAccountLockout.isLockedOut(acInfo);
-                if (!locked && acInfo.isLockout()) {
-                    resetPasswdLockout(aUserName, false);
+            if (!locked) {
+                String userDN = normalizeDN(IdUtils.getDN(amIdentity));
+
+                if (acInfo == null) {
+                    acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
+                }
+
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("isLockedOut:userDN=" + userDN);
+                    DEBUG.message("isLockedOut:acInfo=" + acInfo);
+                }
+                if (acInfo != null) {
+                    locked = isAccountLockout.isLockedOut(acInfo);
+                    if (!locked && acInfo.isLockout()) {
+                        resetPasswdLockout(aUserName, false);
+                    }
                 }
             }
 
@@ -274,6 +280,28 @@ class AMAccountLockout {
         } catch (Exception e) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("isLockedOut:Exception : ", e);
+            }
+        }
+        return locked;
+    }
+
+    boolean attributeLocked(AMIdentity amIdentity) {
+        boolean locked = false;
+        try {
+            if ((loginLockoutAttrName != null) && (loginLockoutAttrValue != null )) {
+                // Use lockout attribute
+                Set<String> values = amIdentity.getAttribute(loginLockoutAttrName);
+                if ((values != null) &&  !values.isEmpty()) {
+                    String lockoutStatus = values.iterator().next();
+                    locked = loginLockoutAttrValue.equalsIgnoreCase(lockoutStatus);
+                }
+            } else {
+                // Use user status as lockout status
+                locked = !amIdentity.isActive();
+            }
+        } catch (Exception e) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("attributeLocked : ", e);
             }
         }
         return locked;
@@ -299,8 +327,13 @@ class AMAccountLockout {
                 DEBUG.message("acInfo=" + acInfo);
             }
             if (isAccountLockout.isMemoryLocking()) {
-                if (acInfo != null) {
-                    locked = acInfo.isLockout();
+                // Memory Lockout should check lockout attribute too
+                locked = attributeLocked(amIdentity);
+
+                if (!locked) {
+                    if (acInfo != null) {
+                        locked = acInfo.isLockout();
+                    }
                 }
             } else {
                 if (isAccountValid(amIdentity)) {
