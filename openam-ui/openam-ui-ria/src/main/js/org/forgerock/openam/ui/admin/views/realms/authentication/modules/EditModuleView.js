@@ -17,6 +17,7 @@
 
 define([
     "jquery",
+    "lodash",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -26,7 +27,7 @@ define([
 
     // jquery dependencies
     "bootstrap-tabdrop"
-], function ($, AbstractView, EventManager, Constants, AuthenticationService, Form, Messages) {
+], function ($, _, AbstractView, EventManager, Constants, AuthenticationService, Form, Messages) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -67,9 +68,12 @@ define([
             });
         },
         save () {
+            var self = this;
             AuthenticationService.authentication.modules
             .update(this.data.realmPath, this.data.name, this.data.type, this.data.form.data())
-            .then(() => {
+            .then((data) => {
+                // Update the form data for re-render the tab
+                _.extend(self.data.form.values, data);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({
