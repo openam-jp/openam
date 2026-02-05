@@ -150,6 +150,12 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String REQ_HEADER_VALUE = "openam-auth-adaptive-req-header-value";
     private static final String REQ_HEADER_SCORE = "openam-auth-adaptive-req-header-score";
     private static final String REQ_HEADER_INVERT = "openam-auth-adaptive-req-header-invert";
+    private static final String GEO_LOCATION_HISTORY_CHECK = "openam-auth-adaptive-geo-location-history-check";
+    private static final String GEO_LOCATION_HISTORY_COUNT = "openam-auth-adaptive-geo-location-history-count";
+    private static final String GEO_LOCATION_HISTORY_ATTRIBUTE = "openam-auth-adaptive-geo-location-history-attribute";
+    private static final String GEO_LOCATION_HISTORY_SAVE = "openam-auth-adaptive-geo-location-history-save";
+    private static final String GEO_LOCATION_HISTORY_SCORE = "openam-auth-adaptive-geo-location-history-score";
+    private static final String GEO_LOCATION_HISTORY_INVERT = "openam-auth-adaptive-geo-location-history-invert";
     private static Debug debug = Debug.getInstance(ADAPTIVE);
     private static DatabaseReader lookupService = null;
     private String userUUID = null;
@@ -207,6 +213,12 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private String reqHeaderValue = null;
     private int reqHeaderScore = 1;
     private boolean reqHeaderInvert = false;
+    private boolean geoLocationHistoryCheck = false;
+    private int geoLocationHistoryCount = 0;
+    private String geoLocationHistoryAttribute = null;
+    private boolean geoLocationHistorySave = false;
+    private int geoLocationHistoryScore = 1;
+    private boolean geoLocationHistoryInvert = false;
     private final static String IP_V4 = "IPv4";
     private final static String IP_V6 = "IPv6";
     private static final String IP_Version = "IPVersion";
@@ -214,6 +226,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String IP_END = "IPEnd";
     private static final String IP_TYPE = "Type";
     private String errMsgCode = null;
+    private  String countryCode = null;
 
     private static final String UNKNOWN_COUNTRY_CODE = "--";
 
@@ -363,6 +376,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 int retVal = checkGeoLocation();
                 if (debug.messageEnabled()) {
                     debug.message("{}.checkGeoLocation: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
+            }
+            if (geoLocationHistoryCheck) {
+                int retVal = checkGeoLocationHistory();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkGeoLocationHistory: returns {}", ADAPTIVE, retVal);
                 }
                 currentScore += retVal;
             }
@@ -655,7 +675,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
     protected int checkGeoLocation() {
         int retVal = 0;
-        String countryCode;
 
         if (debug.messageEnabled()) {
             debug.message("{}.checkGeoLocation: GeoLocation database location = {}", ADAPTIVE, geoLocationDatabase);
@@ -704,6 +723,88 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         if (!geoLocationInvert) {
             retVal = geoLocationScore - retVal;
+        }
+        return retVal;
+    }
+
+    /**
+     * Check to see if the client location is in the history.
+     *
+     * GeoLocationHistory is stored in a single attribute, separated by ",".
+     * The client Location is add to front of list. If the maximum number of
+     * histories is reached, the oldest one will be removed from the end of
+     * the list.
+     *
+     * The PostAuthN Method will update the profile if needed.
+     *
+     * @return score achieved with this test
+     */
+    protected int checkGeoLocationHistory() {
+        int retVal = 0;
+
+        if (geoLocationHistoryAttribute == null) {
+            debug.error("{}.checkGeoLocationHistory: The property '{}' is null", ADAPTIVE, GEO_LOCATION_HISTORY_ATTRIBUTE);
+            return geoLocationHistoryScore;
+        }
+
+        // checkGeoLocation() may have already identified the country code.
+        if (countryCode == null) {
+            DatabaseReader db = getLookupService(geoLocationDatabase);
+
+            if (db == null) {
+                debug.error("{}.checkGeoLocationHistory: GeoLocation database lookup returns null", ADAPTIVE);
+                return geoLocationHistoryScore;
+            }
+
+            try {
+                countryCode = getCountryCode(db, clientIP);
+            } catch (IOException e) {
+                if (debug.warningEnabled()) {
+                    debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An IO error happened", ADAPTIVE, e);
+                }
+                return geoLocationHistoryScore;
+            } catch (GeoIp2Exception e) {
+                if (debug.warningEnabled()) {
+                    debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
+                }
+                return geoLocationHistoryScore;
+            }
+
+            if (debug.messageEnabled()) {
+                debug.message("{}.checkGeoLocationHistory: {} returns {}", ADAPTIVE, clientIP, countryCode);
+            }
+        }
+
+        String historyValues = getIdentityAttributeString(geoLocationHistoryAttribute);
+        if (debug.messageEnabled()) {
+            debug.message("{}.checkGeoLocationHistory: Client Country = {}, History = {}", ADAPTIVE, countryCode,
+                    historyValues);
+        }
+
+        String newHistory = countryCode;
+        int historyCount = 0;
+        if (historyValues != null) {
+            StringTokenizer st = new StringTokenizer(historyValues, ",");
+            while (st.hasMoreTokens()) {
+                String history = st.nextToken();
+                historyCount += 1;
+                if (historyCount < geoLocationHistoryCount) {
+                    newHistory += "," + history;
+                }
+
+                if (countryCode.equals(history)) {
+                    retVal = geoLocationHistoryScore;
+                }
+            }
+        }
+
+        if (geoLocationHistorySave) {
+            postAuthNMap.put("GEOLOCATIONSAVE", newHistory);
+            postAuthNMap.put("GEOLOCATIONAttr", geoLocationHistoryAttribute);
+        }
+
+        if (!geoLocationHistoryInvert) {
+            retVal = geoLocationHistoryScore - retVal;
         }
         return retVal;
     }
@@ -1049,6 +1150,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
                 attrMap.put(name, vals);
             }
+            if (m.containsKey("GEOLOCATIONSAVE")) {
+                String value = m.get("GEOLOCATIONSAVE");
+                String name = m.get("GEOLOCATIONAttr");
+                Set<String> vals = new HashSet<String>();
+                vals.add(value);
+
+                attrMap.put(name, vals);
+            }
 
             // Now we save the attribs,  since we can do it in one shot
             if (!attrMap.isEmpty()) {
@@ -1185,6 +1294,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
             geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
 
+            geoLocationHistoryCheck = getOptionAsBoolean(options, GEO_LOCATION_HISTORY_CHECK);
+            geoLocationHistoryCount = getOptionAsInteger(options, GEO_LOCATION_HISTORY_COUNT);
+            geoLocationHistoryAttribute = CollectionHelper.getMapAttr(options, GEO_LOCATION_HISTORY_ATTRIBUTE);
+            geoLocationHistorySave = getOptionAsBoolean(options, GEO_LOCATION_HISTORY_SAVE);
+            geoLocationHistoryScore = getOptionAsInteger(options, GEO_LOCATION_HISTORY_SCORE);
+            geoLocationHistoryInvert = getOptionAsBoolean(options, GEO_LOCATION_HISTORY_INVERT);
+
             reqHeaderCheck = getOptionAsBoolean(options, REQ_HEADER_CHECK);
             reqHeaderName = CollectionHelper.getMapAttr(options, REQ_HEADER_NAME);
             reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
@@ -1249,6 +1365,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                         .append("\nGeoLocation Values-> ").append(geoLocationValues)
                         .append("\nGeoLocation Score-> ").append(geoLocationScore)
                         .append("\nGeoLocation Invert-> ").append(geoLocationInvert)
+
+                        .append("\nGeoLocation History Check-> ").append(geoLocationHistoryCheck)
+                        .append("\nGeoLocation History Count-> ").append(geoLocationHistoryCount)
+                        .append("\nGeoLocation History Attribute-> ").append(geoLocationHistoryAttribute)
+                        .append("\nGeoLocation History Save-> ").append(geoLocationHistorySave)
+                        .append("\nGeoLocation History Score-> ").append(geoLocationHistoryScore)
+                        .append("\nGeoLocation History Invert-> ").append(geoLocationHistoryInvert)
 
                         .append("\nReq Header Check-> ").append(reqHeaderCheck)
                         .append("\nReq Header Name-> ").append(reqHeaderName)
@@ -1349,6 +1472,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         geoLocationScore = 1;
         geoLocationInvert = false;
 
+        geoLocationHistoryCheck = false;
+        geoLocationHistoryCount = 0;
+        geoLocationHistoryAttribute = null;
+        geoLocationHistorySave = false;
+        geoLocationHistoryScore = 1;
+        geoLocationHistoryInvert = false;
+
         reqHeaderCheck = false;
         reqHeaderName = null;
         reqHeaderValue = null;
@@ -1394,6 +1524,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     }
 
     private static synchronized DatabaseReader getLookupService(String dbLocation) {
+        if (dbLocation == null || StringUtils.isEmpty(dbLocation)) {
+            return null;
+        }
         try {
             if (lookupService == null) {
                 lookupService = new DatabaseReader.Builder(new File(dbLocation)).build();

@@ -652,6 +652,86 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a550"
+                order="5100"
+                resourceName="geolocationHistoryCheckEnabled">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-count"
+                cosQualifier="default"
+                type="single"
+                syntax="number_range"
+                rangeStart="1"
+                rangeEnd="2147483647"
+                i18nKey="a551"
+                order="5200"
+                resourceName="geolocationHistoryCount">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-attribute"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a552"
+                order="5300"
+                resourceName="geolocationHistoryAttribute">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a553"
+                order="5400"
+                resourceName="saveSuccessfulGeolocation">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a554"
+                order="5500"
+                resourceName="geolocationHistoryScore">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a555"
+                order="5600"
+                resourceName="invertGeolocationHistoryScore">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                 <AttributeSchema name="openam-auth-adaptive-auth-level"
@@ -1262,6 +1342,86 @@
                 i18nKey="a548"
                 order="4700"
                 resourceName="invertRequestHeaderScore">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a550"
+                order="5100"
+                resourceName="geolocationHistoryCheckEnabled">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-count"
+                cosQualifier="default"
+                type="single"
+                syntax="number_range"
+                rangeStart="1"
+                rangeEnd="2147483647"
+                i18nKey="a551"
+                order="5200"
+                resourceName="geolocationHistoryCount">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-attribute"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a552"
+                order="5300"
+                resourceName="geolocationHistoryAttribute">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a553"
+                order="5400"
+                resourceName="saveSuccessfulGeolocation">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a554"
+                order="5500"
+                resourceName="geolocationHistoryScore">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-history-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a555"
+                order="5600"
+                resourceName="invertGeolocationHistoryScore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
