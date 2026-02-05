@@ -732,6 +732,58 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-enabled"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a561"
+                order="6100"
+                resourceName="warningMailEnabled">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-attribute"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a562"
+                order="6200"
+                resourceName="warningMailAttribute">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-from-address"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a563"
+                order="6300"
+                resourceName="warningMailFromAddress">
+                    <DefaultValues>
+                        <Value>no-reply@openam.jp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-skip-sending-if-attribute-missing"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a564"
+                order="6400"
+                resourceName="warningMailSkipSendingIfAttributeMissing">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                 <AttributeSchema name="openam-auth-adaptive-auth-level"
@@ -1422,6 +1474,58 @@
                 i18nKey="a555"
                 order="5600"
                 resourceName="invertGeolocationHistoryScore">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-enabled"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a561"
+                order="6100"
+                resourceName="warningMailEnabled">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-attribute"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a562"
+                order="6200"
+                resourceName="warningMailAttribute">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-from-address"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a563"
+                order="6300"
+                resourceName="warningMailFromAddress">
+                    <DefaultValues>
+                        <Value>no-reply@openam.jp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-warning-mail-skip-sending-if-attribute-missing"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a564"
+                order="6400"
+                resourceName="warningMailSkipSendingIfAttributeMissing">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

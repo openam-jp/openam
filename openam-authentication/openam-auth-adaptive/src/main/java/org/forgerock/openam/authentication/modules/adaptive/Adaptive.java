@@ -38,6 +38,7 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.record.Country;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
@@ -61,6 +62,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.DNMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,6 +82,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -156,6 +159,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String GEO_LOCATION_HISTORY_SAVE = "openam-auth-adaptive-geo-location-history-save";
     private static final String GEO_LOCATION_HISTORY_SCORE = "openam-auth-adaptive-geo-location-history-score";
     private static final String GEO_LOCATION_HISTORY_INVERT = "openam-auth-adaptive-geo-location-history-invert";
+    private static final String WARNING_MAIL_ENABLED = "openam-auth-adaptive-warning-mail-enabled";
+    private static final String WARNING_MAIL_ATTRIBUTE = "openam-auth-adaptive-warning-mail-attribute";
+    private static final String WARNING_MAIL_FROM_ADDRESS = "openam-auth-adaptive-warning-mail-from-address";
+    private static final String WARNING_MAIL_SKIP_ATTRIBUTE_MISSING = "openam-auth-adaptive-warning-mail-skip-sending-if-attribute-missing";
+    private static final String SESSION_PROPERTY_WARNING_MAIL = "amAuthAdaptiveWarningMail";
     private static Debug debug = Debug.getInstance(ADAPTIVE);
     private static DatabaseReader lookupService = null;
     private String userUUID = null;
@@ -219,6 +227,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private boolean geoLocationHistorySave = false;
     private int geoLocationHistoryScore = 1;
     private boolean geoLocationHistoryInvert = false;
+    private boolean warningMailEnabled = false;
+    private String warningMailAttrinuteName = null;
+    private String warningMailFromAddress = null;
+    private boolean warningMailSkipSendingAttributeMissing = false;
+    private String warningMailAttrinuteValue = null;
+    private boolean hasIPHistory = true;
+    private boolean hasGeoLocationHistory = true;
     private final static String IP_V4 = "IPv4";
     private final static String IP_V6 = "IPv6";
     private static final String IP_Version = "IPVersion";
@@ -226,7 +241,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String IP_END = "IPEnd";
     private static final String IP_TYPE = "Type";
     private String errMsgCode = null;
-    private  String countryCode = null;
+    private Country country = null;
 
     private static final String UNKNOWN_COUNTRY_CODE = "--";
 
@@ -410,6 +425,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             if (debug.messageEnabled()) {
                 debug.message("{}: Returning Fail. Username='{}'", ADAPTIVE, userName);
             }
+
+            setWarningMailParams();
+
             if (StringUtils.isEmpty(errMsgCode)) {
                 throw new AuthLoginException(ADAPTIVE + " - Risk determined.");
             } else {
@@ -640,6 +658,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
 
             if (ipHistoryValues != null) {
+                hasIPHistory = true;
                 StringTokenizer st = new StringTokenizer(ipHistoryValues, "|");
                 while (st.hasMoreTokens()) {
                     String theIP = st.nextToken();
@@ -652,6 +671,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                         retVal = IPHistoryScore;
                     }
                 }
+            } else {
+                hasIPHistory = false;
             }
         }
 
@@ -670,11 +691,15 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     }
 
     private String getCountryCode(DatabaseReader db, String ipAddress) throws IOException, GeoIp2Exception {
-        return db.country(InetAddress.getByName(ipAddress)).getCountry().getIsoCode();
+        if (country == null) {
+            country = db.country(InetAddress.getByName(ipAddress)).getCountry();
+        }
+        return country.getIsoCode();
     }
 
     protected int checkGeoLocation() {
         int retVal = 0;
+        String countryCode;
 
         if (debug.messageEnabled()) {
             debug.message("{}.checkGeoLocation: GeoLocation database location = {}", ADAPTIVE, geoLocationDatabase);
@@ -741,6 +766,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkGeoLocationHistory() {
         int retVal = 0;
+        String countryCode;
 
         if (geoLocationHistoryAttribute == null) {
             debug.error("{}.checkGeoLocationHistory: The property '{}' is null", ADAPTIVE, GEO_LOCATION_HISTORY_ATTRIBUTE);
@@ -748,31 +774,29 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
 
         // checkGeoLocation() may have already identified the country code.
-        if (countryCode == null) {
-            DatabaseReader db = getLookupService(geoLocationDatabase);
+        DatabaseReader db = getLookupService(geoLocationDatabase);
 
-            if (db == null) {
-                debug.error("{}.checkGeoLocationHistory: GeoLocation database lookup returns null", ADAPTIVE);
-                return geoLocationHistoryScore;
-            }
+        if (db == null) {
+            debug.error("{}.checkGeoLocationHistory: GeoLocation database lookup returns null", ADAPTIVE);
+            return geoLocationHistoryScore;
+        }
 
-            try {
-                countryCode = getCountryCode(db, clientIP);
-            } catch (IOException e) {
-                if (debug.warningEnabled()) {
-                    debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An IO error happened", ADAPTIVE, e);
-                }
-                return geoLocationHistoryScore;
-            } catch (GeoIp2Exception e) {
-                if (debug.warningEnabled()) {
-                    debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
-                }
-                return geoLocationHistoryScore;
+        try {
+            countryCode = getCountryCode(db, clientIP);
+        } catch (IOException e) {
+            if (debug.warningEnabled()) {
+                debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An IO error happened", ADAPTIVE, e);
             }
+            return geoLocationHistoryScore;
+        } catch (GeoIp2Exception e) {
+            if (debug.warningEnabled()) {
+                debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
+            }
+            return geoLocationHistoryScore;
+        }
 
-            if (debug.messageEnabled()) {
-                debug.message("{}.checkGeoLocationHistory: {} returns {}", ADAPTIVE, clientIP, countryCode);
-            }
+        if (debug.messageEnabled()) {
+            debug.message("{}.checkGeoLocationHistory: {} returns {}", ADAPTIVE, clientIP, countryCode);
         }
 
         String historyValues = getIdentityAttributeString(geoLocationHistoryAttribute);
@@ -784,6 +808,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         String newHistory = countryCode;
         int historyCount = 0;
         if (historyValues != null) {
+            hasGeoLocationHistory = true;
             StringTokenizer st = new StringTokenizer(historyValues, ",");
             while (st.hasMoreTokens()) {
                 String history = st.nextToken();
@@ -796,6 +821,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     retVal = geoLocationHistoryScore;
                 }
             }
+        } else {
+            hasGeoLocationHistory = false;
         }
 
         if (geoLocationHistorySave) {
@@ -1198,6 +1225,31 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 debug.message("{}.getIdentity : Unable to Retrieve PostAuthN Params", ADAPTIVE, e);
             }
         }
+
+        try {
+            // Process to send warning mail
+            Map<String, String> mailParams = new HashMap<String, String>();
+            String s = token.getProperty(SESSION_PROPERTY_WARNING_MAIL);
+            if (s != null && !s.isEmpty()) {
+                stringToMap(s, mailParams);
+                token.setProperty(SESSION_PROPERTY_WARNING_MAIL, "");
+
+                String orgName = token.getProperty(Constants.ORGANIZATION);
+                String realm = DNMapper.orgNameToRealmName(orgName);
+
+                String locale = token.getProperty(ISAuthConstants.LOCALE);
+                ResourceBundle bundle = amCache.getResBundle(ADAPTIVE,
+                        com.sun.identity.shared.locale.Locale.getLocale(locale));
+
+                WarningMail mail = new WarningMail(bundle, mailParams, realm, debug);
+                mail.send();
+            }
+
+        } catch (Exception e) {
+            if (debug.messageEnabled()) {
+                debug.message("{}.onLoginSuccess : Unable to send warning mail", ADAPTIVE, e);
+            }
+        }
     }
 
     private void addCookieToResponse(HttpServletRequest request, HttpServletResponse response,
@@ -1234,6 +1286,62 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             if (debug.messageEnabled()) {
                 debug.message("{} Unable to Set PostAuthN Params", ADAPTIVE, e);
             }
+        }
+    }
+
+    private void setWarningMailParams() {
+        if (!warningMailEnabled) {
+            return;
+        }
+
+        if (warningMailAttrinuteName == null) {
+            debug.error("{}.setWarningMailParams: The property '{}' is null", ADAPTIVE, WARNING_MAIL_ATTRIBUTE);
+            return;
+        }
+        if (warningMailFromAddress == null) {
+            debug.error("{}.setWarningMailParams: The property '{}' is null", ADAPTIVE, WARNING_MAIL_FROM_ADDRESS);
+            return;
+        }
+
+        if (warningMailSkipSendingAttributeMissing) {
+            boolean skipMail = (IPHistoryCheck &&  IPHistorySave && !hasIPHistory)
+                    || (geoLocationHistoryCheck && geoLocationHistorySave && !hasGeoLocationHistory);
+
+            if (skipMail) {
+                if (debug.messageEnabled()) {
+                    debug.message("{}.setWarningMailParams: This user '{}' does not have history attributes. Skip to send warning mail.",
+                            ADAPTIVE, userName);
+                }
+                return;
+            }
+        }
+
+        String mailAddress = getIdentityAttributeString(warningMailAttrinuteName);
+        if (mailAddress== null) {
+            debug.error("{}.setWarningMailParams: This user '{}' does not have an email address.", ADAPTIVE, userName);
+            return;
+        }
+
+        Map<String, String> postAuthMailParams = new HashMap<String, String>();
+        postAuthMailParams.put(WarningMail.PARAMETER_FROM_ADDRESS, warningMailFromAddress);
+        postAuthMailParams.put(WarningMail.PARAMETER_TO_ADDRESS, mailAddress);
+        postAuthMailParams.put(WarningMail.PARAMETER_CONTENT_USER_ID, userName);
+        postAuthMailParams.put(WarningMail.PARAMETER_CONTENT_IP_ADDRESS, clientIP);
+        if (geoLocationCheck || geoLocationHistoryCheck) {
+            if (country == null) {
+                postAuthMailParams.put(WarningMail.PARAMETER_CONTENT_COUNTRY_CODE, UNKNOWN_COUNTRY_CODE);
+            } else {
+                postAuthMailParams.put(WarningMail.PARAMETER_CONTENT_COUNTRY_CODE, country.getName());
+            }
+        }
+
+        try {
+            String s = mapToString(postAuthMailParams);
+            if (!s.isEmpty()) {
+                    setUserSessionProperty(SESSION_PROPERTY_WARNING_MAIL, s);
+            }
+        } catch (AuthLoginException e) {
+            debug.error("{} Unable to Set PostAuthN Params for warning mail", ADAPTIVE, e);
         }
     }
 
@@ -1307,6 +1415,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
             reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
 
+            warningMailEnabled = getOptionAsBoolean(options, WARNING_MAIL_ENABLED);
+            warningMailAttrinuteName = CollectionHelper.getMapAttr(options, WARNING_MAIL_ATTRIBUTE);
+            warningMailFromAddress = CollectionHelper.getMapAttr(options, WARNING_MAIL_FROM_ADDRESS);
+            warningMailSkipSendingAttributeMissing = getOptionAsBoolean(options, WARNING_MAIL_SKIP_ATTRIBUTE_MISSING);
+
         } catch (Exception e) {
             debug.error("{}.initParams : Unable to initialize parameters", ADAPTIVE, e);
         } finally {
@@ -1377,7 +1490,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                         .append("\nReq Header Name-> ").append(reqHeaderName)
                         .append("\nReq Header Value-> ").append(reqHeaderValue)
                         .append("\nReq Header Score-> ").append(reqHeaderScore)
-                        .append("\nReq Header Invert-> ").append(reqHeaderInvert);
+                        .append("\nReq Header Invert-> ").append(reqHeaderInvert)
+
+                        .append("\nWarning Mail Enabled-> ").append(warningMailEnabled)
+                        .append("\nWarning Mail Attribute-> ").append(warningMailAttrinuteName)
+                        .append("\nWarning Mail From Address-> ").append(warningMailFromAddress)
+                        .append("\nWarning Mail Skip Sending if History Attribute Missing-> ").append(warningMailSkipSendingAttributeMissing);
+
                 debug.message(message.toString());
             }
         }
@@ -1484,6 +1603,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         reqHeaderValue = null;
         reqHeaderScore = 1;
         reqHeaderInvert = false;
+
+        warningMailEnabled = false;
+        warningMailAttrinuteName = null;
+        warningMailFromAddress = null;
+        warningMailSkipSendingAttributeMissing = false;
 
         userSearchAttributes = Collections.emptySet();
 
