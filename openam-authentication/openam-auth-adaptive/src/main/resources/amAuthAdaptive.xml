@@ -552,6 +552,14 @@
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-ip-address-whitelist"
+                cosQualifier="default"
+                type="list"
+                syntax="string"
+                i18nKey="a571"
+                order="3910"
+                resourceName="geolocationIPAddressWhitelist">
+                </AttributeSchema>
                 <AttributeSchema name="openam-auth-adaptive-geo-location-values"
                 cosQualifier="default"
                 type="single"
@@ -1301,6 +1309,14 @@
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-ip-address-whitelist"
+                cosQualifier="default"
+                type="list"
+                syntax="string"
+                i18nKey="a571"
+                order="3910"
+                resourceName="geolocationIPAddressWhitelist">
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-adaptive-geo-location-values"
                 cosQualifier="default"
