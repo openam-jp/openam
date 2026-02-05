@@ -145,6 +145,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String RISK_ATTRIBUTE_INVERT = "openam-auth-adaptive-risk-attribute-invert";
     private static final String GEO_LOCATION_CHECK = "openam-auth-adaptive-geo-location-check";
     private static final String GEO_LOCATION_DATABASE = "openam-auth-adaptive-geo-location-database";
+    private static final String GEO_LOCATION_IP_WHITELIST = "openam-auth-adaptive-geo-location-ip-address-whitelist";
     private static final String GEO_LOCATION_VALUES = "openam-auth-adaptive-geo-location-values";
     private static final String GEO_LOCATION_SCORE = "openam-auth-adaptive-geo-location-score";
     private static final String GEO_LOCATION_INVERT = "openam-auth-adaptive-geo-location-invert";
@@ -213,6 +214,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private boolean riskAttributeInvert = false;
     private boolean geoLocationCheck = false;
     private String geoLocationDatabase = null;
+    private Set<String> geoLocationIPWhitelist = null;
     private String geoLocationValues = null;
     private int geoLocationScore = 1;
     private boolean geoLocationInvert = false;
@@ -242,6 +244,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String IP_TYPE = "Type";
     private String errMsgCode = null;
     private Country country = null;
+    private Boolean includedInWhitelist = null;
 
     private static final String UNKNOWN_COUNTRY_CODE = "--";
 
@@ -565,16 +568,27 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkIPRange() {
         int retVal = 0;
+        if (containsClientIP(IPRangeRange)) {
+            retVal = IPRangeScore;
+        }
+
+        if (!IPRangeInvert) {
+            retVal = IPRangeScore - retVal;
+        }
+        return retVal;
+    }
+
+    private boolean containsClientIP(Set<String>range) {
         String ipVersion;
         String ipType;
         Map<String, String> holdDetails;
-        for (String nextIP : IPRangeRange) {
+        for (String nextIP : range) {
 
             try {
                 holdDetails = checkIPVersion(nextIP);
             } catch (IllegalArgumentException e) {
                 if (debug.warningEnabled()) {
-                    debug.warning("{}.checkIPRange: IP type could not be validated. IP={}", ADAPTIVE, nextIP, e);
+                    debug.warning("{}.containsClientIP: IP type could not be validated. IP={}", ADAPTIVE, nextIP, e);
                 }
                 continue;
             }
@@ -584,7 +598,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
             if (ipVersion.equalsIgnoreCase(IP_V6) && ValidateIPaddress.isIPv6(clientIP)) {
                 if (debug.messageEnabled()) {
-                    debug.message("{}.checkIPRange: {} --> {}", ADAPTIVE, clientIP, nextIP);
+                    debug.message("{}.containsClientIP: {} --> {}", ADAPTIVE, clientIP, nextIP);
                     debug.message("IP version is: {}", IP_V6);
                     debug.message("Client IP is: {}", IPv6Address.fromString(clientIP));
                 }
@@ -595,42 +609,35 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     IPv6AddressRange iPv6AddressRange = IPv6AddressRange.fromFirstAndLast(
                             IPv6Address.fromString(first), IPv6Address.fromString(last));
                     if (iPv6AddressRange.contains(IPv6Address.fromString(clientIP))) {
-                        retVal = IPRangeScore;
-                        break;
+                        return true;
                     }
                 } else if (ipType.equalsIgnoreCase("CIDR")) {
                     // Subnet mask ip
                     IPv6Network iPv6Network = IPv6Network.fromString(nextIP);
                     if (iPv6Network.contains(IPv6Address.fromString(clientIP))) {
-                        retVal = IPRangeScore;
-                        break;
+                        return true;
                     }
                 } else {
                     // treat as single ip address
                     IPv6Address iPv6AddressNextIP = IPv6Address.fromString(nextIP);
                     if (iPv6AddressNextIP.compareTo(IPv6Address.fromString(clientIP)) == 0) {
-                        retVal = IPRangeScore;
-                        break;
+                        return true;
                     }
                 }
             } else if (ipVersion.equalsIgnoreCase(IP_V4) && ValidateIPaddress.isIPv4(clientIP)) { // treat as IPv4
                 if (debug.messageEnabled()) {
-                    debug.message("{}.checkIPRange: {} --> {}", ADAPTIVE, clientIP, nextIP);
+                    debug.message("{}.containsClientIP: {} --> {}", ADAPTIVE, clientIP, nextIP);
                     debug.message("IP version is: {}", IP_V4);
                     debug.message("Client IP is: {}", clientIP);
                 }
                 IPRange theRange = new IPRange(nextIP);
                 if (theRange.inRange(clientIP)) {
-                    retVal = IPRangeScore;
-                    break;
+                    return true;
                 }
             }
         }
 
-        if (!IPRangeInvert) {
-            retVal = IPRangeScore - retVal;
-        }
-        return retVal;
+        return false;
     }
 
     /**
@@ -705,44 +712,50 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             debug.message("{}.checkGeoLocation: GeoLocation database location = {}", ADAPTIVE, geoLocationDatabase);
         }
 
-        DatabaseReader db = getLookupService(geoLocationDatabase);
+        includedInWhitelist = containsClientIP(geoLocationIPWhitelist);
+        if (includedInWhitelist) {
+            debug.message("{}.checkGeoLocation: The Whitelist contains {}.", ADAPTIVE, clientIP);
+            retVal = geoLocationScore;
+        } else {
+            DatabaseReader db = getLookupService(geoLocationDatabase);
 
-        if (db == null) {
-            debug.error("{}.checkGeoLocation: GeoLocation database lookup returns null", ADAPTIVE);
-            return geoLocationScore;
-        }
-
-        if (geoLocationValues == null) {
-            debug.error("{}.checkGeoLocation: The property '{}' is null", ADAPTIVE, GEO_LOCATION_VALUES);
-            return geoLocationScore;
-        }
-
-        try {
-            countryCode = getCountryCode(db, clientIP);
-        } catch (IOException e) {
-            if (debug.warningEnabled()) {
-                debug.warning("{}.checkGeoLocation: #getCountryCode :: An IO error happened", ADAPTIVE, e);
+            if (db == null) {
+                debug.error("{}.checkGeoLocation: GeoLocation database lookup returns null", ADAPTIVE);
+                return geoLocationScore;
             }
-            return geoLocationScore;
-        } catch (GeoIp2Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning("{}.checkGeoLocation: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
+
+            if (geoLocationValues == null) {
+                debug.error("{}.checkGeoLocation: The property '{}' is null", ADAPTIVE, GEO_LOCATION_VALUES);
+                return geoLocationScore;
             }
-            return geoLocationScore;
-        }
 
-        if (debug.messageEnabled()) {
-            debug.message("{}.checkGeoLocation: {} returns {}", ADAPTIVE, clientIP, countryCode);
-        }
-
-        StringTokenizer st = new StringTokenizer(geoLocationValues, "|");
-        while (st.hasMoreTokens()) {
-            if (countryCode.equalsIgnoreCase(st.nextToken())) {
-                if (debug.messageEnabled()) {
-                    debug.message("{}.checkGeoLocation: Found Country Code : {}", ADAPTIVE, countryCode);
+            try {
+                countryCode = getCountryCode(db, clientIP);
+            } catch (IOException e) {
+                if (debug.warningEnabled()) {
+                    debug.warning("{}.checkGeoLocation: #getCountryCode :: An IO error happened", ADAPTIVE, e);
                 }
-                retVal = geoLocationScore;
-                break;
+                return geoLocationScore;
+            } catch (GeoIp2Exception e) {
+                if (debug.warningEnabled()) {
+                    debug.warning("{}.checkGeoLocation: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
+                }
+                return geoLocationScore;
+            }
+
+            if (debug.messageEnabled()) {
+                debug.message("{}.checkGeoLocation: {} returns {}", ADAPTIVE, clientIP, countryCode);
+            }
+
+            StringTokenizer st = new StringTokenizer(geoLocationValues, "|");
+            while (st.hasMoreTokens()) {
+                if (countryCode.equalsIgnoreCase(st.nextToken())) {
+                    if (debug.messageEnabled()) {
+                        debug.message("{}.checkGeoLocation: Found Country Code : {}", ADAPTIVE, countryCode);
+                    }
+                    retVal = geoLocationScore;
+                    break;
+                }
             }
         }
 
@@ -773,61 +786,74 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             return geoLocationHistoryScore;
         }
 
-        // checkGeoLocation() may have already identified the country code.
-        DatabaseReader db = getLookupService(geoLocationDatabase);
-
-        if (db == null) {
-            debug.error("{}.checkGeoLocationHistory: GeoLocation database lookup returns null", ADAPTIVE);
-            return geoLocationHistoryScore;
-        }
-
-        try {
-            countryCode = getCountryCode(db, clientIP);
-        } catch (IOException e) {
-            if (debug.warningEnabled()) {
-                debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An IO error happened", ADAPTIVE, e);
-            }
-            return geoLocationHistoryScore;
-        } catch (GeoIp2Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
-            }
-            return geoLocationHistoryScore;
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("{}.checkGeoLocationHistory: {} returns {}", ADAPTIVE, clientIP, countryCode);
-        }
-
-        String historyValues = getIdentityAttributeString(geoLocationHistoryAttribute);
-        if (debug.messageEnabled()) {
-            debug.message("{}.checkGeoLocationHistory: Client Country = {}, History = {}", ADAPTIVE, countryCode,
-                    historyValues);
-        }
-
-        String newHistory = countryCode;
-        int historyCount = 0;
-        if (historyValues != null) {
-            hasGeoLocationHistory = true;
-            StringTokenizer st = new StringTokenizer(historyValues, ",");
-            while (st.hasMoreTokens()) {
-                String history = st.nextToken();
-                historyCount += 1;
-                if (historyCount < geoLocationHistoryCount) {
-                    newHistory += "," + history;
-                }
-
-                if (countryCode.equals(history)) {
-                    retVal = geoLocationHistoryScore;
-                }
-            }
+        // checkGeoLocation() may have already check the whitelist
+        if ((includedInWhitelist != null) && (includedInWhitelist)) {
+            debug.message("{}.checkGeoLocationHistory: The Whitelist contains {}.", ADAPTIVE, clientIP);
+            retVal = geoLocationHistoryScore;
         } else {
-            hasGeoLocationHistory = false;
-        }
+            if (includedInWhitelist == null) {
+                includedInWhitelist = containsClientIP(geoLocationIPWhitelist);
+            }
+            if (includedInWhitelist) {
+                debug.message("{}.checkGeoLocationHistory: The Whitelist contains {}.", ADAPTIVE, clientIP);
+                retVal = geoLocationHistoryScore;
+            } else {
+                DatabaseReader db = getLookupService(geoLocationDatabase);
 
-        if (geoLocationHistorySave) {
-            postAuthNMap.put("GEOLOCATIONSAVE", newHistory);
-            postAuthNMap.put("GEOLOCATIONAttr", geoLocationHistoryAttribute);
+                if (db == null) {
+                    debug.error("{}.checkGeoLocationHistory: GeoLocation database lookup returns null", ADAPTIVE);
+                    return geoLocationHistoryScore;
+                }
+
+                try {
+                    countryCode = getCountryCode(db, clientIP);
+                } catch (IOException e) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An IO error happened", ADAPTIVE, e);
+                    }
+                    return geoLocationHistoryScore;
+                } catch (GeoIp2Exception e) {
+                    if (debug.warningEnabled()) {
+                        debug.warning("{}.checkGeoLocationHistory: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
+                    }
+                    return geoLocationHistoryScore;
+                }
+
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkGeoLocationHistory: {} returns {}", ADAPTIVE, clientIP, countryCode);
+                }
+
+                String historyValues = getIdentityAttributeString(geoLocationHistoryAttribute);
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkGeoLocationHistory: Client Country = {}, History = {}", ADAPTIVE, countryCode,
+                            historyValues);
+                }
+
+                String newHistory = countryCode;
+                int historyCount = 0;
+                if (historyValues != null) {
+                    hasGeoLocationHistory = true;
+                    StringTokenizer st = new StringTokenizer(historyValues, ",");
+                    while (st.hasMoreTokens()) {
+                        String history = st.nextToken();
+                        historyCount += 1;
+                        if (historyCount < geoLocationHistoryCount) {
+                            newHistory += "," + history;
+                        }
+
+                        if (countryCode.equals(history)) {
+                            retVal = geoLocationHistoryScore;
+                        }
+                    }
+                } else {
+                    hasGeoLocationHistory = false;
+                }
+
+                if (geoLocationHistorySave) {
+                    postAuthNMap.put("GEOLOCATIONSAVE", newHistory);
+                    postAuthNMap.put("GEOLOCATIONAttr", geoLocationHistoryAttribute);
+                }
+            }
         }
 
         if (!geoLocationHistoryInvert) {
@@ -1398,6 +1424,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
             geoLocationCheck = getOptionAsBoolean(options, GEO_LOCATION_CHECK);
             geoLocationDatabase = CollectionHelper.getMapAttr(options, GEO_LOCATION_DATABASE);
+            geoLocationIPWhitelist = (Set<String>) options.get(GEO_LOCATION_IP_WHITELIST);
             geoLocationValues = CollectionHelper.getMapAttr(options, GEO_LOCATION_VALUES);
             geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
             geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
@@ -1475,6 +1502,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
                         .append("\nGeoLocation Check-> ").append(geoLocationCheck)
                         .append("\nGeoLocation Database-> ").append(geoLocationDatabase)
+                        .append("\nGeoLocation IP Address Whitelist-> ").append(geoLocationIPWhitelist)
                         .append("\nGeoLocation Values-> ").append(geoLocationValues)
                         .append("\nGeoLocation Score-> ").append(geoLocationScore)
                         .append("\nGeoLocation Invert-> ").append(geoLocationInvert)
@@ -1587,6 +1615,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         geoLocationCheck = false;
         geoLocationDatabase = null;
+        geoLocationIPWhitelist = null;
         geoLocationValues = null;
         geoLocationScore = 1;
         geoLocationInvert = false;
