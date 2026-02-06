@@ -25,6 +25,7 @@
  * $Id: AMConfiguration.java,v 1.9 2009/12/23 20:03:04 mrudul_uchil Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.config;
@@ -58,7 +59,7 @@ import javax.security.auth.login.Configuration;
 /**
  * OpenAM JAAS Configuration implementation.
  */
-public class AMConfiguration extends Configuration {
+public class AMConfiguration extends Configuration implements AMConfigurationEventListener {
     
     /**
      * Holds all JAAS configuration, maps configuration name (String) to
@@ -685,6 +686,7 @@ public class AMConfiguration extends Configuration {
      *
      * @param name Configuration name.
      */
+    @Override
     public void processListenerEvent(String name) {
         synchronized (jaasConfig) {
             if (debug.messageEnabled()) {

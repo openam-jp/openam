@@ -25,6 +25,7 @@
  * $Id: AMAuthLevelManager.java,v 1.3 2008/06/25 05:41:51 qcheng Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.config;
@@ -637,8 +638,10 @@ public class AMAuthLevelManager implements ServiceListener {
             if (debug.messageEnabled()) {
                 debug.message("processSMNotification, name=" + configName);
             }
-            ((AMConfiguration)Configuration.getConfiguration())
-                .processListenerEvent(configName);
+            Configuration config = Configuration.getConfiguration();
+            if (config instanceof AMConfigurationEventListener) {
+                ((AMConfigurationEventListener)config).processListenerEvent(configName);
+            }
         } 
 
         return needUpdate;

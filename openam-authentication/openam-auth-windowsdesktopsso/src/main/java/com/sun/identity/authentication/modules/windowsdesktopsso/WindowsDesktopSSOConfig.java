@@ -24,6 +24,7 @@
  *
  * $Id: WindowsDesktopSSOConfig.java,v 1.3 2009/04/07 22:55:13 beomsuk Exp $
  *
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 
@@ -34,9 +35,12 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.authentication.config.AMConfigurationEventListener;
 import com.sun.identity.shared.Constants;
 
-public class WindowsDesktopSSOConfig extends Configuration {
+public class WindowsDesktopSSOConfig extends Configuration
+    implements AMConfigurationEventListener {
+
     public static final String defaultAppName = 
         "com.sun.identity.authentication.windowsdesktopsso";
     private static final String kerberosModuleName = 
@@ -122,6 +126,13 @@ public class WindowsDesktopSSOConfig extends Configuration {
      */
     public void refresh() {
         config.refresh();
+    }
+
+    @Override
+    public void processListenerEvent(String name) {
+        if (config instanceof AMConfigurationEventListener) {
+            ((AMConfigurationEventListener)config).processListenerEvent(name);
+        }
     }
 }
 
