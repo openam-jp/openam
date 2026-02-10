@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.authn.http;
@@ -30,6 +31,8 @@ import org.forgerock.openam.core.rest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.util.Reject;
+
+import com.fasterxml.jackson.core.JsonParseException;
 
 /**
  *
@@ -68,6 +71,9 @@ public class AuthenticationServiceV2 extends AuthenticationServiceV1 {
 
             return createExceptionResponse(response, cause);
 
+        } else if (exception instanceof JsonParseException) {
+            return createExceptionResponse(response,
+                    ResourceException.getException(status.getCode(), ERRMSG_INVALID_JSON, exception));
         } else if (exception == null) {
             return createExceptionResponse(response, ResourceException.getException(status.getCode()));
 

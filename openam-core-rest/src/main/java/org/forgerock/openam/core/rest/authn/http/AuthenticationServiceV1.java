@@ -12,12 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.authn.http;
 
 import static org.forgerock.json.JsonValue.*;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
@@ -74,6 +76,9 @@ public class AuthenticationServiceV1 {
     private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
     private static final String REALM = "realm";
     private static final String JSONCONTENT = "jsonContent";
+
+    protected static final String ERRMSG_INVALID_JSON =
+            "The request could not be processed because the provided content is not valid JSON";
 
     private final RestAuthenticationHandler restAuthenticationHandler;
 
@@ -324,6 +329,8 @@ public class AuthenticationServiceV1 {
             }
             rep.put("errorMessage", getLocalizedMessage(request, exception));
 
+        } else if (exception instanceof JsonParseException) {
+            rep.put("errorMessage", ERRMSG_INVALID_JSON);
         } else if (exception == null) {
             rep.put("errorMessage", status.getReasonPhrase());
         } else {
