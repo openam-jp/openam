@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -58,6 +59,10 @@ public class ExcludedServicesFactory {
         excludedServices.remove(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
         excludedServices.remove("iPlanetAMAuthScriptedService");
         excludedServices.remove("iPlanetAMAuthDeviceIdMatchService");
+
+        if (type == SchemaType.ORGANIZATION) {
+            excludedServices.remove(IdConstants.REPO_SERVICE);
+        }
 
         if (type == SchemaType.GLOBAL) {
             excludedServices.addAll(Arrays.asList(

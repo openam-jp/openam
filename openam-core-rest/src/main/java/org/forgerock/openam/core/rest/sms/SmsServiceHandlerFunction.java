@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.core.rest.sms;
 
@@ -28,6 +29,7 @@ import org.forgerock.guava.common.base.Predicate;
 
 import com.google.inject.Inject;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.IdConstants;
 
 /**
  * Responsible for answering the question of whether a service should be handled by the
@@ -48,6 +50,7 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
     public final Predicate<String> AUTHENTICATION_CHAINS_HANDLES_FUNCTION;
     public final Predicate<String> ENTITYPROVIDER_HANDLES_FUNCTION;
     public final Predicate<String> AUTHENTICATION_MODULE_HANDLES_FUNCTION;
+    public final Predicate<String> ID_REPOSITORY_HANDLES_FUNCTION;
 
     /**
      * List of services which are known to have their own handling registered.
@@ -63,13 +66,15 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
         ENTITYPROVIDER_HANDLES_FUNCTION = new MultiServiceFunction(
                 IDFF_METADATA_SERVICE, SAML2_METADATA_SERVICE, WS_METADATA_SERVICE);
         AUTHENTICATION_MODULE_HANDLES_FUNCTION = new MultiServiceFunction(authenticationServiceNames);
+        ID_REPOSITORY_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.REPO_SERVICE);
 
         ALREADY_HANDLED = Arrays.asList(
                 AUTHENTICATION_HANDLES_FUNCTION,
                 AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
                 AUTHENTICATION_MODULE_HANDLES_FUNCTION,
                 CIRCLES_OF_TRUST_HANDLES_FUNCTION,
-                ENTITYPROVIDER_HANDLES_FUNCTION
+                ENTITYPROVIDER_HANDLES_FUNCTION,
+                ID_REPOSITORY_HANDLES_FUNCTION
         );
     }
 
