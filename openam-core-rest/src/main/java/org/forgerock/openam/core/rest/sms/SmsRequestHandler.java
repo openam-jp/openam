@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -74,6 +75,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
@@ -85,6 +87,8 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import jp.co.osstech.openam.core.rest.sms.IdRepoRealmSmsHandler;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -157,7 +161,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                                 authenticationChainsFilter)),
                 branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                         leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION)),
-                leaf("/services", smsServiceHandlerFunction)
+                leaf("/services", smsServiceHandlerFunction),
+                leaf("/id-repositories", smsServiceHandlerFunction.ID_REPOSITORY_HANDLES_FUNCTION)
         );
 
         this.smsServiceHandlerFunction = smsServiceHandlerFunction;
@@ -187,6 +192,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         addCommonTasksHandler();
         addSitesHandler();
         addServersHandler();
+        addIdRepoHandlers();
     }
 
     //hard-coded authentication routes
@@ -238,6 +244,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
+    //hard-coded realm-config/id-repositories route
+    private void addIdRepoHandlers() {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            getIdRepoRouter().addRoute(EQUALS, "",
+                    newAnnotatedRequestHandler(InjectorHolder.getInstance(IdRepoRealmSmsHandler.class)));
+        }
+    }
+
     /**
      * Identifies the first node in the SMS tree which isn't explicitly handled by another handler.
      */
@@ -258,10 +272,15 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
     }
 
+    private SmsRouteTree getIdRepoRouter() {
+        return routeTree.handles(IdConstants.REPO_SERVICE);
+    }
+
     private void addExcludedServiceProviders() {
         excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Predicate<String>>asSet());
         excludedServiceSingletons.put(SchemaType.ORGANIZATION,
-                asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+                asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION,
+                        smsServiceHandlerFunction.ID_REPOSITORY_HANDLES_FUNCTION));
         excludedServiceCollections.put(SchemaType.GLOBAL,
                 asSet(smsServiceHandlerFunction.AUTHENTICATION_MODULE_HANDLES_FUNCTION));
         excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Predicate<String>>asSet());
@@ -527,6 +546,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             throws SMSException {
         for (String subSchema : schema.getSubSchemaNames()) {
             ServiceSchema subServiceSchema = schema.getSubSchema(subSchema);
+            if (subServiceSchema.getI18NKey() == null || subServiceSchema.getI18NKey().isEmpty()) {
+                // Ignore SubSchema if i18NKey is empty
+                debug.message("SubSchema {} is ignored in {}.", subServiceSchema.getName(),
+                        schema.getName());
+                continue;
+            }
             if (USE_PARENT_PATH.equals(subServiceSchema.getResourceName()) && "".equals(parentPath)) {
                 parentPath = schema.getResourceName();
             }
