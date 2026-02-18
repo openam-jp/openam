@@ -25,7 +25,7 @@
  * $Id: FMEncProvider.java,v 1.5 2008/06/25 05:48:03 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2026 OSSTech Corporation
  */
 package com.sun.identity.saml2.xmlenc;
 
@@ -692,7 +692,7 @@ public final class FMEncProvider implements EncProvider {
 
     private Key getEncryptionKey(XMLCipher cipher, Set<PrivateKey> privateKeys, EncryptedKey encryptedKey,
             String algorithm) throws SAML2Exception {
-        final String classMethod = "FMEncProvider.getEncryptionKey";
+        final String classMethod = "FMEncProvider.getEncryptionKey: ";
         String firstErrorCode = null;
         for (Key privateKey : privateKeys) {
             try {
@@ -708,7 +708,7 @@ public final class FMEncProvider implements EncProvider {
             try {
                 return cipher.decryptKey(encryptedKey, algorithm);
             } catch (XMLEncryptionException xee) {
-                SAML2SDKUtils.debug.error(classMethod + "Failed to decrypt the secret key", xee);
+                SAML2SDKUtils.debug.warning(classMethod + "Failed to decrypt the secret key", xee);
                 if (firstErrorCode == null) {
                     firstErrorCode = "failedDecryptingSecretKey";
                 }
