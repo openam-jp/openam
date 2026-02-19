@@ -462,8 +462,8 @@ public abstract class SmsResourceProvider {
                 }
 
                 Object propertyOrder = (attribute.getOrder() == null) ? i18NKey : attribute.getOrder();
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString
-                        (i18NKey));
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE),
+                        schemaI18n.containsKey(i18NKey) ? schemaI18n.getString(i18NKey) : i18NKey);
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
                         getSchemaDescription(schemaI18n, i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), propertyOrder);
