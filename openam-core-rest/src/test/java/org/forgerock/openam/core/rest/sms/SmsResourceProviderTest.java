@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -31,6 +31,7 @@ import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.LocaleContext;
 import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
 import org.forgerock.util.test.assertj.Conditions;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -94,6 +95,7 @@ public class SmsResourceProviderTest {
         when(localeContext.getLocale()).thenReturn(local);
         when(mockContext.asContext(LocaleContext.class)).thenReturn(localeContext);
 
+        when(mockContext.getParent()).thenReturn(new RootContext());
         when(mockContext.containsContext(RealmContext.class)).thenReturn(true);
         when(mockContext.asContext(RealmContext.class)).thenReturn(mockRealmContext);
         when(mockRealmContext.getResolvedRealm()).thenReturn(RESOLVED_REALM);
@@ -154,6 +156,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         Assertions.assertThat(rp.parentSubConfigFor(mockContext, mockServiceConfigManager)).isEqualTo(mockServiceConfig);
@@ -168,6 +171,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(false);
 
         rp.parentSubConfigFor(mockContext, mockServiceConfigManager);
@@ -187,6 +191,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn("resourceName");
@@ -211,6 +216,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn("resourceName");
@@ -234,6 +240,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
@@ -260,6 +267,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/uri", "", Collections.<String, String>emptyMap());
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
@@ -288,6 +296,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn("placeholder");
@@ -315,6 +324,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn("placeholder");
@@ -342,6 +352,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
@@ -371,6 +382,7 @@ public class SmsResourceProviderTest {
         UriRouterContext urc = new UriRouterContext(mockContext, "/{placeholder}", "", uriTemplaceVariables);
 
         when(mockContext.asContext(UriRouterContext.class)).thenReturn(urc);
+        when(mockContext.containsContext(UriRouterContext.class)).thenReturn(true);
         when(mockServiceConfig.exists()).thenReturn(true);
 
         when(branch.getResourceName()).thenReturn(SmsRequestHandler.USE_PARENT_PATH);
