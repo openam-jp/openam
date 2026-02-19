@@ -13,13 +13,14 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
 
 import static com.sun.identity.authentication.config.AMAuthenticationManager.getAuthenticationServiceNames;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.openam.utils.Time.*;
@@ -45,6 +46,8 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
@@ -57,12 +60,14 @@ import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.annotations.Action;
 import org.forgerock.json.resource.annotations.Create;
 import org.forgerock.json.resource.annotations.Delete;
 import org.forgerock.json.resource.annotations.Query;
 import org.forgerock.json.resource.annotations.Read;
 import org.forgerock.json.resource.annotations.RequestHandler;
 import org.forgerock.json.resource.annotations.Update;
+import org.forgerock.openam.rest.RestConstants;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.Reject;
@@ -94,6 +99,64 @@ public class SmsCollectionProvider extends SmsResourceProvider {
         autoCreatedAuthModule = subSchemaPath.size() == 1 && getAuthenticationServiceNames().contains(serviceName) &&
                 super.uriPath.size() == 1 && AUTO_CREATED_AUTHENTICATION_MODULES.containsValue(super.uriPath.get(0));
         authModuleResourceName = autoCreatedAuthModule ? super.uriPath.get(0) : null;
+    }
+
+    @Action(RestConstants.NEXT_DESCENDENTS)
+    public Promise<ActionResponse, ResourceException> nextDescendentsAction(Context context, String resourceId,
+            ActionRequest request) {
+        try {
+            ServiceConfigManager scm = getServiceConfigManager(context);
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            ServiceConfig contextConfig = config.getSubConfig(getUriTemplateVariables(context).get("id"));
+            if (contextConfig == null) {
+                return new NotFoundException("Resource not found").asPromise();
+            }
+
+            JsonValue result = json(object(field("result", array())));
+            for (String subConfigName : contextConfig.getSubConfigNames("*")) {
+                ServiceConfig subConfig = contextConfig.getSubConfig(subConfigName);
+                ServiceSchema subSchema = schema.getSubSchema(subConfigName);
+                JsonValue value = new SmsCollectionProvider(new SmsJsonConverter(subSchema), subSchema,
+                        subSchema.getServiceType(), subSchemaPath, null, false, debug, resourceBundleCache,
+                        defaultLocale).getJsonValue(null, subConfig, context);
+                result.get("result").add(value.getObject());
+            }
+
+            return newActionResponse(result).asPromise();
+        } catch (SMSException e) {
+            debug.warning("::SmsCollectionProvider:: SMSException on nextdescendents action", e);
+            return new InternalServerErrorException("Unable to perform nextdescendents action SMS config: "
+                    + e.getMessage()).asPromise();
+        } catch (SSOException e) {
+            debug.warning("::SmsCollectionProvider:: SSOException on nextdescendents action", e);
+            return new InternalServerErrorException("Unable to perform nextdescendents action SMS config: "
+                    + e.getMessage()).asPromise();
+        } catch (ResourceException e) {
+            return e.asPromise();
+        }
+    }
+
+    @Action(RestConstants.GET_CREATABLE_TYPES)
+    public Promise<ActionResponse, ResourceException> getCreatableTypes(Context context, String actionId, ActionRequest request) {
+        try {
+            ServiceConfigManager scm = getServiceConfigManager(context);
+            ServiceConfig config = parentSubConfigFor(context, scm);
+            ServiceConfig contextConfig = config.getSubConfig(getUriTemplateVariables(context).get("id"));
+            if (contextConfig == null) {
+                return new NotFoundException("Resource not found").asPromise();
+            }
+            return newActionResponse(json(array())).asPromise();
+        } catch (SSOException e) {
+            debug.warning("::SmsCollectionProvider:: SSOException on getCreatableTypes action", e);
+            return new InternalServerErrorException("Unable to perform getCreatableTypes action SMS config: "
+                    + e.getMessage()).asPromise();
+        } catch (SMSException e) {
+            debug.warning("::SmsCollectionProvider:: SMSException on getCreatableTypes action", e);
+            return new InternalServerErrorException("Unable to perform getCreatableTypes action SMS config: "
+                    + e.getMessage()).asPromise();
+        } catch (ResourceException e) {
+            return e.asPromise();
+        }
     }
 
     /**

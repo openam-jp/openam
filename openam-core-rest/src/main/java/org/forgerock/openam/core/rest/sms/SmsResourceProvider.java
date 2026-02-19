@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,8 +106,8 @@ public abstract class SmsResourceProvider {
     protected final SmsJsonConverter converter;
     protected final Debug debug;
     protected final ServiceSchema schema;
-    private final AMResourceBundleCache resourceBundleCache;
-    private final Locale defaultLocale;
+    protected final AMResourceBundleCache resourceBundleCache;
+    protected final Locale defaultLocale;
 
     SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
             boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug,
@@ -160,7 +161,7 @@ public abstract class SmsResourceProvider {
     protected ServiceConfig parentSubConfigFor(Context context, ServiceConfigManager scm)
             throws SMSException, SSOException, NotFoundException {
 
-        Map<String, String> uriTemplateVariables = context.asContext(UriRouterContext.class).getUriTemplateVariables();
+        Map<String, String> uriTemplateVariables = getUriTemplateVariables(context);
 
         ServiceConfig config;
         if (type == SchemaType.GLOBAL) {
@@ -194,6 +195,16 @@ public abstract class SmsResourceProvider {
             }
         }
         return config;
+    }
+
+    static Map<String, String> getUriTemplateVariables(Context context) {
+        Map<String, String> uriTemplateVariables = new HashMap<>();
+        Context c = context;
+        while (c.containsContext(UriRouterContext.class)) {
+            uriTemplateVariables.putAll(c.asContext(UriRouterContext.class).getUriTemplateVariables());
+            c = c.getParent();
+        }
+        return uriTemplateVariables;
     }
 
     /**
