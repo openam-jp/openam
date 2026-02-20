@@ -12,19 +12,30 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.monitoring;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+import static org.fest.assertions.Assertions.assertThat;
+
+import java.lang.reflect.Field;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.forgerock.openam.shared.monitoring.RateTimer;
 import org.forgerock.openam.shared.monitoring.RateWindow;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.fest.assertions.Assertions.assertThat;
 
 public class RateWindowTest {
 
@@ -570,5 +581,34 @@ public class RateWindowTest {
 
         given(timer.now()).willReturn(timestamp4);
         assertThat(rateWindow.getMaxRate()).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldNotPutUnnecessaryIndexes() {
+        RateWindow rateWindow = createRateWindow(10);
+        ConcurrentSkipListMap<Long, AtomicLong> window = mock(ConcurrentSkipListMap.class);
+        try {
+            Field field = rateWindow.getClass().getDeclaredField("window");
+            field.setAccessible(true);
+            field.set(rateWindow, window);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            fail();
+        }
+
+        Long index1 = 1704034800L * SAMPLE_RATE; // 2024-01-01 00:00:00 JST
+        given(window.isEmpty()).willReturn(true);
+        given(window.lastKey()).willReturn(1704034800L);
+        given(window.headMap(any(Long.class), eq(true))).willReturn(new ConcurrentSkipListMap<Long, AtomicLong>());
+        given(timer.now()).willReturn(index1);
+        rateWindow.incrementForTimestamp(index1);
+
+        Long index2 = 1735657199L * SAMPLE_RATE; // 2024-12-31 23:59:59 JST
+        given(window.isEmpty()).willReturn(false);
+        given(timer.now()).willReturn(index2);
+        rateWindow.incrementForTimestamp(index2);
+
+        // index1 -> 1 time in incrementForTimestamp().
+        // index2 -> 10 times in fillInWindow() and 1 time in incrementForTimestamp().
+        verify(window, times(1 + 10 + 1)).putIfAbsent(any(Long.class), any(AtomicLong.class));
     }
 }
