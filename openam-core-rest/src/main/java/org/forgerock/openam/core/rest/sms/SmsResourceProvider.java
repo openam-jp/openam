@@ -17,32 +17,22 @@
 
 package org.forgerock.openam.core.rest.sms;
 
-import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.core.rest.sms.SmsJsonSchema.*;
 import static org.forgerock.openam.rest.RestConstants.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -60,10 +50,8 @@ import org.forgerock.util.promise.Promise;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
@@ -96,7 +84,6 @@ public abstract class SmsResourceProvider {
         AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauth");
     }
 
-    public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
     protected final String serviceName;
     protected final String serviceVersion;
     protected final List<ServiceSchema> subSchemaPath;
@@ -330,7 +317,8 @@ public abstract class SmsResourceProvider {
      */
     protected void addGlobalSchema(Context context, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.GLOBAL)) {
-            addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
+            addAttributeSchema(result, "/" + PROPERTIES + "/", schema, getLocale(context),
+                    realmFor(context));
         }
     }
 
@@ -344,7 +332,8 @@ public abstract class SmsResourceProvider {
      */
     protected void addOrganisationSchema(Context context, JsonValue result) {
         if (schema.getServiceType().equals(SchemaType.ORGANIZATION)) {
-            addAttributeSchema(result, "/" + PROPERTIES + "/", schema, context);
+            addAttributeSchema(result, "/" + PROPERTIES + "/", schema, getLocale(context),
+                    realmFor(context));
         }
     }
 
@@ -434,215 +423,6 @@ public abstract class SmsResourceProvider {
 
     protected boolean serviceHasDefaultOrGlobalSchema() {
         return !schema.getServiceType().equals(SchemaType.DYNAMIC);
-    }
-
-    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas, Context context) {
-        Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
-        Locale requestLocale = getLocale(context);
-        ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole", requestLocale);
-        String serviceType = schemas.getServiceType().getType();
-        List<String> sections = getSections(attributeSectionMap, consoleI18n, serviceType);
-
-        ResourceBundle schemaI18n = ResourceBundle.getBundle(schemas.getI18NFileName(), requestLocale);
-
-        for (AttributeSchema attribute : schemas.getAttributeSchemas()) {
-            String i18NKey = attribute.getI18NKey();
-            if (i18NKey != null && i18NKey.length() > 0) {
-                String attributePath = attribute.getResourceName();
-                if (!sections.isEmpty()) {
-                    String section = attributeSectionMap.get(attribute.getName());
-                    if (section != null) {
-                        String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
-                        attributePath = section + "/" + PROPERTIES + "/" + attributePath;
-                        result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
-                        result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
-                                getTitle(consoleI18n, schemaI18n, sectionLabel));
-                        result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER), sections.indexOf(section));
-                    }
-                }
-
-                Object propertyOrder = (attribute.getOrder() == null) ? i18NKey : attribute.getOrder();
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE),
-                        schemaI18n.containsKey(i18NKey) ? schemaI18n.getString(i18NKey) : i18NKey);
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
-                        getSchemaDescription(schemaI18n, i18NKey));
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), propertyOrder);
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), !attribute.isOptional());
-                addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, context);
-                addExampleValue(result, path, attribute, attributePath);
-            }
-        }
-    }
-
-    private String getTitle(ResourceBundle consoleI18n, ResourceBundle schemaI18n, String title) {
-        String result = getConsoleString(consoleI18n, title);
-        if (result.equals("")) {
-            result = getConsoleString(schemaI18n, title);
-        }
-
-        return result;
-    }
-
-    private List<String> getSections(Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType) {
-
-        List<String> sections = new ArrayList<>();
-        String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
-
-        if (StringUtils.isNotEmpty(sectionOrder)) {
-            sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
-        }
-
-        if (sections.isEmpty()) {
-            for (String attributeSection : attributeSectionMap.values()) {
-                if (!sections.contains(attributeSection)) {
-                    sections.add(attributeSection);
-                }
-            }
-        }
-        return sections;
-    }
-
-    private void addExampleValue(JsonValue result, String path, AttributeSchema attribute, String attributePath) {
-        final Iterator iterator = attribute.getExampleValues().iterator();
-        String exampleValue = "";
-        if (iterator.hasNext()) {
-            exampleValue = (String) iterator.next();
-        }
-        result.addPermissive(new JsonPointer(path + attributePath + "/" + EXAMPLE_VALUE), exampleValue);
-    }
-
-    static String getSchemaDescription(ResourceBundle i18n, String i18NKey) {
-        StringBuilder description = new StringBuilder();
-        if (i18n.containsKey(i18NKey + ".help")) {
-            description.append(i18n.getString(i18NKey + ".help"));
-        }
-        if (i18n.containsKey(i18NKey + ".help.txt")) {
-            if (description.length() > 0) {
-                description.append("<br><br>");
-            }
-            description.append(i18n.getString(i18NKey + ".help.txt"));
-        }
-        return description.toString();
-    }
-
-    protected String getConsoleString(ResourceBundle console, String key) {
-        try {
-            return console.getString(key);
-        } catch (MissingResourceException e) {
-            return "";
-        }
-    }
-
-    private void addType(JsonValue result, String pointer, AttributeSchema attribute, ResourceBundle schemaI18n,
-                         ResourceBundle consoleI18n, Context context) {
-        String type = null;
-        AttributeSchema.Type attributeType = attribute.getType();
-        AttributeSchema.Syntax syntax = attribute.getSyntax();
-        if (attributeType == AttributeSchema.Type.LIST && (
-                attribute.getUIType() == AttributeSchema.UIType.GLOBALMAPLIST ||
-                attribute.getUIType() == AttributeSchema.UIType.MAPLIST)) {
-            type = OBJECT_TYPE;
-            JsonValue fieldType = json(object());
-            if (attribute.hasChoiceValues()) {
-                addEnumChoices(fieldType, attribute, schemaI18n, consoleI18n, context);
-            } else {
-                fieldType.add(TYPE, STRING_TYPE);
-            }
-            result.addPermissive(new JsonPointer(pointer + "/" + PATTERN_PROPERTIES),
-                    object(field(".*", fieldType.getObject())));
-        } else if (attributeType == AttributeSchema.Type.LIST) {
-            type = ARRAY_TYPE;
-            result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
-                    object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
-            if (attribute.hasChoiceValues()) {
-                addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
-                        context);
-            }
-        } else if (attributeType.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
-            type = ARRAY_TYPE;
-            result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
-                    object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
-            addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
-                    context);
-        } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
-            addEnumChoices(result.get(new JsonPointer(pointer)), attribute, schemaI18n, consoleI18n, context);
-        } else {
-            type = getTypeFromSyntax(syntax);
-        }
-        if (type != null) {
-            result.addPermissive(new JsonPointer(pointer + "/" + TYPE), type);
-        }
-        if (AttributeSchema.Syntax.PASSWORD.equals(syntax)) {
-            result.addPermissive(new JsonPointer(pointer + "/" + FORMAT), PASSWORD_TYPE);
-        }
-    }
-
-    private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle schemaI18n,
-                                ResourceBundle consoleI18n, Context context) {
-        List<String> values = new ArrayList<String>();
-        List<String> descriptions = new ArrayList<String>();
-        Map environment = type == SchemaType.GLOBAL ? Collections.emptyMap() :
-                Collections.singletonMap(Constants.ORGANIZATION_NAME, realmFor(context));
-        Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
-        for (Map.Entry<String, String> value : valuesMap.entrySet()) {
-            values.add(value.getKey());
-            if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())) {
-                if (value.getValue() != null && consoleI18n.containsKey(value.getValue())) {
-                    descriptions.add(consoleI18n.getString(value.getValue()));
-                } else {
-                    descriptions.add(value.getValue());
-                }
-            } else if (value.getValue() != null && schemaI18n.containsKey(value.getValue())) {
-                descriptions.add(schemaI18n.getString(value.getValue()));
-            } else {
-                descriptions.add(value.getKey());
-            }
-        }
-        jsonValue.add(ENUM, values);
-        jsonValue.putPermissive(new JsonPointer("options/enum_titles"), descriptions);
-    }
-
-    private String getTypeFromSyntax(AttributeSchema.Syntax syntax) {
-        String type;
-        if (syntax == BOOLEAN) {
-            type = BOOLEAN_TYPE;
-        } else if (NUMBER_SYNTAXES.contains(syntax)) {
-            type = NUMBER_TYPE;
-        } else {
-            type = STRING_TYPE;
-        }
-        return type;
-    }
-
-    protected Map<String, String> getAttributeNameToSection(ServiceSchema schema) {
-        Map<String, String> result = new LinkedHashMap<>();
-
-        String serviceSectionFilename = schema.getName();
-        if (serviceSectionFilename == null || serviceSectionFilename.equals("serverconfig")) {
-            serviceSectionFilename = schema.getServiceName();
-        }
-        serviceSectionFilename = serviceSectionFilename + ".section.properties";
-
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);
-
-        if (inputStream != null) {
-            String line;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            try {
-                while ((line = reader.readLine()) != null) {
-                    if (!(line.matches("^\\#.*") || line.isEmpty())) {
-                        String[] attributeValue = line.split("=");
-                        final String sectionName = attributeValue[0];
-                        result.put(attributeValue[1], sectionName);
-                    }
-                }
-            } catch (IOException e) {
-                if (debug.errorEnabled()) {
-                    debug.error("Error reading section properties file", e);
-                }
-            }
-        }
-        return result;
     }
 
     protected Locale getLocale(Context context) {

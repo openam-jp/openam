@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -21,8 +22,6 @@ import static org.forgerock.json.JsonValue.object;
 
 import java.util.LinkedHashMap;
 import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -67,23 +66,23 @@ import org.xml.sax.SAXException;
  * @since 13.0.0
  */
 public class SmsJsonConverter {
-    private final ServiceSchema schema;
     private final MapValueParser nameValueParser = new MapValueParser();
     private final Debug debug = Debug.getInstance("SmsJsonConverter");
     private final Map<String, AttributeSchemaConverter> attributeSchemaConverters = new HashMap<String, AttributeSchemaConverter>();
+    protected final ServiceSchema schema;
 
     private BiMap<String, String> attributeNameToResourceName;
     private BiMap<String, String> resourceNameToAttributeName;
     private Map<String, String> attributeNameToSection;
     private List<String> hiddenAttributeNames;
-    private boolean initialised = false;
+    protected boolean initialised = false;
 
     @Inject
     public SmsJsonConverter(ServiceSchema schema) {
         this.schema = schema;
     }
 
-    private synchronized void init() {
+    protected synchronized void init() {
         if (initialised) {
             return;
         }
@@ -112,7 +111,7 @@ public class SmsJsonConverter {
         initialised = true;
     }
 
-    private AttributeSchemaConverter getAttributeSchemaValue(AttributeSchema.Syntax syntax) {
+    protected AttributeSchemaConverter getAttributeSchemaValue(AttributeSchema.Syntax syntax) {
         AttributeSchemaConverter attributeSchemaConverter;
         if (isBoolean(syntax)) {
             attributeSchemaConverter = new BooleanAttributeSchemaValue();
@@ -280,29 +279,29 @@ public class SmsJsonConverter {
                 .SINGLE_CHOICE);
     }
 
-    private boolean isDate(AttributeSchema.Syntax syntax) {
+    protected boolean isDate(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.DATE);
     }
 
-    private boolean isBoolean(AttributeSchema.Syntax syntax) {
+    protected boolean isBoolean(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.BOOLEAN);
     }
 
-    private boolean isInteger(AttributeSchema.Syntax syntax) {
+    protected boolean isInteger(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.NUMBER) || syntax.equals(AttributeSchema.Syntax.NUMBER_RANGE)
                 || syntax.equals(AttributeSchema.Syntax.NUMERIC) || syntax.equals(AttributeSchema.Syntax.PERCENT);
     }
 
-    private boolean isDouble(AttributeSchema.Syntax syntax) {
+    protected boolean isDouble(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.DECIMAL) || syntax.equals(AttributeSchema.Syntax
                 .DECIMAL_NUMBER) || syntax.equals(AttributeSchema.Syntax.DECIMAL_RANGE);
     }
 
-    private boolean isScript(AttributeSchema.Syntax syntax) {
+    protected boolean isScript(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.SCRIPT);
     }
 
-    private boolean isPassword(AttributeSchema.Syntax syntax) {
+    protected boolean isPassword(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.PASSWORD);
     }
 
@@ -412,7 +411,7 @@ public class SmsJsonConverter {
      * @param attributeValuePairs The untranslated list of attribute names to values
      * @return The attribute name to value pairs with all their original attribute names
      */
-    private Map<String, Object> getTranslatedAttributeValuePairs(Map<String, Object> attributeValuePairs) {
+    protected Map<String, Object> getTranslatedAttributeValuePairs(Map<String, Object> attributeValuePairs) {
         Map<String, Object> translatedAttributeValuePairs = new HashMap<String, Object>();
 
         for (String attributeName : attributeValuePairs.keySet()) {
@@ -499,7 +498,7 @@ public class SmsJsonConverter {
         return result;
     }
 
-    private String convertJsonToString(String attributeName, Object value) throws BadRequestException {
+    protected String convertJsonToString(String attributeName, Object value) throws BadRequestException {
         AttributeSchemaConverter converter = getAttributeConverter(attributeName);
         try {
             return converter.fromJson(value);
@@ -508,12 +507,14 @@ public class SmsJsonConverter {
         }
     }
 
-    private static interface AttributeSchemaConverter {
+    protected static interface AttributeSchemaConverter {
         Object toJson(String value);
         String fromJson(Object json);
     }
 
-    private static class StringAttributeSchemaValue implements AttributeSchemaConverter {
+    protected static class StringAttributeSchemaValue implements AttributeSchemaConverter {
+        public StringAttributeSchemaValue() {}
+
         @Override
         public Object toJson(String value) {
             return value;
@@ -525,7 +526,9 @@ public class SmsJsonConverter {
         }
     }
 
-    private static class PasswordAttributeSchemaValue implements AttributeSchemaConverter {
+    protected static class PasswordAttributeSchemaValue implements AttributeSchemaConverter {
+        public PasswordAttributeSchemaValue() {}
+
         @Override
         public Object toJson(String value) {
             return null;
@@ -537,7 +540,9 @@ public class SmsJsonConverter {
         }
     }
 
-    private static class BooleanAttributeSchemaValue implements AttributeSchemaConverter {
+    protected class BooleanAttributeSchemaValue implements AttributeSchemaConverter {
+        public BooleanAttributeSchemaValue() {}
+
         @Override
         public Object toJson(String value) {
             return Boolean.parseBoolean(value);
@@ -549,7 +554,9 @@ public class SmsJsonConverter {
         }
     }
 
-    private static class DoubleAttributeSchemaValue implements AttributeSchemaConverter {
+    protected static class DoubleAttributeSchemaValue implements AttributeSchemaConverter {
+        public DoubleAttributeSchemaValue() {}
+
         @Override
         public Object toJson(String value) {
             return Double.parseDouble(value);
@@ -561,7 +568,9 @@ public class SmsJsonConverter {
         }
     }
 
-    private static class IntegerAttributeSchemaValue implements AttributeSchemaConverter {
+    protected static class IntegerAttributeSchemaValue implements AttributeSchemaConverter {
+        public IntegerAttributeSchemaValue() {}
+
         @Override
         public Object toJson(String value) {
             return Integer.parseInt(value);
@@ -573,7 +582,9 @@ public class SmsJsonConverter {
         }
     }
 
-    private static class ScriptAttributeSchemaValue implements AttributeSchemaConverter {
+    protected static class ScriptAttributeSchemaValue implements AttributeSchemaConverter {
+        public ScriptAttributeSchemaValue() {}
+
         @Override
         public Object toJson(String value) {
             try {
