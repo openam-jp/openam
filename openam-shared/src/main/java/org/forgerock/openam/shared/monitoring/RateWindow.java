@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.shared.monitoring;
 
@@ -96,8 +97,8 @@ public class RateWindow {
     private void fillInWindow(long index) {
         if (!window.isEmpty()) {
             Long lastKey = window.lastKey();
-            for (lastKey = lastKey + 1; lastKey <= index; lastKey++) {
-                window.putIfAbsent(lastKey, new AtomicLong(0));
+            for (int fillSize = Math.min((int)(index - lastKey), size); fillSize > 0; index--, fillSize--) {
+                window.putIfAbsent(index, new AtomicLong(0));
             }
             window.headMap(window.lastKey() - size, true).clear();
         }
