@@ -29,11 +29,9 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.idm.IdConstants;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guava.common.base.Strings;
 import org.forgerock.json.JsonPointer;
@@ -72,8 +70,6 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -191,13 +187,13 @@ public class SmsRealmProvider implements RequestHandler {
                         field("type", "array"),
                         field("items", object(field("type", "string"))),
                         field("title", idRepoI18N.getString(PARENT_I18N_KEY)),
-                        field("description", SmsResourceProvider.getSchemaDescription(idRepoI18N, PARENT_I18N_KEY)),
+                        field("description", SmsJsonSchema.getSchemaDescription(idRepoI18N, PARENT_I18N_KEY)),
                         field("required", true)
                 )),
                 field(ACTIVE_ATTRIBUTE_NAME, object(
                         field("type", "boolean"),
                         field("title", idRepoI18N.getString(ACTIVE_I18N_KEY)),
-                        field("description", SmsResourceProvider.getSchemaDescription(idRepoI18N, ACTIVE_I18N_KEY)),
+                        field("description", SmsJsonSchema.getSchemaDescription(idRepoI18N, ACTIVE_I18N_KEY)),
                         field("required", true)
                 ))
         ))));

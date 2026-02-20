@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.rest;
@@ -44,6 +45,8 @@ public final class RestConstants {
     public final static String COLLECTION = "collection";
     /** The result field constant. **/
     public final static String RESULT = "result";
+    /** The groups field constant. **/
+    public final static String GROUPS = "groups";
 
     private RestConstants() {
         // No extensions.

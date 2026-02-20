@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.rest;
@@ -99,7 +100,7 @@ final public class RestUtils {
     public static boolean isAdmin(Context context, String role) {
         boolean isAdmin = false;
         try {
-            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            String realm = realmFor(context);
             SSOToken userSSOToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
 
             String universalId = userSSOToken.getPrincipal().getName();
@@ -249,6 +250,17 @@ final public class RestUtils {
      */
     public static SSOToken getToken() {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
+    }
+
+    /**
+     * Gets the realm from the underlying RealmContext.
+     *
+     * @param context The Context for the request.
+     * @return The resolved realm.
+     */
+    public static String realmFor(Context context) {
+        return context.containsContext(RealmContext.class) ?
+                context.asContext(RealmContext.class).getResolvedRealm() : null;
     }
 
     /**

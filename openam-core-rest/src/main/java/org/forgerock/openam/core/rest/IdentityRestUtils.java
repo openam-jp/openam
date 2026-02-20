@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.core.rest;
 
@@ -141,7 +142,7 @@ public final class IdentityRestUtils {
         }
     }
 
-    private static boolean isPasswordAttribute(String attributeName) {
+    public static boolean isPasswordAttribute(String attributeName) {
         return PASSWORD_ATTRIBUTES.contains(attributeName.toLowerCase());
     }
 
@@ -240,7 +241,11 @@ public final class IdentityRestUtils {
      *
      * @return identity attribute value represented as a set of strings
      */
-    static Set<String> identityAttributeJsonToSet(JsonValue identityAttributeJson) {
+    public static Set<String> identityAttributeJsonToSet(JsonValue identityAttributeJson) {
+
+        if (identityAttributeJson.isNull()) {
+            return Collections.emptySet();
+        }
 
         if (identityAttributeJson.isString()) {
             return Collections.singleton(identityAttributeJson.asString());

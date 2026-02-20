@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest;
@@ -24,6 +24,9 @@ import static org.forgerock.openam.rest.Routers.*;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnDevicesResource;
+import jp.co.osstech.openam.core.rest.identities.UserResource;
+import jp.co.osstech.openam.core.rest.identities.UserServiceResource;
+import jp.co.osstech.openam.core.rest.identities.UserGroupResource;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2;
@@ -129,6 +132,21 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .authorizeWith(AnyOfAuthzModule.class)
                 .forVersion(1, 2)
                 .toCollection(SessionResource.class);
+
+        realmRouter.route("identities/users")
+                .auditAs(USERS)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toCollection(UserResource.class);
+
+        realmRouter.route("identities/users/{user}/groups")
+                .auditAs(USERS)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toSingleton(UserGroupResource.class);
+
+        realmRouter.route("identities/users/{user}/services")
+                .auditAs(USERS)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toCollection(UserServiceResource.class);
 
         rootRouter.route("tokens")
                 .auditAs(CTS)

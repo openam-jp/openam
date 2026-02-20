@@ -25,7 +25,7 @@
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2021-2026 OSSTech Corporation
  */
 
 package com.sun.identity.idsvcs.opensso;
@@ -35,6 +35,7 @@ import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,6 +102,10 @@ import com.sun.identity.sm.SMSException;
 public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentityServicesImpl {
 
     private static final String AGENT_TYPE_LOWER_CASE = IdConstants.AGENT_TYPE.toLowerCase();
+    private static final String REST_IDENTITIES_SIZE_LIMIT = "jp.openam.rest.identities.search.sizelimit";
+    private static final String REST_IDENTITIES_TIME_LIMIT = "jp.openam.rest.identities.search.timelimit";
+    private static final int DEFAULT_REST_IDENTITIES_SIZE_LIMIT = 100;
+    private static final int DEFAULT_REST_IDENTITIES_TIME_LIMIT = 5;
 
     private final ExceptionMappingHandler<IdRepoException, IdServicesException> idServicesErrorHandler =
             InjectorHolder.getInstance(IdentityServicesExceptionMappingHandler.class);
@@ -222,7 +227,8 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             debug.error("IdentityServicesImpl:create", e);
             if (IdRepoErrorCode.ACCESS_DENIED.equals(e.getErrorCode())) {
                 throw new ForbiddenException(e.getMessage());
-            } else if (IdRepoErrorCode.IDENTITY_ATTRIBUTE_INVALID.equals(e.getErrorCode())) {
+            } else if (IdRepoErrorCode.IDENTITY_ATTRIBUTE_INVALID.equals(e.getErrorCode())
+                    || IdRepoErrorCode.MINIMUM_PASSWORD_LENGTH.equals(e.getErrorCode())) {
                 debug.error(e.getMessage(), e);
                 throw new BadRequestException(e.getMessage());
             } else if (e.getLdapErrorIntCode() == LDAPConstants.LDAP_CONSTRAINT_VIOLATION) {
@@ -508,11 +514,22 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             IdType idType = getIdType(objectType);
 
             if (idType != null) {
-                List<AMIdentity> identities = fetchAMIdentities(idType, crestQuery, true, repo, searchModifiers);
+                List<AMIdentity> identities = fetchAMIdentities(idType, crestQuery, true, repo,
+                        searchModifiers, true);
+
+                // Exclude special users
+                identities.removeAll(getSpecialUsers(realm));
+
                 List<IdentityDetails> result = new ArrayList<>();
                 for (AMIdentity identity : identities) {
                     result.add(convertToIdentityDetails(identity, null));
                 }
+                result.sort(new Comparator<IdentityDetails>() {
+                    @Override
+                    public int compare(IdentityDetails dtls1, IdentityDetails dtls2) {
+                        return dtls1.getName().compareTo(dtls2.getName());
+                    }
+                });
                 return result;
             }
             debug.error("IdentityServicesImpl.searchIdentities unsupported IdType " + objectType);
@@ -990,10 +1007,23 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
     }
 
     private List<AMIdentity> fetchAMIdentities(IdType type, CrestQuery crestQuery,
-                                            boolean fetchAllAttrs, AMIdentityRepository repo, Map searchModifiers)
-            throws IdRepoException, ObjectNotFound, SSOException {
+            boolean fetchAllAttrs, AMIdentityRepository repo, Map searchModifiers)
+                    throws IdRepoException, ObjectNotFound, SSOException {
+        return fetchAMIdentities(type, crestQuery, fetchAllAttrs, repo, searchModifiers, false);
+    }
+
+    private List<AMIdentity> fetchAMIdentities(IdType type, CrestQuery crestQuery,
+            boolean fetchAllAttrs, AMIdentityRepository repo, Map searchModifiers, boolean rest)
+                    throws IdRepoException, ObjectNotFound, SSOException {
 
         IdSearchControl searchControl = new IdSearchControl();
+        if (rest) {
+            int sizeLimit = getSearchResultLimit();
+            int timeLimit = getSearchTimeOutLimit();
+            searchControl.setMaxResults(sizeLimit);
+            searchControl.setTimeOut(timeLimit);
+        }
+
         IdSearchResults searchResults;
         List<AMIdentity> identities;
 
@@ -1024,7 +1054,31 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
         return identities;
     }
 
-   private AMIdentity getAMIdentity(SSOToken ssoToken, AMIdentityRepository repo, String guid, IdType idType)
+    private int getSearchTimeOutLimit() {
+        String limit = SystemProperties.get(REST_IDENTITIES_TIME_LIMIT);
+        try {
+            if (limit == null) {
+                return DEFAULT_REST_IDENTITIES_TIME_LIMIT;
+            }
+            return Integer.parseInt(limit);
+        } catch (NumberFormatException e) {
+            return DEFAULT_REST_IDENTITIES_TIME_LIMIT;
+        }
+    }
+
+    private int getSearchResultLimit() {
+        String limit = SystemProperties.get(REST_IDENTITIES_SIZE_LIMIT);
+        try {
+            if (limit == null) {
+                return DEFAULT_REST_IDENTITIES_SIZE_LIMIT;
+            }
+            return Integer.parseInt(limit);
+        } catch (NumberFormatException e) {
+            return DEFAULT_REST_IDENTITIES_SIZE_LIMIT;
+        }
+    }
+
+    private AMIdentity getAMIdentity(SSOToken ssoToken, AMIdentityRepository repo, String guid, IdType idType)
             throws IdRepoException, SSOException {
         if (isOperationSupported(repo, idType, IdOperation.READ)) {
             try {

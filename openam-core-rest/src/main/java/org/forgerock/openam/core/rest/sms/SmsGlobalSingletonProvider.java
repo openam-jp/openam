@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -111,7 +112,8 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     @Override
     protected void addOrganisationSchema(Context context, JsonValue result) {
         if (organizationSchema != null) {
-            addAttributeSchema(result, "/properties/defaults/", organizationSchema, context);
+            SmsJsonSchema.addAttributeSchema(result, "/properties/defaults/", organizationSchema,
+                    getLocale(context), realmFor(context));
         }
     }
 
