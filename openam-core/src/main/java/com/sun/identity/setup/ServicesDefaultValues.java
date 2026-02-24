@@ -25,6 +25,7 @@
  * $Id: ServicesDefaultValues.java,v 1.38 2009/01/28 05:35:02 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.setup;
@@ -345,7 +346,7 @@ public class ServicesDefaultValues {
         String urlAccessAgentPwd = (String)map.get(
             SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD);
 
-        if (urlAccessAgentPwd != null) {
+        if (urlAccessAgentPwd != null && !urlAccessAgentPwd.isEmpty()) {
             urlAccessAgentPwd.trim();
 
             String urlAccessAgentPwdConfirm = ((String)map.get(

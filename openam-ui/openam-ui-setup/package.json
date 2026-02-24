@@ -1,0 +1,57 @@
+{
+  "name": "openam-ui-setup",
+  "version": "15.0.0",
+  "private": true,
+  "homepage": "./",
+  "dependencies": {
+    "@mui/material": "^7.3.7",
+    "@mui/icons-material": "^7.3.7",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@testing-library/jest-dom": "^6.9.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "i18next": "^25.8.6",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "react": "^19.2.4",
+    "react-app-polyfill": "^3.0.0",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.71.1",
+    "react-i18next": "^16.5.4",
+    "react-router": "^6.30.3",
+    "react-router-dom": "^6.30.3",
+    "web-vitals": "^5.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.4",
+    "vite": "^7.3.1"
+  },
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite",
+    "test": "echo \"No test runner configured\""
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "resolutions": {
+    "@babel/runtime": "^7.26.10",
+    "lodash": "^4.17.23"
+  }
+}

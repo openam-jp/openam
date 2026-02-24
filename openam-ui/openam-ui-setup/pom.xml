@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2026 OSSTech Corporation
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>jp.openam</groupId>
+        <artifactId>openam-ui</artifactId>
+        <version>15.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openam-ui-setup</artifactId>
+    <name>OpenAM Setup Web UI</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <node.install.directory>${project.basedir}</node.install.directory>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-ui-ria</artifactId>
+            <type>zip</type>
+            <classifier>www</classifier>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <installDirectory>${node.install.directory}</installDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-node-and-yarn</id>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <nodeVersion>v22.13.0</nodeVersion>
+                            <yarnVersion>v1.22.22</yarnVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn-install</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>yarn-build</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <arguments>build</arguments>
+                            <environmentVariables>
+                                <VITE_VERSION>${project.version}</VITE_VERSION>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-login-logo</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>build/</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jp.openam</groupId>
+                                    <artifactId>openam-ui-ria</artifactId>
+                                    <type>zip</type>
+                                    <classifier>www</classifier>
+                                    <includes>images/login-logo.png</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-final-zip</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

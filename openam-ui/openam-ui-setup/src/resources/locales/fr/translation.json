@@ -1,0 +1,189 @@
+{
+  "button": {
+    "cancel": "Annuler",
+    "create": "Créer une configuration",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "saveReport": "Save report",
+    "upgrade": "Upgrade"
+  },
+  "configComplete": "Configuration terminée",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "Vous permet de spécifier tous les paramètres de configuration : le type de magasin de données, les propriétés de chiffrement, le magasin de données utilisateur, etc. Cette option est la plus flexible pour la configuration de votre installation.",
+        "label": "Configuration personnalisée",
+        "link": "Créer une nouvelle configuration"
+      },
+      "default": {
+        "description": "Entrez uniquement les mots de passe pour l’administrateur par défaut et le mécanisme d’accès d’agent. Toutes les autres données sont configurées à l’aide des paramètres par défaut. Cette option doit être principalement utilisée à des fins d’évaluation ou de développement.",
+        "label": "Configuration par défaut",
+        "link": "Créer une configuration par défaut"
+      },
+      "subtitle": "Veuillez sélectionner une option de configuration.",
+      "title": "Options de configuration"
+    }
+  },
+  "default": {
+    "description": "Utilisez cette option pour une configuration rapide. Seuls le nom du superutilisateur et le nom d’utilisateur d’agent sont obligatoires. Tous les autres paramètres de configuration vous sont fournis par défaut. Les mots de passe d’utilisateur et d’agent doivent être des valeurs différentes.",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "Demande incorrecte - paramètre d’identifiant/mot de passe manquant",
+    "401": "Non autorisé - informations de connexion non valides",
+    "405": "Méthode non autorisée - seule POST est acceptée",
+    "408": "Délai d’expiration de la demande - demande expirée",
+    "701": "Fichier introuvable - URI de déploiement/serveur incorrect",
+    "702": "Erreur de connexion - URL non valide spécifié",
+    "agentAdminPasswordSame": "Les mots de passe d’utilisateur par défaut et d’agent ne doivent pas correspondre.",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "Impossible de résoudre le nom de dommaine d’Active Directory. Veuillez vous assurer que l’hôte d’OpenAM utilise l’infrastructure d’Active Directory pour DNS.",
+    "cannotConnectDatastore": "Échec de l’authentification sur le magasin de données",
+    "encKeyNeed10Chars": "La sécurité du système peut être mise en danger, car la clé contient moins de 10 caractères.",
+    "invalidCookieDomain": "Domaine de cookies incorrect.",
+    "invalidDN": "Nom distinctif incorrect",
+    "invalidPortNumber": "Le port doit être inférieur ou égal à 65535",
+    "invalidPrimaryURL": "L’URL principal n’est pas valide",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "Nom de domaine manquant",
+    "missingHostname": "Nom d’hôte manquant",
+    "missingLoginID": "ID connexion manquant",
+    "missingPassword": "Mot de passe manquant",
+    "missingPort": "Numéro de port manquant",
+    "missingPrimaryURL": "URL principal manquant",
+    "missingRequiredField": "Champ obligatoire manquant",
+    "missingSiteName": "Nom de site manquant",
+    "noWritePermissionToBasedir": "Aucune autorisation d’écriture sur ce répertoire.",
+    "passwordDontMatch": "Le mot de passe et sa confirmation ne correspondent pas",
+    "passwordSizeInvalid": "Le mot de passe doit contenir au moins 8 caractères",
+    "portUsed": "Port déjà en cours d’utilisation",
+    "unknownHost": "Hôte inconnu"
+  },
+  "gotoLogin": "Procéder à la connexion",
+  "installing": "Veuillez patienter... Configuration en cours...",
+  "label": {
+    "adminPort": "Admin Port",
+    "configDirectoy": "Répertoire de configuration",
+    "configStore": "Magasin de données de configuration",
+    "cookieDomain": "Domaine des cookies",
+    "directoryName": "Nom de répertoire",
+    "domainName": "Nom du domaine Active Directory",
+    "enableSessionFailOver": "Enable Session HA Persistence and Failover",
+    "encKey": "Clé de chiffrement",
+    "hostname": "Nom d’hôte",
+    "jmxPort": "JMX Port",
+    "localReplicationPort": "Port d’écoute",
+    "loginID": "ID connexion",
+    "no": "Aucun",
+    "password": "Mot de passe",
+    "passwordConfirm": "Confirmation du mot de passe",
+    "platformLocale": "environnement linguistique de la plate-forme",
+    "port": "Port",
+    "primaryURL": "URL de l’équilibreur de charge",
+    "remoteAdminPort": "Port d’écoute",
+    "remoteReplicationPort": "Port de réplication",
+    "replicationPort": "Port de réplication",
+    "rootSuffix": "Suffixe racine",
+    "serverURL": "URL du serveur",
+    "siteName": "Nom du site",
+    "sslEnabled": "Compatible SSL",
+    "storeType": {
+      "ADAM": "Mode d’application d’Active Directory",
+      "ADDC": "AD avec nom de domaine",
+      "ADWithHostAndPort": "Active Directory avec hôte et port",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli Directory Server"
+    },
+    "userStoreType": "Type de magasin de données utilisateur",
+    "yes": "Oui"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "OpenDJ"
+    },
+    "instance": {
+      "addToExistingInstance": "Ajouter à un déploiement existant ?",
+      "createNewInstance": "Première instance"
+    },
+    "userStore": {
+      "embedded": "Magasin de données utilisateur OpenAM",
+      "external": "Autre magasin de données utilisateur"
+    }
+  },
+  "returnConfig": "Retourner au programme de configuration",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "Général",
+    "step2": "Paramètres du serveur",
+    "step3": "Magasin de configuration",
+    "step4": "Magasin de l’utilisateur",
+    "step5": "Configuration du site",
+    "step6": "Information sur l’agent",
+    "step7": "Résumé"
+  },
+  "step1": {
+    "description": "Entrez le mot de passe de l’utilisateur par défaut amAdmin.  Le mot de passe doit comporter au moins 8 caractères. Si cette configuration doit faire partie d’un déploiement existant, le mot de passe entré doit correspondre à celui du déploiement d’origine.",
+    "subtitle": "Utilisateur par défaut [amAdmin]",
+    "title": "Étape 1 : général"
+  },
+  "step2": {
+    "description": "Confirmer les paramètres suivants à utiliser pour le serveur.",
+    "subtitle": "Paramètres du serveur",
+    "title": "Étape 2 : paramètres du serveur"
+  },
+  "step3": {
+    "description": "Si aucune autre instance OpenAM n’existe dans l’environnement, sélectionnez la première instance.  Si au moins une instance OpenAM existe dans l’environnement, sélectionnez Ajouter au déploiement existant.",
+    "localPorts": "Paramètres du port de la nouvelle instance OpenAM",
+    "message": {
+      "noreplication": "L’instance OpenAM existante n’est pas configurée pour la réplication. Les ports suivants seront utilisés.",
+      "replication": "L’instance OpenAM existante est déjà configurée pour la réplication sur les ports suivants"
+    },
+    "remotePorts": "Paramètres du port de l’instance de OpenAM existante",
+    "subtitle": "Détails de magasin de configuration",
+    "title": "Étape 3 : paramètres du magasin de données de configuration"
+  },
+  "step4": {
+    "description": "Vous pouvez utiliser le magasin de données fourni avec le magasin de données de configuration OpenAM, ou un autre magasin de données utilisateur de votre choix.  Dans le cadre de la configuration des environnements de production, il est préférable de faire appel à un magasin de données utilisateur externe différent du magasin de données utilisateur OpenAM. Notez que le service de stratégie et le module d’authentification LDAP doivent être configurés pour utiliser le DN administrateur d’annuaire et le mot de passe fournis ici.",
+    "message": {
+      "embeddedUserStore": "L’utilisation d’un magasin de données utilisateur OpenAM n’est prise en charge qu’à des fins de démonstration ou dans les environnements de développement.  Le magasin de données utilisateur OpenAM n’est pas pris en charge dans les environnements de production."
+    },
+    "subtitle": "Détails du magasin d’utilisateur",
+    "title": "Étape 4 : paramètres du magasin de données utilisateur"
+  },
+  "step5": {
+    "description": "Est-ce que cette instance sera déployée derrière un équilibreur de charge en tant que configuration de site ?",
+    "message": {
+      "help": "Il s’agit de la première instance de OpenAM et aucune configuration de site n’existe actuellement. Pour créer une nouvelle configuration de site, fournissez les informations suivantes"
+    },
+    "subtitle": "Détails de configuration de site",
+    "title": "Étape 5 : configuration de site"
+  },
+  "step6": {
+    "description": "Les agents de stratégie OpenAM utilisent ces paramètres pour récupérer les propriétés des agents de stratégie.",
+    "subtitle": "Agent de stratégie par défaut [UrlAccessAgent]",
+    "title": "Étape 6 : utilisateur agent de stratégie par défaut"
+  },
+  "step7": {
+    "defaultUserStore": "Utilisation des paramètres du magasin de configuration",
+    "description": "Prenez le temps de vérifier les paramètres ci-dessous. Si certaines valeurs ne sont pas correctes, revenez en arrière et modifiez les paramètres avant de procéder à la configuration.",
+    "edit": "modifier...",
+    "loginID": "Nom d’utilisateur",
+    "noSite": "L’instance n’est pas configurée derrière un équilibreur de charge.",
+    "title": "Informations récapitulatives du programme de configuration"
+  },
+  "upgrade": {
+    "available": "Mise à niveau disponible",
+    "complete": "Upgrade Complete!",
+    "currentVersion": "Current Version:",
+    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "link": "Mettre à niveau vers OpenAM ${project.version}",
+    "newVersion": "New Version:",
+    "newVersionFound": "&nbsp;",
+    "progress": "Please wait... Upgrade in progress..",
+    "restartContainer": "Please restart your container for changes to take effect.",
+    "subtitle": "Mettre à niveau vers OpenAM ${project.version}",
+    "title": "Upgrading OpenAM"
+  }
+}

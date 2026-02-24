@@ -21,11 +21,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/**
  * Portions Copyrighted 2012-2014 ForgeRock AS
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.setup;
@@ -38,9 +35,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.inject.Inject;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.forgerock.openam.installer.utils.StatusChecker;
 import org.forgerock.openam.license.LicensePresenter;
 import org.forgerock.openam.license.LicenseRejectedException;
@@ -60,6 +62,9 @@ public class OpenAMUpgrade {
 
     private final LicensePresenter licensePresenter;
     private final ResourceBundle rb = ResourceBundle.getBundle(OPENAM_UPGRADE_PROPERTIES);
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final TypeReference<Map<String, String>> REFERENCE = new TypeReference<Map<String, String>>() {};
 
     private boolean acceptLicense = false;
 
@@ -160,13 +165,12 @@ public class OpenAMUpgrade {
             if (responseCode == 200) {
                 br = new BufferedReader(new InputStreamReader(
                         conn.getInputStream()));
-                String str;
-                while ((str = br.readLine()) != null) {
-                    if (str.equals("true")) {
-                        System.out.println("\nUpgrade Complete.");
-                    } else {
-                        System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
-                    }
+                Map<String, String> response = MAPPER.readValue(br, REFERENCE);
+                String message = response.get("message");
+                if ("ok".equals(message)) {
+                    System.out.println("\nUpgrade Complete.");
+                } else {
+                    System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
                 }
             } else {
                 System.out.println(rb.getString("upgradeFailed"));

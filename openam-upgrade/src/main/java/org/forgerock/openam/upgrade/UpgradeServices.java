@@ -23,6 +23,7 @@
  *
  *
  * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.upgrade;
@@ -139,6 +140,12 @@ public class UpgradeServices {
     public void upgrade(SSOToken adminToken, boolean licenseAccepted) throws UpgradeException {
         if (!licenseAccepted) {
             throw new UpgradeException("License terms have not been accepted");
+        }
+
+        if (!VersionUtils.isVersionNewer()) {
+            throw new UpgradeException("No upgrade is required.");
+        } else if (AMSetupServlet.isUpgradeCompleted()) {
+            throw new UpgradeException("The upgrade has already been completed.");
         }
 
         openDJBackupManager.createBackupDirectories();

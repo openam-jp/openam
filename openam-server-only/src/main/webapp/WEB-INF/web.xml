@@ -293,6 +293,26 @@
         <servlet-class>org.forgerock.openam.upgrade.SetUpgradeProgress</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>UpgradeServlet</servlet-name>
+        <servlet-class>jp.co.osstech.openam.config.upgrade.UpgradeServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CheckUpgrade</servlet-name>
+        <servlet-class>jp.co.osstech.openam.config.upgrade.CheckUpgrade</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DefaultValueServlet</servlet-name>
+        <servlet-class>jp.co.osstech.openam.config.DefaultValueServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SetupValidationServlet</servlet-name>
+        <servlet-class>jp.co.osstech.openam.config.SetupValidationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>InitialSetup</servlet-name>
+        <servlet-class>jp.co.osstech.openam.config.InitialSetup</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>GatewayServlet</servlet-name>
         <servlet-class>com.sun.identity.policy.util.Gateway</servlet-class>
     </servlet>
@@ -383,11 +403,6 @@
             <param-value>com.sun.identity.rest.RestService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>click-servlet</servlet-name>
-        <servlet-class>org.apache.click.ClickServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -703,6 +718,30 @@
         <url-pattern>/upgrade/setUpgradeProgress</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>UpgradeServlet</servlet-name>
+        <url-pattern>/upgrade/doUpgrade</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpgradeServlet</servlet-name>
+        <url-pattern>/config/upgrade/upgrade.htm</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckUpgrade</servlet-name>
+        <url-pattern>/upgrade/checkUpgrade</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SetupValidationServlet</servlet-name>
+        <url-pattern>/config/validate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DefaultValueServlet</servlet-name>
+        <url-pattern>/config/defaultValues</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>InitialSetup</servlet-name>
+        <url-pattern>/config/initialSetup</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>PWResetServlet</servlet-name>
         <url-pattern>/ui/*</url-pattern>
     </servlet-mapping>
@@ -772,11 +811,6 @@
     <servlet-mapping>
         <servlet-name>ws</servlet-name>
         <url-pattern>/ws/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>click-servlet</servlet-name>
-        <url-pattern>*.htm</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
