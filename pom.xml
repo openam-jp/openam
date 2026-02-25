@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* Portions Copyrighted 2019-2025 OSSTech Corporation
+* Portions Copyrighted 2019-2026 OSSTech Corporation
 * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
 *
 -->
@@ -852,6 +852,13 @@
             <dependency>
                 <groupId>jp.openam</groupId>
                 <artifactId>openam-ui-ria</artifactId>
+                <version>${project.version}</version>
+                <classifier>www</classifier>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>jp.openam</groupId>
+                <artifactId>openam-ui-setup</artifactId>
                 <version>${project.version}</version>
                 <classifier>www</classifier>
                 <type>zip</type>

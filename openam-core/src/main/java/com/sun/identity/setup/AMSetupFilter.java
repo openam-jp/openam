@@ -25,6 +25,7 @@
  * $Id: AMSetupFilter.java,v 1.12 2008/07/13 06:06:49 kevinserwin Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.setup;
@@ -56,18 +57,26 @@ import com.sun.identity.shared.Constants;
 */
 public final class AMSetupFilter implements Filter {
 
-    private static final String SETUP_URI = "/config/options.htm";
-    private static final String UPGRADE_URI = "/config/upgrade/upgrade.htm";
+    private static final String SETUP_URI = "/config/";
+    private static final String SETUP_EXEC_URI = "/config/initialSetup";
+    private static final String UPGRADE_URI = "/upgrade/doUpgrade";
+    private static final String OLD_UPGRADE_URI = "/config/upgrade/upgrade.htm";
     private static final String SETUP_PROGRESS_URI = "/setup/setSetupProgress";
     private static final String UPGRADE_PROGESS_URI = "/upgrade/setUpgradeProgress";
     private static final String CONFIGURATOR_URI = "configurator";
+
+    private static final String SETUP_HTML = "/config/index.html";
+    private static final String SETUP_VALIDATION_URI = "/config/validate";
+    private static final String SETUP_DEFAULT_VALUES_URI = "/config/defaultValues";
+    private static final String UPGRADE_CHECK_URI = "/upgrade/checkUpgrade";
 
     private static final String AM_ENCRYPTION_PASSWORD_PROPERTY_KEY = "am.enc.pwd";
     private static final String CONFIG_STORE_DOWN_ERROR_CODE = "configstore.down";
     private static final String NOWRITE_PERMISSION_ERROR_CODE = "nowrite.permission";
 
     private static final Collection<String> ALLOWED_RESOURCES = CollectionUtils.asSet("SMSObjectIF", "setSetupProgress",
-            "setUpgradeProgress", "/legal-notices/");
+            "setUpgradeProgress", "/legal-notices/", SETUP_HTML, SETUP_VALIDATION_URI, SETUP_DEFAULT_VALUES_URI,
+            SETUP_EXEC_URI, UPGRADE_URI, UPGRADE_CHECK_URI, OLD_UPGRADE_URI);
     private static final Collection<String> ALLOWED_FILE_EXTENSIONS = CollectionUtils.asSet(".ico", ".htm", ".css",
             ".js", ".jpg", ".gif", ".png");
 
@@ -105,7 +114,7 @@ public final class AMSetupFilter implements Filter {
 
         try {
             if (setupManager.isCurrentConfigurationValid()) {
-                if (isSetupRequest(request.getRequestURI())) {
+                if (isSetupRequest(resourcePath(request))) {
                     response.sendRedirect(createCleanUrl(request));
                 } else {
                     filterChain.doFilter(request, response);
@@ -121,7 +130,7 @@ public final class AMSetupFilter implements Filter {
                 } else {
                     if (isPassthrough && isRequestForAllowedResource(resourcePath(request))) {
                         filterChain.doFilter(request, response);
-                    } else if (isConfiguratorRequest(request.getRequestURI())) {
+                    } else if (isConfiguratorRequest(resourcePath(request))) {
                         filterChain.doFilter(request, response);
                     } else {
                         String url = createCleanUrl(request);
@@ -163,8 +172,9 @@ public final class AMSetupFilter implements Filter {
     }
 
     private boolean isSetupRequest(String requestUri) {
-        return requestUri.endsWith(SETUP_URI) || requestUri.endsWith(SETUP_PROGRESS_URI)
-                || requestUri.endsWith(UPGRADE_URI) || requestUri.endsWith(UPGRADE_PROGESS_URI);
+        return requestUri.startsWith(SETUP_URI) || requestUri.equals(SETUP_PROGRESS_URI)
+                || requestUri.equals(UPGRADE_URI) || requestUri.equals(UPGRADE_PROGESS_URI)
+                || requestUri.equals(UPGRADE_CHECK_URI);
     }
 
     private String createCleanUrl(HttpServletRequest request) {
@@ -173,6 +183,10 @@ public final class AMSetupFilter implements Filter {
     }
 
     private boolean isRequestForAllowedResource(String servletPath) {
+        if (servletPath.equals(SETUP_URI)) {
+            return true;
+        }
+
         for (String allowedResource : ALLOWED_RESOURCES) {
             if (servletPath.contains(allowedResource)) {
                 return true;

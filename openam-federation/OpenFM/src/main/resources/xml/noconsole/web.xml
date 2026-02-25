@@ -24,17 +24,7 @@
 
    $Id: web.xml,v 1.2 2008/06/25 05:51:12 qcheng Exp $
 
+   Portions Copyrighted 2026 OSSTech Corporation
+
 -->
-
-    <servlet>
-        <servlet-name>click-servlet</servlet-name>
-        <servlet-class>org.apache.click.ClickServlet</servlet-class>
-    </servlet>
-
-
-
-    <servlet-mapping>
-        <servlet-name>click-servlet</servlet-name>
-        <url-pattern>*.htm</url-pattern>
-    </servlet-mapping>
 

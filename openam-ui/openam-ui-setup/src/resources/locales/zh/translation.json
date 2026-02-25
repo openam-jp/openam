@@ -1,0 +1,189 @@
+{
+  "button": {
+    "cancel": "取消",
+    "create": "创建配置",
+    "next": "下一页",
+    "previous": "上一步",
+    "saveReport": "Save report",
+    "upgrade": "Upgrade"
+  },
+  "configComplete": "配置完成",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "可让您指定所有配置参数，包括数据存储库类型、加密属性、用户数据存储库等。此选项在设置安装时具有最大灵活性。",
+        "label": "自定义配置",
+        "link": "创建新配置"
+      },
+      "default": {
+        "description": "仅输入默认管理员和代理存取程序的密码。使用默认参数配置所有其他数据。此选项应主要用于评估或开发目的。",
+        "label": "默认配置",
+        "link": "创建默认配置"
+      },
+      "subtitle": "请选择配置选项。",
+      "title": "配置选项"
+    }
+  },
+  "default": {
+    "description": "使用此选项进行快速设置。仅超级用户名和代理用户名是必需的。所有其他配置参数均为默认设置。用户和代理的密码必须为不同值。",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "错误请求 - 缺少 userid/passwd 参数",
+    "401": "未授权 - 证书无效",
+    "405": "方法不允许 - 只允许 POST",
+    "408": "请求超时 - 请求已超时",
+    "701": "未找到文件 - deployuri/server 错误",
+    "702": "连接错误 - 指定的 URL 无效",
+    "agentAdminPasswordSame": "默认用户和代理的密码必须不同。",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "无法解析 Active Directory 域名，请确保 OpenAM 主机将 Active Directory 基础结构用于 DNS。",
+    "cannotConnectDatastore": "无法验证至数据存储库",
+    "encKeyNeed10Chars": "因为密钥少于 10 个字符，系统可能不安全。",
+    "invalidCookieDomain": "Cookie 域无效。",
+    "invalidDN": "标识名无效",
+    "invalidPortNumber": "端口必须小于或等于 65535",
+    "invalidPrimaryURL": "主 URL 无效",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "缺少域名",
+    "missingHostname": "缺少主机名",
+    "missingLoginID": "缺少登录 ID",
+    "missingPassword": "缺少密码",
+    "missingPort": "缺少端口号",
+    "missingPrimaryURL": "缺少主 URL",
+    "missingRequiredField": "缺少必填字段",
+    "missingSiteName": "缺少站点名称",
+    "noWritePermissionToBasedir": "没有该目录的写权限。",
+    "passwordDontMatch": "密码与确认密码不匹配",
+    "passwordSizeInvalid": "密码必须至少为 8 个字符",
+    "portUsed": "端口已被使用",
+    "unknownHost": "未知主机"
+  },
+  "gotoLogin": "继续登录",
+  "installing": "请稍候...正在进行配置...",
+  "label": {
+    "adminPort": "Admin Port",
+    "configDirectoy": "配置目录",
+    "configStore": "配置数据存储库",
+    "cookieDomain": "Cookie 域",
+    "directoryName": "目录名",
+    "domainName": "Active Directory 域名",
+    "enableSessionFailOver": "Enable Session HA Persistence and Failover",
+    "encKey": "加密密钥",
+    "hostname": "主机名",
+    "jmxPort": "JMX Port",
+    "localReplicationPort": "侦听端口",
+    "loginID": "登录 ID",
+    "no": "否",
+    "password": "密码",
+    "passwordConfirm": "确认密码",
+    "platformLocale": "平台区域设置",
+    "port": "端口",
+    "primaryURL": "负载平衡器 URL",
+    "remoteAdminPort": "侦听端口",
+    "remoteReplicationPort": "复制端口",
+    "replicationPort": "复制端口",
+    "rootSuffix": "根后缀",
+    "serverURL": "服务器 URL",
+    "siteName": "站点名称",
+    "sslEnabled": "已启用 SSL",
+    "storeType": {
+      "ADAM": "Active Directory 应用程序模式",
+      "ADDC": "具有域名的 AD",
+      "ADWithHostAndPort": "具有主机和端口的 Active Directory",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli Directory Server"
+    },
+    "userStoreType": "用户数据存储库类型",
+    "yes": "是"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "OpenDJ"
+    },
+    "instance": {
+      "addToExistingInstance": "是否添加到现有部署？",
+      "createNewInstance": "第一个实例"
+    },
+    "userStore": {
+      "embedded": "OpenAM 用户数据存储库",
+      "external": "其他用户数据存储库"
+    }
+  },
+  "returnConfig": "返回配置程序",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "常规",
+    "step2": "服务器设置",
+    "step3": "配置存储库",
+    "step4": "用户存储库",
+    "step5": "站点配置",
+    "step6": "代理信息",
+    "step7": "摘要"
+  },
+  "step1": {
+    "description": "输入默认用户 amAdmin 的密码。密码必须至少为 8 个字符。如果该配置将整合到现有部署，则所输入的密码必须与原始部署的密码匹配。",
+    "subtitle": "默认用户 [amAdmin]",
+    "title": "步骤 1：常规"
+  },
+  "step2": {
+    "description": "确认以下设置以用于服务器。",
+    "subtitle": "服务器设置",
+    "title": "步骤 2：服务器设置"
+  },
+  "step3": {
+    "description": "如果环境中不存在其他 OpenAM 实例，则选择“第一个实例”。如果环境中已存在一个或多个 OpenAM 实例，则选择“添加到现有部署”。",
+    "localPorts": "新的 OpenAM 实例端口设置",
+    "message": {
+      "noreplication": "未设置现有 OpenAM 实例以用于复制。将使用以下端口",
+      "replication": "已设置现有 OpenAM 实例以用于在以下端口复制"
+    },
+    "remotePorts": "现有 OpenAM 实例端口设置",
+    "subtitle": "配置存储库详细信息",
+    "title": "步骤 3：配置数据存储库设置"
+  },
+  "step4": {
+    "description": "可使用 OpenAM 配置数据存储库随附的数据存储库，或使用不同的用户数据存储库。设置生产环境的良好实践是使用与 OpenAM 用户数据存储库不同的外部用户数据存储库。请注意，策略服务和 LDAP 验证模块应配置为使用此处提供的目录管理员 DN 和密码。",
+    "message": {
+      "embeddedUserStore": "仅在用于演示时或在开发环境中支持使用 OpenAM 用户数据存储库。生产环境中不支持 OpenAM 用户数据存储库。"
+    },
+    "subtitle": "用户存储库详细信息",
+    "title": "步骤 4：用户数据存储库设置"
+  },
+  "step5": {
+    "description": "是否将此实例作为站点配置的一部分部署在负载平衡器后方？",
+    "message": {
+      "help": "这是 OpenAM 的第一个实例，并且当前不存在站点配置。要创建新的站点配置，请提供以下信息"
+    },
+    "subtitle": "站点配置详细信息",
+    "title": "步骤 5：站点配置"
+  },
+  "step6": {
+    "description": "OpenAM 策略代理使用这些设置检索策略代理属性。",
+    "subtitle": "默认策略代理 [UrlAccessAgent]",
+    "title": "步骤 6：默认策略代理用户"
+  },
+  "step7": {
+    "defaultUserStore": "使用配置存储库设置",
+    "description": "请花点时间复查以下配置。如果有错误的值，您可以在配置之前返回并修改设置。",
+    "edit": "编辑...",
+    "loginID": "用户名",
+    "noSite": "该实例未设置在负载平衡器后方",
+    "title": "配置程序摘要详细信息"
+  },
+  "upgrade": {
+    "available": "可用升级",
+    "complete": "Upgrade Complete!",
+    "currentVersion": "Current Version:",
+    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "link": "升级到 OpenAM ${project.version}",
+    "newVersion": "New Version:",
+    "newVersionFound": "&nbsp;",
+    "progress": "Please wait... Upgrade in progress..",
+    "restartContainer": "Please restart your container for changes to take effect.",
+    "subtitle": "升级到 OpenAM ${project.version}",
+    "title": "Upgrading OpenAM"
+  }
+}

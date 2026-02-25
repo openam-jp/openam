@@ -1,0 +1,190 @@
+{
+  "button": {
+    "cancel": "取消し",
+    "create": "設定の作成",
+    "next": "次へ",
+    "previous": "戻る",
+    "reset": "最初からやり直す",
+    "saveReport": "レポートの保存",
+    "upgrade": "アップグレード"
+  },
+  "configComplete": "設定が完了しました",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "データストアのタイプ、暗号化のプロパティー、ユーザーデータストアなどを含む、すべての設定パラメータを指定できます。このオプションは、インストールの設定におけるもっとも高い柔軟性を備えています。",
+        "label": "カスタム設定",
+        "link": "新しい設定の作成"
+      },
+      "default": {
+        "description": "デフォルト管理者とエージェントアクセサのパスワードのみを入力します。ほかのすべてのデータはデフォルトパラメータを使用して設定されます。このオプションは、主に評価または開発の目的に使用するようにしてください。",
+        "label": "デフォルト設定",
+        "link": "デフォルト設定の作成"
+      },
+      "subtitle": "設定オプションを選択してください。",
+      "title": "設定オプション"
+    }
+  },
+  "default": {
+    "description": "高速設定にはこのオプションを使用します。スーパーユーザーの名前とエージェントユーザーの名前だけが必要です。ほかのすべての設定パラメータはデフォルトで設定されます。ユーザーとエージェントのパスワードは別の値にする必要があります。",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "正しくない要求 - ユーザー ID/パスワードのパラメータがありません",
+    "401": "未承認 - 資格情報が無効です",
+    "405": "メソッドが許可されていません - 使用できるのは POST だけです",
+    "408": "要求のタイムアウト - 要求がタイムアウトしました",
+    "701": "ファイルが見つかりません - 配備 URI/サーバーが正しくありません",
+    "702": "接続エラー - 無効な URL が指定されました",
+    "agentAdminPasswordSame": "デフォルトユーザーとエージェントのパスワードが一致してはいけません。",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "Active Directory ドメイン名を解決できません。OpenAM ホストが DNS 用の Active Directory インフラストラクチャーを使用していることを確認してください。",
+    "cannotConnectDatastore": "データストアの認証を受けることができません",
+    "encKeyNeed10Chars": "キーが 10 文字未満であるため、システムが安全でない可能性があります。",
+    "invalidCookieDomain": "無効な Cookie ドメインです。",
+    "invalidDN": "無効な識別名",
+    "invalidPortNumber": "ポートは 65535 以下にする必要があります",
+    "invalidPrimaryURL": "プライマリ URL が無効です",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "ドメイン名がありません",
+    "missingHostname": "ホスト名がありません",
+    "missingLoginID": "ログイン ID がありません",
+    "missingPassword": "パスワードが入力されていません",
+    "missingPort": "ポート番号がありません",
+    "missingPrimaryURL": "プライマリ URL がありません",
+    "missingRequiredField": "必須フィールドがありません",
+    "missingSiteName": "サイト名がありません",
+    "noWritePermissionToBasedir": "このディレクトリへの書き込み権がありません。",
+    "passwordDontMatch": "パスワードと確認が一致しません",
+    "passwordSizeInvalid": "パスワードは 8 文字以上でなければなりません",
+    "portUsed": "ポートはすでに使用中です",
+    "unknownHost": "不明なホスト"
+  },
+  "gotoLogin": "ログインに進む",
+  "installing": "お待ちください... 設定しています...",
+  "label": {
+    "adminPort": "管理者ポート",
+    "configDirectoy": "設定ディレクトリ",
+    "configStore": "設定データストア",
+    "cookieDomain": "Cookie ドメイン",
+    "directoryName": "ディレクトリ名",
+    "domainName": "Active Directory ドメイン名",
+    "enableSessionFailOver": "セッション HA 永続化とフェイルオーバーを有効にします",
+    "encKey": "暗号化鍵",
+    "hostname": "ホスト名",
+    "jmxPort": "JMX ポート",
+    "localReplicationPort": "待機ポート",
+    "loginID": "ログイン ID",
+    "no": "いいえ",
+    "password": "パスワード",
+    "passwordConfirm": "パスワードの確認",
+    "platformLocale": "プラットフォームロケール",
+    "port": "ポート",
+    "primaryURL": "ロードバランサの URL",
+    "remoteAdminPort": "待機ポート",
+    "remoteReplicationPort": "レプリケーションポート",
+    "replicationPort": "レプリケーションポート",
+    "rootSuffix": "ルートサフィックス",
+    "serverURL": "サーバー URL",
+    "siteName": "サイト名",
+    "sslEnabled": "SSL が有効",
+    "storeType": {
+      "ADAM": "Active Directory アプリケーションモード",
+      "ADDC": "ドメイン名を含む AD",
+      "ADWithHostAndPort": "ホストおよびポートを含む Active Directory",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli Directory Server"
+    },
+    "userStoreType": "ユーザーデータストアタイプ",
+    "yes": "はい"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "OpenDJ または Oracle Directory Server Enterprise Edition"
+    },
+    "instance": {
+      "addToExistingInstance": "既存の配備に追加しますか。",
+      "createNewInstance": "最初のインスタンス"
+    },
+    "userStore": {
+      "embedded": "OpenAM のユーザーデータストア",
+      "external": "その他のユーザーデータストア"
+    }
+  },
+  "returnConfig": "設定ツールに戻る",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "一般",
+    "step2": "サーバー設定",
+    "step3": "設定ストア",
+    "step4": "ユーザーストア",
+    "step5": "サイト設定",
+    "step6": "エージェント情報",
+    "step7": "概要"
+  },
+  "step1": {
+    "description": "デフォルトユーザー amAdmin のパスワードを入力します。パスワード長は 8 文字以上にする必要があります。この設定が既存の配備の一部になる場合は、入力するパスワードを元の配備のパスワードと一致させてください。",
+    "subtitle": "デフォルトユーザー [amAdmin]",
+    "title": "手順 1: 一般"
+  },
+  "step2": {
+    "description": "サーバーで使用する次の設定を確認します。",
+    "subtitle": "サーバー設定",
+    "title": "手順 2: サーバー設定"
+  },
+  "step3": {
+    "description": "環境にほかの既存の OpenAM インスタンスがなければ、「最初のインスタンス」を選択します。環境に 1 つ以上の既存の OpenAM インスタンスがあれば、「既存の配備に追加しますか。」を選択します。",
+    "localPorts": "新しい OpenAM インスタンスのポート設定",
+    "message": {
+      "noreplication": "既存の OpenAM インスタンスはレプリケーション用に設定されていません。次のポートが使用されます。",
+      "replication": "既存の OpenAM インスタンスはすでに次のポートでのレプリケーション用に設定されています。"
+    },
+    "remotePorts": "既存の OpenAM インスタンスのポート設定",
+    "subtitle": "設定ストアの詳細",
+    "title": "手順 3: 設定データストア設定"
+  },
+  "step4": {
+    "description": "OpenAM 設定データストアに付属のデータストアを使用することも、別のユーザーデータストアを使用することもできます。  本稼働環境を設定する際には、OpenAM ユーザーデータストアとは異なる外部のユーザーデータストアを使用することをお勧めします。ここで指定したディレクトリ管理者 DN とパスワードを使用するようポリシーサービスと LDAP 認証モジュールが設定されることに注意してください。",
+    "message": {
+      "embeddedUserStore": "OpenAM ユーザーデータストアの使用は、デモ目的または開発環境内でのみサポートされます。OpenAM ユーザーデータストアは、本稼働環境ではサポートされません。"
+    },
+    "subtitle": "ユーザーストアの詳細",
+    "title": "手順 4: ユーザーデータストア設定"
+  },
+  "step5": {
+    "description": "このインスタンスは、サイト設定の一部としてロードバランサの背後に配備されますか ?",
+    "message": {
+      "help": "これは OpenAM の最初のインスタンスで、現在、サイト設定は存在しません。新しいサイト設定を作成するには、次の情報を入力します"
+    },
+    "subtitle": "サイト設定の詳細",
+    "title": "手順 5: サイト設定"
+  },
+  "step6": {
+    "description": "これらの設定は、ポリシーエージェントのプロパティーを取得するために OpenAM ポリシーエージェントで使用されます。",
+    "subtitle": "デフォルトポリシーエージェント [UrlAccessAgent]",
+    "title": "手順 6: デフォルトのポリシーエージェントユーザー"
+  },
+  "step7": {
+    "defaultUserStore": "設定ストア設定の使用",
+    "description": "下の設定を確認してください。正しくない値がある場合は、設定を行う前に、戻ってその設定を変更できます。",
+    "edit": "編集...",
+    "loginID": "ユーザー名",
+    "noSite": "このインスタンスは、ロードバランサの背後には設定されません。",
+    "title": "設定ツールの概要と詳細"
+  },
+  "upgrade": {
+    "available": "使用可能なアップグレード",
+    "complete": "アップグレード完了!",
+    "currentVersion": "現在のバージョン:",
+    "description": "<p>アップグレード前に<a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">リリースノート</a>をお読みください。</p>",
+    "link": "OpenAM ${project.version} へのアップグレード",
+    "newVersion": "新しいバージョン:",
+    "newVersionFound": "旧バージョンの設定が見つかりました",
+    "progress": "しばらくお待ちください...アップグレードが進行中です..",
+    "restartContainer": "変更を有効にするため、コンテナを再起動してください。",
+    "subtitle": "OpenAM ${project.version} へのアップグレード",
+    "title": "OpenAM のアップグレード"
+  }
+}

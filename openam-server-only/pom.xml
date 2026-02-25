@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* Portions Copyrighted 2019-2020 Open Source Solution Technology Corporation
+* Portions Copyrighted 2019-2026 OSSTech Corporation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -107,6 +107,15 @@
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/XUI</outputDirectory>
+                                    <includes>**/*</includes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jp.openam</groupId>
+                                    <artifactId>openam-ui-setup</artifactId>
+                                    <classifier>www</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/config</outputDirectory>
                                     <includes>**/*</includes>
                                 </artifactItem>
                             </artifactItems>
@@ -249,6 +258,14 @@
                             </includes>
                             <targetPath>XUI</targetPath>
                             <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/config/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>config</targetPath>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>${basedir}/src/main/webapp</directory>
@@ -654,6 +671,13 @@
         <dependency>
             <groupId>jp.openam</groupId>
             <artifactId>openam-ui-ria</artifactId>
+            <type>zip</type>
+            <classifier>www</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>jp.openam</groupId>
+            <artifactId>openam-ui-setup</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
         </dependency>

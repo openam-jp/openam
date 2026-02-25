@@ -1,0 +1,189 @@
+{
+  "button": {
+    "cancel": "取消",
+    "create": "建立配置",
+    "next": "下一頁",
+    "previous": "上一個",
+    "saveReport": "Save report",
+    "upgrade": "Upgrade"
+  },
+  "configComplete": "配置完成",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "可讓您指定所有配置參數，包括資料存放區、加密特性、使用者資料存放區等的類型。此選項能在您設定安裝時提供最大的靈活度。",
+        "label": "自訂配置",
+        "link": "建立新配置"
+      },
+      "default": {
+        "description": "僅輸入預設管理員和代理程式存取子的密碼。所有其他資料都是使用預設參數配置。此選項主要應該用於評估或部署。",
+        "label": "預設配置",
+        "link": "建立預設配置"
+      },
+      "subtitle": "請選取配置選項。",
+      "title": "配置選項"
+    }
+  },
+  "default": {
+    "description": "使用此選項快速設定。只需要超級使用者名稱和代理程式使用者名稱。所有其他配置參數均已預設。使用者密碼和代理程式密碼決不能相同。",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "錯誤的請求 - 缺少 userid/passwd 參數",
+    "401": "未授權 - 憑證無效",
+    "405": "不允許的方法 - 只能接受 POST",
+    "408": "請求逾時 - 請求已逾時",
+    "701": "找不到檔案 - deployuri/server 不正確",
+    "702": "連線錯誤 - 指定的 URL 無效",
+    "agentAdminPasswordSame": "預設使用者密碼和代理程式密碼決不能相同。",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "無法解析 Active Directory 網域名稱，請確保 OpenAM 主機針對 DNS 使用的是 Active Directory 基礎架構。",
+    "cannotConnectDatastore": "無法認證至資料存放區",
+    "encKeyNeed10Chars": "系統可能不安全，因為金鑰長度少於 10 個字元。",
+    "invalidCookieDomain": "Cookie 網域無效。",
+    "invalidDN": "辨別名稱無效",
+    "invalidPortNumber": "連接埠必須小於或等於 65535",
+    "invalidPrimaryURL": "主要 URL 無效",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "缺少網域名稱",
+    "missingHostname": "缺少主機名稱",
+    "missingLoginID": "缺少登入 ID",
+    "missingPassword": "缺少密碼",
+    "missingPort": "缺少連接埠號碼",
+    "missingPrimaryURL": "缺少主要 URL",
+    "missingRequiredField": "缺少必填欄位",
+    "missingSiteName": "缺少網站名稱",
+    "noWritePermissionToBasedir": "沒有此目錄的寫入權限。",
+    "passwordDontMatch": "密碼與確認密碼不相符",
+    "passwordSizeInvalid": "密碼必須至少為 8 個字元",
+    "portUsed": "連接埠已在使用中",
+    "unknownHost": "未知的主機"
+  },
+  "gotoLogin": "繼續登入",
+  "installing": "請稍候... 正在配置...",
+  "label": {
+    "adminPort": "Admin Port",
+    "configDirectoy": "配置目錄",
+    "configStore": "配置資料存放區",
+    "cookieDomain": "Cookie 網域",
+    "directoryName": "目錄名稱",
+    "domainName": "Active Directory 網域名稱",
+    "enableSessionFailOver": "Enable Session HA Persistence and Failover",
+    "encKey": "加密金鑰",
+    "hostname": "主機名稱",
+    "jmxPort": "JMX Port",
+    "localReplicationPort": "偵聽連接埠",
+    "loginID": "登入 ID",
+    "no": "否",
+    "password": "密碼",
+    "passwordConfirm": "確認密碼",
+    "platformLocale": "平台語言環境",
+    "port": "連接埠",
+    "primaryURL": "負載平衡器 URL",
+    "remoteAdminPort": "偵聽連接埠",
+    "remoteReplicationPort": "複製連接埠",
+    "replicationPort": "複製連接埠",
+    "rootSuffix": "根尾碼",
+    "serverURL": "伺服器 URL",
+    "siteName": "網站名稱",
+    "sslEnabled": "已啟用 SSL",
+    "storeType": {
+      "ADAM": "Active Directory 应用程序模式",
+      "ADDC": "網域名稱式 Active Directory",
+      "ADWithHostAndPort": "主機和連接埠式 Active Directory",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli 目錄伺服器"
+    },
+    "userStoreType": "使用者資料存放區類型",
+    "yes": "是"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "Oracle Directory Server Enterprise Edition"
+    },
+    "instance": {
+      "addToExistingInstance": "增加至現有部署？",
+      "createNewInstance": "第一個實例"
+    },
+    "userStore": {
+      "embedded": "OpenAM 使用者資料存放區",
+      "external": "其他使用者資料存放區"
+    }
+  },
+  "returnConfig": "返回配置程式",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "一般",
+    "step2": "伺服器設定",
+    "step3": "配置存放區",
+    "step4": "使用者存放區",
+    "step5": "網站配置",
+    "step6": "代理程式資訊",
+    "step7": "摘要"
+  },
+  "step1": {
+    "description": "輸入預設使用者 amAdmin 的密碼。密碼必須至少為 8 個字元。若此配置將成為現有部署的一部分，則輸入的密碼必須符合原始部署的密碼。",
+    "subtitle": "預設使用者 [amAdmin]",
+    "title": "步驟 1：一般"
+  },
+  "step2": {
+    "description": "確認下列用於伺服器的設定。",
+    "subtitle": "伺服器設定",
+    "title": "步驟 2：伺服器設定"
+  },
+  "step3": {
+    "description": "如果環境中沒有其他 OpenAM 實例存在，則選擇 [第一個實例]。如果現在環境中已有一個或多個 OpenAM 實例存在，則選擇 [增加至現有部署]。",
+    "localPorts": "新 OpenAM 實例連接埠設定",
+    "message": {
+      "noreplication": "未設定現有 OpenAM 實例以進行複製。將使用下列連接埠",
+      "replication": "已設定現有 OpenAM 實例以在下列連接埠上進行複製"
+    },
+    "remotePorts": "現有 OpenAM 實例連接埠設定",
+    "subtitle": "配置存放區詳細資訊",
+    "title": "步驟 3：配置存放區設定"
+  },
+  "step4": {
+    "description": "您可以使用 OpenAM 配置資料存放區隨附的資料存放區，也可以使用其他的使用者資料存放區。設定生產環境的良好做法就是使用與 OpenAM 使用者資料存放區不同的外部使用者資料存放區。請注意，應該將策略服務與 LDAP 認證模組配置為使用此處提供的目錄管理員 DN 與密碼。",
+    "message": {
+      "embeddedUserStore": "只有用於示範時或在開發環境中，才支援使用 OpenAM 使用者資料存放區。生產環境中不支援 OpenAM 使用者資料存放區。"
+    },
+    "subtitle": "使用者存放區詳細資訊",
+    "title": "步驟 4：使用者資料存放區設定"
+  },
+  "step5": {
+    "description": "是否將此實例作為網站配置的一部分部署在負載平衡器後方？",
+    "message": {
+      "help": "這是 OpenAM 的第一個實例，目前不存在網站配置。若要建立新網站配置，請提供以下資訊"
+    },
+    "subtitle": "網站配置詳細資訊",
+    "title": "步驟 5：網站配置"
+  },
+  "step6": {
+    "description": "OpenAM 策略代理程式會使用這些設定來擷取策略代理程式特性。",
+    "subtitle": "預設策略代理程式 [UrlAccessAgent]",
+    "title": "步驟 6：預設策略代理程式使用者"
+  },
+  "step7": {
+    "defaultUserStore": "使用配置存放區設定",
+    "description": "請先檢閱以下設定。如果存在不正確的值，可在配置之前返回並修改設定。",
+    "edit": "編輯(E)...",
+    "loginID": "使用者名稱",
+    "noSite": "此實例未在負載平衡器後方設定",
+    "title": "配置程式摘要詳細資訊"
+  },
+  "upgrade": {
+    "available": "升級可用",
+    "complete": "Upgrade Complete!",
+    "currentVersion": "Current Version:",
+    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "link": "升級至 OpenAM ${project.version}",
+    "newVersion": "New Version:",
+    "newVersionFound": "&nbsp;",
+    "progress": "Please wait... Upgrade in progress..",
+    "restartContainer": "Please restart your container for changes to take effect.",
+    "subtitle": "升級至 OpenAM ${project.version}",
+    "title": "Upgrading OpenAM"
+  }
+}

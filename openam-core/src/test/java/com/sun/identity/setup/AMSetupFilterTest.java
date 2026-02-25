@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package com.sun.identity.setup;
@@ -108,7 +109,7 @@ public class AMSetupFilterTest {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest("REQUEST_URI");
+        HttpServletRequest request = mockRequest("/servlet");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -124,19 +125,25 @@ public class AMSetupFilterTest {
     @DataProvider
     private Object[][] setupRequestUris() {
         return new Object[][]{
-            {"/config/options.htm"},
+            {"/config/"},
+            {"/config/index.html"},
+            {"/config/initialSetup"},
             {"/setup/setSetupProgress"},
+            {"/config/defaultValues"},
+            {"/config/validate"},
+            {"/upgrade/doUpgrade"},
             {"/config/upgrade/upgrade.htm"},
             {"/upgrade/setUpgradeProgress"},
+            {"/upgrade/checkUpgrade"}
         };
     }
 
     @Test(dataProvider = "setupRequestUris")
-    public void filterShouldRedirectSetupRequestsIfConfigured(String requestUri) throws Exception {
+    public void filterShouldRedirectSetupRequestsIfConfigured(String servletPath) throws Exception {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest(requestUri);
+        HttpServletRequest request = mockRequest(servletPath);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -155,7 +162,7 @@ public class AMSetupFilterTest {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest("REQUEST_URI");
+        HttpServletRequest request = mockRequest("/servlet");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -176,7 +183,7 @@ public class AMSetupFilterTest {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest("REQUEST_URI");
+        HttpServletRequest request = mockRequest("/servlet");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -199,7 +206,7 @@ public class AMSetupFilterTest {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest("/configurator");
+        HttpServletRequest request = mockRequest("/config/configurator");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -217,7 +224,7 @@ public class AMSetupFilterTest {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest("REQUEST_URI");
+        HttpServletRequest request = mockRequest("/servlet");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -228,7 +235,7 @@ public class AMSetupFilterTest {
         setupFilter.doFilter(request, response, chain);
 
         //Then
-        verify(response).sendRedirect("SCHEME://SERVER_NAME:8080/CONTEXT_PATH/config/options.htm");
+        verify(response).sendRedirect("SCHEME://SERVER_NAME:8080/CONTEXT_PATH/config/");
         verifyZeroInteractions(chain);
     }
 
@@ -238,7 +245,7 @@ public class AMSetupFilterTest {
 
         //Given
         initializeFilter();
-        HttpServletRequest request = mockRequest("REQUEST_URI");
+        HttpServletRequest request = mockRequest("/servlet");
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -259,30 +266,40 @@ public class AMSetupFilterTest {
     @DataProvider
     private Object[][] allowedRequestsWhilstConfiguring() {
         return new Object[][]{
-            {".ico"},
-            {".htm"},
-            {".css"},
-            {".js"},
-            {".jpg"},
-            {".gif"},
-            {".png"},
-            {".JPG"},
-            {"SMSObjectIF"},
-            {"setSetupProgress"},
-            {"setUpgradeProgress"},
-            {"/legal-notices/"},
+            {"/config/"},
+            {"/config/index.html"},
+            {"/config/initialSetup"},
+            {"/setup/setSetupProgress"},
+            {"/config/defaultValues"},
+            {"/config/validate"},
+            {"/upgrade/doUpgrade"},
+            {"/config/upgrade/upgrade.htm"},
+            {"/upgrade/setUpgradeProgress"},
+            {"/upgrade/checkUpgrade"},
+            {"/test.ico"},
+            {"/test.htm"},
+            {"/test.css"},
+            {"/test.js"},
+            {"/test.jpg"},
+            {"/test.gif"},
+            {"/test.png"},
+            {"/test.JPG"},
+            {"/jaxrpc/SMSObjectIF"},
+            {"/setup/setSetupProgress"},
+            {"/upgrade/setUpgradeProgress"},
+            {"/legal-notices/"}
         };
     }
 
     @Test(dataProvider = "allowedRequestsWhilstConfiguring")
-    public void filterShouldAllowCertainRequestsThroughIfNotConfiguredAndInConfigurationMode(String suffix)
+    public void filterShouldAllowCertainRequestsThroughIfNotConfiguredAndInConfigurationMode(String servletPath)
             throws Exception {
 
         //Previous request must have been redirected to setup page to set the pass-through flag
         filterShouldRedirectRequestsToSetupPageIfNotConfigured();
 
         //Given
-        HttpServletRequest request = mockRequest(suffix);
+        HttpServletRequest request = mockRequest(servletPath);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
@@ -334,15 +351,15 @@ public class AMSetupFilterTest {
         given(setupManager.isUpgradeCompleted()).willReturn(false);
     }
 
-    private HttpServletRequest mockRequest(String suffix) {
+    private HttpServletRequest mockRequest(String servletPath) {
         HttpServletRequest request = mock(HttpServletRequest.class);
         given(request.getScheme()).willReturn("SCHEME");
         given(request.getServerName()).willReturn("SERVER_NAME");
         given(request.getServerPort()).willReturn(8080);
         given(request.getContextPath()).willReturn("/CONTEXT_PATH");
-        given(request.getRequestURI()).willReturn("REQUEST_URI" + suffix);
-        given(request.getServletPath()).willReturn("SERVLET_PATH" + suffix);
-        given(request.getPathInfo()).willReturn("PATH_INFO" + suffix);
+        given(request.getRequestURI()).willReturn("REQUEST_URI" + servletPath);
+        given(request.getServletPath()).willReturn(servletPath);
+        given(request.getPathInfo()).willReturn("");
         return request;
     }
 

@@ -1,0 +1,189 @@
+{
+  "button": {
+    "cancel": "취소",
+    "create": "구성 만들기",
+    "next": "다음",
+    "previous": "이전",
+    "saveReport": "Save report",
+    "upgrade": "Upgrade"
+  },
+  "configComplete": "구성 완료",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "데이터 저장소 유형, 암호화 등록 정보, 사용자 데이터 저장소 등을 포함한 모든 구성 매개 변수를 지정할 수 있습니다. 이 옵션은 설치를 설정할 때 가장 유연하게 사용할 수 있습니다.",
+        "label": "사용자 정의 구성",
+        "link": "새 구성 만들기"
+      },
+      "default": {
+        "description": "기본 관리자 및 상위 에이전트의 비밀번호만 입력하십시오. 다른 모든 데이터는 기본 매개 변수를 사용하여 구성됩니다. 이 옵션은 기본적으로 평가 또는 개발을 위한 것입니다.",
+        "label": "기본 구성",
+        "link": "기본 구성 만들기"
+      },
+      "subtitle": "구성 옵션을 선택하십시오.",
+      "title": "구성 옵션"
+    }
+  },
+  "default": {
+    "description": "빠른 설정을 위해 이 옵션을 사용합니다. 수퍼유저 이름 및 에이전트 사용자 이름만 필요합니다. 다른 모든 구성 매개 변수는 기본값이 사용됩니다. 사용자 및 에이전트 비밀번호는 서로 달라야 합니다.",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "잘못된 요청 - userid/passwd 매개 변수 없음",
+    "401": "인증되지 않음 - 잘못된 자격 증명",
+    "405": "허용되지 않는 메서드 - POST만 사용 가능",
+    "408": "요청 시간 초과 - 요청이 시간 초과됨",
+    "701": "파일을 찾을 수 없음 - 잘못된 deployuri/server",
+    "702": "연결 오류 - 잘못된 URL 지정됨",
+    "agentAdminPasswordSame": "기본 사용자 및 에이전트 비밀번호가 일치하지 않습니다.",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "Active Directory 도메인 이름을 확인할 수 없습니다. OpenAM 호스트가 DNS에 대한 Active Directory 인프라를 사용하고 있는지 확인하십시오.",
+    "cannotConnectDatastore": "데이터 저장소를 인증할 수 없습니다.",
+    "encKeyNeed10Chars": "키가 10자 미만이므로 시스템이 안전하지 않을 수 있습니다.",
+    "invalidCookieDomain": "잘못된 쿠키 도메인입니다.",
+    "invalidDN": "잘못된 고유 이름(DN)",
+    "invalidPortNumber": "포트는 65535 이하여야 함",
+    "invalidPrimaryURL": "기본 URL이 잘못됨",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "누락된 도메인 이름",
+    "missingHostname": "호스트 이름 없음",
+    "missingLoginID": "로그인 아이디 없음",
+    "missingPassword": "비밀번호 없음",
+    "missingPort": "포트 번호 없음",
+    "missingPrimaryURL": "기본 URL 없음",
+    "missingRequiredField": "필수 필드 없음",
+    "missingSiteName": "사이트 이름 없음",
+    "noWritePermissionToBasedir": "이 디렉토리에 쓸 수 있는 권한이 없습니다.",
+    "passwordDontMatch": "비밀번호와 비밀번호 확인이 일치하지 않음",
+    "passwordSizeInvalid": "비밀번호는 8자 이상이어야 함",
+    "portUsed": "포트가 이미 사용 중입니다.",
+    "unknownHost": "알 수 없는 호스트"
+  },
+  "gotoLogin": "계속 로그인",
+  "installing": "잠시 기다려 주십시오... 구성 진행 중입니다...",
+  "label": {
+    "adminPort": "Admin Port",
+    "configDirectoy": "구성 디렉토리",
+    "configStore": "구성 데이터 저장소",
+    "cookieDomain": "쿠키 도메인",
+    "directoryName": "디렉토리 이름",
+    "domainName": "Active Directory 도메인 이름",
+    "enableSessionFailOver": "Enable Session HA Persistence and Failover",
+    "encKey": "암호화 키",
+    "hostname": "호스트 이름",
+    "jmxPort": "JMX Port",
+    "localReplicationPort": "수신 포트",
+    "loginID": "로그인 아이디",
+    "no": "아니요",
+    "password": "비밀번호",
+    "passwordConfirm": "비밀번호 확인",
+    "platformLocale": "플랫폼 로켈",
+    "port": "포트",
+    "primaryURL": "로드 밸런서 URL",
+    "remoteAdminPort": "수신 포트",
+    "remoteReplicationPort": "복제 포트",
+    "replicationPort": "복제 포트",
+    "rootSuffix": "루트 접미어",
+    "serverURL": "서버 URL",
+    "siteName": "사이트 이름",
+    "sslEnabled": "SSL 활성화",
+    "storeType": {
+      "ADAM": "Active Directory Application Mode",
+      "ADDC": "도메인 이름을 사용한 Active Directory",
+      "ADWithHostAndPort": "호스트 및 포트를 사용한 Active Directory",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli Directory Server"
+    },
+    "userStoreType": "사용자 데이터 저장소 유형",
+    "yes": "예"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "OpenDJ"
+    },
+    "instance": {
+      "addToExistingInstance": "기존 배포에 추가하시겠습니까?",
+      "createNewInstance": "첫 번째 인스턴스"
+    },
+    "userStore": {
+      "embedded": "OpenAM 사용자 데이터 저장소",
+      "external": "기타 사용자 데이터 저장소"
+    }
+  },
+  "returnConfig": "구성자로 돌아가기",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "일반",
+    "step2": "서버 설정",
+    "step3": "구성 저장소",
+    "step4": "사용자 저장소",
+    "step5": "사이트 구성",
+    "step6": "에이전트 정보",
+    "step7": "요약"
+  },
+  "step1": {
+    "description": "기본 사용자인 amAdmin의 비밀번호를 입력하십시오. 비밀번호는 8자 이상이어야 합니다. 이 구성이 기존 배포의 일부인 경우 입력된 비밀번호는 원래 배포의 비밀번호와 일치해야 합니다.",
+    "subtitle": "기본 사용자 [amAdmin]",
+    "title": "1단계: 일반"
+  },
+  "step2": {
+    "description": "서버에 대해 사용할 다음과 같은 설정을 확인합니다.",
+    "subtitle": "서버 설정",
+    "title": "2단계: 서버 설정"
+  },
+  "step3": {
+    "description": "해당 환경에 다른 OpenAM 인스턴스가 없는 경우 \"첫 번째 인스턴스\"를 선택하십시오.  해당 환경에 둘 이상의 OpenAM 인스턴스가 이미 있는 경우 \"기존 배포에 추가하시겠습니까?\"를 선택합니다.",
+    "localPorts": "새 OpenAM 인스턴스 포트 설정",
+    "message": {
+      "noreplication": "기존 OpenAM 인스턴트는 복제를 위해 설정되어 있지 않습니다. 다음 포트가 사용됩니다.",
+      "replication": "기존 OpenAM 인스턴스가 다음 포트에서 이미 복제를 위해 설정되어 있습니다."
+    },
+    "remotePorts": "기존 OpenAM 인스턴스 포트 설정",
+    "subtitle": "구성 저장소 세부 정보",
+    "title": "3단계: 구성 데이터 저장소 설정"
+  },
+  "step4": {
+    "description": "OpenAM 구성 데이터 저장소에서 제공되는 데이터 저장소를 사용하거나 다른 사용자 데이터 저장소를 사용할 수 있습니다.  작업 환경을 설정하는 좋은 방법은 OpenAM 사용자 데이터 저장소가 아닌 외부 사용자 데이터 저장소를 사용하는 것입니다. 정책 서비스와 LDAP 인증 모듈은 여기에 지정된 디렉토리 관리자 DN 및 비밀번호를 사용하도록 구성되어야 합니다.",
+    "message": {
+      "embeddedUserStore": "OpenAM 사용자 데이터 저장소는 데모 또는 개발 환경에서만 사용할 수 있습니다.  OpenAM 사용자 데이터 저장소는 작업 환경에서 사용할 수 없습니다."
+    },
+    "subtitle": "사용자 저장소 세부 정보",
+    "title": "4단계: 사용자 데이터 저장소 설정"
+  },
+  "step5": {
+    "description": "사이트 구성의 일부로서 이 인스턴스가 로드 밸런서 뒤에 배포됩니까?",
+    "message": {
+      "help": "OpenAM의 첫 번째 인스턴스이며 현재 사이트 구성이 없습니다. 새 사이트 구성을 만들려면 다음 정보를 제공하십시오."
+    },
+    "subtitle": "사이트 구성 세부 정보",
+    "title": "5단계: 사이트 구성"
+  },
+  "step6": {
+    "description": "이 설정은 OpenAM 정책 에이전트에서 정책 에이전트 등록 정보를 검색하는 데 사용됩니다.",
+    "subtitle": "기본 정책 에이전트 [UrlAccessAgent]",
+    "title": "6단계: 기본 정책 에이전트 사용자"
+  },
+  "step7": {
+    "defaultUserStore": "구성 저장소 설정 사용",
+    "description": "잠시 아래 설정을 검토하십시오. 값이 올바르지 않은 경우 구성하기 전에 다시 돌아가서 설정을 수정할 수 있습니다.",
+    "edit": "편집...",
+    "loginID": "사용자 이름",
+    "noSite": "이 인스턴스는 로드 밸런서 뒤에 설정되어 있지 않습니다.",
+    "title": "구성자 요약 세부 정보"
+  },
+  "upgrade": {
+    "available": "업그레이드 사용 가능",
+    "complete": "Upgrade Complete!",
+    "currentVersion": "Current Version:",
+    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "link": "OpenAM ${project.version}으로 업그레이드",
+    "newVersion": "New Version:",
+    "newVersionFound": "&nbsp;",
+    "progress": "Please wait... Upgrade in progress..",
+    "restartContainer": "Please restart your container for changes to take effect.",
+    "subtitle": "OpenAM ${project.version}으로 업그레이드",
+    "title": "Upgrading OpenAM"
+  }
+}

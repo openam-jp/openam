@@ -1,0 +1,189 @@
+{
+  "button": {
+    "cancel": "Abbrechen",
+    "create": "Konfiguration erstellen",
+    "next": "Weiter",
+    "previous": "Vorherige",
+    "saveReport": "Save report",
+    "upgrade": "Upgrade"
+  },
+  "configComplete": "Konfiguration abgeschlossen",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "Ermöglicht die Angabe aller Konfigurationsparameter einschließlich Datenspeichertyp, Verschlüsselungseigenschaften, Benutzerdatenspeicher usw. Diese Option bietet die größte Flexibilität bei der Konfiguration der Installation.",
+        "label": "Benutzerdefinierte Konfiguration",
+        "link": "Neue Konfiguration erstellen"
+      },
+      "default": {
+        "description": "Geben Sie nur die Passwortinformationen für den Standardadministrator und den Benutzer mit Zugriff auf den Agent ein. Alle weiteren Daten werden mit Standardparametern konfiguriert. Diese Option ist in erster Linie für Auswertungs- oder Entwicklungszwecke vorgesehen.",
+        "label": "Standard-Konfiguration",
+        "link": "Standard-Konfiguration erstellen"
+      },
+      "subtitle": "Wählen Sie eine Konfigurationsoption aus.",
+      "title": "Konfigurationsoptionen"
+    }
+  },
+  "default": {
+    "description": "Option für schnelle Konfiguration Nur der Name des Super-Users und der Agent-Benutzername müssen angegeben werden. Für alle weiteren Konfigurationsparameter werden Standardwerte verwendet. Für Benutzer und Agent müssen unterschiedliche Passwörter verwendet werden.",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "Fehlerhafte Anforderung - Benutzer-ID/Passwort-Parameter fehlt",
+    "401": "Unberechtigt - Ungültige Berechtigungsnachweise",
+    "405": "Methode nicht zulässig - nur POST wird berücksichtigt",
+    "408": "Anforderungs-Timeout - Anforderung hat Zeitlimit überschritten",
+    "701": "Datei nicht gefunden - falscher deployuri/Server",
+    "702": "Verbindungsfehler - Ungültige URL angegeben",
+    "agentAdminPasswordSame": "Passwörter für Standardbenutzer und Agent dürfen nicht übereinstimmen.",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "Der Domänenname des Active Directory kann nicht aufgelöst werden. Stellen Sie sicher, dass der OpenAM-Host die Active Directory-Infrastruktur für das DNS verwendet.",
+    "cannotConnectDatastore": "Authentifizierung mit Datenspeicher kann nicht durchgeführt werden",
+    "encKeyNeed10Chars": "Sicherheit des Systems kann beeinträchtigt werden, da der Schlüssel weniger als 10 Zeichen umfasst.",
+    "invalidCookieDomain": "Ungültige Cookie-Domäne.",
+    "invalidDN": "Ungültiger Distinguished Name (DN)",
+    "invalidPortNumber": "Portnummer darf nicht größer als 65535 sein",
+    "invalidPrimaryURL": "Primäre URL ist nicht gültig",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "Domänenname fehlt",
+    "missingHostname": "Hostname fehlt",
+    "missingLoginID": "Anmelde-ID fehlt",
+    "missingPassword": "Passwort fehlt",
+    "missingPort": "Portnummer fehlt",
+    "missingPrimaryURL": "Primäre URL fehlt",
+    "missingRequiredField": "Erforderliches Feld fehlt",
+    "missingSiteName": "Site-Name fehlt",
+    "noWritePermissionToBasedir": "Sie haben keine Schreibberechtigung für dieses Verzeichnis.",
+    "passwordDontMatch": "Passwort und Bestätigung stimmen nicht überein",
+    "passwordSizeInvalid": "Passwort muss aus mindestens 8 Zeichen bestehen",
+    "portUsed": "Port wird bereits verwendet",
+    "unknownHost": "Unbekannter  Host"
+  },
+  "gotoLogin": "Anmelden",
+  "installing": "Bitte warten... Konfiguration wird bearbeitet...",
+  "label": {
+    "adminPort": "Admin Port",
+    "configDirectoy": "Konfigurationsverzeichnis",
+    "configStore": "Konfigurationsdatenspeicher",
+    "cookieDomain": "Cookie-Domäne",
+    "directoryName": "Verzeichnisname",
+    "domainName": "Domänenname des Active Directory",
+    "enableSessionFailOver": "Enable Session HA Persistence and Failover",
+    "encKey": "Verschüsselungsschlüssel",
+    "hostname": "Hostname",
+    "jmxPort": "JMX Port",
+    "localReplicationPort": "Zielport",
+    "loginID": "Anmelde-ID",
+    "no": "Nein",
+    "password": "Passwort",
+    "passwordConfirm": "Passwort bestätigen",
+    "platformLocale": "Plattform-Ländereinstellung",
+    "port": "Port",
+    "primaryURL": "URL der Lastverteilung",
+    "remoteAdminPort": "Zielport",
+    "remoteReplicationPort": "Replikationsport",
+    "replicationPort": "Replikationsport",
+    "rootSuffix": "Root-Suffix",
+    "serverURL": "Server-URL",
+    "siteName": "Site-Name",
+    "sslEnabled": "SSL aktiviert",
+    "storeType": {
+      "ADAM": "Active Directory Application Mode",
+      "ADDC": "AD mit Domänenname",
+      "ADWithHostAndPort": "Active Directory mit Host und Port",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli Directory Server"
+    },
+    "userStoreType": "Typ des Benutzerdatenspeichers",
+    "yes": "Ja"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "OpenDJ"
+    },
+    "instance": {
+      "addToExistingInstance": "Zu vorhandener Bereitstellung hinzufügen?",
+      "createNewInstance": "Erste Instanz"
+    },
+    "userStore": {
+      "embedded": "OpenAM-Benutzerdatenspeicher",
+      "external": "Anderer Benutzerdatenspeicher"
+    }
+  },
+  "returnConfig": "Zu Configurator zurückkehren",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "Allgemein",
+    "step2": "Servereinstellungen",
+    "step3": "Konfigurationsspeicher",
+    "step4": "Benutzerspeicher",
+    "step5": "Site-Konfiguration",
+    "step6": "Agenteninformationen",
+    "step7": "Zusammenfassung"
+  },
+  "step1": {
+    "description": "Passwort für den Standardbenutzer, amAdmin, eingeben. Das Passwort muss mindestens 8 Zeichen lang sein. Wenn diese Konfiguration Teil einer bestehenden Bereitstellung sein soll, muss das eingegebene Passwort mit dem Passwort der ursprünglichen Bereitstellung übereinstimmen.",
+    "subtitle": "Standardbenutzer [amAdmin]",
+    "title": "Schritt 1: Allgemein"
+  },
+  "step2": {
+    "description": "Bestätigen Sie die folgenden Einstellungen zur Verwendung mit dem Server.",
+    "subtitle": "Servereinstellungen",
+    "title": "Schritt 2: Servereinstellungen"
+  },
+  "step3": {
+    "description": "Wählen Sie Erste Instanz, wenn in der Umgebung noch keine OpenAM-Instanz vorhanden ist.  Wählen Sie Zu vorhandener Bereitstellung hinzufügen, wenn bereits eine oder mehrere OpenAM-Instanzen in der Umgebung vorhanden sind.",
+    "localPorts": "Porteinstellungen für neue OpenAM-Instanz",
+    "message": {
+      "noreplication": "Die vorhandene OpenAM-Instanz ist nicht zur Replikation eingerichtet. Die folgenden Anschlüsse werden verwendet",
+      "replication": "Die vorhandene OpenAM-Instanz ist bereits zur Replikation an folgenden Anschlüssen eingerichtet."
+    },
+    "remotePorts": "Porteinstellungen für vorhandene OpenAM-Instanz",
+    "subtitle": "Konfigurationsspeicherdetails",
+    "title": "Schritt 3: Konfigurations-Datenspeichereinstellungen"
+  },
+  "step4": {
+    "description": "Sie können den Datenspeicher verwenden, der im OpenAM-Konfigurationsdatenspeicher vorhanden ist, oder einen anderen Benutzerdatenspeicher.  Eine gute Übung für das Einrichten von Produktionsumgebungen besteht darin, einen externen Benutzerdatenspeicher zu verwenden, der vom Benutzerdatenspeicher von OpenAM abweicht. Beachten Sie, dass Richtliniendienst und LDAP-Authentifizierungsmodul so konfiguriert werden müssen, dass der Verzeichnisadministrator-DN und das Passwort verwendet werden, die hier angegeben sind.",
+    "message": {
+      "embeddedUserStore": "Die Verwendung eines OpenAM-Benutzerdatenspeichers wird nur für Demonstrationszwecke oder in Entwicklungsumgebungen unterstützt.  Der OpenAM-Benutzerdatenspeicher wird in Produktionsumgebungen nicht unterstützt."
+    },
+    "subtitle": "Benutzerspeicherdetails",
+    "title": "Schritt 4: Einstellungen für Benutzerdatenspeicher"
+  },
+  "step5": {
+    "description": "Wird diese Instanz hinter einer Lastverteilung als Teil der Site-Konfiguration bereitgestellt?",
+    "message": {
+      "help": "Dies ist die erste Instanz von OpenAM, und derzeit sind keine Site-Konfigurationen vorhanden. Geben Sie folgende Informationen an, um eine neue Site-Konfiguration zu erstellen"
+    },
+    "subtitle": "Site-Konfigurationsdetails",
+    "title": "Schritt 5: Sitekonfiguration"
+  },
+  "step6": {
+    "description": "Diese Einstellungen werden von OpenAM-Richtlinienagenten zum Abrufen der Richtlinienagenteneigenschaften verwendet.",
+    "subtitle": "Standardrichtlinienagent [UrlAccessAgent]",
+    "title": "Schritt 6: Standardrichtlinienbenutzer"
+  },
+  "step7": {
+    "defaultUserStore": "Konfigurationsspeichereinstellungen werden verwendet",
+    "description": "Nehmen Sie sich einen Moment Zeit, um die folgenden Einstellungen zu überprüfen. Wenn einige Werte nicht korrekt sind, können Sie zurückgehen und die Einstellungen vor der Konfiguration ändern.",
+    "edit": "bearbeiten...",
+    "loginID": "Benutzername",
+    "noSite": "Diese Instanz ist nicht hinter einer Lastverteilung eingerichtet.",
+    "title": "Konfigurator-Zusammenfassungsdetails"
+  },
+  "upgrade": {
+    "available": "Upgrade verfügbar",
+    "complete": "Upgrade Complete!",
+    "currentVersion": "Current Version:",
+    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "link": "Upgrade auf OpenAM ${project.version}",
+    "newVersion": "New Version:",
+    "newVersionFound": "&nbsp;",
+    "progress": "Please wait... Upgrade in progress..",
+    "restartContainer": "Please restart your container for changes to take effect.",
+    "subtitle": "Upgrade auf OpenAM ${project.version}",
+    "title": "Upgrading OpenAM"
+  }
+}

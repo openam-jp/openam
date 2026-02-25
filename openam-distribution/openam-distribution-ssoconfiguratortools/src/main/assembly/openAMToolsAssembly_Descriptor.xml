@@ -22,7 +22,7 @@
 * your own identifying information:
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
-* Portions Copyrighted 2019 Open Source Solution Technology Corporation
+* Portions Copyrighted 2026 OSSTech Corporation
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -48,6 +48,9 @@
                 <include>jp.openam:openam-tools</include>
                 <include>jp.openam:openam-license-core</include>
                 <include>jp.openam:openam-installer-utils</include>
+                <include>com.fasterxml.jackson.core:jackson-annotations</include>
+                <include>com.fasterxml.jackson.core:jackson-core</include>
+                <include>com.fasterxml.jackson.core:jackson-databind</include>
             </includes>
         </dependencySet>
         <dependencySet>

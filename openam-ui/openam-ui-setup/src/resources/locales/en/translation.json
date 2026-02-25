@@ -1,0 +1,190 @@
+{
+  "button": {
+    "cancel": "Cancel",
+    "create": "Create Configuration",
+    "next": "Next",
+    "previous": "Previous",
+    "reset": "Start over",
+    "saveReport": "Save report",
+    "upgrade": "Upgrade"
+  },
+  "configComplete": "Configuration Complete",
+  "configuration": {
+    "options": {
+      "custom": {
+        "description": "Allows you to specify all configuration parameters including the type of data store, encryption properties, user data store, etc. This option has the most flexibility in setting up your installation.",
+        "label": "Custom Configuration",
+        "link": "Create New Configuration"
+      },
+      "default": {
+        "description": "Enter only the passwords for the default administrator and the agent accessor. All other data is configured using default parameters. This option should be used primarily for evaluation or development purposes.",
+        "label": "Default Configuration",
+        "link": "Create Default Configuration"
+      },
+      "subtitle": "Please select a configuration option.",
+      "title": "Configuration Options"
+    }
+  },
+  "default": {
+    "description": "Use this option for a quick setup. Only the passwords for the super user and agent user are required. All other configuration parameters are defaulted for you. The user and agent passwords must be different values.",
+    "title": "Provide Default User Passwords"
+  },
+  "error": {
+    "400": "Bad Request - userid/passwd param missing",
+    "401": "Unauthorized - Invalid Credentials",
+    "405": "Method Not Allowed - only POST is honored",
+    "408": "Request Timeout - requested timed out",
+    "701": "File Not Found - incorrect deployuri/server",
+    "702": "Connection Error - Invalid URL specified",
+    "agentAdminPasswordSame": "Default user and agent passwords must not match.",
+    "basedirIsNotEmpty": "Directory is not empty",
+    "cannotConnectAD": "Cannot resolve Active Directory domain name, please ensure the OpenAM host is using the Active Directory infrastructure for DNS.",
+    "cannotConnectDatastore": "Unable to authenticate to datastore",
+    "encKeyNeed10Chars": "System can be insecured as key is less than 10 characters long.",
+    "invalidCookieDomain": "Invalid cookie domain.",
+    "invalidDN": "Invalid Distinguished Name",
+    "invalidPortNumber": "Port must be greater than or equal to 1 and less than or equal to 65535",
+    "invalidPrimaryURL": "Primary URL is not valid",
+    "mismatchedCookieDomain": "Cookie domain is not a part of the server URL",
+    "missingDomainName": "Missing Domain Name",
+    "missingHostname": "Missing Host Name",
+    "missingLoginID": "Missing Login ID",
+    "missingPassword": "Missing Password",
+    "missingPort": "Missing Port Number",
+    "missingPrimaryURL": "Missing Primary URL",
+    "missingRequiredField": "Missing Required Field",
+    "missingSiteName": "Site Name Missing",
+    "noWritePermissionToBasedir": "Do not have write permission to this directory.",
+    "passwordDontMatch": "Password and Confirm do not match",
+    "passwordSizeInvalid": "Password must be at least 8 characters",
+    "portUsed": "Port already in use",
+    "unknownHost": "Unknown host"
+  },
+  "gotoLogin": "Proceed to Login",
+  "installing": "Please wait... configuration in progress...",
+  "label": {
+    "adminPort": "Admin Port",
+    "configDirectoy": "Configuration Directory",
+    "configStore": "Configuration Data Store",
+    "cookieDomain": "Cookie Domain",
+    "directoryName": "Directory Name",
+    "domainName": "Active Directory Domain Name",
+    "enableSessionFailOver": "Enable Session HA Persistence and Failover",
+    "encKey": "Encryption Key",
+    "hostname": "Host Name",
+    "jmxPort": "JMX Port",
+    "localReplicationPort": "Listening Port",
+    "loginID": "Login ID",
+    "no": "No",
+    "password": "Password",
+    "passwordConfirm": "Confirm Password",
+    "platformLocale": "Platform Locale",
+    "port": "Port",
+    "primaryURL": "Load Balancer URL",
+    "remoteAdminPort": "Admin Port",
+    "remoteReplicationPort": "Replication Port",
+    "replicationPort": "Replication Port",
+    "rootSuffix": "Root Suffix",
+    "serverURL": "Server URL",
+    "siteName": "Site Name",
+    "sslEnabled": "SSL/TLS Enabled",
+    "storeType": {
+      "ADAM": "Active Directory Application Mode",
+      "ADDC": "AD with Domain Name",
+      "ADWithHostAndPort": "Active Directory with Host and Port",
+      "ODSEE": "Oracle Directory Server Enterprise Edition",
+      "opendj": "OpenDJ",
+      "tivoli": "IBM Tivoli Directory Server"
+    },
+    "userStoreType": "User Data Store Type",
+    "yes": "Yes"
+  },
+  "options": {
+    "configStore": {
+      "embedded": "OpenAM",
+      "external": "OpenDJ"
+    },
+    "instance": {
+      "addToExistingInstance": "Add to Existing Deployment?",
+      "createNewInstance": "First Instance"
+    },
+    "userStore": {
+      "embedded": "OpenAM User Data Store",
+      "external": "Other User Data Store"
+    }
+  },
+  "returnConfig": "Return to Configurator",
+  "sideBar": {
+    "default": "Credentials",
+    "step1": "General",
+    "step2": "Server Settings",
+    "step3": "Configuration Store",
+    "step4": "User Store",
+    "step5": "Site Configuration",
+    "step6": "Agent Information",
+    "step7": "Summary"
+  },
+  "step1": {
+    "description": "Enter the password for the default user, amAdmin. The password must be at least 8 characters in length. If this configuration will be part of an existing deployment, the password you enter must match that of the original deployment.",
+    "subtitle": "Default User [amAdmin]",
+    "title": "Step 1: General"
+  },
+  "step2": {
+    "description": "Confirm the following settings to use for the server.",
+    "subtitle": "Server Settings",
+    "title": "Step 2: Server Settings"
+  },
+  "step3": {
+    "description": "If no other OpenAM instance already exists in the environment, then choose First Instance.  If one or more OpenAM instances already exist in the environment, choose Add to Existing Deployment.",
+    "localPorts": "New OpenAM instance port settings",
+    "message": {
+      "noreplication": "The existing OpenAM instance is not set up for replication. The following ports will be used",
+      "replication": "The existing OpenAM instance is already set up for replication on the following ports"
+    },
+    "remotePorts": "Existing OpenAM instance port settings",
+    "subtitle": "Configuration Store Details",
+    "title": "Step 3: Configuration Data Store Settings"
+  },
+  "step4": {
+    "description": "You can use the data store that comes with the OpenAM configuration data store, or you can use a different user data store.  A good practice for setting up production environments is to use an external user data store, one that is different than the OpenAM user data store. Please note that Policy Service and LDAP Authentication Module shall be configured to use the Directory Administrator DN and Password provided here.",
+    "message": {
+      "embeddedUserStore": "The OpenAM user data store is not recommended for large scale production environments or deployments with a complex topology."
+    },
+    "subtitle": "User Store Details",
+    "title": "Step 4: User Data Store Settings"
+  },
+  "step5": {
+    "description": "Will this instance be deployed behind a load balancer as part of a site configuration?",
+    "message": {
+      "help": "This is the first instance of OpenAM, and no site configurations currently exist. To create a new site configuration, provide the following information"
+    },
+    "subtitle": "Site Configuration Details",
+    "title": "Step 5: Site Configuration"
+  },
+  "step6": {
+    "description": "These settings are used by OpenAM policy agents for retrieving policy agent properties.",
+    "subtitle": "Default Policy Agent [UrlAccessAgent]",
+    "title": "Step 6: Default Policy Agent User"
+  },
+  "step7": {
+    "defaultUserStore": "Using Configuration Store Settings",
+    "description": "Take a moment to review the settings below. If any values are incorrect you may go back and modify the settings prior to configuration.",
+    "edit": "edit...",
+    "loginID": "User Name",
+    "noSite": "This instance is not setup behind a load balancer",
+    "title": "Configurator Summary Details"
+  },
+  "upgrade": {
+    "available": "Upgrade Available",
+    "complete": "Upgrade Complete!",
+    "currentVersion": "Current Version:",
+    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "link": "Upgrade to OpenAM ${project.version}",
+    "newVersion": "New Version:",
+    "newVersionFound": "An older version of configuration has been found",
+    "progress": "Please wait... Upgrade in progress..",
+    "restartContainer": "Please restart your container for changes to take effect.",
+    "subtitle": "Upgrade to OpenAM ${project.version}",
+    "title": "Upgrading OpenAM"
+  }
+}
