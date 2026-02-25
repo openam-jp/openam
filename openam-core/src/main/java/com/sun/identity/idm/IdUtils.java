@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
- * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2021-2026 OSSTech Corporation
  */
 
 package com.sun.identity.idm;
@@ -848,6 +848,21 @@ public final class IdUtils {
      * @return The AMIdentity of user with username equal to uName.
      */
     public static AMIdentity getIdentity(String uName, String realm) {
+        return getIdentity(uName, realm, IdType.USER);
+    }
+
+    /**
+     * Gets the AMIdentity of a group with groupname equal to gName that exists in realm.
+     *
+     * @param gName groupname
+     * @param realm realm the group belongs to
+     * @return The AMIdentity of group
+     */
+    public static AMIdentity getGroupIdentity(String gName, String realm) {
+        return getIdentity(gName, realm, IdType.GROUP);
+    }
+
+    private static AMIdentity getIdentity(String name, String realm, IdType idType) {
         AMIdentity theID = null;
 
         AMIdentityRepository amIdRepo = getAMIdentityRepository(DNMapper.orgNameToDN(realm));
@@ -860,7 +875,7 @@ public final class IdUtils {
         try {
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.USER, uName, idsc, false, false);
+                    amIdRepo.searchIdentities(idType, name, idsc, false, false);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
@@ -868,11 +883,11 @@ public final class IdUtils {
             if (results == null || results.size() != 1) {
                 throw new IdRepoException("IdUtils" +
                         ".getIdentity : " +
-                        "More than one user found");
+                        "More than one " + idType.getName() + " found");
             }
             theID = results.iterator().next();
         } catch (IdRepoException e) {
-            debug.warning("Error searching for user identity");
+            debug.warning("Error searching for identity");
         } catch (SSOException e) {
             debug.warning("User's ssoToken has expired");
         }

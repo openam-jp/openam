@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.rest.resource;
@@ -66,13 +67,27 @@ public class ContextHelper {
      * @return The resource users username.
      */
     public String getUserId(Context context) {
+        return getId(context, "user");
+    }
+
+    /**
+     * Gets the groupname for the accessed resource.
+     *
+     * @param context The context.
+     * @return The resource groupname.
+     */
+    public String getGroupId(Context context) {
+        return getId(context, "group");
+    }
+
+    private String getId(Context context, String idType) {
         UriRouterContext routerContext = context.asContext(UriRouterContext.class);
-        String userId = routerContext.getUriTemplateVariables().get("user");
-        if (userId == null && !routerContext.isRootContext()
+        String id = routerContext.getUriTemplateVariables().get(idType);
+        if (id == null && !routerContext.isRootContext()
                 && routerContext.getParent().containsContext(UriRouterContext.class)) {
-            return getUserId(routerContext.getParent());
+            return getId(routerContext.getParent(), idType);
         }
-        return userId;
+        return id;
     }
 
     /**

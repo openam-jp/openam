@@ -25,6 +25,7 @@
  * $Id: DelegationManager.java,v 1.10 2008/06/25 05:43:24 qcheng Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.delegation;
 
@@ -86,7 +87,8 @@ public final class DelegationManager {
     private String orgName;
     
     private SSOToken token;
-    private static final String AUTHN_USERS_ID = "id=All Authenticated Users,ou=role," + ServiceManager.getBaseDN();
+
+    public static final String AUTHN_USERS_ID = "id=All Authenticated Users,ou=role," + ServiceManager.getBaseDN();
     
     /**
      * Constructor of <code>DelegationManager</code> for the specified realm.
