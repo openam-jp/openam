@@ -25,6 +25,7 @@
  * $Id: FQDNUtils.java,v 1.6 2008/08/19 19:08:59 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.common;
 
@@ -34,15 +35,13 @@ import java.util.Map;
 import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.configuration.ConfigurationListener;
-import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.Constants;
 
 /**
  * This class determines whether a host name is valid; and allows to retrieve fully qualified host name from a partial
  * (virtual) host name.
  */
-public enum FqdnValidator implements ConfigurationListener {
+public enum FqdnValidator {
 
     INSTANCE;
     private final String defaultHostName;
@@ -51,7 +50,6 @@ public enum FqdnValidator implements ConfigurationListener {
     FqdnValidator() {
         defaultHostName = SystemProperties.get(Constants.AM_SERVER_HOST).toLowerCase();
         initialize();
-        ConfigurationObserver.getInstance().addListener(this);
     }
 
     public static FqdnValidator getInstance() {
@@ -118,10 +116,5 @@ public enum FqdnValidator implements ConfigurationListener {
         }
 
         return fqHostName;
-    }
-
-    @Override
-    public void notifyChanges() {
-        initialize();
     }
 }
