@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.audit;
 
@@ -118,7 +119,9 @@ public final class AuditConstants {
         /** SAML2 audit event component. */
         SAML2("SAML2"),
         /** Self Service audit event component. */
-        SELF_SERVICE("Self Service");
+        SELF_SERVICE("Self Service"),
+        /** Privileges audit event component. */
+        PRIVILEGES("Privileges");
 
         private final String name;
 

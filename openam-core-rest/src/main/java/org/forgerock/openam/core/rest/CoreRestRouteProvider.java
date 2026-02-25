@@ -26,6 +26,9 @@ import com.google.inject.name.Names;
 import jp.co.osstech.openam.core.rest.devices.services.webauthn.WebAuthnDevicesResource;
 import jp.co.osstech.openam.core.rest.identities.UserResource;
 import jp.co.osstech.openam.core.rest.identities.UserServiceResource;
+import jp.co.osstech.openam.core.rest.privileges.AllAuthenticatedUsersPrivilegeResource;
+import jp.co.osstech.openam.core.rest.privileges.GroupPrivilegeResource;
+import jp.co.osstech.openam.core.rest.identities.GroupResource;
 import jp.co.osstech.openam.core.rest.identities.UserGroupResource;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV1;
@@ -147,6 +150,21 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .auditAs(USERS)
                 .authorizeWith(AdminOnlyAuthzModule.class)
                 .toCollection(UserServiceResource.class);
+
+        realmRouter.route("identities/groups")
+                .auditAs(GROUPS)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toCollection(GroupResource.class);
+
+        realmRouter.route("identities/groups/{group}/privileges")
+                .auditAs(PRIVILEGES)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toSingleton(GroupPrivilegeResource.class);
+
+        realmRouter.route("privileges/allauthenticatedusers")
+                .auditAs(PRIVILEGES)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toSingleton(AllAuthenticatedUsersPrivilegeResource.class);
 
         rootRouter.route("tokens")
                 .auditAs(CTS)
