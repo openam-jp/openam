@@ -25,6 +25,7 @@
  * $Id: NamingService.java,v 1.13 2009/04/07 22:30:07 beomsuk Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.iplanet.services.naming.service;
@@ -46,6 +47,8 @@ import com.iplanet.services.naming.share.NamingResponse;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.FqdnValidator;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.Constants;
@@ -55,6 +58,8 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCookies;
 
@@ -158,7 +163,26 @@ public class NamingService implements RequestHandler {
         };
         ServiceListeners builder = InjectorHolder.getInstance(ServiceListeners.class);
         builder.config(NAMING_SERVICE).global(action).schema(action).listen();
-        builder.config(PLATFORM_SERVICE).global(action).schema(action).listen();
+
+        // After ConfigurationObserver resets SystemProperties, need to update FQDN map
+        ConfigurationObserver configurationObserver = ConfigurationObserver.getInstance();
+        ConfigurationListener listener = new ConfigurationListener() {
+            @Override
+            public void notifyChanges() {
+                try {
+                    updateNamingTable();
+                    WebtopNaming.updateNamingTable();
+                } catch (Exception ex) {
+                    namingDebug.error("Error occured in updating naming table", ex);
+                }
+            }
+        };
+        configurationObserver.addServiceListener(listener, new Predicate<String>() {
+            @Override
+            public boolean apply(String s) {
+                return s != null && s.equals(PLATFORM_SERVICE);
+            }
+        });
     }
 
     public NamingService() {
