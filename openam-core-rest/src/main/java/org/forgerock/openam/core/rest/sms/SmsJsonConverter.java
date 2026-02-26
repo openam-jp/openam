@@ -33,21 +33,30 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.sun.identity.common.configuration.MapValueParser;
+import com.sun.identity.idm.IdConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.AttributeSchema.Syntax;
 import com.sun.identity.sm.InvalidAttributeValueException;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
+
+import jp.co.osstech.openam.core.rest.sms.AttributeSchemaFilter;
+
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
@@ -66,6 +75,8 @@ import org.xml.sax.SAXException;
  * @since 13.0.0
  */
 public class SmsJsonConverter {
+    private static final Pattern orderedListPattern = Pattern.compile("(\\s*\\[\\s*\\d++\\s*\\]\\s*=.*)");
+
     private final MapValueParser nameValueParser = new MapValueParser();
     private final Debug debug = Debug.getInstance("SmsJsonConverter");
     private final Map<String, AttributeSchemaConverter> attributeSchemaConverters = new HashMap<String, AttributeSchemaConverter>();
@@ -134,6 +145,7 @@ public class SmsJsonConverter {
      * corresponding JSON representation
      *
      * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
      * @return Json representation of attributeValuePairs
      */
     public JsonValue toJson(Map<String, Set<String>> attributeValuePairs, boolean validate) {
@@ -177,6 +189,25 @@ public class SmsJsonConverter {
      * @return Json representation of attributeValuePairs
      */
     public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate,
+            JsonValue parentJson) {
+        return toJson(realm, attributeValuePairs, validate, false, null, null, parentJson);
+    }
+
+    /**
+     * Will validate the Map representation of the service configuration against the serviceSchema and return a
+     * corresponding JSON representation
+     *
+     * @param realm The realm, or null if global.
+     * @param attributeValuePairs The schema attribute values.
+     * @param validate Should the attributes be validated.
+     * @param inheritable whether to inherit default or group values
+     * @param nonInheritableAttributes The attributes excluded from inheritance
+     * @param inheritedAttributes The inherited attributes
+     * @param parentJson The {@link JsonValue} to which the attributes should be added.
+     * @return Json representation of attributeValuePairs
+     */
+    public JsonValue toJson(String realm, Map<String, Set<String>> attributeValuePairs, boolean validate,
+            boolean inheritable, Set<String> nonInheritableAttributes, Set<String> inheritedAttributes,
             JsonValue parentJson) {
 
         if (!initialised) {
@@ -233,13 +264,56 @@ public class SmsJsonConverter {
                 } else if (containsMultipleValues(type)) {
                     if (isAMap(attributeSchema.getUIType())) {
                         Map<String, Object> map = new HashMap<String, Object>();
+                        boolean isGlobalMapList =
+                                AttributeSchema.UIType.GLOBALMAPLIST.equals(attributeSchema.getUIType());
 
                         Iterator<String> itr = object.iterator();
                         while (itr.hasNext()) {
-                            Pair<String, String> entry = nameValueParser.parse(itr.next());
-                            map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                            String value = itr.next();
+                            Pair<String, String> entry = nameValueParser.parse(value);
+                            if (entry != null) {
+                                map.put(entry.getFirst(), attributeSchemaConverter.toJson(entry.getSecond()));
+                            } else if (isGlobalMapList) {
+                                if (!"[]=".equals(value)) {
+                                    // The global setting key is the empty string
+                                    map.put("", value);
+                                }
+                            }
                         }
                         jsonAttributeValue = map;
+                    } else if (isOrderedListConfiguration(attributeSchema.getUIType(),
+                            attributeSchema.getSyntax(), object)) {
+                        Set<String> sorted = new TreeSet<String>(new Comparator<String>() {
+                            @Override
+                            public int compare(String s1, String s2) {
+                                int idx1 = getIndex(s1);
+                                int idx2 = getIndex(s2);
+                                if (idx1 == idx2) {
+                                    return 0;
+                                }
+                                return (idx1 < idx2) ? -1 : 1;
+                            }
+                            private int getIndex(String str) {
+                                int idx = str.indexOf("]");
+                                return Integer.parseInt(str.substring(1, idx));
+                            }
+                        });
+                        sorted.addAll(object);
+
+                        if (sorted.size() == 1) {
+                            String tmp = (String)sorted.iterator().next();
+                            if (tmp.equals("[0]=")) {
+                                sorted.clear();
+                            }
+                        }
+
+                        List<Object> list = new ArrayList<Object>();
+                        for (String value : sorted) {
+                            int idx = value.indexOf(']');
+                            idx = value.indexOf('=', idx);
+                            list.add(value.substring(idx+1).trim());
+                        }
+                        jsonAttributeValue = list;
                     } else {
                         List<Object> list = new ArrayList<Object>();
 
@@ -251,11 +325,25 @@ public class SmsJsonConverter {
                     }
                 }
 
+                boolean addInherited = inheritable && nonInheritableAttributes != null
+                        && !nonInheritableAttributes.contains(attributeName);
                 String sectionName = attributeNameToSection.get(attributeName);
-                if (sectionName != null) {
-                    parentJson.putPermissive(new JsonPointer("/" + sectionName + "/" + name), jsonAttributeValue);
+                if (addInherited) {
+                    if (sectionName != null) {
+                        parentJson.putPermissive(new JsonPointer("/" + sectionName + "/" + name + "/inherited"),
+                                inheritedAttributes.contains(attributeName));
+                        parentJson.putPermissive(new JsonPointer("/" + sectionName + "/" + name + "/value"), jsonAttributeValue);
+                    } else {
+                        parentJson.putPermissive(new JsonPointer("/" + name + "/inherited"),
+                                inheritedAttributes.contains(attributeName));
+                        parentJson.putPermissive(new JsonPointer("/" + name + "/value"), jsonAttributeValue);
+                    }
                 } else {
-                    parentJson.put(name, jsonAttributeValue);
+                    if (sectionName != null) {
+                        parentJson.putPermissive(new JsonPointer("/" + sectionName + "/" + name), jsonAttributeValue);
+                    } else {
+                        parentJson.put(name, jsonAttributeValue);
+                    }
                 }
             }
         } else {
@@ -267,6 +355,25 @@ public class SmsJsonConverter {
     private boolean isAMap(AttributeSchema.UIType type) {
         return AttributeSchema.UIType.MAPLIST.equals(type)
                 || AttributeSchema.UIType.GLOBALMAPLIST.equals(type);
+    }
+
+    private boolean isOrderedListConfiguration(AttributeSchema.UIType type, Syntax syntax, Set<String> values) {
+        if ((AttributeSchema.UIType.ORDEREDLIST.equals(type)
+                || AttributeSchema.UIType.UNORDEREDLIST.equals(type))
+                && AttributeSchema.Syntax.STRING.equals(syntax)) {
+            // If even one value does not have a prefix, it will not be treated as orderedlist
+            boolean valid = true;
+            for (String value : values) {
+                if (value.length() > 0) {
+                    Matcher m = orderedListPattern.matcher(value);
+                    valid &= m.matches();
+                } else {
+                    return false;
+                }
+            }
+            return valid;
+        }
+        return false;
     }
 
     private boolean containsMultipleValues(AttributeSchema.Type type) {
@@ -320,11 +427,49 @@ public class SmsJsonConverter {
      * Will validate the Json representation of the service configuration against the serviceSchema for a realm,
      * and return a corresponding Map representation.
      *
-     * @param jsonValue The request body.
      * @param realm The realm, or null if global.
+     * @param jsonValue The request body.
      * @return Map representation of jsonValue
      */
     public Map<String, Set<String>> fromJson(String realm, JsonValue jsonValue) throws JsonException, BadRequestException {
+        return fromJson(realm, jsonValue, false, null, null, null);
+    }
+
+    /**
+     * Will validate the Json representation of the service configuration against the serviceSchema for a realm,
+     * and return a corresponding Map representation.
+     *
+     * @param realm The realm, or null if global.
+     * @param jsonValue The request body.
+     * @param inheritable whether to inherit default or group values
+     * @param nonInheritableAttributes The attributes excluded from inheritance
+     * @param inheritedAttributes The inherited attributes
+     * @param nonInheritedAttributes The non-inherited attributes
+     * @return Map representation of jsonValue
+     */
+    public Map<String, Set<String>> fromJson(String realm, JsonValue jsonValue, boolean inheritable,
+            Set<String> nonInheritableAttributes, Set<String> inheritedAttributes, Set<String> nonInheritedAttributes)
+                    throws JsonException, BadRequestException {
+        return fromJson(realm, jsonValue, inheritable, nonInheritableAttributes, inheritedAttributes, nonInheritedAttributes, null);
+    }
+
+    /**
+     * Will validate the Json representation of the service configuration against the serviceSchema for a realm,
+     * and return a corresponding Map representation.
+     *
+     * @param realm The realm, or null if global.
+     * @param jsonValue The request body.
+     * @param inheritable whether to inherit default or group values
+     * @param nonInheritableAttributes The attributes excluded from inheritance
+     * @param inheritedAttributes The inherited attributes
+     * @param nonInheritedAttributes The non-inherited attributes
+     * @param filter the filter to optimize for the service
+     * @return Map representation of jsonValue
+     */
+    public Map<String, Set<String>> fromJson(String realm, JsonValue jsonValue, boolean inheritable,
+            Set<String> nonInheritableAttributes, Set<String> inheritedAttributes, Set<String> nonInheritedAttributes,
+            AttributeSchemaFilter filter)
+                    throws JsonException, BadRequestException {
         if (!initialised) {
             init();
         }
@@ -346,26 +491,85 @@ public class SmsJsonConverter {
                 continue;
             }
 
-            if(shouldNotBeUpdated(attributeName)) {
+            if(shouldNotBeUpdated(attributeName, filter)) {
                 throw new BadRequestException("Invalid attribute, '" + attributeName + "', specified");
             }
 
 
-            final Object attributeValue = translatedAttributeValuePairs.get(attributeName);
+            Object attributeValue = translatedAttributeValuePairs.get(attributeName);
             Set<String> value = new HashSet<>();
+
+            boolean inheritableAttribute = inheritable && nonInheritableAttributes != null
+                    && !nonInheritableAttributes.contains(attributeName);
+            if (inheritableAttribute) {
+                if (attributeValue instanceof HashMap) {
+                    final HashMap<String, Object> attributeMap = (HashMap<String, Object>) attributeValue;
+                    if (attributeMap.containsKey("inherited")) {
+                        Object o = attributeMap.get("inherited");
+                        if (o instanceof Boolean && (Boolean)o) {
+                            inheritedAttributes.add(attributeName);
+                        } else {
+                            nonInheritedAttributes.add(attributeName);
+                        }
+                        if (!attributeMap.containsKey("value")) {
+                            // If the attribute has only `inherited` field, do not set a value in the return value
+                            continue;
+                        }
+                        attributeValue = attributeMap.get("value");
+                    }
+                }
+            } else {
+                // If inheritance is not supported and the `inherited` field is specified, throw exception
+                if (attributeValue instanceof HashMap) {
+                    final HashMap<String, Object> attributeMap = (HashMap<String, Object>) attributeValue;
+                    if (attributeMap.containsKey("inherited")) {
+                        throw new BadRequestException("Invalid attribute value syntax: '" + attributeName + "'");
+                    }
+                }
+            }
 
             if (attributeValue instanceof HashMap) {
                 final HashMap<String, Object> attributeMap = (HashMap<String, Object>) attributeValue;
+                AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
+                boolean isGlobalMapList =
+                        AttributeSchema.UIType.GLOBALMAPLIST.equals(attributeSchema.getUIType());
                 for (String name : attributeMap.keySet()) {
-                    value.add("[" + name + "]=" + convertJsonToString(attributeName, attributeMap.get(name)));
+                    if (name.isEmpty() && isGlobalMapList) {
+                        value.add(convertJsonToString(attributeName, attributeMap.get(name)));
+                    } else {
+                        value.add("[" + name + "]=" + convertJsonToString(attributeName, attributeMap.get(name)));
+                    }
                 }
             } else if (attributeValue instanceof List) {
                 List<Object> attributeArray = (ArrayList<Object>) attributeValue;
-                for (Object val : attributeArray) {
-                    value.add(convertJsonToString(attributeName, val));
+                AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
+                if ((AttributeSchema.UIType.ORDEREDLIST.equals(attributeSchema.getUIType())
+                        || AttributeSchema.UIType.UNORDEREDLIST.equals(attributeSchema.getUIType()))
+                        && AttributeSchema.Syntax.STRING.equals(attributeSchema.getSyntax())) {
+                    int index = 0;
+                    for (Object val : attributeArray) {
+                        value.add("[" + index++ + "]=" + convertJsonToString(attributeName, val));
+                    }
+                } else {
+                    for (Object val : attributeArray) {
+                        value.add(convertJsonToString(attributeName, val));
+                    }
                 }
             } else if (attributeValue != null) {
                 value.add(convertJsonToString(attributeName, attributeValue));
+            }
+
+            // For AgentService
+            if (value.isEmpty() && schema.getServiceName().equals(IdConstants.AGENT_SERVICE)) {
+                // AgentService requires a special value as the initial value
+                AttributeSchema.UIType uiType = schema.getAttributeSchema(attributeName).getUIType();
+                if (AttributeSchema.UIType.ORDEREDLIST.equals(uiType)
+                        || AttributeSchema.UIType.UNORDEREDLIST.equals(uiType)) {
+                    value.add("[0]=");
+                } else if (AttributeSchema.UIType.MAPLIST.equals(uiType)
+                        || AttributeSchema.UIType.GLOBALMAPLIST.equals(uiType)) {
+                    value.add("[]=");
+                }
             }
 
             if (!value.isEmpty() || !isPassword(schema.getAttributeSchema(attributeName).getSyntax())) {
@@ -394,9 +598,10 @@ public class SmsJsonConverter {
                 ("_type") || hiddenAttributeNames.contains(attributeName);
     }
 
-    private boolean shouldNotBeUpdated(String attributeName) {
+    private boolean shouldNotBeUpdated(String attributeName, AttributeSchemaFilter filter) {
         final AttributeSchema attributeSchema = schema.getAttributeSchema(attributeName);
-        return attributeSchema == null || hiddenAttributeNames.contains(attributeName);
+        return attributeSchema == null || hiddenAttributeNames.contains(attributeName)
+                || ( filter != null && !filter.isTarget(attributeSchema));
     }
 
     private AttributeSchemaConverter getAttributeConverter(String attributeName) {

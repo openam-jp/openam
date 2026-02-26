@@ -25,7 +25,7 @@
  * $Id: AgentConfiguration.java,v 1.52 2010/01/07 18:07:39 veiming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2026 OSSTech Corporation
  */
 
 package com.sun.identity.common.configuration;
@@ -80,6 +80,7 @@ public class AgentConfiguration {
     public final static String ATTR_NAME_PWD = "userpassword";
     public final static String ATTR_NAME_FREE_FORM =
         "com.sun.identity.agents.config.freeformproperties";
+    public final static String ATTR_NAME_GROUP = "agentgroup";
     public final static String ATTR_CONFIG_REPO =
         "com.sun.identity.agents.config.repository.location";
     public final static String VAL_CONFIG_REPO_LOCAL = "local";
@@ -469,7 +470,15 @@ public class AgentConfiguration {
         return amir.createIdentity(IdType.AGENTONLY, agentName, inheritedValues);
     }
 
-    private static void addAgentRootURLKey(String agentType, Map map)
+    /**
+     * Add the prefix to sunIdentityServerDeviceKeyValue.
+     *
+     * @param agentType the agent type
+     * @param map the attribute map of the agent
+     * @param validate true if sunIdentityServerDeviceKeyValue is validated
+     * @throws ConfigurationException
+     */
+    public static void addAgentRootURLKey(String agentType, Map map, boolean validate)
             throws ConfigurationException {
         if (agentType.equals(AGENT_TYPE_J2EE) ||
             agentType.equals(AGENT_TYPE_WEB) ||
@@ -480,10 +489,38 @@ public class AgentConfiguration {
                 Set newValues = new HashSet();
                 for (Iterator i = values.iterator(); i.hasNext(); )  {
                     String val = AGENT_ROOT_URL + (String)i.next();
-                    validateAgentRootURL(val);
+                    if (validate) {
+                        validateAgentRootURL(val);
+                    }
                     newValues.add(val);
                 }
                 map.put(DEVICE_KEY, newValues);
+            }
+        }
+    }
+
+    /**
+     * Remove the prefix from sunIdentityServerDeviceKeyValue.
+     *
+     * @param agentType the agent type
+     * @param map the attribute map of the agent
+     */
+    public static void removeAgentRootURLKey(String agentType, Map map) {
+        if (agentType.equals(AGENT_TYPE_J2EE) ||
+                agentType.equals(AGENT_TYPE_WEB) ||
+                agentType.equals(AGENT_TYPE_AGENT_AUTHENTICATOR)) {
+
+            Set newValues = new HashSet();
+            Set<String> values = (Set)map.get(AgentConfiguration.DEVICE_KEY);
+            if ((values != null) && !values.isEmpty()) {
+                for (String val : values) {
+                    if (val.startsWith(AgentConfiguration.AGENT_ROOT_URL)) {
+                        val = val.substring(
+                                AgentConfiguration.AGENT_ROOT_URL.length());
+                    }
+                    newValues.add(val);
+                }
+                map.put(AgentConfiguration.DEVICE_KEY, newValues);
             }
         }
     }
@@ -651,7 +688,7 @@ public class AgentConfiguration {
         }
         tagswapAttributeValues(attributeValues, map);
         if (agentURL != null) { 
-            addAgentRootURLKey(agentType, attributeValues);
+            addAgentRootURLKey(agentType, attributeValues, true);
         }
     }
     

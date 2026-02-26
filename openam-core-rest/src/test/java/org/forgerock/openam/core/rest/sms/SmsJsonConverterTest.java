@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -104,8 +105,7 @@ public class SmsJsonConverterTest {
         addAttributeSchema(INT_VALUE_NAME, AttributeSchema.Syntax.NUMERIC, null, AttributeSchema.Type.SINGLE, null);
         addAttributeSchema(BOOLEAN_VALUE_NAME, AttributeSchema.Syntax.BOOLEAN, null, AttributeSchema.Type.SINGLE, null);
         addAttributeSchema(DECIMAL_VALUE_NAME, AttributeSchema.Syntax.DECIMAL, null, AttributeSchema.Type.SINGLE, null);
-        addAttributeSchema(ARRAY_VALUE_NAME, AttributeSchema.Syntax.STRING, AttributeSchema.UIType.UNORDEREDLIST,
-                AttributeSchema.Type.LIST, null);
+        addAttributeSchema(ARRAY_VALUE_NAME, AttributeSchema.Syntax.STRING, null, AttributeSchema.Type.LIST, null);
         addAttributeSchema(MAP_VALUE_NAME, AttributeSchema.Syntax.STRING, AttributeSchema.UIType.MAPLIST,
                 AttributeSchema.Type.LIST, null);
         addAttributeSchema(SECTION_1_STRING_VALUE_NAME, AttributeSchema.Syntax.STRING, null, AttributeSchema.Type.SINGLE,
