@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -67,9 +68,10 @@ public class SmsJsonSchema {
     public static final String TYPE = "type";
     public static final String FORMAT = "format";
     public static final String STRING_TYPE = "string";
-    public static final String PASSWORD_TYPE = "password";
     public static final String PATTERN_PROPERTIES = "patternProperties";
     public static final String ARRAY_TYPE = "array";
+    public static final String PASSWORD_FORMAT = "password";
+    public static final String PARAGRAPH_FORMAT = "paragraph";
     public static final String ITEMS = "items";
     public static final String PROPERTIES = "properties";
     public static final String TITLE = "title";
@@ -114,6 +116,24 @@ public class SmsJsonSchema {
      */
     public static void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas,
             Locale locale, String realm, AttributeSchemaFilter filter) {
+        addAttributeSchema(result, path, schemas, locale, realm, false, null, filter);
+    }
+
+    /**
+     * Adds the attribute schema json to the JsonValue instance.
+     *
+     * @param result the JsonValue instance
+     * @param path the json path
+     * @param schemas the service schema
+     * @param locale the request locale
+     * @param realm the realm
+     * @param inheritable whether to inherit default or group values
+     * @param nonInheritableAttributes The attributes excluded from inheritance
+     * @param filter the filter to optimize for the service
+     */
+    public static void addAttributeSchema(JsonValue result, String path, ServiceSchema schemas,
+            Locale locale, String realm, boolean inheritable, Set<String> nonInheritableAttributes,
+            AttributeSchemaFilter filter) {
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schemas);
         ResourceBundle consoleI18n = ResourceBundle.getBundle("amConsole", locale);
         String serviceType = schemas.getServiceType().getType();
@@ -138,15 +158,25 @@ public class SmsJsonSchema {
                 }
 
                 String i18NKey = attribute.getI18NKey();
+                boolean addInherited = inheritable && nonInheritableAttributes != null
+                        && !nonInheritableAttributes.contains(attribute.getName());
                 Object propertyOrder = (attribute.getOrder() == null) ? i18NKey : attribute.getOrder();
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE),
                         schemaI18n.containsKey(i18NKey) ? schemaI18n.getString(i18NKey) : i18NKey);
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
                         getSchemaDescription(schemaI18n, i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), propertyOrder);
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), filter.isRequired(attribute));
-                addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, realm, schemas.getServiceType());
+                if (addInherited) {
+                    result.addPermissive(new JsonPointer(path + attributePath + "/" + TYPE), OBJECT_TYPE);
+                } else {
+                    result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), filter.isRequired(attribute));
+                    addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, realm, schemas.getServiceType());
+                }
                 addExampleValue(result, path, attribute, attributePath);
+                if (addInherited) {
+                    addProperties(result, path + attributePath, attribute, schemaI18n, consoleI18n, realm,
+                            schemas.getServiceType(), filter);
+                }
             }
         }
     }
@@ -249,6 +279,11 @@ public class SmsJsonSchema {
             addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
                     realm, schemaType);
         } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
+            JsonValue json = result.get(new JsonPointer(pointer));
+            if (json == null) {
+                json = json(object());
+                result.putPermissive(new JsonPointer(pointer), json.getObject());
+            }
             addEnumChoices(result.get(new JsonPointer(pointer)), attribute, schemaI18n, consoleI18n, realm, schemaType);
         } else {
             type = getTypeFromSyntax(syntax);
@@ -256,8 +291,12 @@ public class SmsJsonSchema {
         if (type != null) {
             result.addPermissive(new JsonPointer(pointer + "/" + TYPE), type);
         }
+
+        // Add format
         if (AttributeSchema.Syntax.PASSWORD.equals(syntax)) {
-            result.addPermissive(new JsonPointer(pointer + "/" + FORMAT), PASSWORD_TYPE);
+            result.addPermissive(new JsonPointer(pointer + "/" + FORMAT), PASSWORD_FORMAT);
+        } else if (AttributeSchema.Syntax.PARAGRAPH.equals(syntax)) {
+            result.addPermissive(new JsonPointer(pointer + "/" + FORMAT), PARAGRAPH_FORMAT);
         }
     }
 
@@ -329,7 +368,18 @@ public class SmsJsonSchema {
         return result;
     }
 
+    private static void addProperties(JsonValue result, String pointer, AttributeSchema attribute,
+            ResourceBundle schemaI18n, ResourceBundle consoleI18n, String realm, SchemaType serviceType,
+            AttributeSchemaFilter filter) {
+        final String valuePath = pointer + "/properties/value";
+        final String inheritedPath = pointer + "/properties/inherited";
 
+        addType(result, valuePath, attribute, schemaI18n, consoleI18n, realm, serviceType);
+        result.addPermissive(new JsonPointer(valuePath + "/" + REQUIRED), filter.isRequired(attribute));
+
+        result.putPermissive(new JsonPointer(inheritedPath + "/" + TYPE), "boolean");
+        result.putPermissive(new JsonPointer(inheritedPath + "/" + REQUIRED), true);
+    }
 
     private static String realmFor(Context context) {
         return context.containsContext(RealmContext.class) ?

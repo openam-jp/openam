@@ -96,7 +96,7 @@ public abstract class SmsResourceProvider {
     protected final AMResourceBundleCache resourceBundleCache;
     protected final Locale defaultLocale;
 
-    SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
+    protected SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
             boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug,
             AMResourceBundleCache resourceBundleCache, Locale defaultLocale) {
         this.schema = schema;
@@ -287,8 +287,8 @@ public abstract class SmsResourceProvider {
                 field(NAME, getI18NName(getLocale(context))),
                 field(COLLECTION, schema.supportsMultipleConfigurations())));
     }
-    
-    private String getI18NName(Locale locale) {
+
+    protected String getI18NName(Locale locale) {
         String i18nKey = schema.getI18NKey();
         String i18nName = schema.getName();
         if (StringUtils.isEmpty(i18nName)) {
@@ -301,7 +301,7 @@ public abstract class SmsResourceProvider {
         return i18nName;
     }
 
-    private JsonValue createSchema(Context context) {
+    protected JsonValue createSchema(Context context) {
         JsonValue result = json(object(field("type", "object")));
         addGlobalSchema(context, result);
         addOrganisationSchema(context, result);

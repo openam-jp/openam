@@ -62,6 +62,7 @@ import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.rest.sms.tree.SmsRouteTree;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
 import org.forgerock.openam.rest.RealmContextFilter;
+import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -75,6 +76,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -88,6 +90,8 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 
+import jp.co.osstech.openam.core.rest.sms.AgentGroupResourceProviderFactory;
+import jp.co.osstech.openam.core.rest.sms.AgentResourceProviderFactory;
 import jp.co.osstech.openam.core.rest.sms.IdRepoRealmSmsHandler;
 
 /**
@@ -110,6 +114,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
     private final SmsGlobalSingletonProviderFactory globalSingletonProviderFactory;
+    private final AgentResourceProviderFactory agentProviderFactory;
+    private final AgentGroupResourceProviderFactory agentGroupProviderFactory;
     private final SchemaType schemaType;
     private final Debug debug;
     private final Pattern schemaDnPattern;
@@ -130,7 +136,10 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
             SmsSingletonProviderFactory singletonProviderFactory,
-            SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
+            SmsGlobalSingletonProviderFactory globalSingletonProviderFactory,
+            AgentResourceProviderFactory agentProviderFactory,
+            AgentGroupResourceProviderFactory agentGroupProviderFactory,
+            @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
             RealmNormaliser realmNormaliser, Map<MatchingResourcePath, CrestAuthorizationModule> globalAuthzModules,
@@ -142,6 +151,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.globalSingletonProviderFactory = globalSingletonProviderFactory;
+        this.agentProviderFactory = agentProviderFactory;
+        this.agentGroupProviderFactory = agentGroupProviderFactory;
         this.debug = debug;
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
@@ -162,7 +173,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 branch("/federation", smsServiceHandlerFunction.CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                         leaf("/entityproviders", smsServiceHandlerFunction.ENTITYPROVIDER_HANDLES_FUNCTION)),
                 leaf("/services", smsServiceHandlerFunction),
-                leaf("/id-repositories", smsServiceHandlerFunction.ID_REPOSITORY_HANDLES_FUNCTION)
+                leaf("/id-repositories", smsServiceHandlerFunction.ID_REPOSITORY_HANDLES_FUNCTION),
+                leaf("/agents", smsServiceHandlerFunction.AGENTS_HANDLES_FUNCTION),
+                leaf("/agents/groups", smsServiceHandlerFunction.AGENTS_GROUPS_HANDLES_FUNCTION)
         );
 
         this.smsServiceHandlerFunction = smsServiceHandlerFunction;
@@ -193,6 +206,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         addSitesHandler();
         addServersHandler();
         addIdRepoHandlers();
+        addAgentHandlers();
     }
 
     //hard-coded authentication routes
@@ -252,6 +266,36 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
+    //hard-coded realm-config/agents route
+    private void addAgentHandlers() {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            try {
+                ServiceSchemaManager mgr = new ServiceSchemaManager(IdConstants.AGENT_SERVICE, RestUtils.getToken());
+                ServiceSchema ss = mgr.getOrganizationSchema();
+                Set<String> agentTypes = ss.getSubSchemaNames();
+                SmsRouteTree agentTree = getAgentRouter();
+                SmsRouteTree agentGroupTree = getAgentGroupRouter();
+                for (String agentType : agentTypes) {
+                    ServiceSchema agentSchema = ss.getSubSchema(agentType);
+                    agentTree.addRoute(STARTS_WITH, agentType,
+                            newCollection(
+                                    agentProviderFactory.create(new SmsJsonConverter(agentSchema), agentSchema,
+                                            schemaType, Collections.<ServiceSchema>emptyList(), agentType, true)));
+                    if (agentSchema.getAttributeSchemaNames().contains(AgentConfiguration.ATTR_NAME_GROUP)) {
+                        agentGroupTree.addRoute(STARTS_WITH, agentType,
+                                newCollection(
+                                        agentGroupProviderFactory.create(new SmsJsonConverter(agentSchema), agentSchema,
+                                                schemaType, Collections.<ServiceSchema>emptyList(), agentType, true)));
+                    }
+                }
+            } catch (SSOException e) {
+                debug.error("Unable to add agent handlers", e);
+            } catch (SMSException e) {
+                debug.error("Unable to add agent handlers", e);
+            }
+        }
+    }
+
     /**
      * Identifies the first node in the SMS tree which isn't explicitly handled by another handler.
      */
@@ -274,6 +318,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private SmsRouteTree getIdRepoRouter() {
         return routeTree.handles(IdConstants.REPO_SERVICE);
+    }
+
+    private SmsRouteTree getAgentRouter() {
+        return routeTree.handles(IdConstants.AGENT_SERVICE);
+    }
+
+    private SmsRouteTree getAgentGroupRouter() {
+        return routeTree.handles(IdConstants.AGENT_SERVICE + "/Groups");
     }
 
     private void addExcludedServiceProviders() {

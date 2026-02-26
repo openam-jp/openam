@@ -51,6 +51,8 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
     public final Predicate<String> ENTITYPROVIDER_HANDLES_FUNCTION;
     public final Predicate<String> AUTHENTICATION_MODULE_HANDLES_FUNCTION;
     public final Predicate<String> ID_REPOSITORY_HANDLES_FUNCTION;
+    public final Predicate<String> AGENTS_HANDLES_FUNCTION;
+    public final Predicate<String> AGENTS_GROUPS_HANDLES_FUNCTION;
 
     /**
      * List of services which are known to have their own handling registered.
@@ -67,6 +69,8 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
                 IDFF_METADATA_SERVICE, SAML2_METADATA_SERVICE, WS_METADATA_SERVICE);
         AUTHENTICATION_MODULE_HANDLES_FUNCTION = new MultiServiceFunction(authenticationServiceNames);
         ID_REPOSITORY_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.REPO_SERVICE);
+        AGENTS_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.AGENT_SERVICE);
+        AGENTS_GROUPS_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.AGENT_SERVICE + "/Groups");
 
         ALREADY_HANDLED = Arrays.asList(
                 AUTHENTICATION_HANDLES_FUNCTION,
@@ -74,7 +78,9 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
                 AUTHENTICATION_MODULE_HANDLES_FUNCTION,
                 CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                 ENTITYPROVIDER_HANDLES_FUNCTION,
-                ID_REPOSITORY_HANDLES_FUNCTION
+                ID_REPOSITORY_HANDLES_FUNCTION,
+                AGENTS_HANDLES_FUNCTION,
+                AGENTS_GROUPS_HANDLES_FUNCTION
         );
     }
 

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -37,6 +38,12 @@ import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SchemaType;
+
+import jp.co.osstech.openam.core.rest.sms.AgentGroupResourceProvider;
+import jp.co.osstech.openam.core.rest.sms.AgentGroupResourceProviderFactory;
+import jp.co.osstech.openam.core.rest.sms.AgentResourceProvider;
+import jp.co.osstech.openam.core.rest.sms.AgentResourceProviderFactory;
+
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.openam.core.rest.UiRolePredicate;
 import org.forgerock.openam.forgerockrest.utils.MatchingResourcePath;
@@ -67,6 +74,14 @@ public class CoreRestSmsGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(SmsGlobalSingletonProvider.class, SmsGlobalSingletonProvider.class)
                 .build(SmsGlobalSingletonProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(AgentResourceProvider.class, AgentResourceProvider.class)
+                .build(AgentResourceProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(AgentGroupResourceProvider.class, AgentGroupResourceProvider.class)
+                .build(AgentGroupResourceProviderFactory.class));
 
         Multibinder<UiRolePredicate> userUiRolePredicates = Multibinder.newSetBinder(binder(),
                 UiRolePredicate.class);
