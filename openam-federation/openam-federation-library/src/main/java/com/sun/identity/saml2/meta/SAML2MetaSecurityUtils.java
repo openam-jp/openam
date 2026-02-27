@@ -25,6 +25,7 @@
  * $Id: SAML2MetaSecurityUtils.java,v 1.6 2009/06/08 23:43:18 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.meta;
@@ -240,9 +241,7 @@ public final class SAML2MetaSecurityUtils {
     {
         NodeList sigElements = null;
         try {
-            Element nscontext =
-                    org.apache.xml.security.utils.XMLUtils
-                            .createDSctx (doc,"ds", Constants.SignatureSpecNS);
+            Element nscontext = XMLUtils.createNamespaceElement(doc,"ds", Constants.SignatureSpecNS);
             sigElements =
                     XPathAPI.selectNodeList(doc, "//ds:Signature", nscontext);
         } catch (Exception ex) {

@@ -25,7 +25,7 @@
  * $Id: SAMLUtils.java,v 1.16 2010/01/09 19:41:06 qcheng Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions Copyrighted 2019-2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml.common;
@@ -50,7 +50,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
-
+import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 
 import java.net.URL;
@@ -1720,11 +1720,12 @@ public class SAMLUtils  extends SAMLUtilsCommon {
           try {
               Canonicalizer c14n = Canonicalizer.getInstance(
                   "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-              byte outputBytes[] = c14n.canonicalizeSubtree(node);
+              ByteArrayOutputStream bout = new ByteArrayOutputStream();
+              c14n.canonicalizeSubtree(node, bout);
               DocumentBuilder documentBuilder = 
                  XMLUtils.getSafeDocumentBuilder(false);
               Document doc = documentBuilder.parse(
-                  new ByteArrayInputStream(outputBytes));
+                  new ByteArrayInputStream(bout.toByteArray()));
               Element result = doc.getDocumentElement();
               return result;
           } catch (Exception e) {
