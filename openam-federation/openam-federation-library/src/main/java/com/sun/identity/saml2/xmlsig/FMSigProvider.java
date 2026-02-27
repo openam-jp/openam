@@ -25,6 +25,7 @@
  * $Id: FMSigProvider.java,v 1.5 2009/05/09 15:43:59 mallas Exp $
  *
  *  Portions Copyrighted 2011-2016 ForgeRock AS.
+ *  Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.xmlsig;
@@ -255,9 +256,7 @@ public final class FMSigProvider implements SigProvider {
                             "errorObtainingElement")
             );
         }
-        Element nscontext =
-                org.apache.xml.security.utils.XMLUtils.
-                        createDSctx(doc, "ds", Constants.SignatureSpecNS);
+        Element nscontext = XMLUtils.createNamespaceElement(doc, "ds", Constants.SignatureSpecNS);
         Element sigElement = null;
         try {
             sigElement = (Element) XPathAPI.selectSingleNode(

@@ -25,6 +25,7 @@
  * $Id: XMLUtils.java,v 1.15 2009/10/19 18:19:20 asyhuang Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.shared.xml;
 
@@ -47,6 +48,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -955,6 +957,21 @@ public class XMLUtils {
             //codes can handle the failure.
             throw new JAXBException("Unable to create SAXSource", ex);
         }
+    }
+
+    /**
+     * Creates an element that is the base of NamespaceContext.
+     *
+     * @param doc XML dom document
+     * @param prefix the namespace prefix
+     * @param namespace the namespace URI
+     * @return an element for NamespaceContext
+     */
+    public static Element createNamespaceElement(Document doc, String prefix, String namespace) {
+        Element ctx = doc.createElementNS(null, "namespaceContext");
+        ctx.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix.trim(),
+                namespace);
+        return ctx;
     }
 
     private static String ATTR_VALUE_PAIR_NODE = "AttributeValuePair";
