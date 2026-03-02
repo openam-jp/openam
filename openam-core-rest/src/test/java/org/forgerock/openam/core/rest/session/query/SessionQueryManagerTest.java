@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session.query;
@@ -76,7 +77,7 @@ public class SessionQueryManagerTest {
         manager.getAllSessions(Arrays.asList(new String[]{"badger"}));
 
         // Then
-        verify(mockQueryType, times(1)).getAllSessions();
+        verify(mockQueryType, times(1)).getSessions(null);
     }
 
     @Test
@@ -89,9 +90,9 @@ public class SessionQueryManagerTest {
         SessionInfo two = mock(SessionInfo.class);
 
         SessionQueryType typeOne = mock(SessionQueryType.class);
-        given(typeOne.getAllSessions()).willReturn(Arrays.asList(new SessionInfo[]{one}));
+        given(typeOne.getSessions(null)).willReturn(Arrays.asList(new SessionInfo[]{one}));
         SessionQueryType typeTwo = mock(SessionQueryType.class);
-        given(typeTwo.getAllSessions()).willReturn(Arrays.asList(new SessionInfo[]{two}));
+        given(typeTwo.getSessions(null)).willReturn(Arrays.asList(new SessionInfo[]{two}));
 
         SessionQueryFactory mockFactory = mock(SessionQueryFactory.class);
         given(mockFactory.getSessionQueryType(badger)).willReturn(typeOne);

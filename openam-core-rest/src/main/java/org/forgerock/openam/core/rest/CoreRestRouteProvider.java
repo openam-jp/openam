@@ -136,6 +136,11 @@ public class CoreRestRouteProvider extends AbstractRestRouteProvider {
                 .forVersion(1, 2)
                 .toCollection(SessionResource.class);
 
+        realmRouter.route("am/sessions")
+                .auditAs(SESSION)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toAnnotatedCollection(jp.co.osstech.openam.core.rest.session.SessionResource.class);
+
         realmRouter.route("identities/users")
                 .auditAs(USERS)
                 .authorizeWith(AdminOnlyAuthzModule.class)
