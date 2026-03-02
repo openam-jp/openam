@@ -12,11 +12,22 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session.query;
 
+import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.rest.session.query.impl.LocalSessionQuery;
 import org.forgerock.openam.core.rest.session.query.impl.RemoteSessionQuery;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * SessionQueryFactory provides a means of generating SessionQueryTypes based on the server id that is provided.
@@ -25,6 +36,8 @@ import org.forgerock.openam.core.rest.session.query.impl.RemoteSessionQuery;
  */
 public class SessionQueryFactory {
 
+    private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
+
     /**
      * Implementation is currently hard-coded to return the RemoteSessionQuery.
      *
@@ -32,6 +45,13 @@ public class SessionQueryFactory {
      * @return A non null SessionQueryType based on the id.
      */
     public SessionQueryType getSessionQueryType(String serverId) {
+        try {
+            if (WebtopNaming.getAMServerID().equals(serverId)) {
+                return new LocalSessionQuery();
+            }
+        } catch (ServerEntryNotFoundException e) {
+            debug.error("SessionQueryFactory.getSessionQueryType() : Unable to create local query instance", e);
+        }
         return new RemoteSessionQuery(serverId);
     }
 }

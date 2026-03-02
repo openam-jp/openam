@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session.query.impl;
@@ -64,13 +65,8 @@ public class RemoteSessionQuery implements SessionQueryType {
         this.serverId = serverId;
     }
 
-    /**
-     * Generates a SessionRequest and uses this to query the remote server.
-     *
-     * @return  Non null but possibly empty collection of Sessions. If the server is down, then this will
-     *          also return no sessions.
-     */
-    public Collection<SessionInfo> getAllSessions() {
+
+    public Collection<SessionInfo> getSessions(String pattern) {
         List<SessionInfo> sessions = new LinkedList<SessionInfo>();
 
         try {
@@ -79,6 +75,10 @@ public class RemoteSessionQuery implements SessionQueryType {
             String sid = adminToken.getTokenID().toString();
 
             SessionRequest sreq = new SessionRequest(SessionRequest.GetValidSessions, sid, false);
+            if (pattern != null) {
+                sreq.setPattern(pattern);
+            }
+
             SessionResponse sres = getSessionResponse(svcurl, sreq);
 
             List<SessionInfo> infoList = sres.getSessionInfo();

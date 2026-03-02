@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session.query;
@@ -60,6 +61,19 @@ public class SessionQueryManager {
      * @return Returns all sessions across all servers.
      */
     public Collection<SessionInfo> getAllSessions(Collection<String> serverIds) {
+        return getSessions(serverIds, null);
+    }
+
+    /**
+     * Returns SessionInfo list from the specified server.
+     *
+     * @param serverIds One or more server id's. Typically this value can be generated using
+     *                  {@link com.iplanet.services.naming.WebtopNaming#getAllServerIDs()} which will provide all
+     *                  server id's known to OpenAM.
+     * @param pattern user id pattern to search for
+     * @return SessionInfo list
+     */
+    public Collection<SessionInfo> getSessions(Collection<String> serverIds, String pattern) {
         // impl note, this could be a Map of Server -> Sessions
 
         List<SessionInfo> sessions = new LinkedList<SessionInfo>();
@@ -67,11 +81,11 @@ public class SessionQueryManager {
         for (String server : serverIds) {
             SessionQueryType queryType = queryFactory.getSessionQueryType(server);
 
-            Collection<SessionInfo> queriedSessions = queryType.getAllSessions();
+            Collection<SessionInfo> queriedSessions = queryType.getSessions(pattern);
 
             if (debug.messageEnabled()) {
                 debug.message(MessageFormat.format(
-                        "SessionQueryManager#getAllSessions() :: Queried {0} from: {1}",
+                        "SessionQueryManager#getSessions() :: Queried {0} from: {1}",
                         queriedSessions.size(),
                         server));
             }

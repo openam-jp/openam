@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session.query;
@@ -28,10 +29,12 @@ import java.util.Collection;
  * @author robert.wapshott@forgerock.com
  */
 public interface SessionQueryType {
+
     /**
-     * Query a server and return all the Sessions that are stored on the server.
+     * Returns SessionInfo list from the server.
      *
-     * @return Non null but possibly empty collection of Sessions.
+     * @param pattern user id pattern to search for
+     * @return SessionInfo list
      */
-    public Collection<SessionInfo> getAllSessions();
+    public Collection<SessionInfo> getSessions(String pattern);
 }
