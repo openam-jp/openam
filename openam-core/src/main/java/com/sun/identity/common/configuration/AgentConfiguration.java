@@ -1700,7 +1700,7 @@ public class AgentConfiguration {
         }
         for (Iterator i = attrValues.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry entry = (Map.Entry)i.next();
-            String correctedKey = (String)mapCase.get(entry.getKey());
+            String correctedKey = (String)mapCase.get(((String)entry.getKey()).toLowerCase());
             if (correctedKey != null) { // can be null like "agenttype"
                 results.put(correctedKey, entry.getValue());
             }
