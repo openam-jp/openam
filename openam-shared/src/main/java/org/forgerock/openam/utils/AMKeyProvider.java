@@ -12,10 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
- */
-
-/*
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.utils;
@@ -47,6 +45,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementation of a {@code KeyProvider} interface for retrieving X509 Certificates and private
@@ -67,7 +66,9 @@ public class AMKeyProvider implements KeyProvider {
     private String keystoreFile = "";
     private String keystoreType = "JKS";
 
-    HashMap keyTable = new HashMap();
+    private HashMap<String, Certificate> keyTable = new HashMap<String, Certificate>();
+    private ConcurrentHashMap<String, PrivateKey> privateKeyCache =
+            new ConcurrentHashMap<String, PrivateKey>();
 
     /**
      * Constructor.
@@ -287,8 +288,15 @@ public class AMKeyProvider implements KeyProvider {
     public java.security.PrivateKey getPrivateKey(String certAlias) {
         java.security.PrivateKey key = null;
         try {
+            key = privateKeyCache.get(certAlias);
+            if (key != null) {
+                return key;
+            }
             key = (PrivateKey) ks.getKey(certAlias,
                     privateKeyPass.toCharArray());
+            if (key != null) {
+                privateKeyCache.put(certAlias, key);
+            }
         } catch (KeyStoreException e) {
             logger.error(e.getMessage());
         } catch (NoSuchAlgorithmException e) {
@@ -324,12 +332,18 @@ public class AMKeyProvider implements KeyProvider {
      */
     public PrivateKey getPrivateKey(String certAlias, String encryptedKeyPass) {
 
-        PrivateKey key = null;
+        PrivateKey key = privateKeyCache.get(certAlias);
+        if (key != null) {
+            return key;
+        }
 
         String keyPass = decodePassword(encryptedKeyPass);
         if (keyPass != null) {
             try {
                 key = (PrivateKey) ks.getKey(certAlias, keyPass.toCharArray());
+                if (key != null) {
+                    privateKeyCache.put(certAlias, key);
+                }
             } catch (KeyStoreException e) {
                 logger.error(e.getMessage());
             } catch (NoSuchAlgorithmException e) {
