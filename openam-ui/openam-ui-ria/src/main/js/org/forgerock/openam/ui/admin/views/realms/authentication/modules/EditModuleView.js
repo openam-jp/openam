@@ -73,7 +73,8 @@ define([
             .update(this.data.realmPath, this.data.name, this.data.type, this.data.form.data())
             .then((data) => {
                 // Update the form data for re-render the tab
-                _.extend(self.data.form.values, data);
+                _.extend(self.data.form.values, self.data.form.data());
+                _.extend(self.data.values, data);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({
@@ -90,7 +91,7 @@ define([
                 schema = this.data.schema.properties[id],
                 element = this.$el.find("#tabpanel").empty().get(0);
 
-            this.data.form = new Form(element, schema, this.data.values);
+            this.data.form = new Form(element, schema, this.data.values[id]);
             this.$el.find("[data-header]").parent().hide();
         }
     });
