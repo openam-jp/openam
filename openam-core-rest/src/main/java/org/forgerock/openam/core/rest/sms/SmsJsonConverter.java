@@ -666,7 +666,10 @@ public class SmsJsonConverter {
 
     protected Map<String, String> getAttributeNameToSection() {
         Map<String, String> result = new LinkedHashMap();
-        String serviceSectionFilename = schema.getName() != null ? schema.getName() : schema.getServiceName();
+        String serviceSectionFilename = schema.getName();
+        if (serviceSectionFilename == null || serviceSectionFilename.equals("serverconfig")) {
+            serviceSectionFilename = schema.getServiceName();
+        }
         serviceSectionFilename = serviceSectionFilename + ".section.properties";
 
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(serviceSectionFilename);
