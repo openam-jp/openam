@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -29,8 +30,8 @@ define([
         setRequireMapConfig = function (serverInfo) {
             require.config({ "map": { "*": {
                 "UserProfileView" : (serverInfo.kbaEnabled === "true"
-                    ? "org/forgerock/commons/ui/user/profile/UserProfileKBAView"
-                    : "org/forgerock/commons/ui/user/profile/UserProfileView")
+                    ? "jp/co/osstech/openam/ui/user/profile/AMUserProfileKBAView"
+                    : "jp/co/osstech/openam/ui/user/profile/AMUserProfileView")
             } } });
 
             return serverInfo;

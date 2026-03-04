@@ -24,6 +24,8 @@
    with the fields enclosed by brackets [] replaced by
    your own identifying information:
    "Portions copyright [year] [name of copyright owner]"
+
+   Portions copyright 2026 OSSTech Corporation
 -->
 
 <ServicesConfiguration>
@@ -145,6 +147,19 @@
                                  i18nKey="a108"
                                  order="900">
                 </AttributeSchema> 
+                <AttributeSchema name="selfWriteUserAttributes"
+                                 type="list"
+                                 syntax="string"
+                                 resourceName="selfWriteUserAttributes"
+                                 i18nKey="a109"
+                                 order="2100">
+                    <DefaultValues>
+                        <Value>givenName</Value>
+                        <Value>sn</Value>
+                        <Value>mail</Value>
+                        <Value>telephoneNumber</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Organization>
         </Schema>
     </Service>
