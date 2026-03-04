@@ -12,10 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- */
-
-/*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.console.sts;
 
@@ -38,6 +36,10 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -156,7 +158,9 @@ public class STSAddViewBeanBase extends AMServiceProfileViewBeanBase {
 
         if (model != null) {
             AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
-            values = ps.getAttributeValues(model.getAttributeValues(), false, model);
+            Map attrValues = model.getAttributeValues();
+            attrValues.put(SharedSTSConstants.DEPLOYMENT_URL_ELEMENT, new HashSet());
+            values = ps.getAttributeValues(attrValues, false, model);
         }
         return values;
     }

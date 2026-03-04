@@ -65,6 +65,7 @@ import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.services.context.Context;
@@ -93,6 +94,10 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import jp.co.osstech.openam.core.rest.sms.AgentGroupResourceProviderFactory;
 import jp.co.osstech.openam.core.rest.sms.AgentResourceProviderFactory;
 import jp.co.osstech.openam.core.rest.sms.IdRepoRealmSmsHandler;
+import jp.co.osstech.openam.core.rest.sms.RestSTSResourceProvider;
+import jp.co.osstech.openam.core.rest.sms.RestSTSResourceProviderFactory;
+import jp.co.osstech.openam.core.rest.sms.SoapSTSResourceProvider;
+import jp.co.osstech.openam.core.rest.sms.SoapSTSResourceProviderFactory;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -116,6 +121,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
     private final SmsGlobalSingletonProviderFactory globalSingletonProviderFactory;
     private final AgentResourceProviderFactory agentProviderFactory;
     private final AgentGroupResourceProviderFactory agentGroupProviderFactory;
+    private final RestSTSResourceProviderFactory restSTSProviderFactory;
+    private final SoapSTSResourceProviderFactory soapSTSProviderFactory;
     private final SchemaType schemaType;
     private final Debug debug;
     private final Pattern schemaDnPattern;
@@ -139,6 +146,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory,
             AgentResourceProviderFactory agentProviderFactory,
             AgentGroupResourceProviderFactory agentGroupProviderFactory,
+            RestSTSResourceProviderFactory restSTSProviderFactory,
+            SoapSTSResourceProviderFactory soapSTSProviderFactory,
             @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory, AuthenticationChainsFilter authenticationChainsFilter,
             RealmContextFilter realmContextFilter, SessionCache sessionCache, CoreWrapper coreWrapper,
@@ -153,6 +162,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         this.globalSingletonProviderFactory = globalSingletonProviderFactory;
         this.agentProviderFactory = agentProviderFactory;
         this.agentGroupProviderFactory = agentGroupProviderFactory;
+        this.restSTSProviderFactory = restSTSProviderFactory;
+        this.soapSTSProviderFactory = soapSTSProviderFactory;
         this.debug = debug;
         this.sessionCache = sessionCache;
         this.coreWrapper = coreWrapper;
@@ -175,7 +186,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
                 leaf("/services", smsServiceHandlerFunction),
                 leaf("/id-repositories", smsServiceHandlerFunction.ID_REPOSITORY_HANDLES_FUNCTION),
                 leaf("/agents", smsServiceHandlerFunction.AGENTS_HANDLES_FUNCTION),
-                leaf("/agents/groups", smsServiceHandlerFunction.AGENTS_GROUPS_HANDLES_FUNCTION)
+                leaf("/agents/groups", smsServiceHandlerFunction.AGENTS_GROUPS_HANDLES_FUNCTION),
+                leaf("/sts", smsServiceHandlerFunction.STS_HANDLES_FUNCTION)
         );
 
         this.smsServiceHandlerFunction = smsServiceHandlerFunction;
@@ -207,6 +219,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         addServersHandler();
         addIdRepoHandlers();
         addAgentHandlers();
+        addSTSHandlers();
     }
 
     //hard-coded authentication routes
@@ -296,6 +309,34 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
         }
     }
 
+    //hard-coded realm-config/sts route
+    private void addSTSHandlers() {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            try {
+                ServiceSchemaManager mgr =
+                        new ServiceSchemaManager(AMSTSConstants.REST_STS_SERVICE_NAME, RestUtils.getToken());
+                ServiceSchema ss = mgr.getOrganizationSchema().getSubSchema("serverconfig");
+                SmsRouteTree restSTSTree = getRestSTSRouter();
+                restSTSTree.addRoute(STARTS_WITH, RestSTSResourceProvider.TYPE,
+                        newCollection(
+                                restSTSProviderFactory.create(new SmsJsonConverter(ss), ss,
+                                        schemaType, Collections.<ServiceSchema>emptyList(), "", true)));
+
+                mgr = new ServiceSchemaManager(AMSTSConstants.SOAP_STS_SERVICE_NAME, RestUtils.getToken());
+                ss = mgr.getOrganizationSchema().getSubSchema("serverconfig");
+                SmsRouteTree soapSTSTree = getRestSTSRouter();
+                soapSTSTree.addRoute(STARTS_WITH, SoapSTSResourceProvider.TYPE,
+                        newCollection(
+                                soapSTSProviderFactory.create(new SmsJsonConverter(ss), ss,
+                                        schemaType, Collections.<ServiceSchema>emptyList(), "", true)));
+            } catch (SSOException e) {
+                debug.error("Unable to add STS handlers", e);
+            } catch (SMSException e) {
+                debug.error("Unable to add STS handlers", e);
+            }
+        }
+    }
+
     /**
      * Identifies the first node in the SMS tree which isn't explicitly handled by another handler.
      */
@@ -326,6 +367,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener, Ser
 
     private SmsRouteTree getAgentGroupRouter() {
         return routeTree.handles(IdConstants.AGENT_SERVICE + "/Groups");
+    }
+
+    private SmsRouteTree getRestSTSRouter() {
+        return routeTree.handles(AMSTSConstants.REST_STS_SERVICE_NAME);
+    }
+
+    private SmsRouteTree getSoapSTSRouter() {
+        return routeTree.handles(AMSTSConstants.SOAP_STS_SERVICE_NAME);
     }
 
     private void addExcludedServiceProviders() {

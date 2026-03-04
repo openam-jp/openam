@@ -43,6 +43,10 @@ import jp.co.osstech.openam.core.rest.sms.AgentGroupResourceProvider;
 import jp.co.osstech.openam.core.rest.sms.AgentGroupResourceProviderFactory;
 import jp.co.osstech.openam.core.rest.sms.AgentResourceProvider;
 import jp.co.osstech.openam.core.rest.sms.AgentResourceProviderFactory;
+import jp.co.osstech.openam.core.rest.sms.RestSTSResourceProvider;
+import jp.co.osstech.openam.core.rest.sms.RestSTSResourceProviderFactory;
+import jp.co.osstech.openam.core.rest.sms.SoapSTSResourceProvider;
+import jp.co.osstech.openam.core.rest.sms.SoapSTSResourceProviderFactory;
 
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.openam.core.rest.UiRolePredicate;
@@ -82,6 +86,14 @@ public class CoreRestSmsGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(AgentGroupResourceProvider.class, AgentGroupResourceProvider.class)
                 .build(AgentGroupResourceProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(RestSTSResourceProvider.class, RestSTSResourceProvider.class)
+                .build(RestSTSResourceProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SoapSTSResourceProvider.class, SoapSTSResourceProvider.class)
+                .build(SoapSTSResourceProviderFactory.class));
 
         Multibinder<UiRolePredicate> userUiRolePredicates = Multibinder.newSetBinder(binder(),
                 UiRolePredicate.class);

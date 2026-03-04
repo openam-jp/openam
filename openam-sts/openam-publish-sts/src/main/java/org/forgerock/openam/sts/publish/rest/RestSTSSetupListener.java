@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.sts.publish.rest;
@@ -43,29 +44,23 @@ public class RestSTSSetupListener implements SetupListener {
      */
     @Override
     public void setupComplete() {
-        new Thread(
-            new Runnable() {
-                public void run() {
-                    Logger logger = null;
-                    try {
-                        logger = STSPublishInjectorHolder.getInstance(Key.get(Logger.class));
-                        RestSTSInstancePublisher publisher = STSPublishInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class));
-                        /*
-                        Don't register the ServiceListener until after the SMS-resident rest-sts instances have been re-published
-                        upon startup. The ServiceListener is only there to bring the rest-sts-instance CREST router in congruence
-                        with the state of the SMS in site deployments.
-                         */
-                        publisher.republishExistingInstances();
-                        publisher.registerServiceListener();
-                    } catch (STSPublishException e) {
-                        if (logger != null) {
-                            logger.error("Exception caught republishing existing Rest STS instances: ", e);
-                        } else {
-                            System.out.println("Exception caught republishing existing Rest STS instances: " + e);
-                        }
-                    }
-                }
+        Logger logger = null;
+        try {
+            logger = STSPublishInjectorHolder.getInstance(Key.get(Logger.class));
+            RestSTSInstancePublisher publisher = STSPublishInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class));
+            /*
+             * Don't register the ServiceListener until after the SMS-resident rest-sts instances have been re-published
+             * upon startup. The ServiceListener is only there to bring the rest-sts-instance CREST router in congruence
+             * with the state of the SMS in site deployments.
+             */
+            publisher.republishExistingInstances();
+            publisher.registerServiceListener();
+        } catch (STSPublishException e) {
+            if (logger != null) {
+                logger.error("Exception caught republishing existing Rest STS instances: ", e);
+            } else {
+                System.out.println("Exception caught republishing existing Rest STS instances: " + e);
             }
-        ).start();
+        }
     }
 }
