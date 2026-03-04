@@ -29,21 +29,23 @@ define([
     KBADelegate.baseEntity = RealmHelper.decorateURIWithSubRealm(`json/__subrealm__/${Constants.SELF_SERVICE_CONTEXT}`);
 
     KBADelegate.saveInfo = function (user) {
+        var type, url, jsonData;
+        type = "PATCH";
+        url = `user/${Configuration.loggedUser.id}`;
+        jsonData = _(user)
+                       .map(function (value, key) {
+                           return {
+                               "operation": "replace",
+                               "field": `/${key}`,
+                               // replace the whole value, rather than just the parts that have changed,
+                               // since there is no consistent way to target items in a set across the stack
+                               value
+                           };
+                       });
         return this.serviceCall({
-            "type": "PATCH",
-            "url": "user/" + Configuration.loggedUser.id,
-            "data": JSON.stringify(
-                _(user)
-                 .map(function (value, key) {
-                     return {
-                         "operation": "replace",
-                         "field": "/" + key,
-                         // replace the whole value, rather than just the parts that have changed,
-                         // since there is no consistent way to target items in a set across the stack
-                         "value": value
-                     };
-                 })
-            )
+            type,
+            url,
+            "data": JSON.stringify(jsonData)
         }).then(function (updatedUser) {
             updatedUser.roles = Configuration.loggedUser.get("roles");
             Configuration.loggedUser.set(Configuration.loggedUser.parse(updatedUser));
