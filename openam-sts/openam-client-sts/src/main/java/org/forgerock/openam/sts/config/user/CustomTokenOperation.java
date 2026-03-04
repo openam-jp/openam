@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.sts.config.user;
@@ -117,7 +118,7 @@ public class CustomTokenOperation {
         String[] tokens = smsString.split(REGEX_PIPE);
         if (tokens.length != 2) {
             throw new IllegalArgumentException("The sms string representation of the CustomTokenOperation must be of " +
-                    "format: custom_token_name|impl_class_mame. The sms string argument: " + smsString);
+                    "format: custom_token_name|impl_class_name. The sms string argument: " + smsString);
 
         }
         return new CustomTokenOperation(tokens[0], tokens[1]);

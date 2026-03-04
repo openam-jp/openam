@@ -26,6 +26,7 @@ import javax.inject.Named;
 
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.base.Predicate;
+import org.forgerock.openam.sts.AMSTSConstants;
 
 import com.google.inject.Inject;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -53,6 +54,7 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
     public final Predicate<String> ID_REPOSITORY_HANDLES_FUNCTION;
     public final Predicate<String> AGENTS_HANDLES_FUNCTION;
     public final Predicate<String> AGENTS_GROUPS_HANDLES_FUNCTION;
+    public final Predicate<String> STS_HANDLES_FUNCTION;
 
     /**
      * List of services which are known to have their own handling registered.
@@ -71,6 +73,8 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
         ID_REPOSITORY_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.REPO_SERVICE);
         AGENTS_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.AGENT_SERVICE);
         AGENTS_GROUPS_HANDLES_FUNCTION = new SingleServiceFunction(IdConstants.AGENT_SERVICE + "/Groups");
+        STS_HANDLES_FUNCTION = new MultiServiceFunction(
+                AMSTSConstants.REST_STS_SERVICE_NAME, AMSTSConstants.SOAP_STS_SERVICE_NAME);
 
         ALREADY_HANDLED = Arrays.asList(
                 AUTHENTICATION_HANDLES_FUNCTION,
@@ -80,7 +84,8 @@ public class SmsServiceHandlerFunction implements Predicate<String> {
                 ENTITYPROVIDER_HANDLES_FUNCTION,
                 ID_REPOSITORY_HANDLES_FUNCTION,
                 AGENTS_HANDLES_FUNCTION,
-                AGENTS_GROUPS_HANDLES_FUNCTION
+                AGENTS_GROUPS_HANDLES_FUNCTION,
+                STS_HANDLES_FUNCTION
         );
     }
 
