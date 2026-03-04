@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest;
@@ -74,6 +75,10 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
+
+import jp.co.osstech.openam.services.security.RestSecurityConfig;
+import jp.co.osstech.openam.services.security.RestSecurityConfig.RestSecurityConfigBuilder;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
@@ -1277,6 +1282,17 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
+
+            RestSecurityConfig restSecurityConfig = configHandler.getConfig(realm, RestSecurityConfigBuilder.class);
+            Set<String> selfWriteUserAttributes = restSecurityConfig.getSelfWriteUserAttributes();
+            if (!selfWriteUserAttributes.isEmpty() && !isAdmin(context)) {
+                for (String key : jVal.keys()) {
+                    if (!USER_PASSWORD.equalsIgnoreCase(key)
+                            && !selfWriteUserAttributes.contains(key)) {
+                        throw new BadRequestException("Unmodifiable attribute is specified for update");
+                    }
+                }
+            }
 
             UserAttributeInfo userAttributeInfo = configHandler.getConfig(realm, UserAttributeInfoBuilder.class);
 

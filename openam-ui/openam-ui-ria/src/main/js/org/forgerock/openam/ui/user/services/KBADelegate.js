@@ -12,18 +12,43 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
+    "lodash",
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/user/delegates/KBADelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (Constants, KBADelegate, RealmHelper) {
+], function (_, Configuration, Constants, KBADelegate, RealmHelper) {
 
     KBADelegate.serviceUrl = RealmHelper.decorateURIWithSubRealm(`/${Constants.context}/json/__subrealm__/${
             Constants.SELF_SERVICE_CONTEXT
         }`);
     KBADelegate.baseEntity = RealmHelper.decorateURIWithSubRealm(`json/__subrealm__/${Constants.SELF_SERVICE_CONTEXT}`);
+
+    KBADelegate.saveInfo = function (user) {
+        return this.serviceCall({
+            "type": "PATCH",
+            "url": "user/" + Configuration.loggedUser.id,
+            "data": JSON.stringify(
+                _(user)
+                 .map(function (value, key) {
+                     return {
+                         "operation": "replace",
+                         "field": "/" + key,
+                         // replace the whole value, rather than just the parts that have changed,
+                         // since there is no consistent way to target items in a set across the stack
+                         "value": value
+                     };
+                 })
+            )
+        }).then(function (updatedUser) {
+            updatedUser.roles = Configuration.loggedUser.get("roles");
+            Configuration.loggedUser.set(Configuration.loggedUser.parse(updatedUser));
+        });
+    };
 
     return KBADelegate;
 });

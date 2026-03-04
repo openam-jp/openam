@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.sm.config;
 
@@ -209,14 +210,17 @@ public final class ConsoleConfigHandlerImpl implements ConsoleConfigHandler {
     }
 
     private void notifyListeners(String source, String orgName) {
-        List<ConsoleConfigListener> listeners = sourceListeners.get(source);
 
+        String realm = dnUtils.orgNameToRealmName(orgName);
+
+        if (registeredSources.contains(source)) {
+            attributeCache.remove(CacheKey.newInstance(source, realm));
+        }
+
+        List<ConsoleConfigListener> listeners = sourceListeners.get(source);
         if (isEmpty(listeners)) {
             return;
         }
-
-        String realm = dnUtils.orgNameToRealmName(orgName);
-        attributeCache.remove(CacheKey.newInstance(source, realm));
 
         for (ConsoleConfigListener listener : listeners) {
             try {

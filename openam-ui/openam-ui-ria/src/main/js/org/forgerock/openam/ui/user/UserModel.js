@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -54,6 +55,18 @@ define([
                     };
 
                 if (method === "update" || method === "patch") {
+                    const updateData = {};
+                    _.forIn(this.changed,
+                        _.bind(
+                            function (val, key) {
+                                if ((val === "") && !(this._previousAttributes[key])) {
+                                    return;
+                                }
+                                if (this._previousAttributes[key] !== val) {
+                                    updateData[key] = val;
+                                }
+                            }, this));
+
                     if (_.has(this.changed, "password")) {
                         // password changes have to occur via a special rest call
                         return ServiceInvoker.restCall({
@@ -78,7 +91,7 @@ define([
                             {
                                 type: "PUT",
                                 data: JSON.stringify(
-                                    _.chain(this.toJSON())
+                                    _.chain(updateData)
                                         .pick(["givenName", "sn", "mail", "postalAddress", "telephoneNumber"])
                                         .mapValues(function (val) {
                                             return typeof val === "string" ? val.trim() : val;
