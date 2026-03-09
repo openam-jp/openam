@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2021-2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.service;
@@ -4917,7 +4917,12 @@ public class LoginState {
         try {
             switch (type) {
                 case SUCCESS:
-                    postProcessInstance.onLoginSuccess(requestMap, servletRequest, servletResponse, getSSOToken());
+                    if (forceAuth && oldSSOToken != null) {
+                        // Use old SSOToken for force auth scenario
+                        postProcessInstance.onLoginSuccess(requestMap, servletRequest, servletResponse, oldSSOToken);
+                    } else {
+                        postProcessInstance.onLoginSuccess(requestMap, servletRequest, servletResponse, getSSOToken());
+                    }
                     break;
                 case FAILURE:
                     postProcessInstance.onLoginFailure(requestMap, servletRequest, servletResponse);
