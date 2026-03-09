@@ -178,7 +178,7 @@
     "available": "使用可能なアップグレード",
     "complete": "アップグレード完了!",
     "currentVersion": "現在のバージョン:",
-    "description": "<p>アップグレード前に<a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">リリースノート</a>をお読みください。</p>",
+    "description": "<p>アップグレード前に<a href=\"https://github.com/openam-jp/openam/wiki\">リリースノート</a>をお読みください。</p>",
     "link": "OpenAM ${project.version} へのアップグレード",
     "newVersion": "新しいバージョン:",
     "newVersionFound": "旧バージョンの設定が見つかりました",

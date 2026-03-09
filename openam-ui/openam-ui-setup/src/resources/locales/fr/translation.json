@@ -177,7 +177,7 @@
     "available": "Mise à niveau disponible",
     "complete": "Upgrade Complete!",
     "currentVersion": "Current Version:",
-    "description": "<p>Please read the <a href=\"https://www.osstech.co.jp/download/updates/docs/openam/OSTD-OpenAM14-ReleaseNote.pdf\">release notes</a> before upgrading.</p>",
+    "description": "<p>Please read the <a href=\"https://github.com/openam-jp/openam/wiki\">release notes</a> before upgrading.</p>",
     "link": "Mettre à niveau vers OpenAM ${project.version}",
     "newVersion": "New Version:",
     "newVersionFound": "&nbsp;",
