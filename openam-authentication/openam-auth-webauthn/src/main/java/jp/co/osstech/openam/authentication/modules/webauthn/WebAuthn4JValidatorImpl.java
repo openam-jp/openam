@@ -16,6 +16,7 @@
 
 package jp.co.osstech.openam.authentication.modules.webauthn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -86,7 +87,8 @@ public class WebAuthn4JValidatorImpl implements WebAuthnValidator {
 
             boolean _userVerificationRequired = config.isVerificationRequired(); 
             boolean _userPresenceRequired = true; 
-            List<String> _expectedExtensionIds = Collections.emptyList(); //OpenAM desn't use extension now.
+            List<String> _expectedExtensionIds = new ArrayList<String>();
+            _expectedExtensionIds.add("credProtect"); // Because of CTAPv2.1(draft!) Yubikey5 + GoogleChrome return "credProtect" extension when residentkey=true.
 
             RegistrationRequest _registrationRequest = new RegistrationRequest(_attestationObjectBytes, _clientDataJsonBytes, 
                     _clientExtensionJSON, _transports);
