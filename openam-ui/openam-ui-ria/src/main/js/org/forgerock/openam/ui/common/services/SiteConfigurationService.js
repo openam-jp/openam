@@ -21,12 +21,9 @@ define([
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/URIUtils",
-    "org/forgerock/openam/ui/common/services/ServerService",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService, RealmHelper) {
+    "org/forgerock/openam/ui/common/services/ServerService"
+], function ($, AbstractDelegate, Configuration, Constants, URIUtils, ServerService) {
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}`),
-        lastKnownSubRealm,
-        lastKnownOverrideRealm,
         setRequireMapConfig = function (serverInfo) {
             require.config({ "map": { "*": {
                 "UserProfileView" : (serverInfo.kbaEnabled === "true"
@@ -43,21 +40,6 @@ define([
      * @param {Function} errorCallback   Error callback function
      */
     obj.getConfiguration = function (successCallback, errorCallback) {
-        if (!Configuration.globalData.auth.subRealm) {
-            try {
-                console.log("No current SUB REALM was detected. Applying from current URI values...");
-                var subRealm = RealmHelper.getSubRealm();
-                console.log(`Changing SUB REALM to '${subRealm}'`);
-
-                Configuration.globalData.auth.subRealm = RealmHelper.getSubRealm();
-
-                lastKnownSubRealm = RealmHelper.getSubRealm();
-                lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
-            } catch (error) {
-                console.log("Unable to applying sub realm from URI values");
-            }
-        }
-
         ServerService.getConfiguration({ suppressEvents: true }).then(function (response) {
             setRequireMapConfig(response);
             successCallback(response);
@@ -70,19 +52,7 @@ define([
      * serverinfo/* REST call, otherwise an empty successful promise.
      */
     obj.checkForDifferences = function () {
-        var currentSubRealm = RealmHelper.getSubRealm(),
-            currentOverrideRealm = RealmHelper.getOverrideRealm(),
-            subRealmChanged = lastKnownSubRealm !== currentSubRealm,
-            overrideRealmChanged = lastKnownOverrideRealm !== currentOverrideRealm;
-        if (subRealmChanged || overrideRealmChanged) {
-            if (currentSubRealm !== lastKnownSubRealm) {
-                console.log(`Changing SUB REALM from '${lastKnownSubRealm}' to '${currentSubRealm}'`);
-                Configuration.globalData.auth.subRealm = currentSubRealm;
-                lastKnownSubRealm = currentSubRealm;
-            }
-
-            lastKnownOverrideRealm = RealmHelper.getOverrideRealm();
-
+        if (Configuration.globalData.auth.authRealm !== Configuration.globalData.auth.sessionRealm) {
             return ServerService.getConfiguration({
                 errorsHandlers: {
                     "unauthorized": { status: "401" },

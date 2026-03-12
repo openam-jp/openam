@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -55,9 +56,7 @@ define([
             var tokenCookie = cookieHelper.getCookie(Configuration.globalData.auth.cookieName);
             SessionService.logout(tokenCookie).then(function () {
                 restLoginHelper.removeSessionCookie();
-                var realm = (Configuration.globalData.auth.passedInRealm != null)
-                                ? Configuration.globalData.auth.passedInRealm
-                                : Configuration.globalData.auth.subRealm;
+                var realm = Configuration.globalData.auth.subRealm;
                 location.href = `#login/${
                     realm
                     }${restLoginHelper.filterUrlParams(Configuration.globalData.auth.urlParams)}`;

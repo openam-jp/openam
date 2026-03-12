@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
  /**
@@ -21,9 +22,10 @@ define([
     "jquery",
     "lodash",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, AbstractDelegate, Constants, RealmHelper) {
+], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
 
     var obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json/`);
 
@@ -40,7 +42,11 @@ define([
         return obj.serviceCall(_.extend({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*")
-        }, callParams));
+        }, callParams)).then(function (response) {
+            Configuration.globalData.auth.authRealm = response.realm.slice(1);
+            return response;
+        });
+
     };
 
     return obj;

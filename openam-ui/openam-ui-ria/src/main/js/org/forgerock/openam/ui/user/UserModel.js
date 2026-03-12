@@ -114,9 +114,19 @@ define([
                     }
                 } else {
                     // The only other supported operation is read
+                    let url = RealmHelper.decorateURIWithSubRealm(`${baseUrl}/${this.id}`);
+                    const auth = Configuration.globalData.auth;
+                    if (auth.sessionRealm && auth.authRealm &&
+                        (auth.sessionRealm.toLowerCase() !== auth.authRealm.toLowerCase())) {
+                        // Since the request realm is different with the session realm, the request realm must be overwritten
+                        const prepend = url.indexOf("?") === -1 ? "?" : "&";
+                        url = `${url}${prepend}realm=/${auth.sessionRealm}`;
+                    } else {
+                        url = RealmHelper.decorateURLWithOverrideRealm(url);
+                    }
                     return ServiceInvoker.restCall(_.extend(
                         {
-                            "url" : RealmHelper.decorateURIWithRealm(`${baseUrl}/${this.id}`),
+                            url,
                             "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
                             "type": "GET"
                         },
@@ -175,10 +185,15 @@ define([
                     errorsHandlers: { "serverError": { status: "503" }, "unauthorized": { status: "401" } }
                 }).then(
                     _.bind(function (data) {
-                        Configuration.globalData.auth.successURL = data.successURL;
-                        Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
-                        Configuration.globalData.auth.subRealm = data.realm.slice(1);
-
+                        const auth = Configuration.globalData.auth;
+                        auth.successURL = data.successURL;
+                        auth.fullLoginURL = data.fullLoginURL;
+                        auth.sessionRealm = data.realm.slice(1);
+                        if (auth.sessionRealm.toLowerCase().indexOf(auth.authRealm.toLowerCase()) === 0) {
+                            auth.subRealm = auth.sessionRealm.slice(auth.authRealm.length);
+                        } else {
+                            auth.subRealm = "";
+                        }
                         // keep track of the current realm as a future default value, following logout:
                         Router.configuration.routes.login.defaults[0] = data.realm;
                         this.set("id", data.id);
