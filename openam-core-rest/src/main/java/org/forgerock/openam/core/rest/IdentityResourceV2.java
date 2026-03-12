@@ -272,7 +272,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
 
             // build resource
             result.put("id", amIdentity.getName());
-            result.put("realm", getRelativeRealmFromSession(context, amIdentity));
+            result.put("realm", DNMapper.orgNameToRealmName(amIdentity.getRealm()));
             result.put("dn", amIdentity.getUniversalId());
             result.put("successURL", ssotok.getProperty(ISAuthConstants.SUCCESS_URL,false));
             result.put("fullLoginURL", ssotok.getProperty(ISAuthConstants.FULL_LOGIN_URL,false));
@@ -288,22 +288,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo", ex);
             return new ForbiddenException("Cannot retrieve id from session.", ex).asPromise();
         }
-    }
-
-    private String getRelativeRealmFromSession(Context context, AMIdentity amIdentity) {
-        RealmContext realmContext = context.asContext(RealmContext.class);
-
-        String sessionRealm = com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm());
-        String baseRealm = realmContext.getDnsAliasRealm();
-        if (sessionRealm.startsWith(baseRealm)) {
-            String realm = sessionRealm.substring(baseRealm.length());
-            if (!realm.startsWith("/")) {
-                realm = "/" + realm;
-            }
-            return realm;
-        }
-
-        return sessionRealm;
     }
 
     /**

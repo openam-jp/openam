@@ -132,13 +132,11 @@ define([
         handleExistingSession (requirements) {
 
             const auth = Configuration.globalData.auth;
-            auth.passedInRealm = RealmHelper.getRealm();
             // If we have a token, let's see who we are logged in as....
             SessionManager.getLoggedUser((user) => {
 
-                if (String(auth.passedInRealm).toLowerCase() === auth.subRealm.toLowerCase()) {
+                if (auth.sessionRealm.toLowerCase() === auth.authRealm.toLowerCase()) {
                     Configuration.setProperty("loggedUser", user);
-                    delete auth.passedInRealm;
 
                     RESTLoginHelper.setSuccessURL(requirements.tokenId, requirements.successUrl).then(() => {
 
