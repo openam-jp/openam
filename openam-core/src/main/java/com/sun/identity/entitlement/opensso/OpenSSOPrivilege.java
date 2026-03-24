@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -150,11 +151,23 @@ public class OpenSSOPrivilege extends Privilege {
         ConditionDecision conditionDecision = doesConditionMatch(realm, subject, resourceName, environment);
 
         if (!conditionDecision.isSatisfied()) {
-            Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
-                    originalEntitlement.getResourceName(), Collections.<String>emptySet());
-            entitlement.setAdvices(conditionDecision.getAdvice());
-            entitlement.setTTL(conditionDecision.getTimeToLive());
-            return Arrays.asList(entitlement);
+            if (recursive) {
+                List<Entitlement> results = new ArrayList<>();
+                for (String resource : originalEntitlement.getResourceNames()) {
+                    Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
+                            resource, Collections.<String>emptySet());
+                    entitlement.setAdvices(conditionDecision.getAdvice());
+                    entitlement.setTTL(conditionDecision.getTimeToLive());
+                    results.add(entitlement);
+                }
+                return results;
+            } else {
+                Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
+                        originalEntitlement.getResourceName(), Collections.<String>emptySet());
+                entitlement.setAdvices(conditionDecision.getAdvice());
+                entitlement.setTTL(conditionDecision.getTimeToLive());
+                return Arrays.asList(entitlement);
+            }
         }
 
         // Finally verify the resource.
