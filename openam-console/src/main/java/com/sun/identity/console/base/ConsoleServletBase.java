@@ -25,6 +25,7 @@
  * $Id: ConsoleServletBase.java,v 1.7 2009/03/24 23:57:32 babysunil Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.console.base;
 
@@ -48,6 +49,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import jp.co.osstech.openam.console.base.SafeRequestContextImpl;
 import org.owasp.esapi.ESAPI;
 
 
@@ -71,6 +74,18 @@ public abstract class ConsoleServletBase
         // Disable the "strict session timeouts" warnings
         // in the server container log.
         setEnforceStrictSessionTimeout(true);
+    }
+
+    /**
+     * Returns a {@link SafeRequestContextImpl} instead of the default {@code RequestContextImpl}
+     * to prevent unsafe Java deserialization via the {@code jato.clientSession} parameter.
+     */
+    @Override
+    protected RequestContext createRequestContext(HttpServletRequest request, HttpServletResponse response) {
+        SafeRequestContextImpl ctx = new SafeRequestContextImpl(
+                getServletName(), getServletContext(), request, response);
+        ctx.setViewBeanManager(new ViewBeanManager(ctx, getPackageName(getClass().getName())));
+        return ctx;
     }
 
     /**
