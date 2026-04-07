@@ -25,7 +25,7 @@
  * $Id: PWResetServlet.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
- * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2012-2026 OSSTech Corporation
  */
 package com.sun.identity.password.ui;
 
@@ -43,7 +43,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import jp.co.osstech.openam.console.base.SafeRequestContextImpl;
 
 /**
  * <code>PWResetServlet</code> is the controller Servlet for the
@@ -77,11 +79,26 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
 	// do nothing
     }    
 
-    /** 
-     * Constructs a module Servlet for password reset URI 
+    /**
+     * Constructs a module Servlet for password reset URI
      */
     public PWResetServlet() {
         super();
+    }
+
+    /**
+     * Returns a {@link SafeRequestContextImpl} instead of the default {@code RequestContextImpl}
+     * to prevent unsafe Java deserialization via the {@code jato.clientSession} parameter.
+     *
+     * <p>Note: {@link #initializeRequestContext} will replace the ViewBeanManager with one
+     * using {@link #PACKAGE_NAME}; the manager set here is a placeholder for consistency.
+     */
+    @Override
+    protected RequestContext createRequestContext(HttpServletRequest request, HttpServletResponse response) {
+        SafeRequestContextImpl ctx = new SafeRequestContextImpl(
+                getServletName(), getServletContext(), request, response);
+        ctx.setViewBeanManager(new ViewBeanManager(ctx, PACKAGE_NAME));
+        return ctx;
     }
 
     /**

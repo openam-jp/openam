@@ -24,16 +24,16 @@
  *
  * $Id: AuthenticationServletBase.java,v 1.4 2008/06/25 05:41:49 qcheng Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.authentication.UI;
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.jato.ApplicationServletBase;
 import com.iplanet.jato.CompleteRequestException;
@@ -42,6 +42,7 @@ import com.iplanet.jato.ViewBeanManager;
 import com.iplanet.jato.view.ViewBean;
 
 import com.sun.identity.shared.debug.Debug;
+import jp.co.osstech.openam.console.base.SafeRequestContextImpl;
 
 /**
  * This is the front controller of authentication UI
@@ -54,6 +55,18 @@ public class AuthenticationServletBase extends ApplicationServletBase {
 static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
     public AuthenticationServletBase() {
         super();
+    }
+
+    /**
+     * Returns a {@link SafeRequestContextImpl} instead of the default {@code RequestContextImpl}
+     * to prevent unsafe Java deserialization via the {@code jato.clientSession} parameter.
+     */
+    @Override
+    protected RequestContext createRequestContext(HttpServletRequest request, HttpServletResponse response) {
+        SafeRequestContextImpl ctx = new SafeRequestContextImpl(
+                getServletName(), getServletContext(), request, response);
+        ctx.setViewBeanManager(new ViewBeanManager(ctx, getPackageName(getClass().getName())));
+        return ctx;
     }
 
     /**
