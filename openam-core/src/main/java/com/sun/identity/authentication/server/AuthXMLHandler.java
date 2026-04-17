@@ -25,6 +25,7 @@
  * $Id: AuthXMLHandler.java,v 1.20 2009/04/29 18:07:03 qcheng Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.authentication.server;
 
@@ -440,11 +441,10 @@ public class AuthXMLHandler implements RequestHandler {
                     }
                     loginState.setClient(clientHost);
                     authContext.login();
-                    //setServletRequest(servletRequest,authContext);
+                    setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
                     loginStatus = authContext.getStatus();
-                    authResponse.setRemoteRequest(loginState.getHttpServletRequest());
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
 
                     postProcess(loginState, authResponse);
@@ -489,11 +489,10 @@ public class AuthXMLHandler implements RequestHandler {
                     } else {
                         authContext.login(indexType,indexName, envMap, null);
                     }
-                    //setServletRequest(servletRequest,authContext);
+                    setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
                     loginStatus = authContext.getStatus();
-                    authResponse.setRemoteRequest(loginState.getHttpServletRequest());
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
                     postProcess(loginState, authResponse);
                     checkACException(authResponse, authContext);
@@ -506,7 +505,7 @@ public class AuthXMLHandler implements RequestHandler {
                 try {
                     Subject subject = authXMLRequest.getSubject();
                     authContext.login(subject);
-                    //setServletRequest(servletRequest,authContext);
+                    setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
                     postProcess(loginState, authResponse);
@@ -519,7 +518,7 @@ public class AuthXMLHandler implements RequestHandler {
                 break;
             case AuthXMLRequest.SubmitRequirements:
                 try {
-                    //setServletRequest(servletRequest,authContext);
+                    setServletRequest(servletRequest,authContext);
                     Callback[] submittedCallbacks =
                     authXMLRequest.getSubmittedCallbacks();
                     authContext.submitRequirements(submittedCallbacks);
@@ -528,7 +527,6 @@ public class AuthXMLHandler implements RequestHandler {
                         reqdCallbacks = authContext.getRequirements();
                         authResponse.setReqdCallbacks(reqdCallbacks);
                     }
-                    authResponse.setRemoteRequest(loginState.getHttpServletRequest());
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
                     postProcess(loginState, authResponse);
                     loginStatus = authContext.getStatus();
