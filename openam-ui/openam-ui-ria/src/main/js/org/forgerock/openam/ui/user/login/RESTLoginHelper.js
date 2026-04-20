@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019-2022 OSSTech Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -99,30 +99,37 @@ define([
     obj.setSuccessURL = function (tokenId, successUrl) {
         const promise = $.Deferred();
         const paramString = URIUtils.getCurrentCompositeQueryString();
-        const goto = query.parseParameters(paramString).goto;
-        if (goto) {
+        let paramgoto = query.parseParameters(paramString).goto;
+        const successvalidategotoURL = function (data) {
             let context = "";
-            AuthNService.validateGotoUrl(goto).then((data) => {
-                if (data.successURL.indexOf("/") === 0 &&
-                    data.successURL.indexOf(`/${Constants.context}`) !== 0) {
-                    context = `/${Constants.context}`;
-                }
-                gotoUrl.set(encodeURIComponent(context + data.successURL));
-                promise.resolve();
-            }, () => {
-                promise.reject();
-            });
-        } else {
-            if (successUrl !== Constants.CONSOLE_PATH) {
-                if (!Configuration.globalData.auth.urlParams) {
-                    Configuration.globalData.auth.urlParams = {};
-                }
-
-                if (!gotoUrl.exists()) {
-                    gotoUrl.set(successUrl);
-                }
+            let redirectUrl = "";
+            if (data.successURL.indexOf("/") === 0 &&
+                data.successURL.indexOf(`/${Constants.context}`) !== 0) {
+                context = `/${Constants.context}`;
+            }
+            redirectUrl = context + data.successURL;
+            if (redirectUrl !== Constants.CONSOLE_PATH) {
+                gotoUrl.set(encodeURIComponent(redirectUrl));
+            } else {
+                delete Configuration.globalData.auth.urlParams.goto;
             }
             promise.resolve();
+        };
+        const failvalidategotoURL = function () {
+            promise.reject();
+        };
+
+        if (successUrl) {
+            AuthNService.validateGotoUrl(successUrl).then(function (data) {
+                successvalidategotoURL(data);
+            }, failvalidategotoURL);
+        } else if (paramgoto) {
+            paramgoto = decodeURIComponent(paramgoto);
+            AuthNService.validateGotoUrl(paramgoto).then(function (data) {
+                successvalidategotoURL(data);
+            }, failvalidategotoURL);
+        } else {
+            failvalidategotoURL();
         }
         return promise;
     };
