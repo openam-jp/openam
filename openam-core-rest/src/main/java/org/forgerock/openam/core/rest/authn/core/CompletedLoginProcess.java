@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.authn.core;
@@ -22,6 +23,8 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 import javax.security.auth.callback.Callback;
 
@@ -108,8 +111,12 @@ public class CompletedLoginProcess extends LoginProcess {
      */
     @Override
     public String getSuccessURL() {
+        RedirectUrlValidator<String> urlValidator =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
         try {
-            return ssoToken.getProperty(ISAuthConstants.SUCCESS_URL);
+            return urlValidator.getRedirectUrl(getOrgDN(),
+                    urlValidator.getAndDecodeParameter(getLoginConfiguration().getHttpRequest(), urlValidator.GOTO),
+                    ssoToken.getProperty(ISAuthConstants.SUCCESS_URL));
         } catch (SSOException e) {
             e.printStackTrace();
         }

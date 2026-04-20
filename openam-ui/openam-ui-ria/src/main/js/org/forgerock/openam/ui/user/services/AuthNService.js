@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 define([
     "jquery",
@@ -249,7 +249,6 @@ define([
         }
     };
     obj.validateGotoUrl = function (goto) {
-        goto = decodeURIComponent(goto);
         return obj.serviceCall({
             type: "POST",
             headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
