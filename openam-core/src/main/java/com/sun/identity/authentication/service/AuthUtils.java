@@ -25,7 +25,7 @@
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2020 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2020-2026 OSSTech Corporation
  */
 package com.sun.identity.authentication.service;
 
@@ -250,7 +250,20 @@ public class AuthUtils extends AuthClientUtils {
                         (isLocalServer(cookieURL,true))) {
                         utilDebug.error("AuthUtils:getAuthContext(): "
                             + "Invalid Session Timed out");
-                        clearAllCookies(request, response);
+                        if (isRestAuth) {
+                            if (!StringUtils.isEmpty(authCookieValue)) {
+                                utilDebug.message("clearAllCookies() will be called.");
+                                clearAllCookies(request, response);
+                            }
+                        } else {
+                            if (sid.toString().equals(authCookieValue)) {
+                                utilDebug.message("clearAuthCookies() will be called.");
+                                clearAuthCookies(request, response, sid);
+                            } else {
+                                utilDebug.message("clearAllCookies() will be called.");
+                                clearAllCookies(request, response);
+                            }
+                        }
                         throw new AuthException(
                             AMAuthErrorCode.AUTH_TIMEOUT, null);
                     }            	
@@ -1870,7 +1883,30 @@ public class AuthUtils extends AuthClientUtils {
          }
          return attrs;
      }
-     
+
+    public static void clearAuthCookies(HttpServletRequest request,
+        HttpServletResponse response, SessionID sid) {
+
+        Set cookieDomainSet = getCookieDomainsForRequest(request);
+        if (cookieDomainSet.isEmpty()) {
+            Cookie cookie = createCookie(getAuthCookieName(),
+                getLogoutCookieString(sid), null);
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        } else {
+            Iterator iter = cookieDomainSet.iterator();
+            while (iter.hasNext()) {
+                String cookieDomain = (String)iter.next();
+                Cookie cookie = createCookie(getAuthCookieName(),
+                    getLogoutCookieString(sid), cookieDomain);
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+        }
+        clearlbCookie(request, response);
+        clearHostUrlCookie(response);
+    }
+
     public static void clearAllCookies(HttpServletRequest request, 
         HttpServletResponse response) {
 
