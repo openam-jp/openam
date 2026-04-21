@@ -923,6 +923,11 @@
         </dependency>
 
         <dependency>
+            <artifactId>openam-authchainswitch</artifactId>
+            <groupId>jp.openam</groupId>
+        </dependency>
+
+        <dependency>
             <artifactId>json-resource</artifactId>
             <groupId>jp.openam.commons</groupId>
         </dependency>

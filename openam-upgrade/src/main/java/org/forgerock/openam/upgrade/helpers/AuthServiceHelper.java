@@ -20,6 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2026 OSSTech Corporation.
  */
 
 package org.forgerock.openam.upgrade.helpers;
@@ -57,12 +59,16 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String NEW_AUTHENTICATOR_OATH = "org.forgerock.openam.authentication.modules.fr.oath.AuthenticatorOATH";
     private final static String NEW_PUSH = "org.forgerock.openam.authentication.modules.push.AuthenticatorPush";
     private final static String NEW_PUSH_REGISTRATION = "org.forgerock.openam.authentication.modules.push.registration.AuthenticatorPushRegistration";
+    private final static String NEW_AUTH_CHAIN_SWITCH = "jp.co.osstech.openam.authentication.modules.authchainswitch.AuthChainSwitch";
+    private final static String NEW_AUTH_CHAIN_SWITCH_CHILD = "jp.co.osstech.openam.authentication.modules.authchainswitch.AuthChainSwitchChild";
+
 
     // Note: Add new modules to this array.
     private final static List<String> NEW_MODULES = Arrays.asList(
             NEW_SECURID, NEW_ADAPTIVE, NEW_OAUTH2, NEW_OATH, NEW_PERSISTENT_COOKIE,
             NEW_OPEN_ID_CONNECT, NEW_SCRIPTED, NEW_SCRIPTED_DEVICE_PRINT,
-            NEW_DEVICE_PRINT_PERSIST, NEW_SAML2, NEW_AUTHENTICATOR_OATH, NEW_PUSH, NEW_PUSH_REGISTRATION);
+            NEW_DEVICE_PRINT_PERSIST, NEW_SAML2, NEW_AUTHENTICATOR_OATH, NEW_PUSH, NEW_PUSH_REGISTRATION,
+            NEW_AUTH_CHAIN_SWITCH, NEW_AUTH_CHAIN_SWITCH_CHILD);
 
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
