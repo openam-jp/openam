@@ -197,6 +197,9 @@ define([
                     message = $.t("config.messages.CommonMessages.unknown");
                 }
                 Messages.addMessage({ message, type: Messages.TYPE_DANGER });
+                // The reason used here will not be translated into a common message and hence not displayed.
+                // This is so that only the message above is displayed.
+                return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
             } else { // we have a 401 unauthorized response
                 errorBody = $.parseJSON(jqXHR.responseText);
                 // if the error body has an authId property, then we may be
