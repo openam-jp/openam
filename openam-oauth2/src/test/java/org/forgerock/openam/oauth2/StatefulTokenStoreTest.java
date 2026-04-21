@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2;
@@ -83,9 +83,13 @@ public class StatefulTokenStoreTest {
     private ClientAuthenticationFailureFactory failureFactory;
     private OAuth2RequestFactory oAuth2RequestFactory;
     private RecoveryCodeGenerator recoveryCodeGenerator;
+    private OAuth2ProviderSettings providerSettings;
+
+    private final int retryNum = 3;
+    private final int retryInt = 100;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
 
         tokenStore = mock(OAuthTokenStore.class);
         providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
@@ -112,6 +116,11 @@ public class StatefulTokenStoreTest {
         openAMtokenStore = new StatefulTokenStore(tokenStore, providerSettingsFactory, oAuth2UrisFactory,
                 clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug,
                 new SecureRandom(), failureFactory, recoveryCodeGenerator);
+
+        providerSettings = mock(OAuth2ProviderSettings.class);
+        given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
+        given(providerSettings.getCtsSearchRetryInterval()).willReturn(retryInt);
+        given(providerSettings.getCtsSearchRetryNumber()).willReturn(retryNum);
     }
 
     @Test
@@ -171,6 +180,73 @@ public class StatefulTokenStoreTest {
         //Expected InvalidGrantException
     }
 
+    @Test
+    public void shouldReadAccessTokenRetryWhenNull() throws Exception {
+        //Given
+        given(tokenStore.read("TOKEN_ID")).willReturn(null);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
+
+        //When
+        try {
+            openAMtokenStore.readAccessToken(request, "TOKEN_ID");
+        } catch (InvalidGrantException | NotFoundException | ServerException ex) {
+            //ignore
+        }
+
+        //Then
+        verify(tokenStore, times(retryNum + 1)).read("TOKEN_ID");
+        assertThat(request.getTokenIdNotFound()).isEqualTo(true);
+    }
+
+    @Test
+    public void shouldReadAccessTokenNoRepeatedRetryWhenNull() throws Exception {
+        //Given
+        given(tokenStore.read("TOKEN_ID")).willReturn(null);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
+        request.setTokenIdNotFound();
+
+        //When
+        try {
+            openAMtokenStore.readAccessToken(request, "TOKEN_ID");
+        } catch (InvalidGrantException | NotFoundException | ServerException ex) {
+            //ignore
+        }
+
+        //Then
+        verify(tokenStore, times(1)).read("TOKEN_ID");
+    }
+
+    @Test (expectedExceptions = InvalidGrantException.class)
+    public void shouldReadAuthorizationCodeWhenNull() throws Exception {
+        //Given
+        given(tokenStore.read("AUTHORIZATION_CODE")).willReturn(null);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
+
+        //When
+        openAMtokenStore.readAuthorizationCode(request, "AUTHORIZATION_CODE");
+
+        //Then
+        //Expected InvalidGrantException
+    }
+
+    @Test
+    public void shouldReadAuthorizationCodeRetryWhenNull() throws Exception {
+        //Given
+        given(tokenStore.read("AUTHORIZATION_CODE")).willReturn(null);
+        OAuth2Request request = oAuth2RequestFactory.create(this.request);
+
+        //When
+        try {
+            openAMtokenStore.readAuthorizationCode(request, "AUTHORIZATION_CODE");
+        } catch (InvalidGrantException | NotFoundException | ServerException ex) {
+            //ignore
+        }
+
+        //Then
+        verify(tokenStore, times(retryNum + 1)).read("AUTHORIZATION_CODE");
+        assertThat(request.getTokenIdNotFound()).isEqualTo(false);
+    }
+
     @Test (expectedExceptions = ServerException.class)
     public void shouldFailToReadAccessToken() throws Exception {
 
@@ -202,8 +278,6 @@ public class StatefulTokenStoreTest {
     @Test
     public void shouldCreateDeviceCode() throws Exception {
         // Given
-        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
         given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
         given(providerSettings.getClaimsParameterSupported()).willReturn(true);
         given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
@@ -243,8 +317,6 @@ public class StatefulTokenStoreTest {
     @Test
     public void shouldCreateDeviceCodeWithNoClaims() throws Exception {
         // Given
-        OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
-        given(providerSettingsFactory.get(any(OAuth2Request.class))).willReturn(providerSettings);
         given(providerSettings.getDeviceCodeLifetime()).willReturn(10);
         given(providerSettings.getClaimsParameterSupported()).willReturn(false);
         given(tokenStore.query(any(QueryFilter.class))).willReturn(json(array()));
