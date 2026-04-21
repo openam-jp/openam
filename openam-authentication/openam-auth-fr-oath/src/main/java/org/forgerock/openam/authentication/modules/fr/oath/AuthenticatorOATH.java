@@ -882,6 +882,7 @@ public class AuthenticatorOATH extends AMLoginModule {
         long drift = time - (this.time / totpTimeStep);
         if (Math.abs(drift) > totpMaxClockDrift) {
             setFailureID(userName);
+            debug.error("OATH.checkOTP(): Login failed due to maximum allowable clock drift limit: " + Math.abs(drift));
             throw new AuthLoginException(amAuthOATH, "outOfSync", null);
         }
 
