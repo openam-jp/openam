@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions copyright 2019-2023 OSSTech Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 package org.forgerock.openam.oauth2;
 
@@ -655,15 +655,45 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             return loaded;
         }
 
+        OAuth2ProviderSettings providerSettings = null;
+        final int ctsRetryNumber;
+        final int ctsRetryInterval;
+
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException ex) {
+            logger.error("No provider settings was found in the realm.");
+        }
+
+        if (providerSettings != null) {
+            ctsRetryNumber = providerSettings.getCtsSearchRetryNumber();
+            ctsRetryInterval = providerSettings.getCtsSearchRetryInterval();
+        } else {
+            ctsRetryNumber = 0;
+            ctsRetryInterval = 0;
+        }
+
         logger.message("Reading Authorization code: {}", code);
-        final JsonValue token;
+        JsonValue token = null;
+        int retryCount = 0;
 
         // Read from CTS
-        try {
-            token = tokenStore.read(code);
-        } catch (CoreTokenException e) {
-            logger.error("Unable to read authorization code corresponding to id: " + code, e);
-            throw new ServerException("Could not read token from CTS: " + e.getMessage());
+        while (true) {
+            try {
+                token = tokenStore.read(code);
+            } catch (CoreTokenException e) {
+                logger.error("Unable to read authorization code corresponding to id: " + code, e);
+                throw new ServerException("Could not read token from CTS: " + e.getMessage());
+            }
+            retryCount++;
+            if (retryCount > ctsRetryNumber || token != null) {
+                break;
+            }
+            try {
+                Thread.sleep(ctsRetryInterval);
+            } catch (InterruptedException ex) {
+            }
+            logger.warning("Retrying the search: retry count = " + retryCount + ", code = " + code);
         }
 
         if (token == null) {
@@ -787,19 +817,58 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             return loaded;
         }
 
+        OAuth2ProviderSettings providerSettings = null;
+        final int ctsRetryNumber;
+        final int ctsRetryInterval;
+
+        try {
+            providerSettings = providerSettingsFactory.get(request);
+        } catch (NotFoundException ex) {
+            logger.error("No provider settings was found in the realm.");
+        }
+
+        if (providerSettings != null) {
+            ctsRetryNumber = providerSettings.getCtsSearchRetryNumber();
+            ctsRetryInterval = providerSettings.getCtsSearchRetryInterval();
+        } else {
+            ctsRetryNumber = 0;
+            ctsRetryInterval = 0;
+        }
+
         logger.message("Reading access token");
 
-        JsonValue token;
+        JsonValue token = null;
+        int retryCount = 0;
 
         // Read from CTS
-        try {
-            token = tokenStore.read(tokenId);
-        } catch (CoreTokenException e) {
-            logger.error("Unable to read access token corresponding to id: " + tokenId, e);
-            throw new ServerException("Could not read token in CTS: " + e.getMessage());
+        while (true) {
+            try {
+                token = tokenStore.read(tokenId);
+            } catch (CoreTokenException e) {
+                logger.error("Unable to read access token corresponding to id: " + tokenId, e);
+                throw new ServerException("Could not read token in CTS: " + e.getMessage());
+            }
+
+            retryCount++;
+            if (retryCount > ctsRetryNumber || token != null) {
+                break;
+            }
+
+            // If tokenId has been searched and not found,
+            // retrying the search should be a waste of time.
+            if (request.getTokenIdNotFound()) {
+                break;
+            }
+
+            try {
+                Thread.sleep(ctsRetryInterval);
+            } catch (InterruptedException ex) {
+            }
+            logger.warning("Retrying the search: retry count = " + retryCount + ", tokenId = " + tokenId);
         }
 
         if (token == null) {
+            request.setTokenIdNotFound();
             logger.error("Unable to read access token corresponding to id: " + tokenId);
             throw new InvalidGrantException("Could not read token in CTS");
         }

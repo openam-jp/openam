@@ -1236,6 +1236,24 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
     }
 
     /**
+     * The maximum number of searches for a code or token that is being replicated.
+     * @return The maximum number of retries.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    public int getCtsSearchRetryNumber() throws ServerException {
+        return (int) getLongSettingValue(OAuth2Constants.OAuth2ProviderService.CTS_SEARCH_RETRY_NUMBER);
+    }
+
+    /**
+     * The time in milliseconds between retries.
+     * @return The interval in milliseconds.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    public int getCtsSearchRetryInterval() throws ServerException {
+        return (int) getLongSettingValue(OAuth2Constants.OAuth2ProviderService.CTS_SERACH_RETRY_INTERVAL);
+    }
+
+    /**
      * ServiceListener implementation to clear cache when it changes.
      */
     private final class OAuth2ProviderSettingsChangeListener implements ServiceListener {

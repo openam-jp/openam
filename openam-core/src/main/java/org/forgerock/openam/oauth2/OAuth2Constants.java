@@ -939,6 +939,10 @@ public class OAuth2Constants {
         public static final String DEVICE_COMPLETION_URL = "completionUrl";
         public static final String DEVICE_CODE_LIFETIME = "deviceCodeLifetime";
         public static final String DEVICE_CODE_POLL_INTERVAL = "devicePollInterval";
+
+        public static final String CTS_SEARCH_RETRY_NUMBER   = "ctsSearchRetryNumber";
+        public static final String CTS_SERACH_RETRY_INTERVAL = "ctsSearchRetryInterval";
+
     }
 
     /**

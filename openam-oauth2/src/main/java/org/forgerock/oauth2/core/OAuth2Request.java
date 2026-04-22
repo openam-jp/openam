@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2018-2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2018-2026 OSSTech Corporation
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  */
 
@@ -60,6 +60,7 @@ public class OAuth2Request {
     private JsonValue body;
     private String validRedirectUri = null;
     private Set<String> validatedScopes = Collections.emptySet();
+    private boolean tokenIdNotFound = false;
 
     /**
      * Constructs a new RestletOAuth2Request.
@@ -351,5 +352,22 @@ public class OAuth2Request {
      */
     public String getValidRedirectUri() {
         return this.validRedirectUri;
+    }
+
+    /**
+     * Sets the TokenIdNotFound flag.
+     *
+     */
+    public void setTokenIdNotFound() {
+        this.tokenIdNotFound = true;
+    }
+
+    /**
+     * Gets the TokenIdNotFound flag.
+     *
+     * @return The tokenIdNotFound flag.
+     */
+    public boolean getTokenIdNotFound() {
+        return tokenIdNotFound;
     }
 }
