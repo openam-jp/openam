@@ -78,7 +78,15 @@ define([
         return obj.serviceCall(serviceCall).then((requirements) => requirements,
             (jqXHR) => {
                 // some auth processes might throw an error fail immediately
-                const errorBody = $.parseJSON(jqXHR.responseText);
+                var errorBody;
+                if (jqXHR.responseJSON) {
+                    errorBody = $.parseJSON(jqXHR.responseText);
+                } else {
+                    errorBody = {
+                        message: $.t("config.messages.CommonMessages.unknown")
+                    };
+                }
+
                 // if the error body contains an authId, then we might be able to
                 // continue on after this error to the next module in the chain
                 if (errorBody.hasOwnProperty("authId")) {
@@ -201,12 +209,15 @@ define([
                 // This is so that only the message above is displayed.
                 return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
             } else { // we have a 401 unauthorized response
-                errorBody = $.parseJSON(jqXHR.responseText);
+                if (jqXHR.responseJSON) {
+                    errorBody = $.parseJSON(jqXHR.responseText);
+                }
+
                 // if the error body has an authId property, then we may be
                 // able to advance beyond this error
-                if (errorBody.hasOwnProperty("authId")) {
+                if (errorBody && errorBody.hasOwnProperty("authId")) {
                     return obj.submitRequirements(errorBody).then(processSucceeded, processFailed);
-                } else {
+                } else if (errorBody) {
                     obj.resetProcess();
                     Messages.addMessage({
                         message: errorBody.message,
@@ -215,6 +226,12 @@ define([
                     goToFailureUrl(errorBody);
                     // The reason used here will not be translated into a common message and hence not displayed.
                     // This is so that only the message above is displayed.
+                    return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
+                } else {
+                    obj.resetProcess();
+
+                    // The reason used here will not be translated into a common message and hence not displayed.
+                    // The common error handler may display a message.
                     return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
                 }
             }
