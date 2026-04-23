@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -24,6 +24,7 @@ import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import java.security.SignatureException;
@@ -256,8 +257,8 @@ public class RestAuthenticationHandler {
                 }
 
                 if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
-                    JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
-                            jsonCallbacks);
+                    JsonValue jsonValue = createJsonCallbackResponse(request, authId, loginConfiguration,
+                            loginProcess, jsonCallbacks);
                     return jsonValue;
                 } else {
                     loginProcess = loginProcess.next(callbacks);
@@ -323,8 +324,9 @@ public class RestAuthenticationHandler {
         return jsonCallbacks;
     }
 
-    private JsonValue createJsonCallbackResponse(String authId, LoginConfiguration loginConfiguration,
-            LoginProcess loginProcess, JsonValue jsonCallbacks) throws SignatureException, RestAuthException {
+    private JsonValue createJsonCallbackResponse(HttpServletRequest request, String authId,
+            LoginConfiguration loginConfiguration, LoginProcess loginProcess, JsonValue jsonCallbacks)
+        throws SignatureException, RestAuthException {
 
         PagePropertiesCallback pagePropertiesCallback = loginProcess.getPagePropertiesCallback();
 
@@ -341,6 +343,11 @@ public class RestAuthenticationHandler {
             String state = pagePropertiesCallback.getPageState();
             jsonResponseObject.put("stage", moduleName + state);
             jsonResponseObject.put("header", pagePropertiesCallback.getHeader());
+            // If using AuthChainSwitch module, overwrite `template` for XUI template HTML.
+            String internalAuthStage = (String) request.getAttribute(ISAuthConstants.INTERNAL_AUTH_STAGE_REQUEST_ATTR);
+            if (internalAuthStage != null) {
+                jsonResponseObject.put("template", internalAuthStage + ".html");
+            }
         }
         jsonResponseObject.put("callbacks", jsonCallbacks.getObject());
 

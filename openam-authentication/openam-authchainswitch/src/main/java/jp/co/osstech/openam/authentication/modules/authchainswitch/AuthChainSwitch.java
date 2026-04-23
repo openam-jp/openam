@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2020-2024 OSSTech Corporation
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 
@@ -73,7 +73,7 @@ public class AuthChainSwitch extends AMLoginModule {
 
     private final static String amAuthAuthChainSwitch = "amAuthAuthChainSwitch";
     private final static String SUCCESS_AUTH_CHAIN = "[Empty]";
-    
+
     private String userName = null;
     private String serviceName = null;
     private String realm = null;
@@ -103,17 +103,17 @@ public class AuthChainSwitch extends AMLoginModule {
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
-        
+
         debug.message("AuthChainSwitch::init");
 
         this.bundle = amCache.getResBundle(amAuthAuthChainSwitch, getLoginLocale());
-        
+
         attribute_name = CollectionHelper.getMapAttr(options, AUTHCHAIN_ATTR_NAME);
         defaultAuthChain = CollectionHelper.getMapAttr(options, DEFAULT_AUTHCHAIN);
         try {
             Set<String> tmp = CollectionHelper.getMapSetThrows(options, ATTRVALUE_AUTHCHAIN_MAP);
             authChainMap = MAP_VALUE_PARSER.parse(tmp);
-        } catch (ValueNotFoundException e) {            
+        } catch (ValueNotFoundException e) {
             debug.error("MAP_VALUE_PARSER.parse Error: ", e);
         }
         authLevel = CollectionHelper.getIntMapAttr(options, AUTHLEVEL, DEFAULT_AUTH_LEVEL, debug);
@@ -131,7 +131,7 @@ public class AuthChainSwitch extends AMLoginModule {
             debug.message("amAuthChainSwitch :: init() : Unable to get userName ", e);
         } catch (SSOException e) {
             debug.message("amAuthChainSwitch :: init() : Unable to get userName ", e);
-        }       
+        }
     }
 
     @Override
@@ -153,7 +153,7 @@ public class AuthChainSwitch extends AMLoginModule {
         }
         request = new AuthChainSwitchHttpServletRequest(original_request);
         request.setUserName(userName);
-        
+
         if (acLocal != null) {
             state = LOGIN_1STEP;
         }
@@ -176,12 +176,12 @@ public class AuthChainSwitch extends AMLoginModule {
                             "SettingError"),
                             "amAuthChainSwitch :: process() - " + DEFAULT_AUTHCHAIN + " is null.");
                 }
-                
+
                 if (id == null) {
                     return processError(bundle.getString(
                             "localAuthChainError"),
                             "amAuthChainSwitch :: process() - getIdentity Error: "
-                                    + "(AMIdentity)id is null");                     
+                                    + "(AMIdentity)id is null");
                 }
                 try {
                     attr_values = id.getAttribute(attribute_name);
@@ -189,14 +189,14 @@ public class AuthChainSwitch extends AMLoginModule {
                     return processError(bundle.getString(
                             "localAuthChainError"),
                             "amAuthChainSwitch :: process() - getAttribute Error: "
-                                    + "Unable to get authchain attrvalue ", e); 
+                                    + "Unable to get authchain attrvalue ", e);
                 } catch (IdRepoException e) {
                     return processError(bundle.getString(
                             "localAuthChainError"),
                             "amAuthChainSwitch :: process() - getAttribute Error: "
-                                    + "Unable to get authchain attrvalue ", e); 
+                                    + "Unable to get authchain attrvalue ", e);
                 }
-                
+
                 if (attr_values.isEmpty()) {
                     serviceName = defaultAuthChain;
                 } else {
@@ -252,29 +252,29 @@ public class AuthChainSwitch extends AMLoginModule {
                     }
                     debug.message("amAuthChainSwitch ::process() : getAttribute Success."
                             + " userName: [" + userName + "] attrvalue: [" + attr_value + "]");
-                }                 
+                }
                 return authchain_login_exec(attr_value);
 
             case LOGIN_SELECT:
                 if (callbacks[0] instanceof ChoiceCallback) {
                     int[] selectedIndexes = ((ChoiceCallback)callbacks[0]).getSelectedIndexes();
-                    
+
                     if (selectedIndexes.length == 1 && selectedIndexes[0] >= 0 &&
                             selectedIndexes[0] < choices.size()) {
                         attr_value = choices.get(selectedIndexes[0]);
                     } else {
                         return processError(bundle.getString("authFailed"),
-                                "AuthChainSwitch :: process() : Callback Error.(index Error: [{}])", selectedIndexes);                        
+                                "AuthChainSwitch :: process() : Callback Error.(index Error: [{}])", selectedIndexes);
                     }
                     serviceName = null;
                     addCookieToResponse(request, response, attr_value);
                     debug.message("amAuthChainSwitch :: process() : ChoiceCallback."
                               + " user choice value: [{}]", attr_value);
                     return authchain_login_exec(attr_value);
-                } 
+                }
                 return processError(bundle.getString("authFailed"),
-                          "AuthChainSwitch :: process() : Callback Error.(no ChoiceCallback)");   
-                
+                          "AuthChainSwitch :: process() : Callback Error.(no ChoiceCallback)");
+
             case LOGIN_1STEP:
             case LOGIN_2STEP:
             case LOGIN_3STEP:
@@ -286,7 +286,7 @@ public class AuthChainSwitch extends AMLoginModule {
             case LOGIN_9STEP:
             case LOGIN_10STEP:
                 return stepLogin(callbacks);
-                
+
             default:
                 return processError(bundle.getString("invalidLoginState"),
                         "Unrecognised login state: {}", state);
@@ -329,17 +329,17 @@ public class AuthChainSwitch extends AMLoginModule {
 
 
     private int authchain_login_exec(String attr_value) throws AuthLoginException {
-        
+
         if (!StringUtils.isEmpty(attr_value)) {
-            serviceName = authChainMap.get(attr_value);     
+            serviceName = authChainMap.get(attr_value);
         }
-        
+
         if (StringUtils.isBlank(serviceName)) {
             return processError(bundle.getString("localAuthChainError"),
                     "amAuthChainSwitch :: process() - Invalid value: "
-                            + "userName:[{}] value:[{}] ", userName, attr_value);               
+                            + "userName:[{}] value:[{}] ", userName, attr_value);
         }
-        
+
         if (serviceName.equals(SUCCESS_AUTH_CHAIN)) {
             if (!session_upgrade || session_upgrade_empty_allow ){
                 debug.message("amAuthChainSwitch ::process() : Success without calling authChain."
@@ -375,8 +375,8 @@ public class AuthChainSwitch extends AMLoginModule {
         }
         return injectCallbacks(null);
     }
-    
-    
+
+
     private void checkForSessionAndGetUsernameAndUUID() throws SSOException, AuthLoginException {
         if (StringUtils.isEmpty(userName)) {
             // session upgrade case. Need to find the user ID from the old
@@ -453,7 +453,7 @@ public class AuthChainSwitch extends AMLoginModule {
             }
             if (!userName.equals(local_userName)) {
                 return processError(bundle.getString("localAuthFailed"),
-                        "AuthChainSwitch :: stepLogin() : local authentication UserName does not match: [{}]", local_userName);                    
+                        "AuthChainSwitch :: stepLogin() : local authentication UserName does not match: [{}]", local_userName);
             }
             return success(userName);
         }
@@ -467,7 +467,7 @@ public class AuthChainSwitch extends AMLoginModule {
             setAuthLevel(authLevel);
             setUserSessionProperty(AUTH_SESSION_PROPERTY_NAME, serviceName);
         } catch (Exception e) {
-            debug.error("Unable to set authLevel :[{}]",authLevel, e);      
+            debug.error("Unable to set authLevel :[{}]",authLevel, e);
         }
         principal = new AuthChainSwitchPrincipal(userName);
         return ISAuthConstants.LOGIN_SUCCEED;
@@ -475,7 +475,7 @@ public class AuthChainSwitch extends AMLoginModule {
 
     /**
      * Submits completed callbacks (from the just-completed step - the first
-     * time this is called realCallbacks should 
+     * time this is called realCallbacks should
      * be null as there is no just-completed step in the internal auth module),
      * and injects the next lot if there are any.
      */
@@ -519,7 +519,7 @@ public class AuthChainSwitch extends AMLoginModule {
                 return finishLoginModule();
             }
         }
-        
+
         if (injectedCallbacks.length > MAX_CALLBACKS_INJECTED) {
             return processError(bundle.getString("localAuthFailed"),
                     "AuthChainSwitch  :: injectAndReturn() :"

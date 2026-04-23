@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions Copyrighted 2020 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 
@@ -51,7 +51,7 @@ public class AuthChainSwitchChild extends AMLoginModule {
         try {
             setAuthLevel(authLevel);
         } catch (Exception e) {
-            debug.error("Unable to set authLevel :[{}]",authLevel, e);      
+            debug.error("Unable to set authLevel :[{}]",authLevel, e);
         }
     }
 
@@ -65,14 +65,14 @@ public class AuthChainSwitchChild extends AMLoginModule {
             debug.error("AuthChainSwitchChild :: This authentication module was called directly.");
             throw new AuthLoginException("This authentication module was called directly.");
         }
-        
+
         final AuthChainSwitchHttpServletRequest acs_req = (AuthChainSwitchHttpServletRequest) req;
         String userName = acs_req.getUserName();
         if (StringUtils.isEmpty(userName)) {
             debug.error("AuthChainSwitchChild :: userName is Empty.");
-            throw new AuthLoginException("userName is Empty.");            
+            throw new AuthLoginException("userName is Empty.");
         }
-        
+
         debug.message("AuthChainSwitchChild :: userName : [{}]", userName);
         storeUsernamePasswd(userName, null);
         principal = new AuthChainSwitchPrincipal(userName);

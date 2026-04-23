@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2020-2024 OSSTech Corporation
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package jp.co.osstech.openam.authentication.modules.authchainswitch;
@@ -46,7 +46,7 @@ final class AuthChainSwitchConstants {
     static final int LOGIN_8STEP  = 9;
     static final int LOGIN_9STEP  = 10;
     static final int LOGIN_10STEP = 11;
-    
+
     /** Auth Module state - Error. */
     static final int STATE_ERROR = 12;
 
@@ -58,7 +58,7 @@ final class AuthChainSwitchConstants {
     /*
      * Auth Module Configuration XML Names.
      */
-    
+
     static final String AUTH_ATTR_PREFIX = "osstech-am-auth-";
 
     /* Auth Level Module Configuration XML Name. */
@@ -74,7 +74,7 @@ final class AuthChainSwitchConstants {
     static final String COOKIE_MAX_AGE = AUTH_ATTR_PREFIX + "cookie-max-age";
     static final String MAPPING_VALUE_NOMATCH_ERROR = AUTH_ATTR_PREFIX + "mapping-value-nomatch-error";
 
-    /* Child auth chain information */    
+    /* Child auth chain information */
     static final String AUTH_SESSION_PROPERTY_NAME = "AuthChainSwitchService";
 
     /**
