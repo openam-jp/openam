@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.spi;
@@ -1995,6 +1996,7 @@ public abstract class AMLoginModule implements LoginModule {
             subject.getPrincipals().remove(principal);
         }
         succeeded = false;
+        principal = null;
         cleanup();
         return true;
     }
@@ -2319,7 +2321,6 @@ public abstract class AMLoginModule implements LoginModule {
     
     // cleanup method for Auth constants
     private void cleanup() {
-        principal = null;
         if (sharedState !=null) {
             sharedState.remove(ISAuthConstants.SHARED_STATE_USERNAME);
             sharedState.remove(ISAuthConstants.SHARED_STATE_PASSWORD);

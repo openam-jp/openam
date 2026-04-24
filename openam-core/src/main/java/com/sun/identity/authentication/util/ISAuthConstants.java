@@ -25,6 +25,7 @@
  * $Id: ISAuthConstants.java,v 1.21 2009/11/25 12:05:07 manish_rustagi Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.util;
@@ -695,4 +696,9 @@ public interface ISAuthConstants {
      * The name of the request attribute that stores whether this is a noSession authentication request.
      */
     public static final String NO_SESSION_REQUEST_ATTR = "org.forgerock.openam.auth.noSession";
+
+    /**
+     * The name of the request attribute for the stage of authentication called internally.
+     */
+    public static final String INTERNAL_AUTH_STAGE_REQUEST_ATTR = "internalAuthenticationStage";
 }

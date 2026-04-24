@@ -605,6 +605,11 @@
                 <artifactId>openam-auth-webauthn</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>jp.openam</groupId>
+                <artifactId>openam-authchainswitch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>jp.openam</groupId>

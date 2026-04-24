@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+#
+# The contents of this file are subject to the terms of the Common Development and
+# Distribution License (the License). You may not use this file except in compliance with the
+# License.
+#
+# You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+# specific language governing permission and limitations under the License.
+#
+# When distributing Covered Software, include this CDDL Header Notice in each file and include
+# the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+# Header, with the fields enclosed by brackets [] replaced by your own identifying
+# information: "Portions copyright [year] [name of copyright owner]".
+#
+# Copyright 2026 OSSTech Corporation
+#
+-->
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+ <Service name="iPlanetAMAuthAuthChainSwitchService" version="1.0">
+  <Schema
+   serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthAuthChainSwitchService"
+   i18nFileName="amAuthAuthChainSwitch" revisionNumber="10"
+   i18nKey="authchainswitch-service-description" resourceName="AuthChainSwitch">
+   <Organization>
+    <AttributeSchema name="iplanet-am-auth-authchainswitch-auth-level" resourceName="authLevel"
+     type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+     order="500" i18nKey="a500">
+     <DefaultValues>
+      <Value>0</Value>
+     </DefaultValues>
+    </AttributeSchema>
+
+    <AttributeSchema name="osstech-am-auth-attribute-name" resourceName="authswitchattributename"
+     type="single" syntax="string" validator="no" i18nKey="a501" order="300" />
+
+    <AttributeSchema name="osstech-am-auth-default-authchain-mapping" resourceName="authswitchdefaultmap"
+     type="single_choice" syntax="string" i18nKey="a502" order="316" >
+        <ChoiceValues>
+            <ChoiceValuesClassName
+                 className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+        </ChoiceValues>
+    </AttributeSchema>
+
+    <AttributeSchema name="osstech-am-auth-attrvalue-authchain-mapping"
+                     type="list"
+                     syntax="string"
+                     uitype="maplist"
+                     validator="MapValueValidator"
+                     resourceName="authswitchmap"
+                     i18nKey="a503"
+                     order="310">
+        <IsOptional/>
+        <ChoiceValues>
+            <ChoiceValuesClassName
+                 className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+        </ChoiceValues>
+    </AttributeSchema>
+
+    <AttributeSchema name="osstech-am-auth-mapping-value-nomatch-error"
+                     cosQualifier="default"
+                     type="single"
+                     syntax="boolean"
+                     i18nKey="a507"
+                     order="313"
+                     resourceName="authchainswitch-mapping-value-nomatch-error">
+        <BooleanValues>
+            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+        </BooleanValues>
+        <DefaultValues>
+            <Value>true</Value>
+        </DefaultValues>
+    </AttributeSchema>
+
+    <AttributeSchema name="osstech-am-auth-session-upgrade-empty-allow"
+                     cosQualifier="default"
+                     type="single"
+                     syntax="boolean"
+                     i18nKey="a504"
+                     order="320"
+                     resourceName="authchainswitchupgradeallow">
+        <BooleanValues>
+            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+        </BooleanValues>
+        <DefaultValues>
+            <Value>false</Value>
+        </DefaultValues>
+    </AttributeSchema>
+
+    <AttributeSchema name="osstech-am-auth-cookie-name" resourceName="authswitchcookiename"
+     type="single" syntax="string" validator="no" i18nKey="a505" order="330" >
+        <DefaultValues>
+            <Value>authchainswitchchoice</Value>
+        </DefaultValues>
+    </AttributeSchema>
+
+    <AttributeSchema name="osstech-am-auth-cookie-max-age" resourceName="authswitchcookiemaxage"
+     type="single" syntax="number_range" rangeStart="0" rangeEnd="10000"
+     order="340" i18nKey="a506">
+        <DefaultValues>
+            <Value>30</Value>
+        </DefaultValues>
+    </AttributeSchema>
+
+    <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+     <AttributeSchema name="iplanet-am-auth-authchainswitch-auth-level" resourceName="authLevel"
+      type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+      order="500" i18nKey="a500">
+      <DefaultValues>
+       <Value>0</Value>
+      </DefaultValues>
+     </AttributeSchema>
+
+     <AttributeSchema name="osstech-am-auth-attribute-name" resourceName="authswitchattributename"
+      type="single" syntax="string" validator="no" i18nKey="a501" order="300" />
+
+    <AttributeSchema name="osstech-am-auth-default-authchain-mapping" resourceName="authswitchdefaultmap"
+      type="single_choice" syntax="string" i18nKey="a502" order="316" >
+        <ChoiceValues>
+            <ChoiceValuesClassName
+                 className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+        </ChoiceValues>
+    </AttributeSchema>
+
+     <AttributeSchema name="osstech-am-auth-attrvalue-authchain-mapping"
+                      type="list"
+                      syntax="string"
+                      uitype="maplist"
+                      validator="MapValueValidator"
+                      resourceName="authswitchmap"
+                      i18nKey="a503"
+                      order="310">
+         <IsOptional/>
+         <ChoiceValues>
+             <ChoiceValuesClassName
+                  className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+         </ChoiceValues>
+     </AttributeSchema>
+     <AttributeSchema name="osstech-am-auth-mapping-value-nomatch-error"
+                      cosQualifier="default"
+                      type="single"
+                      syntax="boolean"
+                      i18nKey="a507"
+                      order="313"
+                      resourceName="authchainswitch-mapping-value-nomatch-error">
+         <BooleanValues>
+             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+         </BooleanValues>
+         <DefaultValues>
+             <Value>true</Value>
+         </DefaultValues>
+     </AttributeSchema>
+     <AttributeSchema name="osstech-am-auth-session-upgrade-empty-allow"
+                      cosQualifier="default"
+                      type="single"
+                      syntax="boolean"
+                      i18nKey="a504"
+                      order="320"
+                      resourceName="authchainswitchupgradeallow">
+         <BooleanValues>
+             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+         </BooleanValues>
+         <DefaultValues>
+             <Value>false</Value>
+         </DefaultValues>
+     </AttributeSchema>
+     <AttributeSchema name="osstech-am-auth-cookie-name" resourceName="authswitchcookiename"
+      type="single" syntax="string" validator="no" i18nKey="a505" order="330" >
+         <DefaultValues>
+             <Value>authchainswitchchoice</Value>
+         </DefaultValues>
+     </AttributeSchema>
+     <AttributeSchema name="osstech-am-auth-cookie-max-age" resourceName="authswitchcookiemaxage"
+      type="single" syntax="number_range" rangeStart="0" rangeEnd="10000"
+      order="340" i18nKey="a506">
+         <DefaultValues>
+             <Value>30</Value>
+         </DefaultValues>
+     </AttributeSchema>
+    </SubSchema>
+   </Organization>
+  </Schema>
+ </Service>
+</ServicesConfiguration>

@@ -435,6 +435,14 @@ define([
             } else if (!pollingInProgress) {
                 // Attempt to load a stage-specific template to render this form.  If not found, use the generic one.
                 template = `templates/openam/authn/${reqs.stage}.html`;
+                // If reqs.template is HTML, use it with priority.
+                if (reqs.template) {
+                    const htmlExt = ".html";
+                    const templateLen = reqs.template.length;
+                    if (reqs.template.substring(templateLen - htmlExt.length, templateLen) === htmlExt) {
+                        template = `templates/openam/authn/${reqs.template}`;
+                    }
+                }
                 UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
