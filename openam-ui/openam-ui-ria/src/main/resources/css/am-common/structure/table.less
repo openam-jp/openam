@@ -85,6 +85,19 @@
     &.table-hover > tbody > tr {
         cursor: pointer;
     }
+
+    /* Fix the table layout */
+    &.fixed-layout {
+        table-layout: fixed;
+    }
+
+    /* Breaks at word boundaries when possible, only breaking within words when necessary */
+    .wrap-text {
+        overflow: visible;
+        white-space: normal;
+        word-wrap: break-word;      /* Non-standard property for IE compatibility */
+        overflow-wrap: break-word;  /* Standard property that allows breaking within words */
+    }
 }
 
 .am-inline-edit-table {

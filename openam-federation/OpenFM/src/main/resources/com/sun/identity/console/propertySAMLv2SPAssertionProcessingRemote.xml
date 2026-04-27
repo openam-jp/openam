@@ -24,6 +24,8 @@
 
    $Id: propertySAMLv2SPAssertionProcessingRemote.xml,v 1.5 2008/07/24 17:53:51 babysunil Exp $
 
+   Portions Copyrighted 2026 OSSTech Corporation
+
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -49,6 +51,15 @@
                 </property>
             </ccgroup>
         </property>            
+    </section>
+    <section name="AttributeConsent" defaultValue="samlv2sp.attribute.label.spAttributeConsent" >
+        <property>
+            <label name="lblSPEnableAttributeConsent"
+                   defaultValue="samlv2sp.attribute.label.spEnableAttibuteConsent"
+                   labelFor="enableAttributeConsent" />
+            <cc name="enableAttributeConsent"
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+        </property>
     </section>
     <section name="ArtMsgEncoding" defaultValue="samlv2sp.attribute.label.spArtMsgEncoding" >
          <property>

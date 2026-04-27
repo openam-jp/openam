@@ -108,6 +108,9 @@ define([
                 context = `/${Constants.context}`;
             }
             redirectUrl = context + data.successURL;
+            if (Configuration.globalData.auth.forceConsent) {
+                redirectUrl += "&forceConsent=true";
+            }
             if (redirectUrl !== Constants.CONSOLE_PATH) {
                 gotoUrl.set(encodeURIComponent(redirectUrl));
             } else {

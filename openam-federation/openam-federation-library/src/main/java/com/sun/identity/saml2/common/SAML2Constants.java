@@ -25,7 +25,7 @@
  * $Id: SAML2Constants.java,v 1.44 2009/11/24 21:53:02 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2026 OSSTech Corporation
  */
 package com.sun.identity.saml2.common;
 
@@ -1632,11 +1632,15 @@ public interface SAML2Constants {
      */
     public static final String SP_DO_NOT_WRITE_FEDERATION_INFO = "spDoNotWriteFederationInfo";
 
+    public static final String SP_ENABLE_ATTRIBUTE_CONSENT = "enableAttributeConsent";
+
     /**
      * Flag to indicate that we do not want to write the federation info in the IdP's local User Data Store. This flag
      * is set in the local IdP extended metadata configuration.
      */
     String IDP_DISABLE_NAMEID_PERSISTENCE = "idpDisableNameIDPersistence";
+
+    public static final String IDP_CONSENT_REQUIRED_ATTRIBUTE = "consentRequiredAttribute";
 
     /**
      * Property to determine whether SAML SP Decryption Debug mode has been enabled.

@@ -103,6 +103,7 @@ module.exports = function (grunt) {
                     only: [
                         "main-authorize.js",
                         "main-device.js",
+                        "main-consent.js",
                         "main.js",
                         "config/**/*.js",
                         "org/forgerock/openam/**/*.js",

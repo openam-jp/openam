@@ -25,6 +25,7 @@
    $Id: propertySAMLv2IDPAssertionProcessingHosted.xml,v 1.5 2008/07/30 21:46:27 babysunil Exp $
 
    Portions Copyrighted 2012-2015 ForgeRock AS.
+   Portions Copyrighted 2026 OSSTech Corporation
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -66,7 +67,33 @@
             </ccgroup>
         </property>
     </section>
-    
+
+    <section name="AttributeConsent" defaultValue="samlv2idp.attribute.label.idpAttributeConsent" >
+        <property>
+            <ccgroup>
+                <property>
+                    <label name="lblIDPConsentRequiredAttribute"
+                           defaultValue="samlv2idp.attribute.label.idpConsentRequiredAttribute"
+                           labelFor="consentRequiredAttribute" />
+                    <ccgroup>
+                        <property>
+                            <cc name="consentRequiredAttribute"
+                                tagclass=
+                                "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                                <attribute name="name" value="list" />
+                                <attribute name="listboxLabel"
+                                           value="label.current.value" />
+                                <attribute name="textboxLabel"
+                                           value="label.new.value" />
+                            </cc>
+                            <fieldhelp name="helpIdpAttributeMap" defaultValue="samlv2idp.attribute.help.ConsentRequiredAttribute" />
+                        </property>
+                    </ccgroup>
+                </property>
+            </ccgroup>
+        </property>
+    </section>
+
     <section name="AccountMapper" defaultValue="samlv2idp.attribute.label.idpAccountMapper" >
         <property> 
             <ccgroup> 

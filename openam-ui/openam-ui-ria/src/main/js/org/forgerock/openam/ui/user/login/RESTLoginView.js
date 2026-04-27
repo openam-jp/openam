@@ -65,6 +65,8 @@ define([
         // and should not show on the upgrade session page
         this.data.showSocialLogin = firstUserNamePassStage && !Configuration.loggedUser &&
                                         !_.isEmpty(Configuration.globalData.socialImplementations);
+        this.data.showConsentAgain = firstUserNamePassStage &&
+                                        Configuration.globalData.auth.urlParams.askConsent === "true";
 
         if (Configuration.backgroundLogin) {
             this.prefillLoginData();
@@ -223,6 +225,14 @@ define([
                 );
             } else if (this.$el.find("[name=loginRemember]").length !== 0) {
                 CookieHelper.deleteCookie("login");
+            }
+
+            if (this.$el.find("[name=consentAgain]").length !== 0) {
+                if (this.$el.find("[name=consentAgain]:checked").length !== 0) {
+                    Configuration.globalData.auth.forceConsent = true;
+                } else {
+                    Configuration.globalData.auth.forceConsent = false;
+                }
             }
 
             // END CUSTOM STAGE-SPECIFIC LOGIC HERE

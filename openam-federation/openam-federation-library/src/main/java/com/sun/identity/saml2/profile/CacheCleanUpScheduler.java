@@ -25,6 +25,7 @@
  * $Id: CacheCleanUpScheduler.java,v 1.8 2009/05/14 17:23:44 exu Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.profile;
@@ -63,6 +64,7 @@ public class CacheCleanUpScheduler {
         pool.schedule(IDPCache.proxySPLogoutReqCache, nextRun);
         pool.schedule(IDPCache.SOAPMessageByLogoutRequestID, nextRun);
         pool.schedule(IDPCache.logoutResponseCache, nextRun);
+        pool.schedule(IDPCache.attributeConsentCache, nextRun);
         pool.schedule(new CacheCleanUpRunnable(SPCache.interval * 1000),
             nextRun);
     }

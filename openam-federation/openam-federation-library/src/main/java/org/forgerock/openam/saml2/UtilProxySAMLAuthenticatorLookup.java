@@ -12,10 +12,11 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
-* Portions Copyrighted 2017 Open Source Solution Technology Corporation.
+* Portions copyright 2017-2026 OSSTech Corporation
 */
 package org.forgerock.openam.saml2;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.multiprotocol.MultiProtocolUtils;
 import com.sun.identity.multiprotocol.SingleLogoutManager;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
@@ -40,12 +41,19 @@ import com.sun.identity.saml2.profile.ServerFaultException;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
 import com.sun.identity.saml2.protocol.Response;
+import com.sun.identity.sm.SMSException;
+
+import jp.co.osstech.openam.saml2.consent.AttributeConsentActorFactory;
+import jp.co.osstech.openam.saml2.consent.AttributeConsentStep;
+
 import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 
@@ -117,6 +125,28 @@ public class UtilProxySAMLAuthenticatorLookup extends SAMLBase implements SAMLAu
             return;
         }
         // End of block for IDP Adapter invocation
+
+        try {
+            AttributeConsentActorFactory factory = new AttributeConsentActorFactory();
+            String realm = data.getRealm();
+            String idpEntityId = data.getIdpEntityID();
+            String spEntityId = data.getSpEntityID();
+            if (spEntityId == null) {
+                if (data.getAuthnRequest() == null) {
+                    authNotAvailable();
+                    return;
+                }
+                spEntityId = data.getAuthnRequest().getIssuer().getValue();
+            }
+            AttributeConsentStep consentStep = factory.getConsentStep(realm, idpEntityId, spEntityId);
+            if (consentStep.needRedirectToConsentPage(data, request)) {
+                consentStep.redirectToConsentPage(data, request, response);
+                return;
+            }
+        } catch (SAML2Exception | IOException | SSOException | SMSException e) {
+            SAML2Utils.debug.error(classMethod + "Unable to redirect to attribute consent page.", e);
+            throw new ServerFaultException(data.getIdpAdapter(), SSO_OR_FEDERATION_ERROR, e.getMessage());
+        }
 
         synchronized (IDPCache.authnRequestCache) {
             cacheObj = (CacheObject) IDPCache.authnRequestCache.remove(data.getRequestID());

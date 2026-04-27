@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -90,6 +90,7 @@ define([
                     "partials/login/_Password.html",
                     "partials/login/_Redirect.html",
                     "partials/login/_RememberLogin.html",
+                    "partials/login/_ConsentAgain.html",
                     "partials/login/_ScriptTextOutput.html",
                     "partials/login/_SelfService.html",
                     "partials/login/_SocialAuthn.html",

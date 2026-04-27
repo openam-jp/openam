@@ -1,0 +1,23 @@
+{
+    "common": {
+        "form": {
+            "copyright": "",
+            "build": "Build"
+        }
+    },
+    "serviceName": "Service Name",
+    "form": {
+        "title": "Released Information",
+        "description": "If you agree, above information will be sent to the service. Do you agree to send the information to the service when you access?",
+        "button": {
+            "agree": "Accept",
+            "disagree": "Reject"
+        },
+        "choice": {
+            "askAgain": "Ask again in next access.",
+            "askIfChange": "Ask if released information is changed.",
+            "askNever": "Accept to send all information to any service, and don't show this page never."
+        }
+    },
+    "rejected": "Information is rejected to be sent."
+}

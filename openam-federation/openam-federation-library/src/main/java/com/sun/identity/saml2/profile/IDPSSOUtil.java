@@ -26,13 +26,14 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
- * Portions Copyrighted 2025 OSSTech Corporation
+ * Portions Copyrighted 2025-2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.profile;
 
 import static org.forgerock.openam.utils.Time.*;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.NameIDInfo;
 import com.sun.identity.saml2.common.NewBoolean;
@@ -104,6 +105,11 @@ import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
+import com.sun.identity.sm.SMSException;
+
+import jp.co.osstech.openam.saml2.consent.AttributeConsentActorFactory;
+import jp.co.osstech.openam.saml2.consent.AttributeConsentStep;
+
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
 import org.forgerock.openam.utils.ClientUtils;
@@ -365,6 +371,17 @@ public class IDPSSOUtil {
                     + "the preSendResponse of the IDP Adapter: ", se2);
         }
         // End of invocation
+
+        AttributeConsentActorFactory factory = new AttributeConsentActorFactory();
+        try {
+            AttributeConsentStep consentStep = factory.getConsentStep(realm, idpEntityID, spEntityID);
+            if (consentStep.needRedirectToConsentPage(request)) {
+                consentStep.redirectToConsentPage(null, request, response);
+                return;
+            }
+        } catch (SSOException | ServerFaultException | SMSException | IOException | SessionException e) {
+            throw new SAML2Exception(e);
+        }
 
         sendResponseToACS(request, response, out, session, authnReq, spEntityID,
                 idpEntityID, idpMetaAlias, realm, nameIDFormat, relayState, null);
@@ -1299,7 +1316,7 @@ public class IDPSSOUtil {
      * @return the <code>IDPAttributeMapper</code>
      * @throws SAML2Exception if the operation is not successful
      */
-    static IDPAttributeMapper getIDPAttributeMapper(
+    public static IDPAttributeMapper getIDPAttributeMapper(
             String realm, String idpEntityID)
             throws SAML2Exception {
         String classMethod = "IDPSSOUtil.getIDPAttributeMapper: ";
@@ -2424,6 +2441,17 @@ public class IDPSSOUtil {
             SAML2Utils.debug.message(classMethod +
                     "New URL for authentication: " + newURL.toString());
         }
+
+        AttributeConsentActorFactory factory = new AttributeConsentActorFactory();
+        try {
+            AttributeConsentStep consentStep = factory.getConsentStep(realm, idpEntityID, spEntityID);
+            if (consentStep.showConsentCheckbox()) {
+                newURL.append("&askConsent=true");
+            }
+        } catch (SSOException | ServerFaultException | SMSException e) {
+            throw new SAML2Exception(e);
+        }
+
         // TODO: here we should check if the new URL is one
         //       the same web container, if yes, forward,
         //       if not, redirect

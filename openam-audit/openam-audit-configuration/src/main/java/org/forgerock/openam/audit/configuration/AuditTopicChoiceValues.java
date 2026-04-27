@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -34,6 +35,7 @@ public class AuditTopicChoiceValues extends ChoiceValues {
         AUDIT_TOPICS.put("activity", "audit.topic.activity");
         AUDIT_TOPICS.put("authentication", "audit.topic.authentication");
         AUDIT_TOPICS.put("config", "audit.topic.config");
+        AUDIT_TOPICS.put("saml2consent", "audit.topic.saml2consent");
     }
 
     @Override
