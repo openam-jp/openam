@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.console.federation.model;
@@ -169,6 +170,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         //RelayState URL List
         extendedMetaIdpMap.put(ATTR_RELAY_STATE_IDP_URL_LIST,
                 Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(IDP_CONSENT_REQUIRED_ATTRIBUTE, Collections.EMPTY_SET);
     }
     
     //extended metadata attributes for sp only
@@ -247,6 +249,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         // Do Not Write Federation Info Feature
         extendedMetaSpMap.put(ATTR_DO_NOT_WRITE_FEDERATION_INFO,
                 Collections.EMPTY_SET);
+        extendedMetaSpMap.put(SP_ENABLE_ATTRIBUTE_CONSENT, Collections.emptySet());
     }
     
     //extended Assertion Content metadata attributes for idp only    
@@ -287,6 +290,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedAPMetaIdpMap.put(AUTH_URL, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(RP_URL, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(APP_LOGOUT_URL, Collections.EMPTY_SET);
+        extendedAPMetaIdpMap.put(IDP_CONSENT_REQUIRED_ATTRIBUTE, Collections.EMPTY_SET);
     }
     
     //extended Services metadata attributes for idp only    
@@ -360,6 +364,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
        extendedAPMetaSpMap.put(ATTR_SP_ADAPTER, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(ATTR_SP_ADAPTER_ENV, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(ARTI_MSG_ENCODE, Collections.EMPTY_SET);
+       extendedAPMetaSpMap.put(SP_ENABLE_ATTRIBUTE_CONSENT, Collections.emptySet());
        // extendedAPMetaSpMap.put(ATTR_DO_NOT_WRITE_FEDERATION_INFO, Collections.EMPTY_SET);
     }
     

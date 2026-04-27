@@ -1,0 +1,46 @@
+{
+    "saml2consent": {
+        "schema": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "id": "/",
+            "type": "object",
+            "properties": {
+                "timestamp": {
+                    "description": "org.forgerock.audit.events.access.timestamp",
+                    "type": "string"
+                },
+                "eventName": {
+                    "description": "org.forgerock.audit.events.access.eventName",
+                    "type": "string"
+                },
+                "transactionId": {
+                    "description": "org.forgerock.audit.events.access.transactionId",
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "org.forgerock.audit.events.access.userId",
+                    "type": "string"
+                },
+                "realm": {
+                    "type": "string"
+                },
+                "idp": {
+                    "type": "string"
+                },
+                "sp": {
+                    "type": "string"
+                },
+                "attributes": {
+                    "type": "array",
+                    "items": {
+                        "id": "0",
+                        "type": "string"
+                    }
+                },
+                "consentType": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

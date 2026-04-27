@@ -25,12 +25,14 @@
  * $Id: SAMLv2Model.java,v 1.34 2009/11/24 21:48:40 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.console.federation.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.federation.SAMLv2AuthContexts;
+import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
 import java.util.List;
 import java.util.Map;
@@ -206,6 +208,7 @@ public interface SAMLv2Model
     public static final String SP_USE_NAMEID = "useNameIDAsSPUserID";
     public static final String SP_AUTHN_CONTEXT_MAPPER = "spAuthncontextMapper";
     public static final String SP_ATTR_MAPPER = "spAttributeMapper";
+    public static final String SP_ENABLE_ATTRIBUTE_CONSENT = SAML2Constants.SP_ENABLE_ATTRIBUTE_CONSENT;
     public static final String SP_AUTHN_CONTEXT_CLASS_REF_MAPPING_DEFAULT=
         "spDefaultAuthnContext";
     public static final String SP_AUTHN_CONTEXT_CLASS_REF_MAPPING =
@@ -278,6 +281,8 @@ public interface SAMLv2Model
 
      // SAMLv2 Service Provider Do not Write Federation Info Feature
      public static final String ATTR_DO_NOT_WRITE_FEDERATION_INFO = "spDoNotWriteFederationInfo";
+
+     public static final String IDP_CONSENT_REQUIRED_ATTRIBUTE = SAML2Constants.IDP_CONSENT_REQUIRED_ATTRIBUTE;
 
      //SAML AUTHORITY
      public static final String ATTR_SEFVICE_DEFAULT_LOCATION = 

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -164,6 +164,15 @@ public class AuditServiceConfigurationProviderImpl implements AuditServiceConfig
             builder.withCoreTopicSchemaExtensions(JsonValueBuilder.toJsonValue(contents.replaceAll("\\s", "")));
         } catch (IOException e) {
             debug.error("Unable to read Audit event configuration file {}", path, e);
+        }
+
+        String additionalConfigJSONPath = "/org/forgerock/openam/audit/custom-config.json";
+        try {
+            InputStream is = AMAuditService.class.getResourceAsStream(additionalConfigJSONPath);
+            String contents = IOUtils.readStream(is);
+            builder.withAdditionalTopicSchemas(JsonValueBuilder.toJsonValue(contents.replaceAll("\\s", "")));
+        } catch (IOException e) {
+            debug.error("Unable to read Audit event configuration file {}", additionalConfigJSONPath, e);
         }
 
         return builder.build();

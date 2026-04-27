@@ -25,6 +25,7 @@
  * $Id: IDPCache.java,v 1.18 2009/05/14 17:23:45 exu Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.saml2.profile;
 
@@ -283,6 +284,15 @@ public class IDPCache {
      *     attribute name as Value.
      */
     public static final Map<String, Map<String, String>> formatAttributeHash = new Hashtable<>();
+
+    /**
+     * Cache saves the <code>AttributeConsentCache</code> objects.
+     * Key : consent ID String
+     * Value : <code>AttributeConsentCache</code> object
+     * from cleanup interval
+     */
+    public static PeriodicCleanUpMap attributeConsentCache = new PeriodicCleanUpMap(
+            SPCache.interval * 1000, SPCache.interval * 1000);
 
     /**
      * Clears the authn context mapping hash tables.

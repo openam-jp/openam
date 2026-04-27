@@ -680,6 +680,11 @@
             </dependency>
             <dependency>
                 <groupId>jp.openam</groupId>
+                <artifactId>openam-federation-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jp.openam</groupId>
                 <artifactId>openam-example-clientsdk-cli</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>

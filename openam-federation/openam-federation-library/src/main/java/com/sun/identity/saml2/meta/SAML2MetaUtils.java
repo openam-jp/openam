@@ -25,6 +25,7 @@
  * $Id: SAML2MetaUtils.java,v 1.9 2009/09/21 17:28:12 exu Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.saml2.meta;
 
@@ -83,7 +84,8 @@ public final class SAML2MetaUtils {
         "com.sun.identity.saml2.jaxb.metadata:" +
 	"com.sun.identity.saml2.jaxb.metadataattr:" +
         "com.sun.identity.saml2.jaxb.entityconfig:" +
-        "com.sun.identity.saml2.jaxb.schema";
+        "com.sun.identity.saml2.jaxb.schema:" +
+        "com.sun.identity.saml2.jaxb.metadataui";
     private static final String JAXB_PACKAGE_LIST_PROP =
         "com.sun.identity.liberty.ws.jaxb.packageList";
     private static JAXBContext jaxbContext = null;

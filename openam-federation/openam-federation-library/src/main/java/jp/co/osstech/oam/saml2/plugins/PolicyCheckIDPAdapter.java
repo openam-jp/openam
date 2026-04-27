@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2019 Open Source Solution Technology Corporation
+ * Copyright (c) 2019-2026 OSSTech Corporation
  * All Rights Reserved.
  *
  * The contents of this file are subject to the terms
@@ -50,6 +50,9 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.sm.DNMapper;
+
+import jp.co.osstech.openam.saml2.consent.AttributeConsentStep;
+
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.HashMap;
@@ -300,6 +303,12 @@ public class PolicyCheckIDPAdapter implements SAML2IdentityProviderAdapter {
                 .append(ACS_URL).append('=').append(URLEncDec.encode(authnRequest.getAssertionConsumerServiceURL())).append('&')
                 .append(SP_ENTITY_ID).append('=').append(URLEncDec.encode(authnRequest.getIssuer().getValue())).append('&')
                 .append(BINDING).append('=').append(URLEncDec.encode(authnRequest.getProtocolBinding()));
+
+        boolean forceConsent = Boolean
+                .parseBoolean(request.getParameter(AttributeConsentStep.REQUEST_PARAM_FORCE_CONSENT));
+        if (forceConsent) {
+            gotoURL.append("&").append(AttributeConsentStep.REQUEST_PARAM_FORCE_CONSENT).append("=true");
+        }
 
         authURL.append(URLEncDec.encode(gotoURL.toString()));
         SAML2Utils.debug.message("{} New URL for authentication: {}", classMethod, authURL.toString());

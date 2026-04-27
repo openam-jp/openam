@@ -143,6 +143,7 @@
             },
             "LoginTemplate" : {
                 "loginRemember" : "ユーザー名を記憶する。",
+                "forceConsent" : "属性送信の同意画面を表示する",
                 "noAccountQuestion" : "アカウントを持っていないですか?",
                 "registerAccount" : "アカウントを登録してください。",
                 "problemLoggingQuestion" : "ログインのトラブルがありますか?",
