@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.common;
@@ -75,4 +76,11 @@ public interface AMLoginModuleBinder {
      * @throws AuthLoginException If the user session is invalid.
      */
     void setUserSessionProperty(String name, String value) throws AuthLoginException;
+
+    /**
+     * Returns JAAS shared state user key.
+     *
+     * @return user key.
+     */
+    String getUserKey();
 }
