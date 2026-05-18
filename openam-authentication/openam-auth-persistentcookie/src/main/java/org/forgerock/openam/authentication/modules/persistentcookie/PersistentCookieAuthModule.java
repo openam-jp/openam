@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyright 2026 OSSTech Corporation
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
