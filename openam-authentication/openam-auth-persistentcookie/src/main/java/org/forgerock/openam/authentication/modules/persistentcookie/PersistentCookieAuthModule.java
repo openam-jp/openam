@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -44,15 +45,20 @@ import org.forgerock.openam.utils.ClientUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -78,12 +84,15 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
     private static final String COOKIE_NAME_KEY = "openam-auth-persistent-cookie-name";
     private static final String COOKIE_DOMAINS_KEY = "openam-auth-persistent-cookie-domains";
     private static final String HMAC_KEY = "openam-auth-persistent-cookie-hmac-key";
+    private static final String DELETE_COOKIE_LOGOUT_KEY = "openam-auth-persistent-cookie-delete-cookie-logout";
+    private static final String CHECK_USER_KEY = "openam-auth-persistent-cookie-check-user";
 
     private static final String OPENAM_USER_CLAIM_KEY = "openam.usr";
     private static final String OPENAM_AUTH_TYPE_CLAIM_KEY = "openam.aty";
     private static final String OPENAM_SESSION_ID_CLAIM_KEY = "openam.sid";
     private static final String OPENAM_REALM_CLAIM_KEY = "openam.rlm";
     private static final String OPENAM_CLIENT_IP_CLAIM_KEY = "openam.clientip";
+    private static final String OPENAM_USER_UNIVERSALID_KEY = "openam.universalid";
 
     private final AMKeyProvider amKeyProvider;
     private final CoreWrapper coreWrapper;
@@ -96,6 +105,9 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
     private String cookieName;
     private Collection<String> cookieDomains;
     private String encryptedHmacKey;
+    private boolean deleteCookieLogout;
+    private boolean checkUser;
+    private String universalId = null;
 
     private Principal principal;
 
@@ -153,6 +165,17 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
         cookieName = CollectionHelper.getMapAttr(options, COOKIE_NAME_KEY);
         cookieDomains = coreWrapper.getCookieDomainsForRequest(getHttpServletRequest());
         String hmacKey = CollectionHelper.getMapAttr(options, HMAC_KEY);
+        deleteCookieLogout = CollectionHelper.getBooleanMapAttr(options, DELETE_COOKIE_LOGOUT_KEY, true);
+        checkUser = CollectionHelper.getBooleanMapAttr(options, CHECK_USER_KEY, false);
+        if (checkUser) {
+            try {
+                checkForSessionAndGetUniversalId((String) sharedState.get(getUserKey()));
+            } catch (AuthLoginException e) {
+                DEBUG.message("PersistentcookieAuthModule.initialize() : Unable to get universalId ", e);
+            } catch (SSOException e) {
+                DEBUG.message("PersistentcookieAuthModule.initialize() : Unable to get universalId ", e);
+            }
+        }
 
         // As this key will need to be passed via session properties to the post-authentication plugin, we encrypt it
         // here to avoid it being accidentally exposed.
@@ -224,6 +247,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
             setUserSessionProperty(ENFORCE_CLIENT_IP_SETTING_KEY, Boolean.toString(enforceClientIP));
             setUserSessionProperty(SECURE_COOKIE_KEY, Boolean.toString(secureCookie));
             setUserSessionProperty(HTTP_ONLY_COOKIE_KEY, Boolean.toString(httpOnlyCookie));
+            setUserSessionProperty(DELETE_COOKIE_LOGOUT_KEY, Boolean.toString(deleteCookieLogout));
             if (cookieName != null) {
                 setUserSessionProperty(COOKIE_NAME_KEY, cookieName);
             }
@@ -287,6 +311,9 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
 
             // Need to get user from jwt to use in Principal
             final String username = (String) claimsSetContext.get(OPENAM_USER_CLAIM_KEY);
+            if (checkUser) {
+                checkUser((String) claimsSetContext.get(OPENAM_USER_UNIVERSALID_KEY));
+            }
             principal = new Principal() {
                 public String getName() {
                     return username;
@@ -319,6 +346,20 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
             throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedClientIPDifferent", null);
         }
         // client IP is valid
+    }
+
+    private void checkUser(final String storedUniversalId) throws AuthLoginException {
+        DEBUG.message("Check the equality of universalId: [" + storedUniversalId + "] [" + universalId +"]");
+        if (storedUniversalId == null || storedUniversalId.isEmpty()) {
+            DEBUG.error("universalId not stored when persistent cookie was issued.");
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedUserDifferent", null);
+        } else if (universalId == null || universalId.isEmpty()) {
+            DEBUG.error("universalId could not be retrieved from sharedState or session.");
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedUserDifferent", null);
+        } else if (!storedUniversalId.equals(universalId)) {
+            DEBUG.error("universalId not the same, cookie value: " + storedUniversalId);
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedUserDifferent", null);
+        }
     }
 
     /**
@@ -395,6 +436,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
             contextMap.put(OPENAM_SESSION_ID_CLAIM_KEY, ssoToken.getTokenID().toString());
             contextMap.put(OPENAM_REALM_CLAIM_KEY, ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY));
             contextMap.put(OPENAM_CLIENT_IP_CLAIM_KEY, ClientUtils.getClientIPAddress(request));
+            contextMap.put(OPENAM_USER_UNIVERSALID_KEY, ssoToken.getProperty(Constants.UNIVERSAL_IDENTIFIER));
 
             String jwtString = ssoToken.getProperty(JwtSessionModule.JWT_VALIDATED_KEY);
             if (jwtString != null) {
@@ -430,12 +472,18 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
     @Override
     public void onLogout(HttpServletRequest request, HttpServletResponse response, SSOToken ssoToken) {
         try {
+            if (!Boolean.parseBoolean(ssoToken.getProperty(DELETE_COOKIE_LOGOUT_KEY))) {
+                DEBUG.message("Persistent cookie not delete on logout.");
+                return;
+            }
             Map<String, Object> config = initialize(null, request, response, ssoToken);
             // The HMAC signing key will be null on logout, but this is rejected by the commons auth module, so
             // replace with a dummy value here. It is not used.
             config.put(JwtSessionModule.HMAC_SIGNING_KEY, Base64.encode(new byte[32]));
             getServerAuthModule().initialize(createRequestMessagePolicy(), null, null, config);
             getServerAuthModule().deleteSessionJwtCookie(prepareMessageInfo(null, response));
+        } catch (SSOException e) {
+            DEBUG.error("Failed to initialise the underlying JASPI Server Auth Module.", e);
         } catch (AuthenticationException e) {
             DEBUG.error("Failed to initialise the underlying JASPI Server Auth Module.", e);
         } catch (AuthException e) {
@@ -461,5 +509,33 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<ServletJw
         String keyAlias = CollectionHelper.getMapAttr(orgConfig.getAttributes(), AUTH_KEY_ALIAS);
 
         return keyAlias;
+    }
+
+    private void checkForSessionAndGetUniversalId(String name) throws SSOException, AuthLoginException {
+        if (StringUtils.isEmpty(name)) {
+            // session upgrade case. Need to find the user ID from the old
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            SSOToken token = mgr.createSSOToken(getHttpServletRequest());
+            if (token == null) {
+                throw new AuthLoginException("amAuth", "noInternalSession", null);
+            }
+            // token.getPrincipal().getName();
+            universalId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("PersistentcookieAuthModule.checkForSessionAndGetUniversalId() :"
+                               + " universalId from SSOToken : " + universalId);
+            }
+        } else {
+            String realm = DNMapper.orgNameToRealmName(getRequestOrg());
+            AMIdentity id = IdUtils.getIdentity(name, realm);
+            if (id == null){
+                throw new AuthLoginException("amAuth", "noUserName", null);
+            }
+            universalId = id.getUniversalId();
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("PersistentcookieAuthModule.checkForSessionAndGetUniversalId() :"
+                               + " universalId from shardState : " + universalId);
+            }
+        }
     }
 }
