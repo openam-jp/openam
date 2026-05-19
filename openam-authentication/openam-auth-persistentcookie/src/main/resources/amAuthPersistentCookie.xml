@@ -12,6 +12,7 @@
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
   ~ Copyright 2013-2016 ForgeRock AS.
+  ~ Portions copyright 2026 OSSTech Corporation
   -->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
         "jar://com/sun/identity/sm/sms.dtd">
@@ -86,6 +87,37 @@
                         <Value>@256_BIT_RANDOM_SECURE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-persistent-cookie-name"
+                        cosQualifier="default" type="single"
+                        syntax="string" i18nKey="a007" order="700" resourceName="persistentCookieName">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-delete-cookie-logout"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a008" order="800" resourceName="deleteCookieLogout">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-check-user"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a009" order="900" resourceName="checkUser">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-idle-time"
@@ -146,6 +178,37 @@
                         order="600" resourceName="hmacKey">
                         <DefaultValues>
                             <Value>@256_BIT_RANDOM_SECURE@</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-persistent-cookie-name"
+                            cosQualifier="default" type="single"
+                            syntax="string" i18nKey="a007" order="700" resourceName="persistentCookieName">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-delete-cookie-logout"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a008" order="800" resourceName="deleteCookieLogout">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-check-user"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a009" order="900" resourceName="checkUser">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
