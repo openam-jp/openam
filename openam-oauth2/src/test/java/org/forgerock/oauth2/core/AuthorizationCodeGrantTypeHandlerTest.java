@@ -14,6 +14,7 @@
  * Copyright 2014-2016 ForgeRock AS.
  *
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.oauth2.core;
@@ -24,6 +25,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,6 +36,8 @@ import java.util.Set;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.util.encode.Base64url;
 import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -50,6 +55,8 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     private TokenInvalidator tokenInvalidator;
     private OAuth2ProviderSettings providerSettings;
     private OAuth2Uris uris;
+    private OAuth2Request request;
+    private ClientRegistration clientRegistration;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -70,17 +77,21 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         providerSettings = mock(OAuth2ProviderSettings.class);
         given(providerSettingsFactory.get(ArgumentMatchers.<OAuth2Request>any())).willReturn(providerSettings);
 
+        clientRegistration = mock(ClientRegistration.class);
+        given(clientAuthenticator.authenticate(ArgumentMatchers.<OAuth2Request>any(), eq("Token Endpoint"))).willReturn(clientRegistration);
+
         uris = mock(OAuth2Uris.class);
+        given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
         given(urisFactory.get(any(OAuth2Request.class))).willReturn(uris);
+
+        request = mock(OAuth2Request.class);
     }
 
     @Test (expectedExceptions = InvalidRequestException.class)
     public void handleShouldThrowInvalidRequestExceptionWhenAuthorizationCodeNotFound() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = null;
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
@@ -99,9 +110,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
@@ -124,9 +133,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     public void handleShouldThrowInvalidGrantExceptionWhenRedirectUriDontMatch() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
@@ -147,9 +154,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     public void handleShouldThrowInvalidGrantExceptionWhenClientDoesNotMatch() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
@@ -172,9 +177,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     public void handleShouldThrowInvalidGrantExceptionWhenAuthorizationCodeHasExpired() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
         given(uris.getTokenEndpoint()).willReturn("Token Endpoint");
@@ -198,9 +201,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     public void shouldHandleAndIssueRefreshToken() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         RefreshToken refreshToken = mock(RefreshToken.class);
         AccessToken accessToken = mock(AccessToken.class);
@@ -242,9 +243,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     public void shouldHandle() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         AccessToken accessToken = mock(AccessToken.class);
         Set<String> validatedScope = new HashSet<String>();
@@ -283,9 +282,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     public void shouldHandleAndIncludeScopeInAccessToken() throws Exception {
 
         //Given
-        OAuth2Request request = mock(OAuth2Request.class);
         given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         AccessToken accessToken = mock(AccessToken.class);
         Set<String> validatedScope = Collections.singleton("SCOPE");
@@ -317,6 +314,108 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
         verify(accessToken).addExtraData(eq("scope"), nullable(String.class));
         assertEquals(actualAccessToken, accessToken);
+    }
+
+    /**
+     * RFC 7636 §4.6: when the authorization code was issued with a code_challenge, the token
+     * endpoint must reject a request that omits code_verifier, even if the realm-wide and
+     * client-level enforcement settings are both disabled (the default).
+     */
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void handleShouldThrowInvalidRequestExceptionWhenCodeIssuedWithChallengeButVerifierMissing()
+            throws Exception {
+
+        //Given
+        given(request.getParameter("code")).willReturn("abc123");
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
+        given(authorizationCode.getCodeChallenge()).willReturn("CHALLENGE");
+        // enforcement settings remain disabled (default mock return value of false)
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn(null);
+
+        //When
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidRequestException
+    }
+
+    /**
+     * When the code carries a code_challenge but the supplied code_verifier does not match, the
+     * request must be rejected with InvalidGrantException.
+     */
+    @Test (expectedExceptions = InvalidGrantException.class)
+    public void handleShouldThrowInvalidGrantExceptionWhenCodeVerifierIncorrect() throws Exception {
+
+        //Given
+        given(request.getParameter("code")).willReturn("abc123");
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
+        given(authorizationCode.isIssued()).willReturn(false);
+        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
+        given(authorizationCode.getCodeChallenge()).willReturn(s256("CORRECT_VERIFIER"));
+        given(authorizationCode.getCodeChallengeMethod())
+                .willReturn(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("WRONG_VERIFIER");
+
+        //When
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidGrantException
+    }
+
+    /**
+     * When the code carries a code_challenge and the correct code_verifier is supplied, the token
+     * is issued even though the enforcement settings are disabled.
+     */
+    @Test
+    public void shouldHandleWhenCodeVerifierMatchesChallenge() throws Exception {
+
+        //Given
+        given(request.getParameter("code")).willReturn("abc123");
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        AccessToken accessToken = mock(AccessToken.class);
+        Set<String> validatedScope = new HashSet<String>();
+
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
+        given(authorizationCode.isIssued()).willReturn(false);
+        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
+        given(authorizationCode.getResourceOwnerId()).willReturn("USERNAME");
+        given(authorizationCode.getRealm()).willReturn("/");
+        given(authorizationCode.getCodeChallenge()).willReturn(s256("CORRECT_VERIFIER"));
+        given(authorizationCode.getCodeChallengeMethod())
+                .willReturn(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("CORRECT_VERIFIER");
+        given(providerSettings.issueRefreshTokens()).willReturn(false);
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class), nullable(String.class),
+                ArgumentMatchers.<String>anySet(), ArgumentMatchers.<RefreshToken>any(), nullable(String.class), nullable(String.class), eq(request)))
+                .willReturn(accessToken);
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(), eq(request)))
+                .willReturn(validatedScope);
+
+        //When
+        AccessToken actualAccessToken = grantTypeHandler.handle(request);
+
+        //Then
+        verify(authorizationCode).setIssued();
+        verify(tokenStore).updateAuthorizationCode(request, authorizationCode);
+        assertEquals(actualAccessToken, accessToken);
+    }
+
+    private static String s256(String codeVerifier) throws Exception {
+        return Base64url.encode(MessageDigest.getInstance("SHA-256")
+                .digest(codeVerifier.getBytes(StandardCharsets.US_ASCII)));
     }
 
     private static class Holder {
