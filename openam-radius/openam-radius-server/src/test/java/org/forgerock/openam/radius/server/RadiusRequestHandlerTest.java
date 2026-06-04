@@ -12,9 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
- */
-/*
  * Portions copyright 2015 ForgeRock AS
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.radius.server;
@@ -66,7 +65,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
+        String url = "127.0.0.1";
         InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
@@ -102,7 +101,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
+        String url = "127.0.0.1";
         InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
@@ -139,7 +138,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
+        String url = "127.0.0.1";
         InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
