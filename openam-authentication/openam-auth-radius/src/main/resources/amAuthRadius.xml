@@ -26,9 +26,9 @@
 
     $Id: amAuthRadius.xml,v 1.2 2008/06/25 05:45:41 qcheng Exp $
 
--->
-<!--
     Portions Copyrighted 2011-2015 ForgeRock AS.
+    Portions Copyrighted 2026 3A Systems LLC.
+    Portions Copyrighted 2026 OSSTech Corporation
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -39,7 +39,7 @@
         <Schema
             serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthRadiusService"
             i18nFileName="amAuthRadius"
-	        revisionNumber="30"
+	        revisionNumber="31"
             i18nKey="iplanet-am-auth-radius-service-description"
             resourceName="radius">
 
@@ -113,6 +113,20 @@
                         <Value>5</Value>
 		    </DefaultValues>
 		</AttributeSchema>
+	        <AttributeSchema name="openam-auth-radius-require-message-authenticator"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a107"
+                    order="700"
+                    resourceName="requireMessageAuthenticator">
+		    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+                        <Value>false</Value>
+		    </DefaultValues>
+		</AttributeSchema>
 		<SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-radius-server1"
                         type="list"
@@ -181,6 +195,20 @@
                         resourceName="healthCheckInterval">
 	            <DefaultValues>
                         <Value>5</Value>
+		    </DefaultValues>
+                    </AttributeSchema>
+	            <AttributeSchema name="openam-auth-radius-require-message-authenticator"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a107"
+                        order="700"
+                        resourceName="requireMessageAuthenticator">
+		    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+	            <DefaultValues>
+                        <Value>false</Value>
 		    </DefaultValues>
                     </AttributeSchema>
 		</SubSchema>
