@@ -32,11 +32,11 @@
 
     <groupId>jp.openam.examples</groupId>
     <artifactId>policy-evaluation-plugin</artifactId>
-    <version>14.0.3</version>
+    <version>14.0.4</version>
     <packaging>jar</packaging>
 
     <properties>
-        <openam.version>14.0.3</openam.version>
+        <openam.version>14.0.4</openam.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

@@ -24,7 +24,7 @@
     <parent>
         <groupId>jp.openam</groupId>
         <artifactId>openam-authentication</artifactId>
-        <version>14.0.3</version>
+        <version>14.0.4</version>
     </parent>
 
     <name>OpenAM Auth Device Id</name>
