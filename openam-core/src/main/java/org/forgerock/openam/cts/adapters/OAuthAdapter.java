@@ -12,6 +12,9 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Portions copyright 2026 3A Systems LLC.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -164,6 +167,9 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      */
     public JsonValue fromToken(Token token) {
         if (token == null){
+            return null;
+        }
+        if (!TokenType.OAUTH.equals(token.getType())) {
             return null;
         }
         String data = blobUtils.getBlobAsString(token);

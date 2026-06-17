@@ -12,22 +12,22 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.util.query.QueryFilter;
 
 import javax.inject.Inject;
@@ -138,7 +138,9 @@ public class OAuthTokenStore {
      * @throws CoreTokenException If there is a problem performing the query.
      */
     public JsonValue query(QueryFilter<CoreTokenField> query) throws CoreTokenException {
-        Collection<Token> tokens = cts.query(new TokenFilterBuilder().withQuery(query).build());
+        Collection<Token> tokens = cts.query(new TokenFilterBuilder()
+                .withQuery(QueryFilter.and(QueryFilter.equalTo(CoreTokenField.TOKEN_TYPE, TokenType.OAUTH), query))
+                .build());
         return convertResults(tokens);
     }
 
@@ -152,7 +154,10 @@ public class OAuthTokenStore {
         Set<Map<String, Object>> results = new HashSet<Map<String, Object>>();
 
         for (Token token : tokens) {
-            results.add(convertToken(token));
+            Map<String, Object> result = convertToken(token);
+            if (result != null) {
+                results.add(result);
+            }
         }
 
         return new JsonValue(results);
@@ -168,6 +173,10 @@ public class OAuthTokenStore {
         if (token == null){
             return null;
         }
-        return tokenAdapter.fromToken(token).asMap();
+        JsonValue value = tokenAdapter.fromToken(token);
+        if (value == null) {
+            return null;
+        }
+        return value.asMap();
     }
 }
