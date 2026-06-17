@@ -25,7 +25,7 @@
  * $Id: SessionRequestHandler.java,v 1.9 2009/04/02 04:11:44 ericow Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2021-2026 OSSTech Corporation
  */
 package com.iplanet.dpro.session.service;
 
@@ -33,7 +33,9 @@ import static org.forgerock.openam.audit.AuditConstants.Component.SESSION;
 import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 import static org.forgerock.openam.session.SessionConstants.TOKEN_RESTRICTION_PROP;
 
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -446,7 +448,8 @@ public class SessionRequestHandler implements RequestHandler {
                     break;
 
                 case SessionRequest.AddSessionListener:
-                    sessionService.addSessionListener(sid, req.getNotificationURL());
+                    sessionService.addSessionListener(this.clientToken, getRawRemoteAddress(servletRequest),
+                            sid, req.getNotificationURL());
                     break;
 
                 case SessionRequest.AddSessionListenerOnAllSessions:
@@ -518,6 +521,24 @@ public class SessionRequestHandler implements RequestHandler {
             throw se;
         } catch (Exception ex) {
             throw new SessionException(ex);
+        }
+    }
+
+    /**
+     * Returns the raw TCP peer address of the request, ignoring any
+     * {@code X-Forwarded-For}-style headers. Used for trust decisions that must not
+     * be influenced by spoofable HTTP headers.
+     *
+     * @return The peer {@link InetAddress}, or {@code null} if it cannot be resolved.
+     */
+    private static InetAddress getRawRemoteAddress(HttpServletRequest servletRequest) {
+        if (servletRequest == null) {
+            return null;
+        }
+        try {
+            return InetAddress.getByName(servletRequest.getRemoteAddr());
+        } catch (UnknownHostException e) {
+            return null;
         }
     }
 
