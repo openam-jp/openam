@@ -144,6 +144,7 @@ public interface SAMLv2Model
     public static final String IDP_AUTO_FED_ENABLED = "autofedEnabled";
     public static final String IDP_AUTO_FED_ATTR = "autofedAttribute";
     public static final String IDP_ATTR_MAP = "attributeMap";
+    public static final String IDP_UNESCAPED_ATTRIBUTES = SAML2Constants.IDP_UNESCAPED_ATTRIBUTES;
     public static final String IDP_NAMEID_ENCRYPTED = 
         "wantNameIDEncrypted";
     public static final String NAMEID_FORMAT_MAP =
@@ -196,6 +197,7 @@ public interface SAMLv2Model
     public static final String SP_AUTO_FED_ENABLED = "autofedEnabled";
     public static final String SP_AUTO_FED_ATTR = "autofedAttribute";
     public static final String SP_ATTR_MAP = "attributeMap";
+    public static final String SP_UNESCAPED_ATTRIBUTES = SAML2Constants.SP_UNESCAPED_ATTRIBUTES;
     public static final String SP_NAMEID_ENCRYPTED = "wantNameIDEncrypted";
     public static final String SP_LOGOUT_REQ_SIGN =
         "wantLogoutRequestSigned";

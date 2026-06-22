@@ -693,6 +693,10 @@ public interface SAML2Constants {
      */
     public String ATTRIBUTE_MAP = "attributeMap";
 
+    public static final String IDP_UNESCAPED_ATTRIBUTES = "idpUnescapedAttributes";
+
+    public static final String SP_UNESCAPED_ATTRIBUTES = "spUnescapedAttributes";
+
     /**
      * Service provider adapter implementation class
      */

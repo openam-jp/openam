@@ -50,7 +50,26 @@
                     <fieldhelp name="helpSPAttributeMap" defaultValue="samlv2sp.attribute.help.SPAttributeMap" />
                 </property>
             </ccgroup>
-        </property>            
+        </property>
+        <property>
+            <label name="lblSPUnescapedAttributes"
+                   defaultValue="samlv2sp.attribute.label.spUnescapedAttributes"
+                   labelFor="spUnescapedAttributes" />
+            <ccgroup>
+                <property>
+                    <cc name="spUnescapedAttributes"
+                        tagclass=
+                        "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                        <attribute name="name" value="list" />
+                        <attribute name="listboxLabel"
+                                   value="label.current.value" />
+                        <attribute name="textboxLabel"
+                                   value="label.new.value" />
+                    </cc>
+                    <fieldhelp name="helpSPUnescapedAttributes" defaultValue="samlv2sp.attribute.help.spUnescapedAttributes" />
+                </property>
+            </ccgroup>
+        </property>
     </section>
     <section name="AttributeConsent" defaultValue="samlv2sp.attribute.label.spAttributeConsent" >
         <property>
