@@ -121,6 +121,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaIdpMap.put(IDP_AUTO_FED_ENABLED, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_AUTO_FED_ATTR, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_ATTR_MAP, Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(IDP_UNESCAPED_ATTRIBUTES, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_NAMEID_ENCRYPTED, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(NAMEID_FORMAT_MAP,Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_LOGOUT_REQ_SIGN, Collections.EMPTY_SET);
@@ -184,6 +185,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaSpMap.put(SP_AUTO_FED_ATTR, Collections.EMPTY_SET);
         
         extendedMetaSpMap.put(SP_ATTR_MAP, Collections.EMPTY_SET);
+        extendedMetaSpMap.put(SP_UNESCAPED_ATTRIBUTES, Collections.EMPTY_SET);
         extendedMetaSpMap.put(SP_NAMEID_ENCRYPTED, Collections.EMPTY_SET);
         extendedMetaSpMap.put(SP_LOGOUT_REQ_SIGN, Collections.EMPTY_SET);
         extendedMetaSpMap.put(SP_LOGOUT_RESP_SIGN, Collections.EMPTY_SET);
@@ -282,6 +284,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     //extended Assertion Processing metadata attributes for idp only    
     static {
         extendedAPMetaIdpMap.put(IDP_ATTR_MAP, Collections.EMPTY_SET);
+        extendedAPMetaIdpMap.put(IDP_UNESCAPED_ATTRIBUTES, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(IDP_ATTR_MAPPER, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(IDP_AUTO_FED_ENABLED, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(IDP_AUTO_FED_ATTR, Collections.EMPTY_SET);
@@ -350,6 +353,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     //extended Assertion Processing metadata attributes for sp only    
     static {
        extendedAPMetaSpMap.put(SP_ATTR_MAP, Collections.EMPTY_SET);
+       extendedAPMetaSpMap.put(SP_UNESCAPED_ATTRIBUTES, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(SP_ATTR_MAPPER, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(SP_AUTO_FED_ENABLED, Collections.EMPTY_SET);
        extendedAPMetaSpMap.put(SP_AUTO_FED_ATTR, Collections.EMPTY_SET);

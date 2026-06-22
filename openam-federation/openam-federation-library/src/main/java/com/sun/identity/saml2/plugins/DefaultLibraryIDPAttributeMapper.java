@@ -25,6 +25,7 @@
  * $Id: DefaultLibraryIDPAttributeMapper.java,v 1.3 2009/11/30 21:11:08 exu Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.plugins;
@@ -33,6 +34,7 @@ import static org.forgerock.openam.utils.AttributeUtils.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -46,7 +48,9 @@ import com.sun.identity.plugin.session.SessionException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.encode.Base64;
 
+import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Attribute;
 
@@ -315,7 +319,9 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
             attribute.setNameFormat(nameFormat);
         }
         if (values != null && !values.isEmpty()) {
-            boolean toEscape = needToEscapeXMLSpecialCharacters(hostEntityID, remoteEntityID, realm);
+            List<String> unescapedAttributeNames = getUnescapedAttributeNames(hostEntityID, remoteEntityID, realm);
+            boolean toEscape = needToEscapeXMLSpecialCharacters(hostEntityID, remoteEntityID, realm)
+                    && !unescapedAttributeNames.contains(name);
             List<String> list = new ArrayList<String>();
             for (String value : values) {
                 if (toEscape) {
@@ -382,5 +388,19 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
         }
 
         return result;
+    }
+
+    private List<String> getUnescapedAttributeNames(String hostEntityID, String remoteEntityID, String realm) {
+        List<String> spUnescapedAttributeNames = SAML2Utils.getAllAttributeValueFromSSOConfig(realm, remoteEntityID,
+                SAML2Constants.SP_ROLE, SAML2Constants.SP_UNESCAPED_ATTRIBUTES);
+        if (spUnescapedAttributeNames != null && !spUnescapedAttributeNames.isEmpty()) {
+            return spUnescapedAttributeNames;
+        }
+        List<String> idpUnescapedAttributeNames = SAML2Utils.getAllAttributeValueFromSSOConfig(realm, hostEntityID,
+                SAML2Constants.IDP_ROLE, SAML2Constants.IDP_UNESCAPED_ATTRIBUTES);
+        if (idpUnescapedAttributeNames != null && !idpUnescapedAttributeNames.isEmpty()) {
+            return idpUnescapedAttributeNames;
+        }
+        return Collections.emptyList();
     }
 }
