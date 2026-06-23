@@ -1,0 +1,13 @@
+<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<EntityDescriptor entityID="https://sp.example.com/">
+<Extensions>
+<mdrpi:RegistrationInfo xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi">
+<mdrpi:RegistrationPolicy xml:lang="en">https://www.example.com/en/</mdrpi:RegistrationPolicy>
+<mdrpi:RegistrationPolicy xml:lang="ja">https://www.example.com/ja/</mdrpi:RegistrationPolicy>
+</mdrpi:RegistrationInfo>
+</Extensions>
+<SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://sp.example.com/" index="0"/>
+</SPSSODescriptor>
+</EntityDescriptor>
+</EntitiesDescriptor>

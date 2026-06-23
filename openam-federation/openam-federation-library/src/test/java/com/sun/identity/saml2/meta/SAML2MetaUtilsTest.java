@@ -12,11 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.meta;
 
 import static org.testng.Assert.*;
+
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -68,4 +71,18 @@ public class SAML2MetaUtilsTest {
         assertEquals(result, PATH_SEPARATOR + TEST_SUB_REALM + PATH_SEPARATOR + TEST_ENTITY);        
     }    
     
+    @Test
+    public void deserializeMetadataWithUnknownExtensionsElement() {
+        try {
+            String metadata = IOUtils
+                    .toString(this.getClass().getClassLoader()
+                            .getResourceAsStream("metadata-with-unknown-extensions.xml"));
+            Object deselialized = SAML2MetaUtils.convertStringToJAXB(metadata);
+            String selialized = SAML2MetaUtils.convertJAXBToString(deselialized);
+            Object deserializedAgain = SAML2MetaUtils.convertStringToJAXB(selialized);
+        } catch (Exception e) {
+            fail("Failed to deserialize.", e);
+        }
+    }
+
 }
