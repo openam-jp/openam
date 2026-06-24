@@ -25,7 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2021-2026 OSSTech Corporation
  */
 package com.iplanet.dpro.session.service;
 
@@ -64,6 +64,7 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
+import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
@@ -100,6 +101,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -975,10 +977,22 @@ public class SessionService {
     }
 
     /**
-     * Adds listener to a Internal Sessions.
+     * Internal-only: adds a session event listener URL without any caller-privilege check.
+     *
+     * <p>This overload performs no agent/admin verification on the caller and MUST NOT be
+     * exposed to remote/PLL requests. It is intended only for trusted in-JVM callers that
+     * register the server's own local notification URL (see
+     * {@link com.iplanet.dpro.session.Session#addInternalSessionListener()}), where the
+     * URL is fixed to {@code WebtopNaming.getNotificationURL()} and outbound delivery is
+     * suppressed for local URLs by {@code SessionNotificationSender}.
+     *
+     * <p>External PLL callers must go through
+     * {@link #addSessionListener(SSOToken, java.net.InetAddress, SessionID, String)}, which
+     * enforces the agent-or-admin / trusted-source privilege check required to prevent SSRF
+     * via arbitrary notification URLs.
      *
      * @param sid Session ID
-     * @param url
+     * @param url Notification URL (expected to be the local server's notification URL)
      * @throws SessionException Session is null OR the Session is invalid
      */
     public void addSessionListener(SessionID sid, String url) throws SessionException {
@@ -995,6 +1009,71 @@ public class SessionService {
             throw new IllegalArgumentException("Session id mismatch");
         }
         session.addSessionEventURL(url, sid);
+    }
+
+    /**
+     * PLL entry point that gates session listener registration against SSRF abuse.
+     *
+     * <p>Two acceptance criteria, evaluated in order:
+     * <ol>
+     *   <li>{@code clientToken} represents an agent (APPLICATION_SESSION) or admin
+     *       principal (dsame super user / top-level delegated admin).</li>
+     *   <li>{@code clientAddress} (the raw TCP peer address of the PLL request) is
+     *       on the trusted source list. This fallback preserves compatibility with
+     *       older OpenAM peers in the same site that do not attach an admin token
+     *       to inter-server crosstalk requests.</li>
+     * </ol>
+     *
+     * <p>Any other caller (e.g. an arbitrary authenticated end user) is rejected,
+     * which prevents the notification channel from being used as an outbound HTTP
+     * request primitive.
+     *
+     * @param clientToken SSO token of the requester (PLL Requester field). May be {@code null}.
+     * @param clientAddress Raw TCP peer address of the incoming PLL request
+     *                      ({@code HttpServletRequest.getRemoteAddr()}). MUST NOT be derived
+     *                      from {@code X-Forwarded-For} or similar spoofable HTTP headers.
+     *                      May be {@code null}.
+     * @param sid Session ID to register the listener on.
+     * @param url Notification URL.
+     * @throws SessionException if neither criterion is met or the session is invalid.
+     */
+    public void addSessionListener(SSOToken clientToken, InetAddress clientAddress, SessionID sid, String url)
+            throws SessionException {
+        if (!isAgentOrAdminToken(clientToken) && !isTrustedRemoteAddress(clientAddress)) {
+            throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
+        }
+        addSessionListener(sid, url);
+    }
+
+    private boolean isAgentOrAdminToken(SSOToken clientToken) {
+        if (clientToken == null) {
+            return false;
+        }
+        try {
+            if (!ssoTokenManager.isValidToken(clientToken)) {
+                return false;
+            }
+            if (hasTopLevelAdminRole(clientToken, clientToken.getPrincipal().getName())) {
+                return true;
+            }
+            Session clientSession = sessionCache.getSession(new SessionID(clientToken.getTokenID().toString()));
+            return clientSession.getType() == APPLICATION_SESSION;
+        } catch (Exception e) {
+            sessionDebug.warning("SessionService.isAgentOrAdminToken: privilege check failed", e);
+            return false;
+        }
+    }
+
+    private boolean isTrustedRemoteAddress(InetAddress clientAddress) {
+        if (clientAddress == null) {
+            return false;
+        }
+        try {
+            return SessionUtils.isTrustedSource(clientAddress);
+        } catch (SessionException e) {
+            sessionDebug.warning("SessionService.isTrustedRemoteAddress: trust check failed", e);
+            return false;
+        }
     }
 
     /**
