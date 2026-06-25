@@ -1037,10 +1037,15 @@
         <servlet-name>ReturnRegistration</servlet-name>
         <url-pattern>/ReturnRegistration/*</url-pattern>
     </servlet-mapping>
+    <!-- CVE-2026-45052: The Liberty ID-WSF SOAP receiver
+         (/Liberty/idpp, /Liberty/disco) is disabled because it allows
+         unauthenticated read/write access to another user's IDPP and
+         Discovery Service entries (CWE-285).
     <servlet-mapping>
         <servlet-name>WSSOAPReceiver</servlet-name>
         <url-pattern>/Liberty/*</url-pattern>
     </servlet-mapping>
+    -->
     <servlet-mapping>
         <servlet-name>WSPRedirectHandler</servlet-name>
         <url-pattern>/WSPRedirectHandler/*</url-pattern>
