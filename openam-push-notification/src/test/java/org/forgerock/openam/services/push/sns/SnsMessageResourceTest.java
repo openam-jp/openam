@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions copyright 2026 3A Systems LLC.
 */
 package org.forgerock.openam.services.push.sns;
 
@@ -48,6 +49,7 @@ import org.forgerock.openam.services.push.PushNotificationService;
 import org.forgerock.openam.services.push.dispatch.MessageDispatcher;
 import org.forgerock.openam.services.push.dispatch.PredicateNotMetException;
 import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.util.promise.Promise;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -108,6 +110,7 @@ public class SnsMessageResourceTest {
             ExecutionException, InterruptedException, CoreTokenException {
         //given
         Token mockToken = mock(Token.class);
+        when(mockToken.getType()).thenReturn(TokenType.PUSH);
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.setSubRealm("realm", "realm");
@@ -139,6 +142,7 @@ public class SnsMessageResourceTest {
         Jwt mockJwt = mock(Jwt.class);
         JwtClaimsSet mockClaimSet = mock(JwtClaimsSet.class);
         Token mockToken = mock(Token.class);
+        when(mockToken.getType()).thenReturn(TokenType.PUSH);
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.setSubRealm("realm", "realm");
