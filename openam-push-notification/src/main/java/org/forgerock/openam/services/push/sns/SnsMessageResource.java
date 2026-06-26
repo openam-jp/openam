@@ -23,6 +23,7 @@ import static org.forgerock.openam.services.push.PushNotificationConstants.*;
 import static org.forgerock.util.promise.Promises.*;
 
 import com.sun.identity.shared.debug.Debug;
+import java.util.HashMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -239,8 +240,21 @@ public class SnsMessageResource {
     }
 
     private void addRegistrationInfo(Token coreToken, JsonValue actionContent) {
-        coreToken.setBlob(jsonSerialisation.serialise(actionContent.getObject()).getBytes());
+        Map<String, Object> minimal = new HashMap<>();
+        putIfPresent(minimal, actionContent, COMMUNICATION_ID);
+        putIfPresent(minimal, actionContent, MECHANISM_UID);
+        putIfPresent(minimal, actionContent, COMMUNICATION_TYPE);
+        putIfPresent(minimal, actionContent, DEVICE_TYPE);
+        putIfPresent(minimal, actionContent, DEVICE_ID);
+        coreToken.setBlob(jsonSerialisation.serialise(minimal).getBytes());
         coreToken.setAttribute(CoreTokenField.INTEGER_ONE, ACCEPT_VALUE);
+    }
+
+    private void putIfPresent(Map<String, Object> target, JsonValue source, String key) {
+        JsonValue value = source.get(key);
+        if (value != null && value.isNotNull()) {
+            target.put(key, value.getObject());
+        }
     }
 
     private void addDeny(Token coreToken, JsonValue actionContent) {
