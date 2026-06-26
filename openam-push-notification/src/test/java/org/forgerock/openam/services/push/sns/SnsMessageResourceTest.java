@@ -13,6 +13,7 @@
 *
 * Copyright 2016 ForgeRock AS.
 * Portions copyright 2026 3A Systems LLC.
+* Portions copyright 2026 OSSTech Corporation
 */
 package org.forgerock.openam.services.push.sns;
 
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.verify;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.ExecutionException;
+import org.mockito.ArgumentCaptor;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jwt.Jwt;
@@ -122,6 +124,7 @@ public class SnsMessageResourceTest {
         given(request.getAction()).willReturn("register");
         doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
         given(mockCTS.read("asdf")).willReturn(mockToken);
+        given(mockToken.getType()).willReturn(TokenType.PUSH);
         given(mockToken.getBlob()).willReturn("{ }".getBytes());
         given(mockSerialisation.serialise(any())).willReturn("");
 
@@ -154,6 +157,7 @@ public class SnsMessageResourceTest {
         given(request.getAction()).willReturn("authenticate");
         doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
         given(mockCTS.read("asdf")).willReturn(mockToken);
+        given(mockToken.getType()).willReturn(TokenType.PUSH);
         given(mockToken.getBlob()).willReturn("{ }".getBytes());
         given(mockSerialisation.serialise(any())).willReturn("");
         given(mockReconstructor.reconstructJwt(anyString(), (Class<Jwt>) any())).willReturn(mockJwt);
@@ -211,6 +215,79 @@ public class SnsMessageResourceTest {
 
         //then
         result.getOrThrow();
+    }
+
+    @Test (expectedExceptions = BadRequestException.class)
+    public void shouldFailWhenCTSTokenIsNotPushType() throws ResourceException, InterruptedException,
+            PredicateNotMetException, CoreTokenException {
+        //given
+        Token mockToken = mock(Token.class);
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
+        realmContext.setSubRealm("realm", "realm");
+
+        JsonValue content = JsonValue.json(object(field("messageId", "asdf"), field("jwt", "")));
+
+        ActionRequest request = mock(ActionRequest.class);
+        given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("register");
+        doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
+        given(mockCTS.read("asdf")).willReturn(mockToken);
+        given(mockToken.getType()).willReturn(TokenType.OAUTH);
+
+        //when
+        Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
+
+        //then
+        verify(mockCTS, times(0)).update((Token) any());
+        verify(mockToken, times(0)).setBlob((byte[]) any());
+        result.getOrThrow();
+    }
+
+    @Test
+    public void regShouldWriteOnlyWhitelistedFieldsToBlob() throws NotFoundException, PredicateNotMetException,
+            ExecutionException, InterruptedException, CoreTokenException {
+        //given
+        Token mockToken = mock(Token.class);
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
+        realmContext.setSubRealm("realm", "realm");
+
+        JsonValue content = JsonValue.json(object(
+                field("messageId", "asdf"),
+                field("jwt", "irrelevant"),
+                field(COMMUNICATION_ID, "comm-id"),
+                field(MECHANISM_UID, "mech-uid"),
+                field(COMMUNICATION_TYPE, "comm-type"),
+                field(DEVICE_TYPE, "dev-type"),
+                field(DEVICE_ID, "dev-id"),
+                field("attacker", "payload")));
+
+        ActionRequest request = mock(ActionRequest.class);
+        given(request.getContent()).willReturn(content);
+        given(request.getAction()).willReturn("register");
+        doThrow(new NotFoundException()).when(mockDispatcher).handle(anyString(), (JsonValue) anyObject());
+        given(mockCTS.read("asdf")).willReturn(mockToken);
+        given(mockToken.getType()).willReturn(TokenType.PUSH);
+        given(mockToken.getBlob()).willReturn("{ }".getBytes());
+
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+        given(mockSerialisation.serialise(captor.capture())).willReturn("");
+
+        //when
+        Promise<ActionResponse, ResourceException> result = messageResource.authenticate(realmContext, request);
+
+        //then
+        assertThat(result.get()).isNotNull();
+        Object serialised = captor.getValue();
+        assertThat(serialised).isInstanceOf(java.util.Map.class);
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, Object> blob = (java.util.Map<String, Object>) serialised;
+        assertThat(blob).hasSize(5);
+        assertThat(blob.keySet())
+                .contains(COMMUNICATION_ID, MECHANISM_UID, COMMUNICATION_TYPE, DEVICE_TYPE, DEVICE_ID);
+        assertThat(blob.get(COMMUNICATION_ID)).isEqualTo("comm-id");
+        assertThat(blob.get(DEVICE_ID)).isEqualTo("dev-id");
     }
 
     @Test (expectedExceptions = BadRequestException.class)

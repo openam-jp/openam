@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -33,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import static java.util.TimeZone.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -162,6 +163,30 @@ public class OAuthAdapterTest {
         // Then
         assertNotNull(result);
         assert(result.asMap().get(field.getOAuthField()).toString().contains(id[0]));
+    }
+
+    @Test
+    public void shouldNotDeserialiseNonOAuthTokenType() {
+        // Given
+        String[] id = {"badger"};
+        List<String> list = new ArrayList<String>(Arrays.asList(id));
+        OAuthTokenField field = OAuthTokenField.ID;
+
+        JSONSerialisation serialisation = new JSONSerialisation(new ObjectMapper());
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), list);
+        String serialisedObject = serialisation.serialise(values);
+
+        Token token = new Token(id[0], TokenType.PUSH);
+        token.setBlob(serialisedObject.getBytes());
+
+        // When
+        JsonValue result = adapter.fromToken(token);
+
+        // Then
+        assertThat(result).isNull();
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)
