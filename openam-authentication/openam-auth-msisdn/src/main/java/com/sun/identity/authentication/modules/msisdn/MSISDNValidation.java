@@ -25,6 +25,7 @@
  * $Id: MSISDNValidation.java,v 1.3 2008/06/25 05:41:59 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.modules.msisdn;
@@ -32,12 +33,15 @@ package com.sun.identity.authentication.modules.msisdn;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Map;
+import java.util.regex.Pattern;
+
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import org.forgerock.openam.ldap.LDAPAuthUtils;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.SearchScope;
 
 /**
@@ -73,6 +77,7 @@ public class MSISDNValidation {
     private String userNamingAttr;
     private String returnUserDN;
     private static final String amAuthMSISDN = "amAuthMSISDN";
+    private static final Pattern MSISDN_PATTERN = Pattern.compile("\\+{0,1}\\d{7,}");
     private java.util.Locale locale;
 
     private static final String TRUSTED_GATEWAY_LIST = 
@@ -194,14 +199,17 @@ public class MSISDNValidation {
      */
     protected String getUserId(String msisdnNumber) throws AuthLoginException {
         String validatedUserID = null;
+        if (!isValidMsisdn(msisdnNumber)) {
+            debug.error("MSISDN - Invalid MSISDN number");
+            throw new AuthLoginException(amAuthMSISDN, "MSISDNInvalidNumber", null);
+        }
+
         try {
             LDAPAuthUtils ldapUtil =
                 new LDAPAuthUtils(serverHost, serverPort, Collections.<String>emptySet(),
                         useSSL, AMResourceBundleCache.getInstance().getResBundle(amAuthMSISDN, locale), startSearchLoc,
                         debug);
-            String searchFilter = new StringBuffer(250).append("(")
-                .append(userSearchAttr).append("=")
-                .append(msisdnNumber).append(")").toString();
+            String searchFilter = Filter.equality(userSearchAttr, msisdnNumber).toString();
 
             ldapUtil.setReturnUserDN(returnUserDN);
             ldapUtil.setUserNamingAttribute(userNamingAttr);
@@ -228,8 +236,14 @@ public class MSISDNValidation {
                             "MSISDNValidateEx",null);
 
             }
+        } catch (AuthLoginException e) {
+            throw e;
         } catch (Exception e) {
             throw new AuthLoginException(e);
         }
+    }
+
+    static boolean isValidMsisdn(String msisdnNumber) {
+        return msisdnNumber != null && MSISDN_PATTERN.matcher(msisdnNumber).matches();
     }
 }
