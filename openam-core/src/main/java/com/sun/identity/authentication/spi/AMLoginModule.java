@@ -247,7 +247,7 @@ public abstract class AMLoginModule implements LoginModule {
     private String moduleName = null;
     private String moduleClass = null;
     private static final String bundleName = "amAuth";
-    private static AuthD ad = AuthD.getAuth();
+    private final AuthD ad;
     private Principal principal = null;
     // the authentication status
     private boolean succeeded = false;
@@ -278,6 +278,7 @@ public abstract class AMLoginModule implements LoginModule {
      */
     public AMLoginModule() {
         auditor = InjectorHolder.getInstance(AuthenticationModuleEventAuditor.class);
+        ad = AuthD.getAuth();
     }
     
     /**
