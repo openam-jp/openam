@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -97,7 +99,15 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         }
 
         final String codeVerifier = request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER);
-        if (providerSettings.isCodeVerifierRequired()) {
+
+        // RFC 7636 §4.6: if the code was issued with a code_challenge,
+        // the token endpoint MUST verify code_verifier regardless of
+        // any provider-wide enforcement setting.
+        final String storedCodeChallenge = authorizationCode.getCodeChallenge();
+        final boolean codeWasIssuedWithChallenge =
+                storedCodeChallenge != null && !storedCodeChallenge.isEmpty();
+
+        if (providerSettings.isCodeVerifierRequired() || codeWasIssuedWithChallenge) {
             if (codeVerifier == null) {
                 String message = "code_verifier parameter required";
                 throw new InvalidRequestException(message);
@@ -134,7 +144,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
                 throw new InvalidGrantException("Authorization code expired.");
             }
 
-            if (providerSettings.isCodeVerifierRequired()) {
+            if (codeWasIssuedWithChallenge) {
                 checkCodeVerifier(authorizationCode, codeVerifier);
             }
 
