@@ -25,8 +25,9 @@
  * $Id: IdRepoJAXRPCObjectImpl.java,v 1.13 2010/01/06 01:58:27 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2021 OSSTech Corporation
+ * Portions Copyrighted 2021-2026 OSSTech Corporation
  * Portions Copyrighted 2023 OGIS-RI Co., Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.idm.server;
@@ -55,6 +56,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.jaxrpc.JAXRPCRequestFilter;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -695,6 +697,11 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     }
 
     public void deRegisterNotificationURL_idrepo(String notificationID) throws RemoteException {
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            idRepoDebug.warning("IdRepoJAXRPCObjectImpl.deRegisterNotificationURL_idrepo: "
+                    + "rejecting unauthorized deregistration for ID: {}", notificationID);
+            return;
+        }
         synchronized (idRepoNotificationURLs) {
             URL url = idRepoNotificationURLs.remove(notificationID);
             if (url != null && idRepoDebug.messageEnabled()) {
@@ -746,6 +753,14 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     }
 
     public String registerNotificationURL_idrepo(String url) throws RemoteException {
+        // Only a server or an agent may register a notification URL. This prevents
+        // unauthenticated callers from turning this endpoint into a stored SSRF
+        // (GHSA-w858-46wv-v45w).
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            idRepoDebug.warning("IdRepoJAXRPCObjectImpl.registerNotificationURL_idrepo: "
+                    + "rejecting unauthorized registration for URL: {}", url);
+            return "0";
+        }
         return registerNotificationURL(url, idRepoNotificationURLs);
     }
 
