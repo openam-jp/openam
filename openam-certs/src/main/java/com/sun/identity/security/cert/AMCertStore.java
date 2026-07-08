@@ -25,6 +25,7 @@
  * $Id: AMCertStore.java,v 1.5 2009/01/28 05:35:12 ww203982 Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.security.cert;
@@ -45,6 +46,7 @@ import java.security.cert.X509Certificate;
 
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -304,15 +306,13 @@ public class AMCertStore {
      * @return searchFilter
      */
     public static String setSearchFilter(String attrName, String attrValue) {
-        String searchFilter = new StringBuffer(128).append("(")
-                    .append(attrName).append("=")
-                    .append(attrValue).append(")").toString();
- 
+        String searchFilter = Filter.equality(attrName, attrValue).toString();
+
         if (debug.messageEnabled()) {
             debug.message("AMCertStore.setSearchFilter : " +
                 "ldc.search: using this filter: " + searchFilter);
         }
-                
+
         return searchFilter;
     }
 
