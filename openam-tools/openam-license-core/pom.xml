@@ -24,7 +24,7 @@
     <parent>
         <artifactId>openam-tools</artifactId>
         <groupId>jp.openam</groupId>
-        <version>14.0.4</version>
+        <version>14.0.5</version>
     </parent>
 
     <!-- Component Definition -->
