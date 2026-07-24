@@ -25,6 +25,8 @@
  * $Id: AuthXMLUtils.java,v 1.10 2009/06/19 20:39:09 qcheng Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.share;
@@ -44,9 +46,13 @@ import com.sun.identity.security.EncodeAction;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.security.AccessController;
+import java.security.Principal;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -1547,7 +1553,19 @@ public class AuthXMLUtils {
             
             if (callback == null) {
                 if ((className != null) && (className.length() != 0)) {
-                    Class xmlClass = Class.forName(className);
+                    // The class name is read from attacker-controllable XML on the
+                    // unauthenticated /authservice endpoint. Load the class without
+                    // running its static initializers and verify it implements
+                    // DSAMECallbackInterface BEFORE instantiating it; otherwise an
+                    // arbitrary class could be instantiated, leading to remote code
+                    // execution (GHSA-wg5r-wc3x-39vc).
+                    Class xmlClass = Class.forName(className, false,
+                        AuthXMLUtils.class.getClassLoader());
+                    if (!DSAMECallbackInterface.class.isAssignableFrom(xmlClass)) {
+                        debug.error("createCustomCallback : class " + className
+                            + " is not a DSAMECallbackInterface implementation");
+                        return null;
+                    }
                     callback = (DSAMECallbackInterface) xmlClass.newInstance();
                 }
             }
@@ -1698,6 +1716,60 @@ public class AuthXMLUtils {
         return encodedString;
     }
     
+    // Hardened deserialization for the encrypted <Subject> value received from
+    // the auth server. The value is Java-serialized, so without a class allowlist
+    // a forged or relayed response could trigger gadget-chain code execution in
+    // the AuthContext client. A legitimate javax.security.auth.Subject graph only
+    // contains the Subject itself, JDK collections/scalars and
+    // java.security.Principal implementations (GHSA-wg5r-wc3x-39vc, related
+    // deserialization hardening).
+    //
+    // The allowlist is enforced by overriding ObjectInputStream.resolveClass()
+    // rather than using java.io.ObjectInputFilter, so it remains compatible with
+    // Java 7/8 where the serialization-filter API is not available.
+    static final class SubjectObjectInputStream extends ObjectInputStream {
+
+        SubjectObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc)
+                throws IOException, ClassNotFoundException {
+            Class<?> resolved = super.resolveClass(desc);
+            Class<?> clazz = resolved;
+            while (clazz.isArray()) {
+                clazz = clazz.getComponentType();
+            }
+            if (clazz.isPrimitive() || isAllowedSubjectClass(clazz)) {
+                return resolved;
+            }
+            debug.warning("getDeSerializedSubject : rejected class "
+                + clazz.getName() + " during Subject deserialization");
+            throw new InvalidClassException(clazz.getName(),
+                "class is not allowed during Subject deserialization");
+        }
+
+        @Override
+        protected Class<?> resolveProxyClass(String[] interfaces)
+                throws IOException, ClassNotFoundException {
+            debug.warning("getDeSerializedSubject : rejected dynamic proxy "
+                + "during Subject deserialization");
+            throw new InvalidClassException(
+                "dynamic proxies are not allowed during Subject deserialization");
+        }
+    }
+
+    private static boolean isAllowedSubjectClass(Class<?> clazz) {
+        if (Principal.class.isAssignableFrom(clazz)) {
+            return true;
+        }
+        String name = clazz.getName();
+        return name.startsWith("java.lang.") || name.startsWith("java.util.")
+            || name.startsWith("java.security.")
+            || name.startsWith("javax.security.");
+    }
+
     /**
      * Deserializes Subject.
      *
@@ -1721,7 +1793,7 @@ public class AuthXMLUtils {
             byteDecrypted = sSerialized;
             //convert byte to object using streams
             byteIn = new ByteArrayInputStream(byteDecrypted);
-            objInStream  = new ObjectInputStream(byteIn);
+            objInStream  = new SubjectObjectInputStream(byteIn);
             tempObject = objInStream.readObject();
         }catch(Exception e){
             debug.message("Exception Message in decrypt: " , e);
