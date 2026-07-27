@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -23,6 +24,8 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.ShortClientAttributeNa
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.validation.ValidationException;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
@@ -55,6 +59,7 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
+import org.forgerock.openam.oauth2.validation.SsrfUrlValidator;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
 import org.forgerock.openidconnect.exceptions.InvalidPostLogoutRedirectUri;
@@ -82,6 +87,7 @@ public class OpenIdConnectClientRegistrationService {
     private final AccessTokenVerifier tokenVerifier;
     private final TokenStore tokenStore;
     private final OpenIDConnectURLValidator urlValidator;
+    private final SsrfUrlValidator ssrfUrlValidator;
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
@@ -92,17 +98,20 @@ public class OpenIdConnectClientRegistrationService {
      * @param tokenVerifier An instance of the AccessTokenVerifier.
      * @param tokenStore An instance of the TokenStore.
      * @param urlValidator An instance of the URLValidator.
+     * @param ssrfUrlValidator An instance of the SsrfUrlValidator, used to guard fetches of
+     *         client-supplied URLs such as {@code sector_identifier_uri} (GHSA-7c7p-4mff-c9vg).
      */
     @Inject
     OpenIdConnectClientRegistrationService(ClientDAO clientDAO,
             OAuth2ProviderSettingsFactory providerSettingsFactory,
             AccessTokenVerifier tokenVerifier, TokenStore tokenStore,
-            OpenIDConnectURLValidator urlValidator) {
+            OpenIDConnectURLValidator urlValidator, SsrfUrlValidator ssrfUrlValidator) {
         this.clientDAO = clientDAO;
         this.providerSettingsFactory = providerSettingsFactory;
         this.tokenVerifier = tokenVerifier;
         this.tokenStore = tokenStore;
         this.urlValidator = urlValidator;
+        this.ssrfUrlValidator = ssrfUrlValidator;
     }
 
     /**
@@ -249,9 +258,28 @@ public class OpenIdConnectClientRegistrationService {
             }
 
             if (input.get(SECTOR_IDENTIFIER_URI.getType()).asString() != null) {
+                final String sectorIdentifierUri = input.get(SECTOR_IDENTIFIER_URI.getType()).asString();
+                // Validate the URL before fetching it, to prevent server-side request forgery
+                // (GHSA-7c7p-4mff-c9vg): require https and reject private/loopback/link-local hosts.
                 try {
-                    URL sectorIdentifier = new URL(input.get(SECTOR_IDENTIFIER_URI.getType()).asString());
-                    List<String> response = mapper.readValue(sectorIdentifier, List.class);
+                    ssrfUrlValidator.validate(sectorIdentifierUri);
+                } catch (ValidationException e) {
+                    logger.error("Rejected sector_identifier_uri (must be https and must not target a "
+                            + "private, loopback or link-local address): {}", sectorIdentifierUri);
+                    throw new InvalidClientMetadata("Invalid sector_identifier_uri requested.");
+                }
+                try {
+                    URL sectorIdentifier = new URL(sectorIdentifierUri);
+                    HttpURLConnection connection = HttpURLConnectionManager.getConnection(sectorIdentifier);
+                    // Do not follow redirects: the SSRF guard validates the initial URL, but a 3xx
+                    // to an internal address would otherwise be followed and defeat that check
+                    // (GHSA-7c7p-4mff-c9vg). Set on this connection only, not in the shared
+                    // HttpURLConnectionManager.
+                    connection.setInstanceFollowRedirects(false);
+                    List<String> response;
+                    try (InputStream in = connection.getInputStream()) {
+                        response = mapper.readValue(in, List.class);
+                    }
 
                     if (!response.containsAll(redirectUris)) {
                         logger.error("Request_uris not included in sector_identifier_uri.");
@@ -261,7 +289,7 @@ public class OpenIdConnectClientRegistrationService {
                     logger.error("Invalid sector_identifier_uri requested.");
                     throw new InvalidClientMetadata("Invalid sector_identifier_uri requested.");
                 }
-                clientBuilder.setSectorIdentifierUri(input.get(SECTOR_IDENTIFIER_URI.getType()).asString());
+                clientBuilder.setSectorIdentifierUri(sectorIdentifierUri);
             }
 
             List<String> scopes = input.get(SCOPES.getType()).asList(String.class);
