@@ -112,6 +112,7 @@ import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
+import org.forgerock.openam.oauth2.validation.SsrfUrlValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
@@ -222,6 +223,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         Multibinder.newSetBinder(binder(), ResourceSetRegistrationHook.class);
 
         bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
+        bind(SsrfUrlValidator.class).toInstance(SsrfUrlValidator.getInstance());
         install(new LabelsGuiceModule());
 
         bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
