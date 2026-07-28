@@ -20,6 +20,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ListenerResource.java,v 1.5 2009/12/15 00:44:19 veiming Exp $
+ *
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.rest;
@@ -27,6 +29,7 @@ package com.sun.identity.rest;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementListener;
 import com.sun.identity.entitlement.ListenerManager;
+import com.sun.identity.entitlement.PrivilegeChangeNotifier;
 import java.util.List;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +62,11 @@ public class ListenerResource extends ResourceBase {
     ) {
         try {
             Subject caller = getCaller(request);
+            // Reject unsafe callback URLs (loopback/link-local/private/metadata, non-http(s)) so
+            // they are never registered — prevents stored SSRF (GHSA-g499-5qm8-4grm).
+            if (!PrivilegeChangeNotifier.isListenerUrlAllowed(url)) {
+                return createResponseJSONString(400, headers, "Invalid listener url");
+            }
             EntitlementListener l = new EntitlementListener(url,
                 application, resources);
             ListenerManager.getInstance().addListener(caller, l);
