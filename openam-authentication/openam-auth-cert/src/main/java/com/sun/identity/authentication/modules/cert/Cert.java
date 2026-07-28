@@ -25,6 +25,7 @@
  * $Id: Cert.java,v 1.14 2009/03/13 20:54:42 beomsuk Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.modules.cert;
@@ -485,6 +486,10 @@ public class Cert extends AMLoginModule {
     	int ret = ISAuthConstants.LOGIN_IGNORE;
 		
     	try {
+            if (!new AMCertPath(null).verify(allCerts, false, false)) {
+                debug.error("Cert.doJCERevocationValidation: trust chain verify failed, rejecting before CRL fetch.");
+                return ret;
+            }
             Vector crls = new Vector();
             for (X509Certificate cert : allCerts) {
                 X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
