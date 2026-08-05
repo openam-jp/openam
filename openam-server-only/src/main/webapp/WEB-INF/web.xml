@@ -262,16 +262,8 @@
     </filter-mapping>
     -->
     <filter-mapping>
-        <filter-name>AuthNFilter</filter-name>
-        <url-pattern>/ws/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
         <filter-name>JAXRPCRequestFilter</filter-name>
         <url-pattern>/jaxrpc/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AuthZFilter</filter-name>
-        <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
 
     <!-- filter mapping -->
@@ -358,20 +350,16 @@
         <servlet-name>SMSServlet</servlet-name>
         <servlet-class>com.sun.identity.sm.SMServlet</servlet-class>
     </servlet>
+    <!-- Password Reset UI disabled
     <servlet>
         <servlet-name>PWResetServlet</servlet-name>
         <servlet-class>com.sun.identity.password.ui.PWResetServlet</servlet-class>
     </servlet>
+    -->
     <servlet>
         <description>notificationservice</description>
         <servlet-name>notificationservice</servlet-name>
         <servlet-class>com.iplanet.services.comm.client.PLLNotificationServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <description>Web Service Endpoint - Identity Services</description>
-        <display-name>IdentityServices</display-name>
-        <servlet-name>IdentityServices</servlet-name>
-        <servlet-class>com.sun.identity.idsvcs.IdentityServicesServlet</servlet-class>
     </servlet>
     <servlet>
         <description>REST Endpoint - Identity Services</description>
@@ -394,24 +382,6 @@
         <servlet-class>com.sun.identity.entitlement.util.NetworkMonitor</servlet-class>
     </servlet>
 
-    <!-- JAX-RS -->
-    <!-- Java defines REST support via the Java Specification Request 311 (JSR). 
-         This specificiation is called JAX-RS (The Java API for RESTful Web Services). 
-         JAX-RS uses annotations to define the REST relevance of Java classes.
-
-         Jersey is the reference implementation for this specification. 
-         Jersey contains basically a REST server and a REST client. 
-         The core client can be used provides a library to communicate with the server.
-    -->
-    <servlet>
-        <servlet-name>ws</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>com.sun.identity.rest.RestService</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
 
     <servlet>
         <servlet-name>MonitoringFedConfig</servlet-name>
@@ -423,6 +393,7 @@
         <servlet-name>cdcservlet</servlet-name>
         <servlet-class>com.iplanet.services.cdc.CDCServlet</servlet-class>
     </servlet>
+    <!-- SAML 1.x disabled
     <servlet>
         <description>SAMLAwareServlet</description>
         <servlet-name>SAMLAwareServlet</servlet-name>
@@ -443,96 +414,7 @@
         <servlet-name>AssertionManagerServlet</servlet-name>
         <servlet-class>com.sun.identity.saml.servlet.AssertionManagerServlet</servlet-class>
     </servlet>
-    <servlet>
-        <description>FSAssertionManagerServlet</description>
-        <servlet-name>FSAssertionManagerServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.FSAssertionManagerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <description>SecurityTokenManagerServlet</description>
-        <servlet-name>SecurityTokenManagerServlet</servlet-name>
-        <servlet-class>com.sun.identity.liberty.ws.security.SecurityTokenManagerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>preLoginHandler</servlet-name>
-        <servlet-class>com.sun.identity.federation.login.FSPreLoginHandler</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>postLoginHandler</servlet-name>
-        <servlet-class>com.sun.identity.federation.login.FSPostLoginHandler</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessLogout</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.logout.FSProcessLogoutServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReturnLogout</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.logout.FSReturnLogoutServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SingleSignOnService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSSSOAndFedService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>IntersiteTransferService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSIntersiteTransferService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AssertionConsumerService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSAssertionConsumerService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SOAPReceiver</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.FSSOAPReceiver</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>FederationTerminationServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.termination.FSTerminationInitiationServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessTermination</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.termination.FSTerminationRequestServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReturnTermination</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.termination.FSTerminationReturnServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>InitiateRegistration</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.registration.FSRegistrationInitiationServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessRegistration</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.registration.FSRegistrationRequestServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReturnRegistration</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.registration.FSRegistrationReturnServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.logout.FSSingleLogoutServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>WSSOAPReceiver</servlet-name>
-        <servlet-class>com.sun.identity.liberty.ws.soapbinding.SOAPReceiver</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>WSPRedirectHandler</servlet-name>
-        <servlet-class>com.sun.identity.liberty.ws.interaction.WSPRedirectHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>IDPFinderService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSIDPFinderService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>idffwriter</servlet-name>
-        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>idffreader</servlet-name>
-        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieReaderServlet</servlet-class>
-    </servlet>
+    -->
     <servlet>
         <servlet-name>saml2writer</servlet-name>
         <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet</servlet-class>
@@ -678,10 +560,6 @@
         <jsp-file>/saml2/jsp/SA_SP.jsp</jsp-file>
     </servlet>
     <servlet>
-        <servlet-name>MultiProtocolRelayServlet</servlet-name>
-        <servlet-class>com.sun.identity.multiprotocol.MultiProtocolRelayServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>WSFederationServlet</servlet-name>
         <servlet-class>com.sun.identity.wsfederation.servlet.WSFederationServlet</servlet-class>
     </servlet>
@@ -749,10 +627,12 @@
         <servlet-name>InitialSetup</servlet-name>
         <url-pattern>/config/initialSetup</url-pattern>
     </servlet-mapping>
+    <!-- Password Reset UI disabled
     <servlet-mapping>
         <servlet-name>PWResetServlet</servlet-name>
         <url-pattern>/ui/*</url-pattern>
     </servlet-mapping>
+    -->
     <servlet-mapping>
         <servlet-name>GatewayServlet</servlet-name>
         <url-pattern>/gateway</url-pattern>
@@ -798,10 +678,6 @@
         <url-pattern>/notificationservice</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>IdentityServices</servlet-name>
-        <url-pattern>/identityservices/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>IdentityServicesHandler</servlet-name>
         <url-pattern>/identity/*</url-pattern>
     </servlet-mapping>
@@ -813,12 +689,6 @@
     <servlet-mapping>
         <servlet-name>entitlementmonitor</servlet-name>
         <url-pattern>/entitlementmonitor/*</url-pattern>
-    </servlet-mapping>
-
-    <!-- JAX-RS End-Points -->
-    <servlet-mapping>
-        <servlet-name>ws</servlet-name>
-        <url-pattern>/ws/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -954,13 +824,10 @@
         <url-pattern>/spsaehandler/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>IDPFinderService</servlet-name>
-        <url-pattern>/idpfinder</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>cdcservlet</servlet-name>
         <url-pattern>/cdcservlet</url-pattern>
     </servlet-mapping>
+    <!-- SAML 1.x disabled
     <servlet-mapping>
         <servlet-name>SAMLAwareServlet</servlet-name>
         <url-pattern>/SAMLAwareServlet</url-pattern>
@@ -977,95 +844,7 @@
         <servlet-name>AssertionManagerServlet</servlet-name>
         <url-pattern>/AssertionManagerServlet/*</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>FSAssertionManagerServlet</servlet-name>
-        <url-pattern>/FSAssertionManagerServlet/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SecurityTokenManagerServlet</servlet-name>
-        <url-pattern>/SecurityTokenManagerServlet/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>preLoginHandler</servlet-name>
-        <url-pattern>/preLogin</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>postLoginHandler</servlet-name>
-        <url-pattern>/postLogin/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessLogout</servlet-name>
-        <url-pattern>/ProcessLogout/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReturnLogout</servlet-name>
-        <url-pattern>/ReturnLogout/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/liberty-logout</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SingleSignOnService</servlet-name>
-        <url-pattern>/SingleSignOnService/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>IntersiteTransferService</servlet-name>
-        <url-pattern>/IntersiteTransferService</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AssertionConsumerService</servlet-name>
-        <url-pattern>/AssertionConsumerService/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SOAPReceiver</servlet-name>
-        <url-pattern>/SOAPReceiver/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>FederationTerminationServlet</servlet-name>
-        <url-pattern>/federation-terminate</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessTermination</servlet-name>
-        <url-pattern>/ProcessTermination/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReturnTermination</servlet-name>
-        <url-pattern>/ReturnTermination/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>InitiateRegistration</servlet-name>
-        <url-pattern>/InitiateRegistration</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessRegistration</servlet-name>
-        <url-pattern>/ProcessRegistration/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReturnRegistration</servlet-name>
-        <url-pattern>/ReturnRegistration/*</url-pattern>
-    </servlet-mapping>
-    <!-- CVE-2026-45052: The Liberty ID-WSF SOAP receiver
-         (/Liberty/idpp, /Liberty/disco) is disabled because it allows
-         unauthenticated read/write access to another user's IDPP and
-         Discovery Service entries (CWE-285).
-    <servlet-mapping>
-        <servlet-name>WSSOAPReceiver</servlet-name>
-        <url-pattern>/Liberty/*</url-pattern>
-    </servlet-mapping>
     -->
-    <servlet-mapping>
-        <servlet-name>WSPRedirectHandler</servlet-name>
-        <url-pattern>/WSPRedirectHandler/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>idffwriter</servlet-name>
-        <url-pattern>/idffwriter</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>idffreader</servlet-name>
-        <url-pattern>/idffreader</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>saml2writer</servlet-name>
         <url-pattern>/saml2writer</url-pattern>
@@ -1073,10 +852,6 @@
     <servlet-mapping>
         <servlet-name>saml2reader</servlet-name>
         <url-pattern>/saml2reader</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>MultiProtocolRelayServlet</servlet-name>
-        <url-pattern>/multiprotocolrelay/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>WSFederationServlet</servlet-name>
@@ -1126,19 +901,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>OAuth2RegisterClient</servlet-name>
-        <jsp-file>/oauth2/registerClient.jsp</jsp-file>
-    </servlet>
-
-    <servlet>
         <servlet-name>OAuth2ConnectCheckSession</servlet-name>
         <jsp-file>/oauth2/checkSession.jsp</jsp-file>
     </servlet>
-
-    <servlet-mapping>
-        <servlet-name>OAuth2RegisterClient</servlet-name>
-        <url-pattern>/oauth2/registerClient.jsp</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>OAuth2ConnectCheckSession</servlet-name>
