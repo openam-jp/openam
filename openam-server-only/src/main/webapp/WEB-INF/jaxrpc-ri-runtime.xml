@@ -25,6 +25,7 @@
 
    $Id: jaxrpc-ri-runtime.xml,v 1.2 2008/06/25 05:48:39 qcheng Exp $
 
+   Portions Copyrighted 2026 OSSTech Corporation
 -->
 
 <endpoints xmlns='http://java.sun.com/xml/ns/jax-rpc/ri/runtime' version='1.0'>
