@@ -412,19 +412,6 @@
         <servlet-class>com.sun.identity.saml.servlet.AssertionManagerServlet</servlet-class>
     </servlet>
     <servlet>
-        <description>SecurityTokenManagerServlet</description>
-        <servlet-name>SecurityTokenManagerServlet</servlet-name>
-        <servlet-class>com.sun.identity.liberty.ws.security.SecurityTokenManagerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>WSSOAPReceiver</servlet-name>
-        <servlet-class>com.sun.identity.liberty.ws.soapbinding.SOAPReceiver</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>WSPRedirectHandler</servlet-name>
-        <servlet-class>com.sun.identity.liberty.ws.interaction.WSPRedirectHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>saml2writer</servlet-name>
         <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet</servlet-class>
     </servlet>
@@ -849,23 +836,6 @@
     <servlet-mapping>
         <servlet-name>AssertionManagerServlet</servlet-name>
         <url-pattern>/AssertionManagerServlet/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SecurityTokenManagerServlet</servlet-name>
-        <url-pattern>/SecurityTokenManagerServlet/*</url-pattern>
-    </servlet-mapping>
-    <!-- CVE-2026-45052: The Liberty ID-WSF SOAP receiver
-         (/Liberty/idpp, /Liberty/disco) is disabled because it allows
-         unauthenticated read/write access to another user's IDPP and
-         Discovery Service entries (CWE-285).
-    <servlet-mapping>
-        <servlet-name>WSSOAPReceiver</servlet-name>
-        <url-pattern>/Liberty/*</url-pattern>
-    </servlet-mapping>
-    -->
-    <servlet-mapping>
-        <servlet-name>WSPRedirectHandler</servlet-name>
-        <url-pattern>/WSPRedirectHandler/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>saml2writer</servlet-name>
