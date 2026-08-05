@@ -48,6 +48,7 @@
         service='IdentityManagementServices'
         port='DirectoryManagerIFPort'
         urlpattern='/jaxrpc/DirectoryManagerIF'/>
+    <!-- SAML 1.x disabled
     <endpoint
         name='AssertionManagerIF'
         interface='com.sun.identity.saml.AssertionManagerIF'
@@ -58,4 +59,5 @@
         service='AssertionManagerService'
         port='AssertionManagerIFPort'
         urlpattern='/AssertionManagerServlet/AssertionManagerIF'/>
+    -->
 </endpoints>

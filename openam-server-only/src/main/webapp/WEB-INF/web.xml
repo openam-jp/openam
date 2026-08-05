@@ -391,6 +391,7 @@
         <servlet-name>cdcservlet</servlet-name>
         <servlet-class>com.iplanet.services.cdc.CDCServlet</servlet-class>
     </servlet>
+    <!-- SAML 1.x disabled
     <servlet>
         <description>SAMLAwareServlet</description>
         <servlet-name>SAMLAwareServlet</servlet-name>
@@ -411,6 +412,7 @@
         <servlet-name>AssertionManagerServlet</servlet-name>
         <servlet-class>com.sun.identity.saml.servlet.AssertionManagerServlet</servlet-class>
     </servlet>
+    -->
     <servlet>
         <servlet-name>saml2writer</servlet-name>
         <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet</servlet-class>
@@ -821,6 +823,7 @@
         <servlet-name>cdcservlet</servlet-name>
         <url-pattern>/cdcservlet</url-pattern>
     </servlet-mapping>
+    <!-- SAML 1.x disabled
     <servlet-mapping>
         <servlet-name>SAMLAwareServlet</servlet-name>
         <url-pattern>/SAMLAwareServlet</url-pattern>
@@ -837,6 +840,7 @@
         <servlet-name>AssertionManagerServlet</servlet-name>
         <url-pattern>/AssertionManagerServlet/*</url-pattern>
     </servlet-mapping>
+    -->
     <servlet-mapping>
         <servlet-name>saml2writer</servlet-name>
         <url-pattern>/saml2writer</url-pattern>
