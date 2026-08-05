@@ -350,10 +350,12 @@
         <servlet-name>SMSServlet</servlet-name>
         <servlet-class>com.sun.identity.sm.SMServlet</servlet-class>
     </servlet>
+    <!-- Password Reset UI disabled
     <servlet>
         <servlet-name>PWResetServlet</servlet-name>
         <servlet-class>com.sun.identity.password.ui.PWResetServlet</servlet-class>
     </servlet>
+    -->
     <servlet>
         <description>notificationservice</description>
         <servlet-name>notificationservice</servlet-name>
@@ -625,10 +627,12 @@
         <servlet-name>InitialSetup</servlet-name>
         <url-pattern>/config/initialSetup</url-pattern>
     </servlet-mapping>
+    <!-- Password Reset UI disabled
     <servlet-mapping>
         <servlet-name>PWResetServlet</servlet-name>
         <url-pattern>/ui/*</url-pattern>
     </servlet-mapping>
+    -->
     <servlet-mapping>
         <servlet-name>GatewayServlet</servlet-name>
         <url-pattern>/gateway</url-pattern>
