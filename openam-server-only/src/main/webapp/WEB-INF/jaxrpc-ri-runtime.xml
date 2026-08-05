@@ -49,16 +49,6 @@
         port='DirectoryManagerIFPort'
         urlpattern='/jaxrpc/DirectoryManagerIF'/>
     <endpoint
-        name='EntityObjectIF'
-        interface='com.sun.identity.entity.EntityObjectIF'
-        implementation='com.sun.identity.entity.EntityObjectImpl'
-        tie='com.sun.identity.entity.EntityObjectIF_Tie'
-        model=''
-        wsdl='/WEB-INF/wsdl/IdentityManagementServices.wsdl'
-        service='IdentityManagementServices'
-        port='EntityObjectIFPort'
-        urlpattern='/jaxrpc/EntityObjectIF'/>
-    <endpoint
         name='AssertionManagerIF'
         interface='com.sun.identity.saml.AssertionManagerIF'
         implementation='com.sun.identity.saml.AssertionManagerImpl'
