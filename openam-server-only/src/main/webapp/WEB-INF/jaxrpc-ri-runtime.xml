@@ -59,16 +59,6 @@
         port='EntityObjectIFPort'
         urlpattern='/jaxrpc/EntityObjectIF'/>
     <endpoint
-        name='IdentityServices'
-        interface='com.sun.identity.idsvcs.IdentityServices'
-        implementation='com.sun.identity.idsvcs.opensso.IdentityServicesImpl'
-        tie='com.sun.identity.idsvcs.IdentityServicesImpl_Tie'
-        mode=''
-        wsdl='/WEB-INF/wsdl/IdentityServices.wsdl'
-        service='IdentityServices'
-        port='IdentityServicesPort'
-        urlpattern='/identityservices/IdentityServices'/>
-    <endpoint
         name='AssertionManagerIF'
         interface='com.sun.identity.saml.AssertionManagerIF'
         implementation='com.sun.identity.saml.AssertionManagerImpl'

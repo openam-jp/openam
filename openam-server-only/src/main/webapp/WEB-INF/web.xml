@@ -360,12 +360,6 @@
         <servlet-class>com.iplanet.services.comm.client.PLLNotificationServlet</servlet-class>
     </servlet>
     <servlet>
-        <description>Web Service Endpoint - Identity Services</description>
-        <display-name>IdentityServices</display-name>
-        <servlet-name>IdentityServices</servlet-name>
-        <servlet-class>com.sun.identity.idsvcs.IdentityServicesServlet</servlet-class>
-    </servlet>
-    <servlet>
         <description>REST Endpoint - Identity Services</description>
         <display-name>IdentityServicesHandler</display-name>
         <servlet-name>IdentityServicesHandler</servlet-name>
@@ -770,10 +764,6 @@
     <servlet-mapping>
         <servlet-name>notificationservice</servlet-name>
         <url-pattern>/notificationservice</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>IdentityServices</servlet-name>
-        <url-pattern>/identityservices/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>IdentityServicesHandler</servlet-name>
