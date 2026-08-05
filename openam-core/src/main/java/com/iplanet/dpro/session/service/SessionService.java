@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2021-2026 OSSTech Corporation
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.service;
 
@@ -86,6 +87,7 @@ import org.forgerock.openam.sso.providers.stateless.StatelessSession;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionFactory;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -919,7 +921,7 @@ public class SessionService {
 
         if (sess != null) {
             sid = sess.getID();
-            checkPermissionToDestroySession(requester, sid);
+            checkPermissionToDestroySession(requester, sess);
             destroyInternalSession(sid);
         }
     }
@@ -936,11 +938,44 @@ public class SessionService {
      * </ul>
      *
      * @param requester The requester's session.
-     * @param sid The session to destroy.
+     * @param sessionToDestroy The session to destroy. Both the session id and the realm the permission is evaluated
+     * against are derived from it, so that the two can never refer to different sessions.
      * @throws SessionException If none of the conditions above is fulfilled, i.e. when the requester does not have the
      * necessary permissions to destroy the session.
      */
-    public void checkPermissionToDestroySession(Session requester, SessionID sid) throws SessionException {
+    public void checkPermissionToDestroySession(Session requester, Session sessionToDestroy) throws SessionException {
+        checkPermissionToDestroySession(requester, sessionToDestroy.getID(), sessionToDestroy.getClientDomain());
+    }
+
+    /**
+     * Checks if the requester has the necessary permission to destroy the provided session.
+     *
+     * @param requester The requester's session.
+     * @param sessionToDestroy The internal session to destroy. Both the session id and the realm the permission is
+     * evaluated against are derived from it, so that the two can never refer to different sessions.
+     * @throws SessionException If the requester does not have the necessary permissions to destroy the session.
+     * @see #checkPermissionToDestroySession(Session, Session)
+     */
+    public void checkPermissionToDestroySession(Session requester, InternalSession sessionToDestroy)
+            throws SessionException {
+        checkPermissionToDestroySession(requester, sessionToDestroy.getID(), sessionToDestroy.getClientDomain());
+    }
+
+    /**
+     * Checks the permission against an already resolved session id and realm.
+     * <p>
+     * Private on purpose: the realm must always be the realm of the session identified by {@code sid}, and passing
+     * the requester's own realm here is exactly the defect this method had. Callers have to hand over the session
+     * object so that the two facts cannot drift apart.
+     *
+     * @param requester The requester's session.
+     * @param sid The id of the session to destroy.
+     * @param sessionClientDomain The client domain (realm) of the session identified by {@code sid}. Never the
+     * requester's own client domain.
+     * @throws SessionException If the requester does not have the necessary permissions to destroy the session.
+     */
+    private void checkPermissionToDestroySession(Session requester, SessionID sid, String sessionClientDomain)
+            throws SessionException {
         if (requester.getState(false) != VALID) {
             throw new SessionException(SessionBundle.getString("invalidSessionState") + sid.toString());
         }
@@ -950,11 +985,27 @@ public class SessionService {
                 return;
             }
 
-            AMIdentity user = getUser(requester);
-            Set<String> orgList = user.getAttribute("iplanet-am-session-destroy-sessions");
-            if (!orgList.contains(requester.getClientDomain())) {
+            // The realm restriction has to be evaluated against the session being destroyed, not against the
+            // requester's own realm, otherwise the delegation is not scoped to a realm at all.
+            if (StringUtils.isBlank(sessionClientDomain)) {
+                sessionDebug.warning("SessionService.checkPermissionToDestroySession: refusing to destroy a session, "
+                        + "the realm of the session to destroy could not be determined.");
                 throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
             }
+
+            AMIdentity user = getUser(requester);
+            if (user == null) {
+                sessionDebug.warning("SessionService.checkPermissionToDestroySession: refusing to destroy a session, "
+                        + "the identity of the requester could not be resolved.");
+                throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
+            }
+            Set<String> orgList = user.getAttribute("iplanet-am-session-destroy-sessions");
+            if (orgList == null || !orgList.contains(sessionClientDomain)) {
+                throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
+            }
+        } catch (SessionException se) {
+            // Propagate the denial (and any state error) unchanged rather than re-wrapping it below.
+            throw se;
         } catch (Exception e) {
             throw new SessionException(e);
         }
