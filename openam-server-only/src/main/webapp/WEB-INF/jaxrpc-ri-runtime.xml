@@ -69,16 +69,6 @@
         port='AssertionManagerIFPort'
         urlpattern='/AssertionManagerServlet/AssertionManagerIF'/>
     <endpoint
-        name='FSAssertionManagerIF'
-        interface='com.sun.identity.federation.services.FSAssertionManagerIF'
-        implementation='com.sun.identity.federation.services.FSAssertionManagerImpl'
-        tie='com.sun.identity.federation.services.FSAssertionManagerIF_Tie'
-        model=''
-        wsdl=''
-        service='FSAssertionManagerService'
-        port='FSAssertionManagerIFPort'
-        urlpattern='/FSAssertionManagerServlet/FSAssertionManagerIF'/>
-    <endpoint
         name='SecurityTokenManagerIF'
         interface='com.sun.identity.liberty.ws.security.SecurityTokenManagerIF'
         implementation='com.sun.identity.liberty.ws.security.SecurityTokenManagerImpl'

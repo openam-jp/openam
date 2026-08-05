@@ -412,74 +412,9 @@
         <servlet-class>com.sun.identity.saml.servlet.AssertionManagerServlet</servlet-class>
     </servlet>
     <servlet>
-        <description>FSAssertionManagerServlet</description>
-        <servlet-name>FSAssertionManagerServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.FSAssertionManagerServlet</servlet-class>
-    </servlet>
-    <servlet>
         <description>SecurityTokenManagerServlet</description>
         <servlet-name>SecurityTokenManagerServlet</servlet-name>
         <servlet-class>com.sun.identity.liberty.ws.security.SecurityTokenManagerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>preLoginHandler</servlet-name>
-        <servlet-class>com.sun.identity.federation.login.FSPreLoginHandler</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>postLoginHandler</servlet-name>
-        <servlet-class>com.sun.identity.federation.login.FSPostLoginHandler</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessLogout</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.logout.FSProcessLogoutServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReturnLogout</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.logout.FSReturnLogoutServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SingleSignOnService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSSSOAndFedService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>IntersiteTransferService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSIntersiteTransferService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AssertionConsumerService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSAssertionConsumerService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>SOAPReceiver</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.FSSOAPReceiver</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>FederationTerminationServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.termination.FSTerminationInitiationServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessTermination</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.termination.FSTerminationRequestServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReturnTermination</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.termination.FSTerminationReturnServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>InitiateRegistration</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.registration.FSRegistrationInitiationServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ProcessRegistration</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.registration.FSRegistrationRequestServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReturnRegistration</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.registration.FSRegistrationReturnServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.logout.FSSingleLogoutServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>WSSOAPReceiver</servlet-name>
@@ -488,18 +423,6 @@
     <servlet>
         <servlet-name>WSPRedirectHandler</servlet-name>
         <servlet-class>com.sun.identity.liberty.ws.interaction.WSPRedirectHandlerServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>IDPFinderService</servlet-name>
-        <servlet-class>com.sun.identity.federation.services.fednsso.FSIDPFinderService</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>idffwriter</servlet-name>
-        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>idffreader</servlet-name>
-        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieReaderServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>saml2writer</servlet-name>
@@ -644,10 +567,6 @@
     <servlet>
         <servlet-name>spsaehandler</servlet-name>
         <jsp-file>/saml2/jsp/SA_SP.jsp</jsp-file>
-    </servlet>
-    <servlet>
-        <servlet-name>MultiProtocolRelayServlet</servlet-name>
-        <servlet-class>com.sun.identity.multiprotocol.MultiProtocolRelayServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>WSFederationServlet</servlet-name>
@@ -912,10 +831,6 @@
         <url-pattern>/spsaehandler/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>IDPFinderService</servlet-name>
-        <url-pattern>/idpfinder</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>cdcservlet</servlet-name>
         <url-pattern>/cdcservlet</url-pattern>
     </servlet-mapping>
@@ -936,72 +851,8 @@
         <url-pattern>/AssertionManagerServlet/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>FSAssertionManagerServlet</servlet-name>
-        <url-pattern>/FSAssertionManagerServlet/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>SecurityTokenManagerServlet</servlet-name>
         <url-pattern>/SecurityTokenManagerServlet/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>preLoginHandler</servlet-name>
-        <url-pattern>/preLogin</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>postLoginHandler</servlet-name>
-        <url-pattern>/postLogin/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessLogout</servlet-name>
-        <url-pattern>/ProcessLogout/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReturnLogout</servlet-name>
-        <url-pattern>/ReturnLogout/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/liberty-logout</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SingleSignOnService</servlet-name>
-        <url-pattern>/SingleSignOnService/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>IntersiteTransferService</servlet-name>
-        <url-pattern>/IntersiteTransferService</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AssertionConsumerService</servlet-name>
-        <url-pattern>/AssertionConsumerService/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SOAPReceiver</servlet-name>
-        <url-pattern>/SOAPReceiver/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>FederationTerminationServlet</servlet-name>
-        <url-pattern>/federation-terminate</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessTermination</servlet-name>
-        <url-pattern>/ProcessTermination/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReturnTermination</servlet-name>
-        <url-pattern>/ReturnTermination/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>InitiateRegistration</servlet-name>
-        <url-pattern>/InitiateRegistration</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ProcessRegistration</servlet-name>
-        <url-pattern>/ProcessRegistration/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReturnRegistration</servlet-name>
-        <url-pattern>/ReturnRegistration/*</url-pattern>
     </servlet-mapping>
     <!-- CVE-2026-45052: The Liberty ID-WSF SOAP receiver
          (/Liberty/idpp, /Liberty/disco) is disabled because it allows
@@ -1017,24 +868,12 @@
         <url-pattern>/WSPRedirectHandler/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>idffwriter</servlet-name>
-        <url-pattern>/idffwriter</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>idffreader</servlet-name>
-        <url-pattern>/idffreader</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>saml2writer</servlet-name>
         <url-pattern>/saml2writer</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>saml2reader</servlet-name>
         <url-pattern>/saml2reader</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>MultiProtocolRelayServlet</servlet-name>
-        <url-pattern>/multiprotocolrelay/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>WSFederationServlet</servlet-name>
