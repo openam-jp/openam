@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -28,6 +29,7 @@ package com.sun.identity.entitlement.opensso;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.EntitlementClassResolver;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.policy.PolicyException;
@@ -163,7 +165,10 @@ public class PolicyResponseProvider implements ResourceAttribute {
     @JsonIgnore
     public ResponseProvider getResponseProvider() throws EntitlementException {
         try {
-            ResponseProvider rp = Class.forName(className).asSubclass(ResponseProvider.class).newInstance();
+            // Resolve without running the target's static initializer and reject any class that is
+            // not an instantiable com.sun.identity.policy ResponseProvider BEFORE it is constructed
+            // (unsafe reflection, CWE-470).
+            ResponseProvider rp = EntitlementClassResolver.newInstance(className, ResponseProvider.class);
             Map<String, Set<String>> properties = new HashMap<String, Set<String>>();
             properties.put(propertyName, propertyValues);
             rp.setProperties(properties);
