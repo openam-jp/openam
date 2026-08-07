@@ -15,6 +15,7 @@
  *
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
  * Portions copyright 2026 OSSTech Corporation
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -317,6 +318,41 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     /**
+     * Stubs out the full happy path through {@code handle}, so that a test only needs to stub the
+     * PKCE specific values it cares about (enforcement flags, code challenge, challenge method and
+     * the supplied code_verifier).
+     *
+     * @return the mocked AuthorizationCode returned by the token store.
+     */
+    private AuthorizationCode givenHappyPathCode(AccessToken accessToken) throws Exception {
+
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        Set<String> validatedScope = new HashSet<String>();
+
+        given(request.getParameter("code")).willReturn("abc123");
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
+        given(authorizationCode.isIssued()).willReturn(false);
+        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getExpiryTime()).willReturn(currentTimeMillis() + 100);
+        given(authorizationCode.getResourceOwnerId()).willReturn("USERNAME");
+        given(authorizationCode.getRealm()).willReturn("/");
+        given(providerSettings.issueRefreshTokens()).willReturn(false);
+        given(tokenStore.createAccessToken(nullable(String.class), nullable(String.class), nullable(String.class),
+                nullable(String.class), nullable(String.class), nullable(String.class),
+                ArgumentMatchers.<String>anySet(), ArgumentMatchers.<RefreshToken>any(), nullable(String.class),
+                nullable(String.class), eq(request)))
+                .willReturn(accessToken);
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), ArgumentMatchers.<String>anySet(),
+                eq(request)))
+                .willReturn(validatedScope);
+
+        return authorizationCode;
+    }
+
+    /**
      * RFC 7636 §4.6: when the authorization code was issued with a code_challenge, the token
      * endpoint must reject a request that omits code_verifier, even if the realm-wide and
      * client-level enforcement settings are both disabled (the default).
@@ -326,10 +362,8 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             throws Exception {
 
         //Given
-        given(request.getParameter("code")).willReturn("abc123");
-        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        AuthorizationCode authorizationCode = givenHappyPathCode(mock(AccessToken.class));
 
-        given(tokenStore.readAuthorizationCode(eq(request), nullable(String.class))).willReturn(authorizationCode);
         given(authorizationCode.getCodeChallenge()).willReturn("CHALLENGE");
         // enforcement settings remain disabled (default mock return value of false)
         given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn(null);
@@ -339,6 +373,137 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Then
         // Expect InvalidRequestException
+    }
+
+    /**
+     * The hybrid response types ("code token", "code id_token", "code id_token token") issue an
+     * authorization code as well, so a code minted without a code_challenge while enforcement is on
+     * must be refused at the token endpoint rather than exchanged for tokens.
+     */
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void handleShouldThrowInvalidRequestExceptionWhenEnforcedAndCodeHasNoChallenge() throws Exception {
+
+        //Given
+        AuthorizationCode authorizationCode = givenHappyPathCode(mock(AccessToken.class));
+
+        given(providerSettings.isCodeVerifierRequired()).willReturn(true);
+        given(authorizationCode.getCodeChallenge()).willReturn(null);
+        given(authorizationCode.getCodeChallengeMethod()).willReturn(null);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("anyVerifier");
+
+        //When
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidRequestException
+    }
+
+    /** The same fail closed behaviour must apply to the client level enforcement flag. */
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void handleShouldThrowInvalidRequestExceptionWhenClientEnforcesAndCodeHasNoChallenge() throws Exception {
+
+        //Given
+        AuthorizationCode authorizationCode = givenHappyPathCode(mock(AccessToken.class));
+
+        given(providerSettings.isCodeVerifierRequired()).willReturn(false);
+        given(clientRegistration.isCodeVerifierRequired()).willReturn(true);
+        given(authorizationCode.getCodeChallenge()).willReturn(null);
+        given(authorizationCode.getCodeChallengeMethod()).willReturn(null);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("anyVerifier");
+
+        //When
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidRequestException
+    }
+
+    /** An empty code_verifier is no verifier at all and must be rejected like a missing one. */
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void handleShouldThrowInvalidRequestExceptionWhenCodeVerifierIsEmpty() throws Exception {
+
+        //Given
+        AuthorizationCode authorizationCode = givenHappyPathCode(mock(AccessToken.class));
+
+        given(providerSettings.isCodeVerifierRequired()).willReturn(true);
+        given(authorizationCode.getCodeChallenge()).willReturn(s256("CORRECT_VERIFIER"));
+        given(authorizationCode.getCodeChallengeMethod())
+                .willReturn(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("");
+
+        //When
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidRequestException
+    }
+
+    /** RFC 7636 §4.3: an omitted code_challenge_method defaults to "plain". */
+    @Test
+    public void shouldHandleWhenChallengeMethodOmittedAndPlainVerifierMatches() throws Exception {
+
+        //Given
+        AccessToken accessToken = mock(AccessToken.class);
+        AuthorizationCode authorizationCode = givenHappyPathCode(accessToken);
+
+        given(authorizationCode.getCodeChallenge()).willReturn("aPlainVerifier");
+        given(authorizationCode.getCodeChallengeMethod()).willReturn(null);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("aPlainVerifier");
+
+        //When
+        AccessToken actualAccessToken = grantTypeHandler.handle(request);
+
+        //Then
+        verify(authorizationCode).setIssued();
+        assertEquals(actualAccessToken, accessToken);
+    }
+
+    /**
+     * An explicitly empty code_challenge_method is malformed, not omitted: treating it as "plain"
+     * would downgrade a challenge that was meant to be S256 into one the verifier matches literally.
+     */
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void handleShouldThrowInvalidRequestExceptionWhenChallengeMethodIsEmptyString() throws Exception {
+
+        //Given
+        AuthorizationCode authorizationCode = givenHappyPathCode(mock(AccessToken.class));
+
+        given(authorizationCode.getCodeChallenge()).willReturn("aPlainVerifier");
+        given(authorizationCode.getCodeChallengeMethod()).willReturn("");
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("aPlainVerifier");
+
+        //When
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidRequestException
+    }
+
+    /**
+     * The PKCE enforcement check must sit after the replay check, so that replaying a code minted
+     * without a challenge still invalidates the tokens issued from it instead of being turned away
+     * early by an InvalidRequestException.
+     */
+    @Test
+    public void handleShouldInvalidateTokensWhenChallengeLessCodeIsReplayedUnderEnforcement() throws Exception {
+
+        //Given
+        AuthorizationCode authorizationCode = givenHappyPathCode(mock(AccessToken.class));
+
+        given(providerSettings.isCodeVerifierRequired()).willReturn(true);
+        given(authorizationCode.getCodeChallenge()).willReturn(null);
+        given(request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER)).willReturn("anyVerifier");
+        given(authorizationCode.isIssued()).willReturn(true);
+
+        try {
+            //When
+            grantTypeHandler.handle(request);
+            fail("Expected exception as authorization code has already been issued");
+        } catch (InvalidGrantException e) {
+            //Then
+            verify(tokenInvalidator).invalidateTokens(eq(request), nullable(String.class), nullable(String.class),
+                    nullable(String.class));
+        }
     }
 
     /**
