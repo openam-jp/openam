@@ -14,6 +14,7 @@
  * Copyright 2014-2016 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
  * Portions Copyrighted 2019 OGIS-RI Co., Ltd.
+ * Portions copyright 2026 3A Systems LLC.
  */
 package org.forgerock.openam.oauth2.guice;
 
@@ -111,6 +112,7 @@ import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
+import org.forgerock.openam.oauth2.validation.JwksUriValidator;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.oauth2.validation.SsrfUrlValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
@@ -224,6 +226,7 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
         bind(SsrfUrlValidator.class).toInstance(SsrfUrlValidator.getInstance());
+        bind(JwksUriValidator.class).toInstance(JwksUriValidator.getInstance());
         install(new LabelsGuiceModule());
 
         bind(OAuth2UrisFactory.class).to(OpenAMOAuth2UrisFactory.class);
