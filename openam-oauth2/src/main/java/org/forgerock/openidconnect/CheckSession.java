@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openidconnect;
@@ -40,9 +41,11 @@ import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
@@ -64,6 +67,7 @@ public class CheckSession {
     private final ClientRegistrationStore clientRegistrationStore;
     private final CTSPersistentStore cts;
     private final TokenAdapter<JsonValue> tokenAdapter;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new CheckSession.
@@ -71,11 +75,42 @@ public class CheckSession {
     public CheckSession() {
         ssoTokenManager = InjectorHolder.getInstance(SSOTokenManager.class);
         openAMSettings = InjectorHolder.getInstance(OpenAMSettings.class);
+        providerSettingsFactory = InjectorHolder.getInstance(OAuth2ProviderSettingsFactory.class);
         signingManager = InjectorHolder.getInstance(SigningManager.class);
         clientRegistrationStore = InjectorHolder.getInstance(ClientRegistrationStore.class);
         cts = InjectorHolder.getInstance(CTSPersistentStore.class);
         tokenAdapter = InjectorHolder.getInstance(Key.get(new TypeLiteral<TokenAdapter<JsonValue>>() { },
                 Names.named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)));
+    }
+
+    /**
+     * Whether OpenID Connect Session Management is enabled for the realm of the request. As the checkSession
+     * endpoint is not realm specific, the realm is taken from the OpenID Token of the request, and the feature is
+     * treated as disabled when the realm cannot be determined.
+     *
+     * @param request The HttpServletRequest.
+     * @return {@code true} if OpenID Connect Session Management is enabled.
+     */
+    public boolean isSessionManagementEnabled(HttpServletRequest request) {
+        final SignedJwt jwt = getIDToken(request);
+
+        if (jwt == null) {
+            return false;
+        }
+
+        final String realm = (String) jwt.getClaimsSet().getClaim(REALM);
+
+        if (realm == null) {
+            logger.error("No realm found in the id_token supplied to the checkSession endpoint");
+            return false;
+        }
+
+        try {
+            return providerSettingsFactory.get(OAuth2Request.forRealm(realm)).isOidcSessionManagementEnabled();
+        } catch (NotFoundException | ServerException e) {
+            logger.error("Unable to get the OAuth2 provider settings of the realm " + realm, e);
+            return false;
+        }
     }
 
     /**

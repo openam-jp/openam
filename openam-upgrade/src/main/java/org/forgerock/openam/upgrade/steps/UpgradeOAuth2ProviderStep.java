@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -61,6 +62,8 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
     private static final Map<String, String> RESPONSE_TYPE_PLUGINS_UPGRADE_MAPPINGS = new HashMap<>();
     private static final String OLD_SCOPE_PLUGIN = "org.forgerock.openam.oauth2.provider.impl.ScopeImpl";
     private static final String NEW_SCOPE_PLUGIN = "org.forgerock.openam.oauth2.OpenAMScopeValidator";
+    private static final Set<String> OIDC_ENDPOINT_ENABLED_ATTRIBUTES = asSet(OIDC_SESSION_MANAGEMENT_ENABLED,
+            OIDC_RP_INITIATED_LOGOUT_ENABLED, OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED);
 
     static {
         ALGORITHM_NAMES.put(JwsAlgorithm.HS256.getAlgorithm(), JwsAlgorithm.HS256.name());
@@ -91,6 +94,8 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
     private static final String OAUTH2_PROVIDER = "OAuth2Provider";
 
     private final Map<String, Map<String, Set<String>>> attributesToUpdate =
+            new HashMap<String, Map<String, Set<String>>>();
+    private final Map<String, Map<String, Set<String>>> oidcEndpointsToEnable =
             new HashMap<String, Map<String, Set<String>>>();
     private ServiceConfigManager scm;
     private ServiceSchemaManager ssm;
@@ -135,6 +140,11 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 final Map<String, Set<String>> withoutValidators = SMSUtils.removeValidators(withDefaults,
                         serviceSchema);
 
+                final Map<String, Set<String>> oidcEndpoints = getOidcEndpointsToEnable(withoutDefaults);
+                if (!oidcEndpoints.isEmpty()) {
+                    oidcEndpointsToEnable.put(realm, oidcEndpoints);
+                }
+
                 if (isProviderRelyingOnDefaults(withoutDefaults, withoutValidators)) {
                     attributesToUpdate.put(realm, withoutValidators);
                 } else if (shouldUpgradeClaims(withDefaults)) {
@@ -144,6 +154,8 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 } else if (shouldUpgradeResponseTypePlugins(withoutDefaults)) {
                     attributesToUpdate.put(realm, null);
                 } else if (shouldUpgradeScopePlugin(withoutDefaults)) {
+                    attributesToUpdate.put(realm, null);
+                } else if (!oidcEndpoints.isEmpty()) {
                     attributesToUpdate.put(realm, null);
                 }
             }
@@ -193,6 +205,23 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
         return attributes.get(SCOPE_PLUGIN_CLASS).contains(OLD_SCOPE_PLUGIN);
     }
 
+    /**
+     * The OpenID Connect endpoint settings are disabled by default, so providers that were created before those
+     * settings existed have to have them enabled explicitly to retain their behaviour.
+     *
+     * @param withoutDefaults The provider's attributes without the schema defaults.
+     * @return The settings that need to be enabled, which is empty if the provider has all of them set already.
+     */
+    private Map<String, Set<String>> getOidcEndpointsToEnable(Map<String, Set<String>> withoutDefaults) {
+        final Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+        for (String attribute : OIDC_ENDPOINT_ENABLED_ATTRIBUTES) {
+            if (!withoutDefaults.containsKey(attribute)) {
+                result.put(attribute, asSet("true"));
+            }
+        }
+        return result;
+    }
+
     @Override
     public void perform() throws UpgradeException {
         persistDefaultsForProviders();
@@ -212,6 +241,7 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 renameAlgorithms(attributes);
                 sortScopes(attributes);
                 migrateScopeValidatorPlugin(attributes);
+                enableOidcEndpoints(realm, attributes);
                 serviceConfig.setAttributes(attributes);
                 UpgradeProgress.reportEnd("upgrade.success");
             }
@@ -247,6 +277,13 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                 }
             }
             attributes.put(ID_TOKEN_SIGNING_ALGORITHMS, newAlgorithms);
+        }
+    }
+
+    private void enableOidcEndpoints(String realm, Map<String, Set<String>> attributes) {
+        final Map<String, Set<String>> oidcEndpoints = oidcEndpointsToEnable.get(realm);
+        if (oidcEndpoints != null) {
+            attributes.putAll(oidcEndpoints);
         }
     }
 

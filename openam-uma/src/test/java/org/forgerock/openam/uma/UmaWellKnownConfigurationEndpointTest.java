@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.uma;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.*;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -96,7 +98,7 @@ public class UmaWellKnownConfigurationEndpointTest {
         given(providerSettings.getSupportedClaimTokenProfiles())
                 .willReturn(Collections.singleton("CLAIM_TOKEN_PROFILE"));
         given(providerSettings.getSupportedUmaProfiles()).willReturn(Collections.singleton(URI.create("UMA_PROFILE")));
-        given(umaUris.getDynamicClientEndpoint()).willReturn(URI.create("DYNAMIC_CLIENT_ENDPOINT"));
+        given(umaUris.getDynamicClientEndpoint()).willReturn(Optional.of(URI.create("DYNAMIC_CLIENT_ENDPOINT")));
         given(umaUris.getRequestingPartyClaimsEndpoint()).willReturn(URI.create("REQUESTING_PARTY_CLAIMS_ENDPOINT"));
         return providerSettings;
     }

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.uma;
@@ -20,6 +21,7 @@ import static org.forgerock.json.JsonValue.*;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.Optional;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
@@ -95,9 +97,9 @@ public class UmaWellKnownConfigurationEndpoint extends ServerResource {
         if (supportedUmaProfiles != null && !supportedUmaProfiles.isEmpty()) {
             configuration.add("uma_profiles_supported", supportedUmaProfiles);
         }
-        URI dynamicClientEndpoint = umaUris.getDynamicClientEndpoint();
-        if (dynamicClientEndpoint != null) {
-            configuration.add("dynamic_client_endpoint", dynamicClientEndpoint);
+        Optional<URI> dynamicClientEndpoint = umaUris.getDynamicClientEndpoint();
+        if (dynamicClientEndpoint.isPresent()) {
+            configuration.add("dynamic_client_endpoint", dynamicClientEndpoint.get());
         }
         URI requestingPartyClaimsEndpoint = umaUris.getRequestingPartyClaimsEndpoint();
         if (requestingPartyClaimsEndpoint != null) {

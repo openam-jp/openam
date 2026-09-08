@@ -924,6 +924,9 @@ public class OAuth2Constants {
         public static final String PHONE_MAPPING = "org-forgerock-oidc-phone-attribute-mapping";
         public static final String STORE_OPS_TOKENS = "storeOpsTokens";
         public static final String CLIENTS_CAN_SKIP_CONSENT = "clientsCanSkipConsent";
+        public static final String OIDC_SESSION_MANAGEMENT_ENABLED = "osstech-oauth2-provider-oidc-session-management-enabled";
+        public static final String OIDC_RP_INITIATED_LOGOUT_ENABLED = "osstech-oauth2-provider-oidc-rp-initiated-logout-enabled";
+        public static final String OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED = "osstech-oauth2-provider-oidc-dynamic-client-registration-enabled";
 
         public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
         public static final String DEFAULT_SCOPES = "forgerock-oauth2-provider-default-scopes";

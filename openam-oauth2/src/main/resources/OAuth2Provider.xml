@@ -605,6 +605,51 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="osstech-oauth2-provider-oidc-session-management-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="oidcSessionManagementEnabled"
+                                 i18nKey="a139"
+                                 order="430">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="osstech-oauth2-provider-oidc-rp-initiated-logout-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="oidcRpInitiatedLogoutEnabled"
+                                 i18nKey="a140"
+                                 order="440">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="osstech-oauth2-provider-oidc-dynamic-client-registration-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="oidcDynamicClientRegistrationEnabled"
+                                 i18nKey="a141"
+                                 order="450">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema name="ctsSearchRetryNumber" type="single" i18nKey="a137"
                         syntax="number_range" rangeStart="0" rangeEnd="10"
                         order="500">

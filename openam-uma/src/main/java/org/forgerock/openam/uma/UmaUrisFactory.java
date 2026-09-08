@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.uma;
@@ -19,6 +20,7 @@ package org.forgerock.openam.uma;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -210,8 +212,13 @@ public class UmaUrisFactory {
         }
 
         @Override
-        public URI getDynamicClientEndpoint() {
-            return URI.create(oauth2Uris.getClientRegistrationEndpoint());
+        public Optional<URI> getDynamicClientEndpoint() throws ServerException {
+            URI dynamicClientEndpoint = null;
+            Optional<String> clientRegistrationEndpoint = oauth2Uris.getClientRegistrationEndpoint();
+            if (clientRegistrationEndpoint.isPresent()) {
+                dynamicClientEndpoint = URI.create(clientRegistrationEndpoint.get());
+            }
+            return Optional.ofNullable(dynamicClientEndpoint);
         }
 
         /**

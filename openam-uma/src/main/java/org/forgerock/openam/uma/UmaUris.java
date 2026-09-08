@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.uma;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
@@ -84,8 +86,9 @@ public interface UmaUris {
      * Gets the Client registration endpoint.
      *
      * @return The Client registration endpoint.
+     * @throws ServerException If there is a problem reading the configuration.
      */
-    URI getDynamicClientEndpoint();
+    Optional<URI> getDynamicClientEndpoint() throws ServerException;
 
     /**
      * Gets the UMA requesting party claims endpoint.
