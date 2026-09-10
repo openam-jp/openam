@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openidconnect;
@@ -32,6 +33,7 @@ import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -82,10 +84,19 @@ public class OpenIDConnectProviderConfiguration {
         configuration.put("authorization_endpoint", uris.getAuthorizationEndpoint());
         configuration.put("token_endpoint", uris.getTokenEndpoint());
         configuration.put("userinfo_endpoint", uris.getUserInfoEndpoint());
-        configuration.put("check_session_iframe", uris.getCheckSessionEndpoint());
-        configuration.put("end_session_endpoint", uris.getEndSessionEndpoint());
+        Optional<String> checkSessionEndpoint = uris.getCheckSessionEndpoint();
+        if (checkSessionEndpoint.isPresent()) {
+            configuration.put("check_session_iframe", checkSessionEndpoint.get());
+        }
+        Optional<String> endSessionEndpoint = uris.getEndSessionEndpoint();
+        if (endSessionEndpoint.isPresent()) {
+            configuration.put("end_session_endpoint", endSessionEndpoint.get());
+        }
         configuration.put("jwks_uri", uris.getJWKSUri());
-        configuration.put("registration_endpoint", uris.getClientRegistrationEndpoint());
+        Optional<String> clientRegistrationEndpoint = uris.getClientRegistrationEndpoint();
+        if (clientRegistrationEndpoint.isPresent()) {
+            configuration.put("registration_endpoint", clientRegistrationEndpoint.get());
+        }
         configuration.put("claims_supported", providerSettings.getSupportedClaims());
         configuration.put("scopes_supported", providerSettings.getSupportedScopes());
         configuration.put("response_types_supported",

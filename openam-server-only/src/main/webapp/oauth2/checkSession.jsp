@@ -21,6 +21,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Portions copyright 2026 OSSTech Corporation
  */
 --%>
 
@@ -29,6 +31,10 @@
 <%@ page import="org.owasp.esapi.ESAPI" %>
 <%
     CheckSession checkSession = new CheckSession();
+    if (!checkSession.isSessionManagementEnabled(request)) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+    }
     String cookieName = checkSession.getCookieName();
     String clientSessionURI = checkSession.getClientSessionURI(request);
     Boolean validSession = checkSession.getValidSession(request);

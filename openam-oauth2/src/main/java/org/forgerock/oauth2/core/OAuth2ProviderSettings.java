@@ -1236,6 +1236,51 @@ public class OAuth2ProviderSettings extends OpenAMSettingsImpl {
     }
 
     /**
+     * Whether OpenID Connect Session Management is enabled.
+     *
+     * @return {@code true} if OpenID Connect Session Management is enabled.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    public boolean isOidcSessionManagementEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.OIDC_SESSION_MANAGEMENT_ENABLED);
+        } catch (SSOException | SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    /**
+     * Whether OpenID Connect RP-Initiated Logout is enabled.
+     *
+     * @return {@code true} if OpenID Connect RP-Initiated Logout is enabled.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    public boolean isOidcRpInitiatedLogoutEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.OIDC_RP_INITIATED_LOGOUT_ENABLED);
+        } catch (SSOException | SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    /**
+     * Whether OpenID Connect Dynamic Client Registration is enabled.
+     *
+     * @return {@code true} if OpenID Connect Dynamic Client Registration is enabled.
+     * @throws ServerException If the setting could not be retrieved.
+     */
+    public boolean isOidcDynamicClientRegistrationEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED);
+        } catch (SSOException | SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    /**
      * The maximum number of searches for a code or token that is being replicated.
      * @return The maximum number of retries.
      * @throws ServerException If the setting could not be retrieved.

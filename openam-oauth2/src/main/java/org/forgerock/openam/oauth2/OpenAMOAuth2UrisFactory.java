@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.oauth2;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -182,13 +184,21 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
         }
 
         @Override
-        public String getCheckSessionEndpoint() {
-            return baseUrl + "/connect/checkSession";
+        public Optional<String> getCheckSessionEndpoint() throws ServerException {
+            String checkSessionEndpoint = null;
+            if (oAuth2ProviderSettings.isOidcSessionManagementEnabled()) {
+                checkSessionEndpoint = baseUrl + "/connect/checkSession";
+            }
+            return Optional.ofNullable(checkSessionEndpoint);
         }
 
         @Override
-        public String getEndSessionEndpoint() {
-            return baseUrl + "/connect/endSession";
+        public Optional<String> getEndSessionEndpoint() throws ServerException {
+            String endSessionEndpoint = null;
+            if (oAuth2ProviderSettings.isOidcRpInitiatedLogoutEnabled()) {
+                endSessionEndpoint = baseUrl + "/connect/endSession";
+            }
+            return Optional.ofNullable(endSessionEndpoint);
         }
 
         @Override
@@ -201,8 +211,12 @@ public class OpenAMOAuth2UrisFactory implements OAuth2UrisFactory<RealmInfo> {
         }
 
         @Override
-        public String getClientRegistrationEndpoint() {
-            return baseUrl + "/connect/register";
+        public Optional<String> getClientRegistrationEndpoint() throws ServerException {
+            String clientRegistrationEndpoint = null;
+            if (oAuth2ProviderSettings.isOidcDynamicClientRegistrationEnabled()) {
+                clientRegistrationEndpoint = baseUrl + "/connect/register";
+            }
+            return Optional.ofNullable(clientRegistrationEndpoint);
         }
     }
 }

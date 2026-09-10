@@ -13,9 +13,12 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions copyright 2026 OSSTech Corporation.
  */
 
 package org.forgerock.oauth2.core;
+
+import java.util.Optional;
 
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
@@ -62,15 +65,17 @@ public interface OAuth2Uris {
      * Gets the URI for the OpenID Connect check session endpoint.
      *
      * @return The OpenID Connect check session endpoint.
+     * @throws ServerException If any internal server error occurs.
      */
-    String getCheckSessionEndpoint();
+    Optional<String> getCheckSessionEndpoint() throws ServerException;
 
     /**
      * Gets the URI for the OpenID Connect end session endpoint.
      *
      * @return The OpenID Connect end session endpoint.
+     * @throws ServerException If any internal server error occurs.
      */
-    String getEndSessionEndpoint();
+    Optional<String> getEndSessionEndpoint() throws ServerException;
 
     /**
      * Gets the JSON Web Key Set URI.
@@ -84,8 +89,9 @@ public interface OAuth2Uris {
      * Gets the OpenID Connect client registration endpoint.
      *
      * @return The OpenID Connect client registration endpoint.
+     * @throws ServerException If any internal server error occurs.
      */
-    String getClientRegistrationEndpoint();
+    Optional<String> getClientRegistrationEndpoint() throws ServerException;
 
     /**
      * Returns the default URL for this provider's token introspection endpoint.

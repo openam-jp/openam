@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openidconnect;
@@ -21,8 +22,11 @@ import javax.inject.Inject;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.slf4j.Logger;
@@ -37,6 +41,7 @@ public class OpenIDConnectEndSession {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final OpenIDConnectProvider openIDConnectProvider;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new OpenIdConnectEndSession.
@@ -44,8 +49,10 @@ public class OpenIDConnectEndSession {
      * @param openIDConnectProvider An instance of the OpenIDConnectProvider.
      */
     @Inject
-    public OpenIDConnectEndSession(final OpenIDConnectProvider openIDConnectProvider) {
+    public OpenIDConnectEndSession(final OpenIDConnectProvider openIDConnectProvider,
+            OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.openIDConnectProvider = openIDConnectProvider;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
@@ -54,11 +61,17 @@ public class OpenIDConnectEndSession {
      *
      * @param request The request.
      * @param idToken The OpenId Token.
-     * @throws BadRequestException If the request is malformed.
+     * @throws BadRequestException If the request is malformed or OpenID Connect RP-Initiated Logout is disabled.
      * @throws ServerException If any internal server error occurs.
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    public void endSession(OAuth2Request request, String idToken) throws BadRequestException, ServerException {
+    public void endSession(OAuth2Request request, String idToken)
+            throws BadRequestException, ServerException, NotFoundException {
 
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        if (!providerSettings.isOidcRpInitiatedLogoutEnabled()) {
+            throw new BadRequestException("OpenID Connect RP-Initiated Logout is disabled");
+        }
         if (idToken == null || idToken.isEmpty()) {
             logger.warn("No id_token_hint parameter supplied to the endSession endpoint");
             throw new BadRequestException("The endSession endpoint requires an id_token_hint parameter");

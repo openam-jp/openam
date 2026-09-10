@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  * Portions copyright 2026 3A Systems LLC.
  */
 
@@ -52,6 +52,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -128,13 +129,17 @@ public class OpenIdConnectClientRegistrationService {
      * @throws UnsupportedResponseTypeException If the requested response type is not supported by either the client
      *          or the OAuth2 provider.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws BadRequestException If OpenID Connect Dynamic Client Registration is disabled.
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
             throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
-            AccessDeniedException, NotFoundException, InvalidPostLogoutRedirectUri {
+            AccessDeniedException, NotFoundException, InvalidPostLogoutRedirectUri, BadRequestException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
+        if (!providerSettings.isOidcDynamicClientRegistrationEnabled()) {
+            throw new BadRequestException("OpenID Connect Dynamic Client Registration is disabled");
+        }
         if (!providerSettings.isOpenDynamicClientRegistrationAllowed()) {
             if (!tokenVerifier.verify(request).isValid()) {
                 throw new AccessDeniedException("Access Token not valid");
@@ -564,9 +569,17 @@ public class OpenIdConnectClientRegistrationService {
      * @throws InvalidRequestException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
      * @throws InvalidClientMetadata
+     * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
+     * @throws ServerException If any internal server error occurs.
+     * @throws BadRequestException If OpenID Connect Dynamic Client Registration is disabled.
      */
     public JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request)
-            throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException {
+            throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException,
+            NotFoundException, ServerException, BadRequestException {
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        if (!providerSettings.isOidcDynamicClientRegistrationEnabled()) {
+            throw new BadRequestException("OpenID Connect Dynamic Client Registration is disabled");
+        }
         if (clientId != null) {
             if (accessToken == null || accessToken.isEmpty()) {
                 logger.error("ConnectClientRegistration.getClient(): Invalid accessToken");
