@@ -21,6 +21,7 @@
  *
  * Copyright 2013-2015 ForgeRock AS.
  * Portions copyright 2020-2026 OSSTech Corporation
+ * Portions copyright 2026 3A Systems LLC
  */
 
 package org.forgerock.openam.services.email;
@@ -47,14 +48,19 @@ public class MailServerImpl implements MailServer {
 
     protected Debug debug = null;
 
+    /**
+     * Names of the Email Service attributes holding the wording of the mails the self service actions send.
+     * Public so that the callers reading them keep no copy of the name of their own.
+     */
+    public static final String SUBJECT = "forgerockEmailServiceSMTPSubject";
+    public static final String MESSAGE = "forgerockEmailServiceSMTPMessage";
+
     private static String SMTP_HOSTNAME = "forgerockEmailServiceSMTPHostName";
     private static String SMTP_HOSTPORT = "forgerockEmailServiceSMTPHostPort";
     private static String SMTP_USERNAME = "forgerockEmailServiceSMTPUserName";
     private static String SMTP_USERPASSWORD = "forgerockEmailServiceSMTPUserPassword";
     private static String SMTP_SSL_ENABLED = "forgerockEmailServiceSMTPSSLEnabled";
     private static String FROM_ADDRESS = "forgerockEmailServiceSMTPFromAddress";
-    private static String SUBJECT = "forgerockEmailServiceSMTPSubject";
-    private static String MESSAGE = "forgerockEmailServiceSMTPMessage";
 
     private static String HTML_MIME_TYPE = "text/html";
     private static String PLAIN_MIME_TYPE = "text/plain";
