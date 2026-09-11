@@ -139,8 +139,9 @@ public final class SAML2MetaUtils {
     public static Object convertStringToJAXB(String str)
         throws JAXBException {
 
+       String replaced = workaroundJAXBBug(str);
        Unmarshaller u = jaxbContext.createUnmarshaller();
-       return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
+       return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(replaced))));
     }
 
     /**
@@ -746,6 +747,10 @@ public final class SAML2MetaUtils {
         } else {
             return convertStringToJAXB(replaced);
         }
+    }
+
+    private static String workaroundJAXBBug(String metadata) {
+        return metadata.replaceAll("<(.*:)?Extensions/>", "");
     }
 
    private static void workaroundAbstractRoleDescriptor(Document doc) {
