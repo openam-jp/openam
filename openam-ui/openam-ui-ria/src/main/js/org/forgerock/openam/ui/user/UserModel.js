@@ -87,7 +87,7 @@ define([
                         currentPassword = this.currentPassword;
                         delete this.currentPassword;
                         options.error = errorCallback;
-                        return ServiceInvoker.restCall(_.extend(
+                        return ServiceInvoker.restCall(_.assign(
                             {
                                 type: "PUT",
                                 data: JSON.stringify(
@@ -124,7 +124,7 @@ define([
                     } else {
                         url = RealmHelper.decorateURLWithOverrideRealm(url);
                     }
-                    return ServiceInvoker.restCall(_.extend(
+                    return ServiceInvoker.restCall(_.assign(
                         {
                             url,
                             "headers": { "Accept-API-Version": "protocol=1.0,resource=2.0" },
@@ -215,7 +215,7 @@ define([
              * @returns {Boolean}      Whether this model has any of the roles specified
              */
             hasRole (roles) {
-                return _.spread(_.partial(_.contains, this.uiroles))(arrayify(roles));
+                return _.spread(_.partial(_.includes, this.uiroles))(arrayify(roles));
             }
         });
     return new UserModel();

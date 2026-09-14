@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -88,7 +89,7 @@ define([
 
                             self.moduleSelect = new SelectComponent({
                                 options: formData.allModules,
-                                selectedOption: _.find(formData.allModules, "_id", linkConfig.module),
+                                selectedOption: _.find(formData.allModules, { _id: linkConfig.module }),
                                 onChange (module) {
                                     linkConfig.module = module._id;
                                     linkConfig.type = module.type;
@@ -104,7 +105,7 @@ define([
                             const criteriaOptions = _.map(formData.allCriteria, (value, key) => ({ key, value }));
                             self.criteriaSelect = new SelectComponent({
                                 options: criteriaOptions,
-                                selectedOption: _.find(criteriaOptions, "key", linkConfig.criteria),
+                                selectedOption: _.find(criteriaOptions, { key: linkConfig.criteria }),
                                 onChange (option) {
                                     linkConfig.criteria = option.key;
                                     dialog.options.validateDialog(dialog);
@@ -124,7 +125,7 @@ define([
 
                                 options[optionsKey] = optionsValue;
                                 if (optionsKey && optionsValue && !_.has(linkConfig.options, optionsKey)) {
-                                    _.extend(linkConfig.options, options);
+                                    _.assign(linkConfig.options, options);
                                     dialog.options.refreshOptionsTab(dialog);
                                     dialog.options.validateDialog(dialog);
                                 }

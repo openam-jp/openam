@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
  /**
@@ -24,7 +25,7 @@ define([
     const emptyValueKeys = schemaValuePair.values.getEmptyValueKeys();
     const requiredAndEmptyKeys = _.intersection(requiredSchemaKeys, emptyValueKeys);
 
-    return _.extend(schemaValuePair, {
+    return _.assign(schemaValuePair, {
         schema: schemaValuePair.schema.addDefaultProperties(requiredAndEmptyKeys)
     });
 });

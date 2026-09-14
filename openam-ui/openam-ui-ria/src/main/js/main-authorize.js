@@ -20,19 +20,19 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 require.config({
     map: {
         "*" : {
             "ThemeManager" : "org/forgerock/openam/ui/common/util/ThemeManager",
-            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter",
-            // TODO: Remove this when there are no longer any references to the "underscore" dependency
-            "underscore"   : "lodash"
+            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter"
         }
     },
     paths: {
-        "lodash":       "libs/lodash-3.10.1-min",
+        "lodash":       "libs/lodash-4.18.1-min",
         "handlebars":   "libs/handlebars-4.0.5",
         "i18next":      "libs/i18next-1.7.3-min",
         "jquery":       "libs/jquery-2.1.1-min",
@@ -92,14 +92,14 @@ require([
     });
 
     if (data.oauth2Data) {
-        _.each(data.oauth2Data.displayScopes, function (obj) {
+        _.forEach(data.oauth2Data.displayScopes, function (obj) {
             if (_.isEmpty(obj.values)) {
                 delete obj.values;
             }
             return obj;
         });
 
-        _.each(data.oauth2Data.displayClaims, function (obj) {
+        _.forEach(data.oauth2Data.displayClaims, function (obj) {
             if (_.isEmpty(obj.values)) {
                 delete obj.values;
             }

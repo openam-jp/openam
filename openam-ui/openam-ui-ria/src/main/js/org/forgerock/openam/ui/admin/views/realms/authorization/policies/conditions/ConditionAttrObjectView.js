@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -87,7 +88,7 @@ define([
                     }
                 };
 
-                _.extend(options, { plugins: ["restore_on_backspace"] });
+                _.assign(options, { plugins: ["restore_on_backspace"] });
                 $item.selectize(options);
             });
         }

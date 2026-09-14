@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -39,7 +40,7 @@ define([
     AMSelfRegistrationView.prototype = SelfRegistrationView;
     AMSelfRegistrationView.prototype.endpoint = Constants.SELF_SERVICE_REGISTER;
 
-    _.extend(AMSelfRegistrationView.prototype, AnonymousProcessView.prototype);
+    _.assign(AMSelfRegistrationView.prototype, AnonymousProcessView.prototype);
 
     AMSelfRegistrationView.prototype.renderProcessState = function (response) {
 

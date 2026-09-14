@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -262,7 +263,7 @@ define([
                     };
             }());
 
-        _.each(this.state.filters, function (filter) {
+        _.forEach(this.state.filters, function (filter) {
             if (filter.query() !== "") {
                 params.push(getFilter(filter.name, filter.query()));
             }
@@ -303,7 +304,7 @@ define([
         }
 
         _.forIn(options.data, function (val, key) {
-            if (_.include(includeList, key)) {
+            if (_.includes(includeList, key)) {
                 params.push(`${key}=${val}`);
             }
         });
@@ -353,7 +354,7 @@ define([
                 return model.cid !== cid;
             });
 
-        _.each(filtered, function (model) {
+        _.forEach(filtered, function (model) {
             model.set("direction", null);
         });
     };
@@ -365,7 +366,7 @@ define([
         };
 
         if (data && typeof data === "object") {
-            _.extend(state, data);
+            _.assign(state, data);
         }
         return state;
     };

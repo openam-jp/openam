@@ -846,9 +846,9 @@ Copyright: Copyright Mathias Bynens <http://mathiasbynens.be/>
 Version: js2form-2.0.js
 Copyright: Copyright (c) 2010 Maxim Vasiliev
 
-Version: lodash-3.10.1-min.js
-Copyright: Copyright 2012-2015 The Dojo Foundation
-           Copyright (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative (from Underscore.js 1.5.2)
+Version: lodash-4.18.1-min.js
+Copyright: Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+           Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors <http://underscorejs.org/>
 
 Version: moment-2.8.1-min.js
 Copyright: Copyright Tim Wood, Iskren Chernev, Moment.js

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -67,11 +68,11 @@ define([
 
     function populateOptionsFromJsonSchemaGroup (properties, selectize) {
 
-        _.each(properties, (group, groupName) => {
+        _.forEach(properties, (group, groupName) => {
             selectize.addOptionGroup(groupName, {
                 label: group.title || " "
             });
-            _.each(group.properties, (option, key) => {
+            _.forEach(group.properties, (option, key) => {
                 selectize.addOption({
                     text: option.title,
                     value: key,

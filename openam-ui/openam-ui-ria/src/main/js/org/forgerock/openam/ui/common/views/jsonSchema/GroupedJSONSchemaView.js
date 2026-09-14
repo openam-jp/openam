@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -88,17 +89,17 @@ define([
             }));
 
             if (this.options.showOnlyRequiredAndEmpty) {
-                orderedSchemaValuePairs = _(orderedSchemaValuePairs)
+                orderedSchemaValuePairs = _.chain(orderedSchemaValuePairs)
                     .map(setDefaultPropertiesToRequiredAndEmpty)
                     .map(showEnablePropertyIfAllPropertiesHidden)
-                    .omit(emptyProperties)
+                    .reject(emptyProperties)
                     .value();
             }
 
-            this.subviews = _(orderedSchemaValuePairs)
+            this.subviews = _.chain(orderedSchemaValuePairs)
                 .map(createJSONEditorView)
-                .invoke("render")
-                .each((view) => { view.$el.appendTo(this.$el); })
+                .invokeMap("render")
+                .forEach((view) => { view.$el.appendTo(this.$el); })
                 .value();
 
             invokeOnRenderedAfterTimeout(this.options.onRendered);
@@ -106,7 +107,7 @@ define([
             return this;
         },
         getData () {
-            const values = _.map(this.subviews, (view) => view.getData());
+            const values = _.invokeMap(this.subviews, "getData");
 
             return _.reduce(values, _.merge, {});
         }

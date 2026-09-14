@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -32,7 +33,7 @@ define([
     };
 
     obj.prototype.reset = function () {
-        _.each(this.forms, function (form) {
+        _.forEach(this.forms, function (form) {
             form.reset();
         });
     };

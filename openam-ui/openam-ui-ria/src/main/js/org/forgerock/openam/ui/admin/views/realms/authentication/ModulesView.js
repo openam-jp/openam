@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -108,7 +109,7 @@ define([
         deleteModules (event, selectedModules) {
             var self = this,
                 element = event.currentTarget,
-                moduleInfos = _(selectedModules).toArray().map(getModuleInfoFromElement).value();
+                moduleInfos = _.chain(selectedModules).toArray().map(getModuleInfoFromElement).value();
 
             $(element).prop("disabled", true);
 
@@ -134,9 +135,9 @@ define([
             modulesPromise = AuthenticationService.authentication.modules.all(this.data.realmPath);
 
             Promise.all([chainsPromise, modulesPromise]).then(function (values) {
-                _.each(values[1][0].result, function (module) {
-                    _.each(values[0].values.result, function (chain) {
-                        _.each(chain.authChainConfiguration, function (link) {
+                _.forEach(values[1][0].result, function (module) {
+                    _.forEach(values[0].values.result, function (chain) {
+                        _.forEach(chain.authChainConfiguration, function (link) {
                             if (link.module === module._id) {
                                 module.chains = module.chains || [];
                                 module.chains.push(chain._id);

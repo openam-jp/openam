@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -36,7 +37,7 @@ define([
             this.data.selectedUserAttributes = args[0];
             this.data.allUserAttributes = [];
 
-            _.each(args[1], function (propertyName) {
+            _.forEach(args[1], function (propertyName) {
                 attr = {};
                 attr.propertyName = propertyName;
                 attr.selected = (_.find(self.data.selectedUserAttributes, function (obj) {
@@ -59,7 +60,7 @@ define([
                 attr,
                 self = this;
 
-            _.each(this.data.selectedUserAttributes, function (value) {
+            _.forEach(this.data.selectedUserAttributes, function (value) {
                 attr = {};
                 attr.type = self.attrType;
                 attr.propertyName = value.propertyName || value;

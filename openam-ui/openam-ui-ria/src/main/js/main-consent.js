@@ -18,13 +18,11 @@ require.config({
     map: {
         "*": {
             "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
-            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter",
-            // TODO: Remove this when there are no longer any references to the "underscore" dependency
-            "underscore": "lodash"
+            "Router": "org/forgerock/openam/ui/common/SingleRouteRouter"
         }
     },
     paths: {
-        "lodash": "libs/lodash-3.10.1-min",
+        "lodash": "libs/lodash-4.18.1-min",
         "handlebars": "libs/handlebars-4.0.5",
         "i18next": "libs/i18next-1.7.3-min",
         "jquery": "libs/jquery-2.1.1-min",

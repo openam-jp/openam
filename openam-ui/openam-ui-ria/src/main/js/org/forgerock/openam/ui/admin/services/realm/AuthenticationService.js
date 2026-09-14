@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 /**
@@ -64,7 +64,7 @@ define([
                         headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
                     })
                 ).then(function (chainsData, authenticationData) {
-                    _.each(chainsData[0].result, function (chainData) {
+                    _.forEach(chainsData[0].result, function (chainData) {
 
                         if (chainData._id === authenticationData[0].adminAuthModule) {
                             chainData.defaultConfig = chainData.defaultConfig || {};
@@ -117,7 +117,7 @@ define([
                         chainData[0].orgConfig = true;
                     }
 
-                    _.each(chainData[0].authChainConfiguration, function (chainLink) {
+                    _.forEach(chainData[0].authChainConfiguration, function (chainLink) {
                         moduleName = _.find(modulesData[0].result, { _id: chainLink.module });
                         // The server allows for deletion of modules that are in use within a chain. The chain itself
                         // will still have a reference to the deleted module.
@@ -213,7 +213,7 @@ define([
                 get (realm, type) {
                     // TODO: change this to a proper server-side call when OPENAM-7242 is implemented
                     return obj.authentication.modules.types.all(realm).then(function (data) {
-                        return _.findWhere(data.result, { "_id": type });
+                        return _.find(data.result, { "_id": type });
                     });
                 }
             },

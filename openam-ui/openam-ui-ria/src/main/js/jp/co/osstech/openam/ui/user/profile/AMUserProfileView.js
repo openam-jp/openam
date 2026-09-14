@@ -16,7 +16,7 @@
 
 define([
     "jquery",
-    "underscore",
+    "lodash",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "org/forgerock/commons/ui/common/util/ModuleLoader",
@@ -54,8 +54,7 @@ define([
                                 return typeof val === "string" ? val.trim() : val;
                             });
                         const currentData =
-                            _(Configuration.loggedUser.toJSON())
-                                .chain()
+                            _.chain(Configuration.loggedUser.toJSON())
                                 .pick(["username", "givenName", "sn", "mail", "telephoneNumber"])
                                 .defaults({ "givenName" : "", "sn" : "", "mail" : "", "telephoneNumber" : "" })
                                 .value();

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -43,7 +44,7 @@ define([
             this.data.itemID = itemID;
             this.data.firstChild = firstChild;
 
-            _.each(this.data.operators, function (operator) {
+            _.forEach(this.data.operators, function (operator) {
                 operator.i18nKey = self.operatorI18nKey + operator.title;
             });
 
@@ -91,7 +92,7 @@ define([
 
             item.data("itemData", itemData);
 
-            _.each(this.data.operators, function (obj) {
+            _.forEach(this.data.operators, function (obj) {
                 item.removeClass(obj.title.toLowerCase());
             });
             item.addClass(value.toLowerCase());
@@ -104,7 +105,7 @@ define([
                 option = null;
 
             if (dropbox.children(":not(.dragged)").length > 1) {
-                _.each(this.data.operators, function (obj) {
+                _.forEach(this.data.operators, function (obj) {
                     option = select.find(`option[value="${obj.title}"]`);
                     var isDisabled = !!(obj.config.properties.condition || obj.config.properties.subject);
                     option.prop("disabled", isDisabled);

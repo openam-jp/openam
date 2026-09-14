@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -45,19 +46,24 @@ define([
             // remains intact and we just call Navigation.reset() when a users session ends or a new one begins.
             if (_.has(Navigation.configuration, "links.admin.urls.realms.urls")) {
                 Navigation.configuration.links.admin.urls.realms.urls = _.reject(
-                    Navigation.configuration.links.admin.urls.realms.urls, "dynamicLink", true);
+                    Navigation.configuration.links.admin.urls.realms.urls, { dynamicLink: true });
             }
 
-            _(data.result).filter("active").sortBy("path").take(maxRealms).forEach(function (realm) {
-                name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
-                Navigation.addLink({
-                    "url": `#${Router.getLink(Router.configuration.routes.realmDefault,
-                        [encodeURIComponent(realm.path)])}`,
-                    name,
-                    "cssClass": "dropdown-sub",
-                    "dynamicLink": true
-                }, "admin", "realms");
-            }).run();
+            _.chain(data.result)
+                .filter("active")
+                .sortBy("path")
+                .take(maxRealms)
+                .forEach(function (realm) {
+                    name = realm.name === "/" ? $.t("console.common.topLevelRealm") : realm.name;
+                    Navigation.addLink({
+                        "url": `#${Router.getLink(Router.configuration.routes.realmDefault,
+                            [encodeURIComponent(realm.path)])}`,
+                        name,
+                        "cssClass": "dropdown-sub",
+                        "dynamicLink": true
+                    }, "admin", "realms");
+                })
+                .value();
 
             Navigation.addLink({
                 "url": `#${Router.getLink(Router.configuration.routes.realms)}`,

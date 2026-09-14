@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -71,7 +72,7 @@ define([
                 return;
             }
 
-            _.each(this.data.items, (item) => {
+            _.forEach(this.data.items, (item) => {
                 if (this.isExistingItem(pending, item)) { // provide child implementation
                     duplicateIndex = counter;
                     return;

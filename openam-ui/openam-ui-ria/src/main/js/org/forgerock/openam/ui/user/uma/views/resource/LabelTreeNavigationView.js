@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -57,7 +58,7 @@ define([
             this.callback = callback;
 
             UMAService.labels.all().done(function (data) {
-                if (!_.any(data.result, function (label) {
+                if (!_.some(data.result, function (label) {
                     return label.name.toLowerCase() === "starred";
                 })) {
                     UMAService.labels.create("starred", "STAR");
@@ -73,7 +74,7 @@ define([
                 };
                 self.data.nestedLabels = [];
 
-                _.each(self.data.labels.user, function (label) {
+                _.forEach(self.data.labels.user, function (label) {
                     self.addToParent(self.data.nestedLabels, label);
                 });
 
@@ -107,7 +108,7 @@ define([
             this.data.nestedLabels = [];
             this.data.labels.user = _.sortBy(userLabels, function (label) { return label.name; });
 
-            _.each(this.data.labels.user, function (label) {
+            _.forEach(this.data.labels.user, function (label) {
                 self.addToParent(self.data.nestedLabels, label);
             });
 

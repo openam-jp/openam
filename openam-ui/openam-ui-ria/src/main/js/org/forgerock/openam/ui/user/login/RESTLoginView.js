@@ -109,7 +109,7 @@ define([
      * @returns {Boolean} if the "PollingWaitCallback" is present on the current stage
      */
     function hasPollingCallback (requirements) {
-        return _.some(requirements.callbacks, "type", "PollingWaitCallback");
+        return _.some(requirements.callbacks, { type: "PollingWaitCallback" });
     }
 
     /**
@@ -118,7 +118,7 @@ define([
      * @returns {Boolean} if the "ConfirmationCallback" is present on the current stage
      */
     function hasConfirmationCallback (requirements) {
-        return _.some(requirements.callbacks, "type", "ConfirmationCallback");
+        return _.some(requirements.callbacks, { type: "ConfirmationCallback" });
     }
 
     var LoginView = AbstractView.extend({
@@ -176,7 +176,7 @@ define([
                 submitContent = {},
                 auth = Configuration.globalData.auth;
 
-            _.each(_.keys(auth.urlParams), function (key) {
+            _.forEach(_.keys(auth.urlParams), function (key) {
                 if (key.indexOf("IDToken") > -1) {
                     index = parseInt(key.substring(7), 10) - 1;
                     submitContent[`callback_${index}`] = auth.urlParams[`IDToken${key.substring(7)}`];
@@ -371,23 +371,23 @@ define([
                 template,
                 self = this;
 
-            this.userNamePasswordStage = _.contains(usernamePasswordStages, reqs.stage);
+            this.userNamePasswordStage = _.includes(usernamePasswordStages, reqs.stage);
 
             requirements.callbacks = [];
 
-            _.each(reqs.callbacks, (element) => {
+            _.forEach(reqs.callbacks, (element) => {
                 let redirectForm;
                 let redirectCallback;
 
                 if (element.type === "RedirectCallback") {
-                    redirectCallback = _.object(_.map(element.output, (o) => {
+                    redirectCallback = _.fromPairs(_.map(element.output, (o) => {
                         return [o.name, o.value];
                     }));
 
                     redirectForm = $(`<form action='${redirectCallback.redirectUrl}' method='POST'></form>`);
 
                     if (redirectCallback.redirectMethod === "POST") {
-                        _.each(redirectCallback.redirectData, (v, k) => {
+                        _.forEach(redirectCallback.redirectData, (v, k) => {
                             redirectForm.append(
                                 `<input type='hidden' name='${k}' value='${v}' aria-hidden='true' />`);
                         });
@@ -453,7 +453,7 @@ define([
                         template = `templates/openam/authn/${reqs.template}`;
                     }
                 }
-                UIUtils.compileTemplate(template, _.extend({}, Configuration.globalData, this.data))
+                UIUtils.compileTemplate(template, _.assign({}, Configuration.globalData, this.data))
                     .always(function (compiledTemplate) {
                         // A rendered template will be a string; an error will be an object
                         self.template = typeof compiledTemplate === "string" ? template : self.genericTemplate;
@@ -497,7 +497,7 @@ define([
             // they must be transformed into the "authIndexType" and "authIndexValue" params
             // but if composite_advice set that must be adhered to
             if (!params.authIndexType || params.authIndexType !== "composite_advice") {
-                _.each(["authlevel", "module", "service", "user", "resource"], function (param) {
+                _.forEach(["authlevel", "module", "service", "user", "resource"], function (param) {
                     if (params[param]) {
                         params.authIndexType = ((param === "authlevel") ? "level" : param);
                         params.authIndexValue = params[param];
@@ -578,7 +578,7 @@ define([
                     defaultOption = options.value.length > 1
                         ? _.find(this.output, { name: "defaultOption" }) : { "value": 0 };
 
-                    _.each(options.value, function (option, key) {
+                    _.forEach(options.value, function (option, key) {
                         btnClass = (defaultOption && defaultOption.value === key) ? "btn-primary" : "btn-default";
                         result += renderPartial("Confirmation", {
                             btnClass,

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019-2023 OSSTech Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -57,7 +57,7 @@ define([
             this.data = $.extend(true, [], schema);
             this.data.itemID = itemID;
 
-            _.each(this.data.conditions, function (condition) {
+            _.forEach(this.data.conditions, function (condition) {
                 condition.i18nKey = $.t(self.i18n.condition.key + condition.title + self.i18n.condition.title);
             });
 
@@ -119,7 +119,7 @@ define([
                         self.setListItemHtml(item, itemToDisplay);
                     });
                 } else {
-                    _.each(mergedData, function (val, key) {
+                    _.forEach(mergedData, function (val, key) {
                         if (key === "type") {
                             itemToDisplay["console.common.type"] = $.t(self.i18n.condition.key + type +
                                 self.i18n.condition.title);
@@ -280,7 +280,7 @@ define([
                 }
             } else if (schema.title === self.MEMBERSHIP_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
-                _.each(["users", "groups"], function (identityType) {
+                _.forEach(["users", "groups"], function (identityType) {
                     new ArrayAttr().render({
                         itemData,
                         hiddenData,
@@ -387,7 +387,7 @@ define([
                 endIndex = -1,
                 startIndex = String("id=").length;
 
-            _.each(values, function (universalid) {
+            _.forEach(values, function (universalid) {
                 endIndex = universalid.indexOf(",ou=");
                 if (universalid.indexOf(",ou=user") > -1) {
                     returnObj.users[universalid] = universalid.substring(startIndex, endIndex);

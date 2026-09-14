@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -170,7 +171,7 @@ define([
             }
         }
         getPasswordKeys () {
-            const passwordProperties = _.pick(this.raw.properties, _.matches({ format: "password" }));
+            const passwordProperties = _.pickBy(this.raw.properties, _.matches({ format: "password" }));
 
             return _.keys(passwordProperties);
         }
@@ -178,7 +179,7 @@ define([
             return _.mapValues(this.raw.properties, (property) => new JSONSchema(property));
         }
         getRequiredPropertyKeys () {
-            return _.keys(_.pick(this.raw.properties, _.matches({ required: true })));
+            return _.keys(_.pickBy(this.raw.properties, _.matches({ required: true })));
         }
         hasEnableProperty () {
             return !_.isUndefined(this.raw.properties[`${_.camelCase(this.raw.title)}Enabled`]);
@@ -206,7 +207,7 @@ define([
         }
         omit (predicate) {
             const schema = _.cloneDeep(this.raw);
-            schema.properties = _.omit(this.raw.properties, predicate);
+            schema.properties = _.omitBy(this.raw.properties, predicate);
 
             return new JSONSchema(schema);
         }
