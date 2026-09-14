@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -127,7 +128,7 @@ define([
 
                     options.allResourceTypes = resourceTypes;
                     options.availableResourceTypes = _.filter(resourceTypes, function (item) {
-                        return !_.contains(self.data.entity.resourceTypeUuids, item.uuid);
+                        return !_.includes(self.data.entity.resourceTypeUuids, item.uuid);
                     });
 
                     options.selectedResourceTypes = _.findByValues(options.allResourceTypes, "uuid",
@@ -146,12 +147,12 @@ define([
                         self.data.entity.applicationType = self.APPLICATION_TYPE;
                         self.processConditions(self.data, envConditions[0].result, subjConditions[0].result);
                         self.data.entity.entitlementCombiner = decisionCombiners[0].result[0].title;
-                        _.extend(self.data, { options: populateAvailableResourceTypes(resourceTypes[0].result) });
+                        _.assign(self.data, { options: populateAvailableResourceTypes(resourceTypes[0].result) });
                         parentRenderCallback();
                     });
             } else {
                 this.resourceTypesPromise.done(function (resourceTypes) {
-                    _.extend(self.data, { options: populateAvailableResourceTypes(resourceTypes.result) });
+                    _.assign(self.data, { options: populateAvailableResourceTypes(resourceTypes.result) });
                     parentRenderCallback();
                 });
             }
@@ -181,7 +182,7 @@ define([
 
         populateConditions (selected, available) {
             var result = [];
-            _.each(available, function (cond) {
+            _.forEach(available, function (cond) {
                 result.push(cond.title);
             });
             return result;
@@ -197,7 +198,7 @@ define([
             this.updateFields();
             this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
-            _.extend(this.model.attributes, this.data.entity);
+            _.assign(this.model.attributes, this.data.entity);
             savePromise = this.model.save();
 
             if (savePromise) {
@@ -213,7 +214,7 @@ define([
                         }
                     });
             } else {
-                _.extend(this.model.attributes, nonModifiedAttributes);
+                _.assign(this.model.attributes, nonModifiedAttributes);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);
             }
         },
@@ -251,7 +252,7 @@ define([
         updateFields () {
             const dataFields = this.$el.find("[data-field]");
 
-            _.each(dataFields, (field) => {
+            _.forEach(dataFields, (field) => {
                 const dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {

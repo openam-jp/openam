@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -41,7 +42,7 @@ define([
         },
 
         getGroupedData () {
-            return _(this.inlineEditList.getData())
+            return _.chain(this.inlineEditList.getData())
                 .groupBy("key")
                 .map((values, key) => ({
                     type: "Static",

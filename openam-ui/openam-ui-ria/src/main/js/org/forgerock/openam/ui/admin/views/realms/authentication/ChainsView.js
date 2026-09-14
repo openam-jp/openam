@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -102,7 +103,7 @@ define([
         deleteChains (event, selectedChains) {
             var self = this,
                 element = event.currentTarget,
-                names = _(selectedChains).toArray().map(getChainNameFromElement).value();
+                names = _.chain(selectedChains).toArray().map(getChainNameFromElement).value();
 
             $(element).prop("disabled", true);
 
@@ -123,7 +124,7 @@ define([
             this.data.realmPath = args[0];
 
             AuthenticationService.authentication.chains.all(this.data.realmPath).then(function (data) {
-                _.each(data.values.result, function (obj) {
+                _.forEach(data.values.result, function (obj) {
                     // Add default chains to top of list.
                     if (obj.active) {
                         sortedChains.unshift(obj);

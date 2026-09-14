@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 
@@ -41,10 +41,10 @@ define([
 
         getWeekDays () {
             var weekdays = [], i = 0, self = this;
-            _.invoke(self.days, function () {
+            _.forEach(self.days, function (day) {
                 weekdays[i] = {};
-                weekdays[i].title = $.t(self.i18n.weekdays.key + this + self.i18n.weekdays.full);
-                weekdays[i].value = this;
+                weekdays[i].title = $.t(self.i18n.weekdays.key + day + self.i18n.weekdays.full);
+                weekdays[i].value = day;
                 i++;
             });
             return weekdays;

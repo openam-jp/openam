@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
  /**
@@ -108,7 +108,7 @@ define([
             return new JSONValues(clone);
         }
         extend (object) {
-            return new JSONValues(_.extend({}, this.raw, object));
+            return new JSONValues(_.assign({}, this.raw, object));
         }
         getEmptyValueKeys () {
             function isEmpty (value) {
@@ -146,7 +146,7 @@ define([
             if (json._defaultsProperties) {
                 json.defaults = {};
 
-                _.each(this.raw._defaultsProperties, (property) => {
+                _.forEach(this.raw._defaultsProperties, (property) => {
                     json.defaults[property] = json[property];
                     delete json[property];
                 });
@@ -156,7 +156,7 @@ define([
             if (json._dynamicProperties) {
                 json.dynamic = {};
 
-                _.each(this.raw._dynamicProperties, (property) => {
+                _.forEach(this.raw._dynamicProperties, (property) => {
                     json.dynamic[property] = json[property];
                     delete json[property];
                 });

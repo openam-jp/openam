@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 require.config({
@@ -28,15 +28,16 @@ require.config({
             "Router"            : "org/forgerock/commons/ui/common/main/Router",
             "RegisterView"      : "org/forgerock/openam/ui/user/anonymousProcess/SelfRegistrationView",
             "KBADelegate"       : "org/forgerock/openam/ui/user/services/KBADelegate",
-            // TODO: Remove this when there are no longer any references to the "underscore" dependency
-            "underscore"        : "lodash"
+            // "underscore" is the real Underscore.js for legacy libraries.
+            // Project code should use "lodash" instead.
+            "lodash"            : "lodashWrapper"
         }
     },
     paths: {
         "autosizeInput": "libs/jquery.autosize.input.min",
 
         "backbone"           : "libs/backbone-1.1.2-min",
-        "backbone.paginator" : "libs/backbone.paginator.min-2.0.2-min",
+        "backbone.paginator" : "libs/backbone.paginator.min-2.0.8-min",
         "backbone-relational": "libs/backbone-relational-0.9.0-min",
 
         "backgrid"          : "libs/backgrid.min-0.3.5-min",
@@ -57,7 +58,9 @@ require.config({
         "jquery"      : "libs/jquery-2.1.1-min",
         "js2form"     : "libs/js2form-2.0-769718a",
         "jsonEditor"  : "libs/jsoneditor-0.7.23-custom",
-        "lodash"      : "libs/lodash-3.10.1-min",
+        "lodash-original": "libs/lodash-4.18.1-min",
+        "lodashWrapper": "jp/co/osstech/commons/ui/common/util/lodash-wrapper",
+        "underscore"  : "libs/underscore-1.13.8-min",
         "moment"      : "libs/moment-2.8.1-min",
         "qrcode"      : "libs/qrcode-1.4.3-min",
         "sortable"    : "libs/jquery-sortable-0.9.12",
@@ -74,8 +77,12 @@ require.config({
             deps: ["jquery"],
             exports: "autosizeInput"
         },
+        "lodash-original": {
+            deps: ["underscore"],
+            exports: "_"
+        },
         "backbone": {
-            deps: ["lodash"],
+            deps: ["underscore"],
             exports: "Backbone"
         },
         "backbone.paginator": {
@@ -86,7 +93,7 @@ require.config({
         },
 
         "backgrid": {
-            deps: ["jquery", "lodash", "backbone"],
+            deps: ["jquery", "underscore", "backbone", "lodash"],
             exports: "Backgrid"
         },
         "backgrid-filter": {
@@ -103,7 +110,7 @@ require.config({
             deps: ["jquery"]
         },
         "bootstrap-dialog": {
-            deps: ["jquery", "lodash", "backbone", "bootstrap"]
+            deps: ["jquery", "underscore", "backbone", "bootstrap"]
         },
         "bootstrap-tabdrop": {
             deps: ["jquery", "bootstrap"]
@@ -145,9 +152,6 @@ require.config({
         },
         "spin": {
             exports: "spin"
-        },
-        "lodash": {
-            exports: "_"
         },
         "xdate": {
             exports: "xdate"

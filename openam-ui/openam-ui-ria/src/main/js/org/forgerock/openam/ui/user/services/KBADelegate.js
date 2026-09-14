@@ -32,16 +32,15 @@ define([
         var type, url, jsonData;
         type = "PATCH";
         url = `user/${Configuration.loggedUser.id}`;
-        jsonData = _(user)
-                       .map(function (value, key) {
-                           return {
-                               "operation": "replace",
-                               "field": `/${key}`,
-                               // replace the whole value, rather than just the parts that have changed,
-                               // since there is no consistent way to target items in a set across the stack
-                               value
-                           };
-                       });
+        jsonData = _.map(user, function (value, key) {
+            return {
+                "operation": "replace",
+                "field": `/${key}`,
+                // replace the whole value, rather than just the parts that have changed,
+                // since there is no consistent way to target items in a set across the stack
+                value
+            };
+        });
         return this.serviceCall({
             type,
             url,

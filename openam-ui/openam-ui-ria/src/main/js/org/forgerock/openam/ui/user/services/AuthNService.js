@@ -37,7 +37,7 @@ define([
     function handleFragmentParameters (params) {
 
         if (Configuration.globalData.auth.urlParams) {
-            _.extend(params, Configuration.globalData.auth.urlParams);
+            _.assign(params, Configuration.globalData.auth.urlParams);
         }
 
         // In case user has logged in already update session
@@ -252,7 +252,7 @@ define([
     }
     obj.getRequirements = function (args) {
         if (AuthenticationToken.get()) {
-            return obj.submitRequirements(_.extend({ authId: AuthenticationToken.get() },
+            return obj.submitRequirements(_.assign({ authId: AuthenticationToken.get() },
                 Configuration.globalData.auth.urlParams)).done(() => {
                     knownAuth = _.clone(Configuration.globalData.auth);
                     AuthenticationToken.remove();

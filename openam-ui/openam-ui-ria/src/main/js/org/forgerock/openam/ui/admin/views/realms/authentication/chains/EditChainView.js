@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -197,7 +197,7 @@ define([
 
                     if (self.data.form.chainData.authChainConfiguration.length > 0) {
 
-                        _.each(self.data.form.chainData.authChainConfiguration, function (linkConfig, index) {
+                        _.forEach(self.data.form.chainData.authChainConfiguration, function (linkConfig, index) {
                             var linkView = createLinkView(index, self);
                             self.addItemToList(linkView.element);
                             linkView.render();

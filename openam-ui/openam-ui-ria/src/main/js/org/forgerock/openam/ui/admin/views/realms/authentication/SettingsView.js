@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -80,7 +81,7 @@ define([
 
             AuthenticationService.authentication.update(this.data.realmLocation, formData).then((data) => {
                 // update formData for correct re-render tab after saving
-                _.extend(self.data.formData.values, data);
+                _.assign(self.data.formData.values, data);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({

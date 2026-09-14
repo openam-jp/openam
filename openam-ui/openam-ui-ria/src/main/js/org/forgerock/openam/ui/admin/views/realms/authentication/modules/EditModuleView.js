@@ -73,8 +73,8 @@ define([
             .update(this.data.realmPath, this.data.name, this.data.type, this.data.form.data())
             .then((data) => {
                 // Update the form data for re-render the tab
-                _.extend(self.data.form.values, self.data.form.data());
-                _.extend(self.data.values, data);
+                _.assign(self.data.form.values, self.data.form.data());
+                _.assign(self.data.values, data);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
             }, (response) => {
                 Messages.addMessage({

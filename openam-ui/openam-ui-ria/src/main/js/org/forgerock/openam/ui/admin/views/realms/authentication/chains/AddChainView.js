@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 define([
     "jquery",
@@ -26,7 +27,7 @@ define([
             nameExists,
             isValid;
 
-        nameExists = _.findWhere(this.data.chainsData, { _id:name });
+        nameExists = _.find(this.data.chainsData, { _id:name });
         if (nameExists) {
             Messages.addMessage({
                 type: Messages.TYPE_DANGER,
@@ -50,7 +51,7 @@ define([
             this.data.realmPath = args[0];
 
             AuthenticationService.authentication.chains.all(this.data.realmPath).then(function (data) {
-                _.each(data.values.result, function (obj) {
+                _.forEach(data.values.result, function (obj) {
                     chainsData.push(obj);
                 });
                 self.data.chainsData = chainsData;

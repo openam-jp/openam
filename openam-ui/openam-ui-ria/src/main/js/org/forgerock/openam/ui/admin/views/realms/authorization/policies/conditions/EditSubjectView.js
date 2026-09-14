@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -43,7 +44,7 @@ define([
             this.data = $.extend(true, [], schema);
             this.data.itemID = itemID;
 
-            _.each(this.data.subjects, function (subj) {
+            _.forEach(this.data.subjects, function (subj) {
                 subj.i18nKey = $.t(self.subjectI18n.key + subj.title + self.subjectI18n.title);
             });
 
@@ -90,7 +91,7 @@ define([
                 type = mergedData.type;
                 itemToDisplay = {};
 
-                _.each(mergedData, function (val, key) {
+                _.forEach(mergedData, function (val, key) {
                     if (key === "type") {
                         itemToDisplay["console.common.type"] = $.t(self.subjectI18n.key + type +
                             self.subjectI18n.title);
@@ -165,7 +166,7 @@ define([
                 htmlBuiltPromise = $.Deferred();
 
             if (schema.title === self.IDENTITY_RESOURCE) {
-                _.each(["users", "groups"], function (identityType) {
+                _.forEach(["users", "groups"], function (identityType) {
                     new ArrayAttr().render({
                         itemData,
                         hiddenData,
@@ -257,7 +258,7 @@ define([
                 endIndex = -1,
                 startIndex = String("id=").length;
 
-            _.each(values, function (universalid) {
+            _.forEach(values, function (universalid) {
                 endIndex = universalid.indexOf(",ou=");
                 if (universalid.indexOf(",ou=user") > -1) {
                     returnObj.users[universalid] = universalid.substring(startIndex, endIndex);

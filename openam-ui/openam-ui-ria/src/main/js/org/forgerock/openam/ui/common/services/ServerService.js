@@ -39,7 +39,7 @@ define([
     };
 
     obj.getConfiguration = function (callParams) {
-        return obj.serviceCall(_.extend({
+        return obj.serviceCall(_.assign({
             headers: { "Accept-API-Version": "protocol=1.0,resource=1.1" },
             url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*")
         }, callParams)).then(function (response) {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -74,7 +75,7 @@ define([
         throwOnNoData(data);
         throwOnArgsNotArray(args);
 
-        _.each(data, (navObj) => {
+        _.forEach(data, (navObj) => {
             if (navObj.route) {
                 navObj.href = `#${Router.getLink(Router.configuration.routes[navObj.route], args)}`;
             } else if (navObj.event) {
