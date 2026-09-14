@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -47,9 +48,8 @@ define([
                 url: "?_queryFilter=true",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
             }).done((data) => {
-                data.result = _(data.result).each((realm) => {
-                    realm.path = getRealmPath(realm);
-                }).sortBy("path").value();
+                _.forEach(data.result, (realm) => { realm.path = getRealmPath(realm); });
+                data.result = _.sortBy(data.result, "path");
             });
         },
 

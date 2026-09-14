@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -60,7 +61,7 @@ define([
 
                     if ($item.data().source) {
                         if (type === view.SCRIPT_TYPE) {
-                            _.extend(options, {
+                            _.assign(options, {
                                 placeholder: $.t(view.SCRIPT_PLACEHOLDER),
                                 preload: true,
                                 sortField: "value",
@@ -75,7 +76,7 @@ define([
                                 }
                             });
                         } else if (type === view.TIME_ZONE_TYPE) {
-                            _.extend(options, {
+                            _.assign(options, {
                                 placeholder: $.t(view.TIME_ZONE_PLACEHOLDER),
                                 preload: true,
                                 sortField: "value",
@@ -91,7 +92,7 @@ define([
                                         dataType: "json",
                                         cache: true
                                     }).done(function (data) {
-                                        _.each(data.timezones, function (value) {
+                                        _.forEach(data.timezones, function (value) {
                                             selectize.addOption({ value, text: value });
                                         });
                                     });
@@ -100,8 +101,8 @@ define([
                                     view.data.itemData.enforcementTimeZone = value ? value : view.DEFAULT_TIME_ZONE;
                                 }
                             });
-                        } else if (_.contains(view.IDENTITY_TYPES, type)) {
-                            _.extend(options, {
+                        } else if (_.includes(view.IDENTITY_TYPES, type)) {
+                            _.assign(options, {
                                 placeholder: $.t(view.IDENTITY_PLACEHOLDER),
                                 sortField: "value",
                                 load (query, callback) {
@@ -125,7 +126,7 @@ define([
                             });
                         }
                     } else {
-                        _.extend(options, {
+                        _.assign(options, {
                             delimiter: false,
                             persist: false,
                             create (input) {
@@ -147,7 +148,7 @@ define([
                         }
                     }
 
-                    _.extend(options, { plugins: ["restore_on_backspace"] });
+                    _.assign(options, { plugins: ["restore_on_backspace"] });
                     $item.selectize(options);
                 });
 
@@ -161,7 +162,7 @@ define([
             var selectize = this;
             PoliciesService.queryIdentities($(item).data().source, query)
                 .done(function (data) {
-                    _.each(data.result, function (value) {
+                    _.forEach(data.result, function (value) {
                         selectize.addOption({ value, text: value });
                     });
                     callback(data.result);
@@ -183,7 +184,7 @@ define([
             var selectize = this;
             PoliciesService.getDataByType($(item).data().source)
                 .done(function (data) {
-                    _.each(data.result, function (value) {
+                    _.forEach(data.result, function (value) {
                         selectize.addOption({ value: value._id, text: value.name });
                     });
                     callback(data.result);

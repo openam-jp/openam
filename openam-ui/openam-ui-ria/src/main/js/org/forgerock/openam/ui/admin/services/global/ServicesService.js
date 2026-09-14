@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -49,17 +50,15 @@ define([
     };
 
     obj.instance = {
-        getAll () {  // TODO this is the only difference in GLOBAL and REALM service rest calls
+        getAll () { // TODO this is the only difference in GLOBAL and REALM service rest calls
             return obj.serviceCall({
                 url: "?_action=nextdescendents",
                 type: "POST",
                 headers: { "Accept-API-Version": "protocol=1.0,resource=1.0" }
-            }).then((response) =>
-                _(response.result).map((item) => {
-                    item["name"] = item._type.name;
-                    return item;
-                }).sortBy("name").value()
-            );
+            }).then((response) => {
+                _.forEach(response.result, (item) => { item.name = item._type.name; });
+                return _.sortBy(response.result, "name");
+            });
         },
         get (type) {
             const getInstance = () => obj.serviceCall({

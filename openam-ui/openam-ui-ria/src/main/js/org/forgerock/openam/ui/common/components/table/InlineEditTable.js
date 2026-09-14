@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -47,7 +48,7 @@ define([
 
         getHeaders () {
             const headers = [];
-            _.each(this.rowSchema.properties, (item) => {
+            _.forEach(this.rowSchema.properties, (item) => {
                 headers[item.propertyOrder] = item.title;
             });
             return headers;
@@ -64,7 +65,7 @@ define([
 
                 this.tBody = this.$el.find("tbody");
 
-                _.each(this.values, (value) => {
+                _.forEach(this.values, (value) => {
                     const row = this.initRow(value);
                     this.tBody.append(row.renderInReadOnlyMode().$el);
                     this.rows.push(row);
@@ -127,7 +128,7 @@ define([
         },
 
         getData () {
-            return _.map(this.rows, (row) => row.getData());
+            return _.invokeMap(this.rows, "getData");
         },
 
         isValid () {

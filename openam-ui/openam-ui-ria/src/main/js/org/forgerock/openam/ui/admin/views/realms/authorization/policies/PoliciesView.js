@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 
@@ -52,7 +52,7 @@ define([
                 paginator,
                 ClickableRow;
 
-            _.extend(this.data, data);
+            _.assign(this.data, data);
 
             Policies = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/policies"),

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -125,7 +126,7 @@ define([
                 $.when(this.policySetModelPromise, this.resourceTypesPromise).done(
                     (policySetModel, resourceTypes) => {
                         self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
-                            (item) => _.contains(policySetModel[0].resourceTypeUuids, item.uuid));
+                            (item) => _.includes(policySetModel[0].resourceTypeUuids, item.uuid));
                         self.parentRender(() => { self.buildResourceTypeSelection(); });
                     });
             } else {
@@ -139,10 +140,10 @@ define([
                     const policySet = policySetModel[0];
 
                     self.data.options.availableResourceTypes = _.filter(resourceTypes[0].result,
-                        (item) => _.contains(policySet.resourceTypeUuids, item.uuid));
+                        (item) => _.includes(policySet.resourceTypeUuids, item.uuid));
 
-                    self.staticAttributes = _.where(self.model.attributes.resourceAttributes, { type: "Static" });
-                    self.userAttributes = _.where(self.model.attributes.resourceAttributes, { type: "User" });
+                    self.staticAttributes = _.filter(self.model.attributes.resourceAttributes, { type: "Static" });
+                    self.userAttributes = _.filter(self.model.attributes.resourceAttributes, { type: "User" });
                     self.customAttributes = _.difference(self.model.attributes.resourceAttributes,
                         self.staticAttributes, self.userAttributes);
                     self.allUserAttributes = _.sortBy(allUserAttributes[0].result);
@@ -205,7 +206,7 @@ define([
         getAvailableActionsForResourceType (resourceType) {
             var availableActions = [];
             if (resourceType) {
-                _.each(resourceType.actions, function (val, key) {
+                _.forEach(resourceType.actions, function (val, key) {
                     availableActions.push({ action: key, value: val });
                 });
             }
@@ -236,7 +237,7 @@ define([
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field) {
+            _.forEach(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {
@@ -258,7 +259,7 @@ define([
             this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
             if (this.newEntity) {
-                _.extend(this.model.attributes, this.data.entity);
+                _.assign(this.model.attributes, this.data.entity);
             } else {
                 activeTabIndex = this.$el.find(".tab-pane.active").index();
                 activeTab = this.tabs[activeTabIndex];
@@ -269,7 +270,7 @@ define([
 
                 if (activeTab.attr) {
                     activeTabProperties = _.pick(this.data.entity, this.tabs[activeTabIndex].attr);
-                    _.extend(this.model.attributes, activeTabProperties);
+                    _.assign(this.model.attributes, activeTabProperties);
                 }
             }
 

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 /**
@@ -47,7 +48,7 @@ define([
         const hasSubSchema = subSchemaTypes && subSchemaTypes.length > 0;
 
         if (schema.isCollection()) {
-            tabs = tabs.concat(_(schema.raw.properties)
+            tabs = tabs.concat(_.chain(schema.raw.properties)
                 .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
                 .sortBy("order")
                 .value());
@@ -139,10 +140,10 @@ define([
 
         render () {
             const serviceCalls =
-                _([this.getInstance, this.getSubSchemaTypes])
-                .compact()
-                .map((serviceCall) => serviceCall())
-                .value();
+                _.chain([this.getInstance, this.getSubSchemaTypes])
+                    .compact()
+                    .map((serviceCall) => serviceCall())
+                    .value();
 
             Promise.all(serviceCalls).then((response) => {
                 const instance = response[0];

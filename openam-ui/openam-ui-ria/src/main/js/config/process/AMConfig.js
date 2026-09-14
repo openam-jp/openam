@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2019-2022 OSSTech Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -202,7 +202,7 @@ define([
         processDescription (event, Configuration, Router) {
             if (!Configuration.loggedUser) {
                 Router.routeTo(Router.configuration.routes.login, { trigger: true });
-            } else if (_.contains(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
+            } else if (_.includes(Configuration.loggedUser.uiroles, "ui-realm-admin")) {
                 Router.routeTo(Router.configuration.routes.realms, {
                     args: [],
                     trigger: true

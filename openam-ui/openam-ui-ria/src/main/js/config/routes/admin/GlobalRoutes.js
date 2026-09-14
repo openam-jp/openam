@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 define([
@@ -109,8 +109,10 @@ define([
     };
 
     // Add routes for "Server Edit" tree navigation
-    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced", "directoryConfiguration"], (suffix) => {
-        routes[`editServer${_.capitalize(suffix)}`] = {
+    _.forEach(
+        ["general", "security", "session", "sdk", "cts", "uma", "advanced", "directoryConfiguration"],
+        (suffix) => {
+        routes[`editServer${_.upperFirst(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/deployment/servers/EditServerTreeNavigationView",
             page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
             url: new RegExp(`deployment/servers/([^\/]+)/(${suffix})`),
@@ -122,8 +124,8 @@ define([
     });
 
     // Add routes for "Server Defaults" tree navigation
-    _.each(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (suffix) => {
-        routes[`editServerDefaults${_.capitalize(suffix)}`] = {
+    _.forEach(["general", "security", "session", "sdk", "cts", "uma", "advanced"], (suffix) => {
+        routes[`editServerDefaults${_.upperFirst(suffix)}`] = {
             view: "org/forgerock/openam/ui/admin/views/configuration/server/EditServerDefaultsTreeNavigationView",
             page: "org/forgerock/openam/ui/admin/views/common/server/EditServerView",
             url: new RegExp(`configure/(server-defaults)/(${suffix})`),

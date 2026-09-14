@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -26,7 +27,7 @@ define([
     AMForgotUsernameView.prototype = ForgotUsernameView;
     AMForgotUsernameView.prototype.endpoint = Constants.SELF_SERVICE_FORGOTTEN_USERNAME;
 
-    _.extend(AMForgotUsernameView.prototype, AnonymousProcessView.prototype);
+    _.assign(AMForgotUsernameView.prototype, AnonymousProcessView.prototype);
 
     return new AMForgotUsernameView();
 });

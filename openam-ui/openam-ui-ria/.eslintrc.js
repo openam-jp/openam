@@ -3,9 +3,18 @@ module.exports = {
     extends: [
         "forgerock"
     ],
+    plugins: [
+        "lodash"
+    ],
     parser: "babel-eslint",
     parserOptions: {
         ecmaVersion: 6
+    },
+    settings: {
+        lodash: {
+            version: 4,
+            pragma: "_"
+        }
     },
     env: {
         amd: true,
@@ -20,6 +29,14 @@ module.exports = {
          * These are rules we're sure about. They will cause the build to fail.
          * --------------------------------------------------------------------------------
          */
+        "lodash/callback-binding": 2,
+        "lodash/chain-style": [2, "explicit"],
+        "lodash/no-double-unwrap": 2,
+        "lodash/no-extra-args": 2,
+        "lodash/prefer-invoke-map": 2,
+        "lodash/preferred-alias": 2,
+        "lodash/unwrap": 2,
+
         "array-bracket-spacing": [2, "never"],
         "arrow-parens": [2, "always"],
         "arrow-spacing": 2,
@@ -133,6 +150,25 @@ module.exports = {
          * TODO: Remove them from eslint-config-forgerock
          */
         "no-empty-label": 0,
-        "space-return-throw-case": 0
+        "space-return-throw-case": 0,
+
+        /**
+         * Disabled because ESLint 4.x + babel-eslint 8.x detects significantly more
+         * violations than ESLint 2.x did. These can be re-enabled incrementally.
+         */
+        "camelcase": 0,
+        "eqeqeq": 0,
+        "guard-for-in": 0,
+        "indent": 0,
+        "no-cond-assign": 0,
+        "no-return-assign": 0,
+        "no-sequences": 0,
+        "no-unused-expressions": 0,
+        "no-unused-vars": 0,
+        "no-use-before-define": 0,
+        "no-useless-escape": 0,
+        "no-void": 0,
+        "one-var": 0,
+        "prefer-const": 0
     }
 };

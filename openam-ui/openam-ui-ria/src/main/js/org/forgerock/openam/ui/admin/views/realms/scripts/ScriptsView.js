@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -208,7 +209,7 @@ define([
 
         onRowSelect (model, selected) {
             if (selected) {
-                if (!_.contains(this.data.selectedUUIDs, model.id)) {
+                if (!_.includes(this.data.selectedUUIDs, model.id)) {
                     this.data.selectedUUIDs.push(model.id);
                 }
             } else {

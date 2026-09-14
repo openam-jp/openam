@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -90,7 +91,7 @@ define([
             this.data.entity = _.cloneDeep(this.model.attributes);
 
             data.actions = [];
-            _.each(this.data.entity.actions, function (v, k) {
+            _.forEach(this.data.entity.actions, function (v, k) {
                 data.actions.push({ name: k, value: v });
             });
             data.actions.sort();
@@ -134,7 +135,7 @@ define([
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field) {
+            _.forEach(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "checkbox") {
@@ -160,10 +161,10 @@ define([
             this.activeTabId = this.$el.find(".tab-menu li.active a").attr("href");
 
             if (this.data.newEntity) {
-                _.extend(this.model.attributes, this.data.entity);
+                _.assign(this.model.attributes, this.data.entity);
             } else {
                 activeTabProperties = _.pick(this.data.entity, this.tabs[activeTab.index()].attr);
-                _.extend(this.model.attributes, activeTabProperties);
+                _.assign(this.model.attributes, activeTabProperties);
             }
 
             savePromise = this.model.save();
@@ -181,7 +182,7 @@ define([
                         }
                     });
             } else {
-                _.extend(this.model.attributes, nonModifiedAttributes);
+                _.assign(this.model.attributes, nonModifiedAttributes);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);
             }
         },

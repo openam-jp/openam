@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -81,7 +82,8 @@ define([
         onDeleteMultiple (event) {
             event.preventDefault();
 
-            const ids = _(this.$el.find("input[type=checkbox]:checked")).toArray().map(getServiceIdFromElement).value();
+            const ids = _.chain(this.$el.find("input[type=checkbox]:checked"))
+                .toArray().map(getServiceIdFromElement).value();
 
             _.bind(deleteServices, this)(ids);
         },

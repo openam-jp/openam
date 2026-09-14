@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 import $ from "jquery";
@@ -130,7 +131,7 @@ class ListRealmsView extends AbstractView {
             self.data.allRealmPaths = [];
             NavigationHelper.populateRealmsDropdown(data);
 
-            _.each(self.data.realms, (realm) => {
+            _.forEach(self.data.realms, (realm) => {
                 realm.isTopLevelRealm = self.isTopLevelRealm(realm.path);
                 self.data.allRealmPaths.push(realm.path);
             });

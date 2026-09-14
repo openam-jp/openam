@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 (function () {
@@ -23,25 +24,14 @@
     require.config({
         baseUrl: "/base/target/compiled",
 
-        map: {
-            "*": {
-                // TODO: Remove this when there are no longer any references to the "underscore" dependency
-                "underscore": "lodash"
-            }
-        },
         paths: {
             chai: "/base/node_modules/chai/chai",
             handlebars: "/base/target/dependencies/libs/handlebars-4.0.5",
             jquery: "/base/target/dependencies/libs/jquery-2.1.1-min",
-            lodash: "/base/target/dependencies/libs/lodash-3.10.1-min",
+            lodash: "/base/target/dependencies/libs/lodash-4.18.1-min",
             sinon: "/base/target/test-classes/libs/sinon-1.15.4",
             "sinon-chai": "/base/node_modules/sinon-chai/lib/sinon-chai",
             squire: "/base/target/test-classes/libs/squire-0.2.0"
-        },
-        shim: {
-            "lodash": {
-                exports: "_"
-            }
         }
     });
 

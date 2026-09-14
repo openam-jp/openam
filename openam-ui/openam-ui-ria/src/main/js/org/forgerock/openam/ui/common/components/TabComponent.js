@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -47,10 +48,8 @@ define([
             if (_.isEmpty(options.tabs)) {
                 throw new TypeError("[TabComponent] \"tabs\" argument is an empty Array.");
             }
-            _(options.tabs)
-                .each(_.partial(has, "id"))
-                .each(_.partial(has, "title"))
-                .value();
+            _.forEach(options.tabs, _.partial(has, "id"));
+            _.forEach(options.tabs, _.partial(has, "title"));
 
             this.options = options;
         },

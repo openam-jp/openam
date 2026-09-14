@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -66,7 +67,7 @@ define([
 
             var self = this;
 
-            _.each(this.data.options.availableEnvironments, function (item) {
+            _.forEach(this.data.options.availableEnvironments, function (item) {
 
                 if (item.logical === true) {
                     self.data.operators.push(item);

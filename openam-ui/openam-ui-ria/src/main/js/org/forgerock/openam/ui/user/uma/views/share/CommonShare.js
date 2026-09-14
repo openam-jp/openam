@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -261,7 +262,7 @@ define([
         save () {
             var permissions = this.parentModel.get("policy").get("permissions"),
                 subjects = this.$el.find("#selectUser select")[0].selectize.getValue(),
-                scopes = _.each(this.$el.find("#selectPermission select")[0].selectize.getValue(), function (scope) {
+                scopes = _.forEach(this.$el.find("#selectPermission select")[0].selectize.getValue(), function (scope) {
                     return UMAPolicyPermissionScope.find({ id: scope });
                 }),
                 newPermissions = [],

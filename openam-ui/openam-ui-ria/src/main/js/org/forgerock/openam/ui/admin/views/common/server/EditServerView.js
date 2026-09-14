@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -34,7 +35,7 @@ define([
 ], ($, _, Messages, AbstractView, EventManager, Constants, ServersService, PanelComponent, PartialBasedView,
     TabComponent, TabSearch, InlineEditTable, JSONSchema, JSONValues, Promise, FlatJSONSchemaView) => {
     function createTabs (schema) {
-        return _(schema.raw.properties)
+        return _.chain(schema.raw.properties)
             .map((value, key) => ({ id: key, order: value.propertyOrder, title: value.title }))
             .sortBy("order")
             .value();

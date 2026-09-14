@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -34,7 +35,7 @@ define([
 
     const getColumns = (rowData, rowSchema) => {
         const columns = [];
-        _.each(rowSchema.properties, (property, propertyName) => {
+        _.forEach(rowSchema.properties, (property, propertyName) => {
             columns[property.propertyOrder] = {
                 data: rowData[propertyName],
                 required: _.includes(rowSchema.required, propertyName) ? "required" : false
@@ -52,7 +53,7 @@ define([
 
     const getRowDataFromDom = (rowSchema, domElement) => {
         const rowData = {};
-        _.each(rowSchema.properties, (property, propertyName) => {
+        _.forEach(rowSchema.properties, (property, propertyName) => {
             let element = "input";
             if (property.enum) {
                 element = "select";

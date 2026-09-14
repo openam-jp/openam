@@ -38,7 +38,7 @@ define([
         AuthNService.getRequirements(params).then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
-            _.each(requirements.callbacks, function (obj, i) {
+            _.forEach(requirements.callbacks, function (obj, i) {
                 if (params.hasOwnProperty(`callback_${i}`)) {
                     populatedRequirements.callbacks[i].input[0].value = params[`callback_${i}`];
                 }

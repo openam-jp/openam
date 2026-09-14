@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -154,7 +155,7 @@ define([
             starButton.attr("disabled", true);
 
             self.model.save().always(function () {
-                var isStarred = _.contains(self.model.get("labels"), starredLabelId);
+                var isStarred = _.includes(self.model.get("labels"), starredLabelId);
                 starButton.attr("disabled", false);
                 starIcon.removeClass("fa-refresh fa-spin");
                 starIcon.addClass(isStarred ? "fa-star" : "fa-star-o");
@@ -187,16 +188,16 @@ define([
         updateLabelOptions () {
             var labelsSelectize = this.getLabelSelectize(),
                 userLabels = _.filter(this.allLabels, isUserLabel),
-                resourceUserLabelNames = _(this.model.get("labels"))
+                resourceUserLabelNames = _.chain(this.model.get("labels"))
                     .map(_.partial(getLabelForId, this.allLabels))
                     .filter(isUserLabel)
                     .sortBy("name")
-                    .pluck("name")
+                    .map("name")
                     .value();
             labelsSelectize.clearOptions();
             labelsSelectize.addOption(userLabels);
             labelsSelectize.clear();
-            _.each(resourceUserLabelNames, function (item) {
+            _.forEach(resourceUserLabelNames, function (item) {
                 labelsSelectize.addItem(item);
             });
         },
@@ -376,7 +377,7 @@ define([
                     });
 
                     var starredLabel = _.find(this.allLabels, { type: "STAR" }),
-                        isStarred = _.contains(this.model.get("labels"), starredLabel._id);
+                        isStarred = _.includes(this.model.get("labels"), starredLabel._id);
 
                     if (isStarred) {
                         self.$el.find("#starred i").toggleClass("fa-star-o fa-star");
@@ -423,18 +424,14 @@ define([
                 labelsSelectize = this.getLabelSelectize(),
                 selectedUserLabelNames = labelsSelectize.getValue(),
                 userLabels = _.filter(this.allLabels, isUserLabel),
-                userLabelNames = _.pluck(userLabels, "name"),
+                userLabelNames = _.map(userLabels, "name"),
                 newUserLabelNames = _.difference(selectedUserLabelNames, userLabelNames),
                 existingUserLabelNames = _.intersection(selectedUserLabelNames, userLabelNames),
-                existingUserLabelIds = _(existingUserLabelNames)
-                    .map(_.partial(getLabelForName, userLabels))
-                    .pluck("_id")
-                    .value(),
-                existingNonUserLabelIds = _(self.model.get("labels"))
-                    .map(_.partial(getLabelForId, this.allLabels))
-                    .reject(isUserLabel)
-                    .pluck("_id")
-                    .value(),
+                existingUserLabelIds = _.map(
+                    _.map(existingUserLabelNames, _.partial(getLabelForName, userLabels)), "_id"),
+                existingNonUserLabelIds = _.map(
+                    _.reject(_.map(self.model.get("labels"), _.partial(getLabelForId, this.allLabels)),
+                        isUserLabel), "_id"),
                 existingLabelIds = existingUserLabelIds.concat(existingNonUserLabelIds);
 
             self.disableLabelControls();

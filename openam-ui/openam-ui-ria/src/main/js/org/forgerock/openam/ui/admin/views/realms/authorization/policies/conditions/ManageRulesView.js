@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2019 Open Source Solution Technology Corporation
+ * Portions copyright 2019-2026 OSSTech Corporation
  */
 
 
@@ -73,8 +73,8 @@ define([
         },
 
         init (args, events) {
-            _.extend(this.events, events);
-            _.extend(Constants, this.types);
+            _.assign(this.events, events);
+            _.assign(Constants, this.types);
 
             this.localEntity = null;
             this.sortingInitialised = false;
@@ -87,7 +87,7 @@ define([
         buildList () {
             var self = this,
                 newRule = null,
-                operators = _.pluck(this.data.operators, "title"),
+                operators = _.map(this.data.operators, "title"),
                 properties = null;
 
             function buildListItem (data, container) {
@@ -95,8 +95,8 @@ define([
                     data = [data];
                 }
 
-                _.each(data, function (item) {
-                    if (item && _.contains(operators, item.type)) {
+                _.forEach(data, function (item) {
+                    if (item && _.includes(operators, item.type)) {
 
                         newRule = new OperatorRulesView();
                         newRule.render(self.data, container, self.idPrefix + self.idCount, (self.idCount === 0));
@@ -132,7 +132,7 @@ define([
              * one or less, the root logical will be striped from the json before it is saved.
              */
 
-            if (!this.localEntity || _.contains(operators, this.localEntity.type) === false) {
+            if (!this.localEntity || _.includes(operators, this.localEntity.type) === false) {
                 properties = _.clone(this.localEntity);
                 this.localEntity = { type: "AND" };
                 this.localEntity[this.properties] = [properties];

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -83,7 +84,7 @@ define([
             const subrealm = RealmHelper.getSubRealm();
 
             EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                route: _.extend({}, Router.currentRoute, { forceUpdate: true }),
+                route: _.assign({}, Router.currentRoute, { forceUpdate: true }),
                 args: [`/${subrealm}`]
             });
         }

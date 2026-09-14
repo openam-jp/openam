@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 
@@ -83,7 +84,7 @@ define([
                     name: "type",
                     label: $.t("uma.history.grid.header.2"),
                     cell: "string",
-                    formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
+                    formatter: _.assign({}, Backgrid.CellFormatter.prototype, {
                         fromRaw (rawValue) {
                             return $.t(`uma.history.grid.types.${rawValue.toLowerCase()}`);
                         }

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 define([
@@ -153,7 +154,7 @@ define([
                         watchedObj: this.data.entity,
                         undo: !this.newEntity,
                         undoCallback (changes) {
-                            _.extend(self.data.entity, changes);
+                            _.assign(self.data.entity, changes);
                             var context = _.find(self.data.contexts, {
                                 "_id": self.data.entity.context
                             });
@@ -200,7 +201,7 @@ define([
                 dataFields = this.$el.find("[data-field]"),
                 dataField;
 
-            _.each(dataFields, function (field) {
+            _.forEach(dataFields, function (field) {
                 dataField = field.getAttribute("data-field");
 
                 if (field.type === "radio") {
@@ -237,7 +238,7 @@ define([
 
             this.updateFields();
 
-            _.extend(this.model.attributes, { description: "" }, this.data.entity);
+            _.assign(this.model.attributes, { description: "" }, this.data.entity);
             savePromise = this.model.save();
 
             if (savePromise) {
@@ -252,7 +253,7 @@ define([
                     }
                 });
             } else {
-                _.extend(this.model.attributes, nonModifiedAttributes);
+                _.assign(this.model.attributes, nonModifiedAttributes);
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);
             }
         },
