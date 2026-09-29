@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014-2016 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC
 */
 package org.forgerock.openam.entitlement.rest.wrappers;
 
@@ -20,7 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.interfaces.ISaveIndex;
+import com.sun.identity.entitlement.interfaces.ISearchIndex;
+import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Set;
@@ -28,7 +33,6 @@ import javax.security.auth.Subject;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.util.Reject;
 
 /**
  * Wrapper for the Jsonification of the Application class.
@@ -158,14 +162,33 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
     }
 
     @JsonProperty("entitlementCombiner")
-    public void setEntitlementCombiner(String name) {
-        Reject.ifNull(name);
-        application.setEntitlementCombinerName(EntitlementUtils.getEntitlementCombiner(name));
+    public void setEntitlementCombiner(String name) throws ClassNotFoundException {
+        // Same contract as the three index setters: an absent value is a no-op, leaving the combiner
+        // unset for ApplicationService to default to DenyOverride. Rejecting it here instead threw a
+        // NullPointerException out of a Jackson setter, which reached the client as an opaque
+        // "Unable to instantiate class null" Bad Request.
+        if (name == null || name.isEmpty()) {
+            return;
+        }
+
+        try {
+            // Strict resolution: a request-supplied name that is not a registered combiner or an
+            // instantiable EntitlementCombiner implementation must surface as an error, not silently
+            // fall back to DenyOverride (and never load-and-initialise an arbitrary class, CWE-470).
+            application.setEntitlementCombinerName(EntitlementUtils.resolveEntitlementCombiner(name));
+        } catch (ClassNotFoundException e) {
+            debug.warning("EntitlementCombiner class could not be resolved.", e);
+            throw e;
+        }
     }
 
     @JsonProperty("entitlementCombiner")
     public String getEntitlementCombiner() {
-        return application.getEntitlementCombiner().getName();
+        // Application.getEntitlementCombiner() instantiates the configured class and answers null when
+        // that fails, so render it null-safe like the three index getters: a stored class that cannot be
+        // instantiated must not turn every read of the application into a 500.
+        EntitlementCombiner combiner = application.getEntitlementCombiner();
+        return combiner == null ? null : combiner.getName();
     }
 
     @JsonProperty("searchIndex")
@@ -177,9 +200,10 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         }
 
         try {
-            application.setSearchIndex(Class.forName(classname));
+            application.setSearchIndex(
+                    EntitlementUtils.resolveInstantiableExtensionClass(classname, ISearchIndex.class));
         } catch (ClassNotFoundException e) {
-            debug.warning("SearchIndex class not found.", e);
+            debug.warning("SearchIndex class could not be resolved.", e);
             throw e;
         } catch (InstantiationException e) {
             debug.warning("SearchIndex class unable to instantiate.", e);
@@ -204,9 +228,9 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         }
 
         try {
-            application.setSaveIndex(Class.forName(classname));
+            application.setSaveIndex(EntitlementUtils.resolveInstantiableExtensionClass(classname, ISaveIndex.class));
         } catch (ClassNotFoundException e) {
-            debug.warning("SaveIndex class not found.", e);
+            debug.warning("SaveIndex class could not be resolved.", e);
             throw e;
         } catch (InstantiationException e) {
             debug.warning("SaveIndex class unable to instantiate.", e);
@@ -231,9 +255,10 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         }
 
         try {
-            application.setResourceComparator(Class.forName(classname));
+            application.setResourceComparator(
+                    EntitlementUtils.resolveInstantiableExtensionClass(classname, ResourceName.class));
         } catch (ClassNotFoundException e) {
-            debug.warning("ResourceComparator class not found.", e);
+            debug.warning("ResourceComparator class could not be resolved.", e);
             throw e;
         } catch (InstantiationException e) {
             debug.warning("ResourceComparator class unable to instantiate.", e);

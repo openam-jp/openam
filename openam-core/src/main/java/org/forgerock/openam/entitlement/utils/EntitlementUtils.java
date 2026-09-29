@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
  */
 package org.forgerock.openam.entitlement.utils;
 
@@ -21,6 +22,7 @@ import static org.forgerock.openam.utils.Time.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -424,23 +426,127 @@ public final class EntitlementUtils {
      * This is so that older systems which used the canonical name to refer to the class to instantiate
      * correctly find their class. This may also fail.
      *
-     * If this fails, we simply return the default: {@link DenyOverride}.
+     * If this fails — the class cannot be loaded, or is not an instantiable {@link EntitlementCombiner}
+     * subtype — we simply return the default: {@link DenyOverride}. Callers that must surface an invalid
+     * name to the caller instead of silently falling back should use
+     * {@link #resolveEntitlementCombiner(String)}.
      *
      * @param name the name used to reference the combiner. Must not be null.
      * @return the class represented by the name
      */
     public static Class<? extends EntitlementCombiner> getEntitlementCombiner(String name) {
         Reject.ifNull(name);
-        Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
-        if (combinerClass != null) {
-            return combinerClass;
-        }
         try {
-            return Class.forName(name).asSubclass(EntitlementCombiner.class);
+            return resolveEntitlementCombiner(name);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error("EntitlementService.getEntitlementCombiner", ex);
         }
         return DenyOverride.class;
+    }
+
+    /**
+     * Strict variant of {@link #getEntitlementCombiner(String)}: resolves a combiner short name via the
+     * {@link org.forgerock.openam.entitlement.EntitlementRegistry}, or a canonical class name via
+     * {@link #resolveExtensionClass(String, Class)}, and throws instead of falling back to
+     * {@link DenyOverride} when the name is rejected. Intended for request-supplied names (e.g. the
+     * Applications REST endpoint), where an invalid name must produce an error rather than silently
+     * configure a different combiner.
+     *
+     * @param name the name used to reference the combiner. Must not be null.
+     * @return the class represented by the name, guaranteed to be an instantiable
+     *         {@link EntitlementCombiner} implementation
+     * @throws ClassNotFoundException if the name matches no registered combiner and cannot be resolved
+     *         to an instantiable {@link EntitlementCombiner} subtype
+     */
+    public static Class<? extends EntitlementCombiner> resolveEntitlementCombiner(String name)
+            throws ClassNotFoundException {
+        Reject.ifNull(name);
+        Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
+        if (combinerClass != null) {
+            return combinerClass;
+        }
+        // Application.getEntitlementCombiner() instantiates it with newInstance(), so require a class
+        // that call can actually construct: otherwise the combiner resolves here and silently becomes
+        // null later, and the application service replaces it with DenyOverride behind the caller's back.
+        return resolveInstantiableExtensionClass(name, EntitlementCombiner.class);
+    }
+
+    /**
+     * Safely resolves an attacker- or config-supplied class name into a concrete implementation of an
+     * expected entitlement extension interface (e.g. {@code ISearchIndex}, {@code ISaveIndex},
+     * {@code ResourceName}).
+     * <p>
+     * The class is loaded WITHOUT running its static initializer (the three-argument
+     * {@link Class#forName(String, boolean, ClassLoader)} form with {@code initialize == false}) and is
+     * validated to be an instantiable subtype of {@code expectedType} <em>before</em> it is ever
+     * instantiated by the caller. This prevents loading and instantiating arbitrary classpath classes
+     * with dangerous static-initializer or no-arg-constructor side effects (unsafe reflection, CWE-470).
+     * <p>
+     * Callers that go on to instantiate the class themselves with {@link Class#newInstance()} should use
+     * {@link #resolveInstantiableExtensionClass(String, Class)} instead, which additionally requires the
+     * class to be reachable that way. This variant only guarantees the type, so it also serves callers
+     * that hand the class to a framework able to use non-public constructors (e.g. Jackson).
+     *
+     * @param className the requested implementation class name
+     * @param expectedType the interface the class must implement
+     * @param <T> the expected interface type
+     * @return the validated class, guaranteed to be a concrete subtype of {@code expectedType}
+     * @throws ClassNotFoundException if the class cannot be loaded, or is not a concrete subtype of
+     *         {@code expectedType}
+     */
+    public static <T> Class<? extends T> resolveExtensionClass(String className, Class<T> expectedType)
+            throws ClassNotFoundException {
+        final Class<?> clazz;
+        try {
+            clazz = Class.forName(className, false, expectedType.getClassLoader());
+        } catch (LinkageError e) {
+            throw new ClassNotFoundException("Unable to load class " + className, e);
+        }
+        // Modifier.isAbstract is true for interfaces as well as abstract classes, so this one check
+        // rejects every non-instantiable type.
+        if (!expectedType.isAssignableFrom(clazz) || Modifier.isAbstract(clazz.getModifiers())) {
+            throw new ClassNotFoundException(
+                    className + " is not an instantiable " + expectedType.getSimpleName() + " implementation");
+        }
+        return clazz.asSubclass(expectedType);
+    }
+
+    /**
+     * {@link #resolveExtensionClass(String, Class)} for callers that instantiate the resolved class with
+     * {@link Class#newInstance()}: the class must additionally be public and declare a public no-arg
+     * constructor, which is exactly what that call needs.
+     * <p>
+     * Both properties are read from the class declaration, so nothing of the class runs during the check.
+     * Rejecting here keeps the failure a clean {@link ClassNotFoundException} attached to the name that
+     * caused it — a Bad Request for request-supplied names, a null degrade for config-supplied ones —
+     * instead of an {@code InstantiationException} / {@code IllegalAccessException} surfacing later, or a
+     * silently absent extension. A constructor that throws at runtime cannot be detected without running
+     * it and is out of scope; callers that instantiate lazily must still cope with a null instance.
+     *
+     * @param className the requested implementation class name
+     * @param expectedType the interface the class must implement
+     * @param <T> the expected interface type
+     * @return the validated class, guaranteed to be instantiable via {@link Class#newInstance()}
+     * @throws ClassNotFoundException if the class cannot be loaded, is not a subtype of
+     *         {@code expectedType}, or cannot be instantiated through its no-arg constructor
+     */
+    public static <T> Class<? extends T> resolveInstantiableExtensionClass(String className, Class<T> expectedType)
+            throws ClassNotFoundException {
+        Class<? extends T> clazz = resolveExtensionClass(className, expectedType);
+        // A non-public class is reachable only from its own package, which no instantiation site is.
+        if (!Modifier.isPublic(clazz.getModifiers())) {
+            throw new ClassNotFoundException(className + " is not a public "
+                    + expectedType.getSimpleName() + " implementation");
+        }
+        try {
+            // getConstructor() looks the declaration up; it neither runs nor initialises anything.
+            clazz.getConstructor();
+        } catch (NoSuchMethodException e) {
+            throw new ClassNotFoundException(className + " has no public no-argument constructor", e);
+        } catch (LinkageError e) {
+            throw new ClassNotFoundException("Unable to load class " + className, e);
+        }
+        return clazz;
     }
 
     /**
