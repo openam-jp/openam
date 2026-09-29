@@ -24,6 +24,7 @@
  *
  * $Id: IUMSConstants.java,v 1.3 2008/06/25 05:41:45 qcheng Exp $
  *
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.iplanet.ums;
@@ -415,8 +416,11 @@ public interface IUMSConstants {
     public static final String SMS_failed_to_get_schema_manager = 
         "sms-failed_to_get_schema_manager";
 
-    public static final String SMS_VALIDATOR_CANNOT_INSTANTIATE_CLASS = 
+    public static final String SMS_VALIDATOR_CANNOT_INSTANTIATE_CLASS =
         "sms-validator_cannot_instantiate_class";
+
+    public static final String SMS_VALIDATOR_VALUES_TOO_LARGE =
+        "sms-validator_values_too_large";
 
     public static final String SMS_xml_invalid_doc_type = "sms-invalid-doctype";
 
