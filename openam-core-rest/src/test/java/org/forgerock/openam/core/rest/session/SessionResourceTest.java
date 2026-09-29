@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session;
@@ -22,11 +23,9 @@ import static org.forgerock.openam.core.rest.session.SessionResource.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anySetOf;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.*;
@@ -40,10 +39,8 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletRequest;
@@ -60,9 +57,11 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
@@ -95,7 +94,6 @@ public class SessionResourceTest {
 
     @BeforeMethod
     public void setUp() throws IdRepoException, SSOException {
-        SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
         propertyWhitelist = mock(SessionPropertyWhitelist.class);
@@ -110,8 +108,7 @@ public class SessionResourceTest {
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
         configureWhitelist();
-        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager, authUtilsWrapper,
-                propertyWhitelist) {
+        sessionResource = new SessionResource(ssoTokenManager, authUtilsWrapper, propertyWhitelist) {
             @Override
             AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
                 return amIdentity;
@@ -149,48 +146,58 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldUseSessionQueryManagerForAllSessionsQuery() {
+    public void shouldRefuseTheAllSessionsQuery() {
         // Given
-        String badger = "badger";
-        String weasel = "weasel";
-
-        SessionQueryManager mockManager = mock(SessionQueryManager.class);
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
-        QueryResourceHandler handler = mock(QueryResourceHandler.class);
-
-        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
-        List<String> list = Arrays.asList(badger, weasel);
-        doReturn(list).when(resource).getAllServerIds();
 
         // When
-        resource.queryCollection(null, request, handler);
+        Promise<QueryResponse, ResourceException> promise = queryCollection(request);
 
         // Then
-        List<String> result = Arrays.asList(badger, weasel);
-        verify(mockManager, times(1)).getAllSessions(result);
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(NotSupportedException.class);
     }
 
     @Test
-    public void shouldQueryNamedServerInServerMode() {
+    public void shouldRefuseTheNamedServerQuery() {
         // Given
-        String badger = "badger";
-
-        SessionQueryManager mockManager = mock(SessionQueryManager.class);
-        QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
         QueryRequest request = mock(QueryRequest.class);
-        given(request.getQueryId()).willReturn(badger);
-
-        SessionResource resource = spy(new SessionResource(mockManager, null, null, null));
+        given(request.getQueryId()).willReturn("badger");
 
         // When
-        resource.queryCollection(null, request, mockHandler);
+        Promise<QueryResponse, ResourceException> promise = queryCollection(request);
 
         // Then
-        verify(resource, times(0)).getAllServerIds();
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(NotSupportedException.class);
+    }
 
-        List<String> result = Collections.singletonList(badger);
-        verify(mockManager, times(1)).getAllSessions(result);
+    @Test
+    public void shouldRefuseTheServerListQuery() {
+        // Given the query that used to return the server ids of the deployment
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryId()).willReturn(SessionResource.KEYWORD_LIST);
+
+        // When
+        Promise<QueryResponse, ResourceException> promise = queryCollection(request);
+
+        // Then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(NotSupportedException.class);
+    }
+
+    /**
+     * Runs the query against a resource of its own, and asserts that nothing was handed to the query handler.
+     */
+    private Promise<QueryResponse, ResourceException> queryCollection(QueryRequest request) {
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
+        SessionResource resource = new SessionResource(null, null, null);
+
+        Promise<QueryResponse, ResourceException> promise = resource.queryCollection(null, request, handler);
+
+        verify(handler, times(0)).handleResource(any(ResourceResponse.class));
+        return promise;
     }
 
     @Test

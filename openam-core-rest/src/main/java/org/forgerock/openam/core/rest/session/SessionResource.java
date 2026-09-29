@@ -12,18 +12,17 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -35,14 +34,11 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -71,7 +67,6 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -83,16 +78,12 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 /**
- * Represents Sessions that can queried via a REST interface.
+ * Represents Sessions that can be acted upon via a REST interface.
  *
- * Currently describe three different entrypoints for this Resource, useful when querying
- * Session Information:
- *
- * <ul>
- *     <li>All - All sessions across all servers known to OpenAM.</li>
- *     <li>Servers - Lists all servers that are known to OpenAM.</li>
- *     <li>[server-id] - Lists the servers for that server instance.</li>
- * </ul>
+ * The query entrypoints of this resource - {@literal all}, {@literal [server-id]} and {@literal list} - are no
+ * longer supported and are answered with 501. They listed the sessions of a server, or of the whole deployment,
+ * under the administrative token of the server, so neither the realm the sessions belong to nor the caller took
+ * part in the query.
  *
  * This resources acts as a read only resource for the most part, allowing only
  * specific, whitelisted properties to be set through it.
@@ -129,7 +120,6 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String HEADER_USER_ID = "userid";
     public static final String HEADER_TIME_REMAINING = "timeleft";
 
-    private final SessionQueryManager queryManager;
     private final SSOTokenManager ssoTokenManager;
     private final AuthUtilsWrapper authUtilsWrapper;
     private final Map<String, ActionHandler> actionHandlers;
@@ -137,17 +127,15 @@ public class SessionResource implements CollectionResourceProvider {
 
     /**
      * Dependency Injection constructor allowing the SessionResource dependency to be provided.
-     *  @param sessionQueryManager An instance of the SessionQueryManager. Must not null.
+     *
      * @param ssoTokenManager An instance of the SSOTokenManager.
      * @param authUtilsWrapper A wrapper around AuthUtils static methods to facilitate testing.
      * @param sessionPropertyWhitelist A session property whitelist
      */
     @Inject
-    public SessionResource(final SessionQueryManager sessionQueryManager,
-                           final SSOTokenManager ssoTokenManager,
+    public SessionResource(final SSOTokenManager ssoTokenManager,
                            final AuthUtilsWrapper authUtilsWrapper,
                            final SessionPropertyWhitelist sessionPropertyWhitelist) {
-        this.queryManager = sessionQueryManager;
         this.ssoTokenManager = ssoTokenManager;
         this.authUtilsWrapper = authUtilsWrapper;
         this.sessionPropertyWhitelist = sessionPropertyWhitelist;
@@ -164,20 +152,6 @@ public class SessionResource implements CollectionResourceProvider {
         actionHandlers.put(SET_PROPERTY_ACTION_ID, new SetPropertyActionHandler());
         actionHandlers.put(DELETE_PROPERTY_ACTION_ID, new DeletePropertyActionHandler());
         actionHandlers.put(GET_PROPERTY_NAMES_ACTION_ID, new GetPropertyNamesActionHandler());
-    }
-
-    /**
-     * Returns a collection of all Server ID that are known to the OpenAM instance.
-     *
-     *  @return A non null, possibly empty collection of server ids.
-     */
-    public Collection<String> getAllServerIds() {
-        try {
-            return WebtopNaming.getAllServerIDs();
-        } catch (Exception e) {
-            LOGGER.error("SessionResource.getAllServerIds() :: WebtopNaming throw irrecoverable error.");
-            throw new IllegalStateException("Cannot recover from this error", e);
-        }
     }
 
     /**
@@ -336,11 +310,16 @@ public class SessionResource implements CollectionResourceProvider {
     }
 
     /**
-     * Queries the session resources using one of the predefined query filters.
+     * Session queries are no longer supported by this resource, and are answered with 501.
      *
-     * all - (default) will query all Sessions across all servers.
-     * list - will list the available servers which is useful for the next query
-     * [server-id] - will list the available Sessions on the named server.
+     * <p>The listing queries {@literal all} and {@literal [server-id]} collected the sessions of the whole
+     * deployment, or of one of its servers, under the administrative token of the server: neither the realm the
+     * sessions belong to nor the caller took part in the query, so the per realm scoping of the session service
+     * was evaluated for the administrator instead of the caller. An administrator delegated a single realm was
+     * therefore answered with the sessions of every realm of the deployment.</p>
+     *
+     * <p>The {@literal list} query, which returned the server ids of the deployment, is refused as well: it only
+     * existed to provide the server id of the {@literal [server-id]} query.</p>
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -348,39 +327,9 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
-        String id = request.getQueryId();
-
-        if (KEYWORD_LIST.equals(id)) {
-            Collection<String> servers = generateListServers();
-            LOGGER.message("SessionResource.queryCollection() :: Retrieved list of servers for query.");
-            handler.handleResource(newResourceResponse(KEYWORD_LIST, String.valueOf(currentTimeMillis()),
-                    new JsonValue(servers)));
-        } else {
-            Collection<SessionInfo> sessions;
-
-            if (KEYWORD_ALL.equals(id)) {
-                sessions = generateAllSessions();
-                LOGGER.message("SessionResource.queryCollection() :: Retrieved list of sessions for query.");
-            } else {
-                sessions = generateNamedServerSession(id);
-                LOGGER.message("SessionResource.queryCollection() :: Retrieved list of specified servers for query.");
-            }
-
-            for (SessionInfo session : sessions) {
-
-                long timeleft = TimeUnit.SECONDS.toMinutes(session.getTimeLeft());
-                String username = session.getProperties().get("UserId");
-
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put(HEADER_USER_ID, username);
-                map.put(HEADER_TIME_REMAINING, timeleft);
-
-                handler.handleResource(newResourceResponse("Sessions", String.valueOf(currentTimeMillis()),
-                        new JsonValue(map)));
-            }
-        }
-
-        return newResultPromise(newQueryResponse());
+        LOGGER.warning("SessionResource.queryCollection() :: rejected the session query '{}', which is no longer "
+                + "supported", request.getQueryId());
+        return new NotSupportedException("Querying sessions is not supported").asPromise();
     }
 
     /**
@@ -390,40 +339,6 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String id, ReadRequest request) {
         return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * @param serverId Server to query.
-     * @return A non null collection of SessionInfos from the named server.
-     */
-    private Collection<SessionInfo> generateNamedServerSession(String serverId) {
-        List<String> serverList = Arrays.asList(new String[]{serverId});
-        Collection<SessionInfo> sessions = queryManager.getAllSessions(serverList);
-        if (LOGGER.messageEnabled()) {
-            LOGGER.message("SessionResource.generateNmaedServerSession :: retrieved session list for server, " +
-                    serverId);
-        }
-        return sessions;
-    }
-
-
-    /**
-     * @return A non null collection of SessionInfo instances queried across all servers.
-     */
-    private Collection<SessionInfo> generateAllSessions() {
-        Collection<SessionInfo> sessions = queryManager.getAllSessions(getAllServerIds());
-        if (LOGGER.messageEnabled()) {
-            LOGGER.message("SessionResource.generateNmaedServerSession :: retrieved session list for all servers.");
-        }
-        return sessions;
-    }
-
-
-    /**
-     * @return Returns a JSON Resource which defines the available servers.
-     */
-    private Collection<String> generateListServers() {
-        return getAllServerIds();
     }
 
     /**
