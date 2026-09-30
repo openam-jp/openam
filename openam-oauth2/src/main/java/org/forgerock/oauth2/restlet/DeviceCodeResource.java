@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -35,6 +36,7 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
@@ -98,6 +100,18 @@ public class DeviceCodeResource extends ServerResource {
                 clientRegistrationStore.get(clientId, request);
             }
 
+            final String codeChallenge = request.getParameter(CODE_CHALLENGE);
+            final String codeChallengeMethod = request.getParameter(CODE_CHALLENGE_METHOD);
+
+            // The challenge is verified when the device code is redeemed; reject a method that could never
+            // verify now, rather than at the client's first poll. An explicitly empty method is malformed,
+            // not omitted (RFC 7636 4.3).
+            if (!StringUtils.isEmpty(codeChallenge) && codeChallengeMethod != null
+                    && !CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)
+                    && !CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
+                throw new InvalidRequestException("Invalid value for " + CODE_CHALLENGE_METHOD);
+            }
+
             if (scope == null) {
                 scope = "";
             }
@@ -116,8 +130,8 @@ public class DeviceCodeResource extends ServerResource {
                     maxAge == null ? null : Integer.valueOf(maxAge),
                     request.<String>getParameter(CLAIMS),
                     request,
-                    request.<String>getParameter(CODE_CHALLENGE),
-                    request.<String>getParameter(CODE_CHALLENGE_METHOD));
+                    codeChallenge,
+                    codeChallengeMethod);
 
             Map<String, Object> result = new HashMap<>();
             OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);

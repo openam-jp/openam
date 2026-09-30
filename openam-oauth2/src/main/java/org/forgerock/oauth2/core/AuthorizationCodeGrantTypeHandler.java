@@ -18,9 +18,6 @@
 
 package org.forgerock.oauth2.core;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -33,11 +30,9 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
-import org.forgerock.util.encode.Base64url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
@@ -104,9 +99,7 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         // RFC 7636 §4.6: if the code was issued with a code_challenge,
         // the token endpoint MUST verify code_verifier regardless of
         // any provider-wide enforcement setting.
-        final String storedCodeChallenge = authorizationCode.getCodeChallenge();
-        final boolean codeWasIssuedWithChallenge =
-                storedCodeChallenge != null && !storedCodeChallenge.isEmpty();
+        final boolean codeWasIssuedWithChallenge = PkceVerifier.hasChallenge(authorizationCode.getCodeChallenge());
 
         AccessToken accessToken;
         Set<String> authorizationScope;
@@ -149,10 +142,8 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             }
 
             if (codeWasIssuedWithChallenge) {
-                if (isEmpty(codeVerifier)) {
-                    throw new InvalidRequestException("code_verifier parameter required");
-                }
-                checkCodeVerifier(authorizationCode, codeVerifier);
+                PkceVerifier.verify(authorizationCode.getCodeChallenge(), authorizationCode.getCodeChallengeMethod(),
+                        codeVerifier);
             }
 
             final String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
@@ -181,37 +172,5 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         }
 
         return accessToken;
-    }
-
-    private void checkCodeVerifier(AuthorizationCode authorizationCode, String codeVerifier) throws
-            InvalidGrantException, InvalidRequestException {
-        final String codeChallenge = authorizationCode.getCodeChallenge();
-        final String codeChallengeMethod = authorizationCode.getCodeChallengeMethod();
-
-        // RFC 7636 4.3: an omitted code_challenge_method defaults to "plain". An explicitly empty
-        // value is malformed, not omitted, so it falls through to the rejection below.
-        if (codeChallengeMethod == null
-                || OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
-            checkCodeChallenge(codeChallenge, codeVerifier);
-        } else if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)){
-            String encodedCodeVerifier = null;
-            try {
-                encodedCodeVerifier = Base64url.encode(
-                        MessageDigest.getInstance("SHA-256").digest(codeVerifier.getBytes(StandardCharsets.US_ASCII)));
-                checkCodeChallenge(codeChallenge, encodedCodeVerifier);
-            } catch (NoSuchAlgorithmException e) {
-                logger.error("Error encoding code verifier.");
-                throw new InvalidGrantException();
-            }
-        } else {
-            throw new InvalidRequestException("Invalid code challenge method specified.");
-        }
-    }
-
-    private void checkCodeChallenge(String codeChallenge, String codeVerifier) throws InvalidGrantException {
-        if (!MessageDigest.isEqual(codeVerifier.getBytes(), codeChallenge.getBytes())) {
-            logger.error("Incorrect Code Verifier,");
-            throw new InvalidGrantException();
-        }
     }
 }
