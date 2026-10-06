@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -245,6 +246,11 @@ public class IdTokenInfo extends ServerResource {
                 return (T) realm;
             }
             return delegate.getParameter(name);
+        }
+
+        @Override
+        public String getBodyParameter(final String name) {
+            return delegate.getBodyParameter(name);
         }
 
         /**
