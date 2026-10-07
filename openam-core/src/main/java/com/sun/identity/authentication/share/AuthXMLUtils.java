@@ -46,11 +46,8 @@ import com.sun.identity.security.EncodeAction;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.security.AccessController;
 import java.security.Principal;
 import java.security.cert.CertificateEncodingException;
@@ -76,6 +73,7 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jp.co.osstech.openam.utils.ObjectInputFilterSupport;
 import org.forgerock.openam.utils.IOUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1716,58 +1714,49 @@ public class AuthXMLUtils {
         return encodedString;
     }
     
-    // Hardened deserialization for the encrypted <Subject> value received from
-    // the auth server. The value is Java-serialized, so without a class allowlist
-    // a forged or relayed response could trigger gadget-chain code execution in
-    // the AuthContext client. A legitimate javax.security.auth.Subject graph only
-    // contains the Subject itself, JDK collections/scalars and
+    // Hardened deserialization filter for the encrypted <Subject> value received
+    // from the auth server. The value is Java-serialized, so without a class
+    // allowlist a forged or relayed response could trigger gadget-chain code
+    // execution in the AuthContext client. A legitimate javax.security.auth.Subject
+    // graph only contains the Subject itself, JDK collections/scalars and
     // java.security.Principal implementations (GHSA-wg5r-wc3x-39vc, related
-    // deserialization hardening).
-    //
-    // The allowlist is enforced by overriding ObjectInputStream.resolveClass()
-    // rather than using java.io.ObjectInputFilter, so it remains compatible with
-    // Java 7/8 where the serialization-filter API is not available.
-    static final class SubjectObjectInputStream extends ObjectInputStream {
-
-        SubjectObjectInputStream(InputStream in) throws IOException {
-            super(in);
-        }
-
-        @Override
-        protected Class<?> resolveClass(ObjectStreamClass desc)
-                throws IOException, ClassNotFoundException {
-            Class<?> resolved = super.resolveClass(desc);
-            Class<?> clazz = resolved;
-            while (clazz.isArray()) {
-                clazz = clazz.getComponentType();
+    // deserialization hardening). ObjectInputFilterSupport installs it through
+    // sun.misc.ObjectInputFilter on Java 8 and java.io.ObjectInputFilter from Java 9.
+    private static final ObjectInputFilterSupport.Filter SUBJECT_DESERIALISATION_FILTER =
+        new ObjectInputFilterSupport.Filter() {
+            @Override
+            public ObjectInputFilterSupport.Status checkInput(
+                    ObjectInputFilterSupport.FilterInfo info) {
+                return filterSubjectClass(info);
             }
-            if (clazz.isPrimitive() || isAllowedSubjectClass(clazz)) {
-                return resolved;
-            }
-            debug.warning("getDeSerializedSubject : rejected class "
-                + clazz.getName() + " during Subject deserialization");
-            throw new InvalidClassException(clazz.getName(),
-                "class is not allowed during Subject deserialization");
-        }
+        };
 
-        @Override
-        protected Class<?> resolveProxyClass(String[] interfaces)
-                throws IOException, ClassNotFoundException {
-            debug.warning("getDeSerializedSubject : rejected dynamic proxy "
-                + "during Subject deserialization");
-            throw new InvalidClassException(
-                "dynamic proxies are not allowed during Subject deserialization");
+    private static ObjectInputFilterSupport.Status filterSubjectClass(
+            ObjectInputFilterSupport.FilterInfo info) {
+        // Reject oversized or deeply nested graphs before resolving any class.
+        if (info.depth() > 20L || info.references() > 1000L
+                || info.arrayLength() > 10000L) {
+            return ObjectInputFilterSupport.Status.REJECTED;
         }
-    }
-
-    private static boolean isAllowedSubjectClass(Class<?> clazz) {
-        if (Principal.class.isAssignableFrom(clazz)) {
-            return true;
+        Class<?> clazz = info.serialClass();
+        if (clazz == null) {
+            return ObjectInputFilterSupport.Status.UNDECIDED;
+        }
+        while (clazz.isArray()) {
+            clazz = clazz.getComponentType();
+        }
+        if (clazz.isPrimitive() || Principal.class.isAssignableFrom(clazz)) {
+            return ObjectInputFilterSupport.Status.ALLOWED;
         }
         String name = clazz.getName();
-        return name.startsWith("java.lang.") || name.startsWith("java.util.")
-            || name.startsWith("java.security.")
-            || name.startsWith("javax.security.");
+        if (name.startsWith("java.lang.") || name.startsWith("java.util.")
+                || name.startsWith("java.security.")
+                || name.startsWith("javax.security.")) {
+            return ObjectInputFilterSupport.Status.ALLOWED;
+        }
+        debug.warning("getDeSerializedSubject : rejected class " + name
+            + " during Subject deserialization");
+        return ObjectInputFilterSupport.Status.REJECTED;
     }
 
     /**
@@ -1793,7 +1782,16 @@ public class AuthXMLUtils {
             byteDecrypted = sSerialized;
             //convert byte to object using streams
             byteIn = new ByteArrayInputStream(byteDecrypted);
-            objInStream  = new SubjectObjectInputStream(byteIn);
+            objInStream  = new ObjectInputStream(byteIn);
+            // The filter is the only class allowlist here, so the Subject is not
+            // read at all on a JVM without a filter API (Java 8 before 8u121).
+            if (!ObjectInputFilterSupport.setObjectInputFilter(objInStream,
+                    SUBJECT_DESERIALISATION_FILTER)) {
+                debug.error("getDeSerializedSubject : no deserialization filter"
+                    + " API is available (Java 8u121 or later is required),"
+                    + " so the Subject is not deserialized");
+                return null;
+            }
             tempObject = objInStream.readObject();
         }catch(Exception e){
             debug.message("Exception Message in decrypt: " , e);

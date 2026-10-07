@@ -24,9 +24,9 @@
  *
  * $Id: CaseInsensitiveKey.java,v 1.2 2008/06/25 05:42:25 qcheng Exp $
  *
- */
-/**
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.common;
 
@@ -34,9 +34,16 @@ import java.io.Serializable;
 
 /**
  * String wrapper that returns a case insensitive hash code useful for case
- * insensitive hashing in HashSet and HashMap.
+ * insensitive hashing in HashSet and HashMap. It is comparable so that a HashMap
+ * can order keys whose hash codes collide in a tree bin instead of scanning the
+ * whole bin on every insertion.
  */
-public class CaseInsensitiveKey implements Serializable {
+public class CaseInsensitiveKey implements Serializable, Comparable<CaseInsensitiveKey> {
+
+    // The value computed for this class before it implemented Comparable, which would otherwise change it,
+    // so that instances serialised by an earlier version still deserialise.
+    private static final long serialVersionUID = -2547198926477156204L;
+
     String mKey;
 
     public CaseInsensitiveKey(String key) {
@@ -53,6 +60,12 @@ public class CaseInsensitiveKey implements Serializable {
 
     public int hashCode() {
         return mKey.toLowerCase().hashCode();
+    }
+
+    // Consistent with equals(): String.CASE_INSENSITIVE_ORDER returns 0 exactly when equalsIgnoreCase holds
+    @Override
+    public int compareTo(CaseInsensitiveKey o) {
+        return String.CASE_INSENSITIVE_ORDER.compare(mKey, o.mKey);
     }
 
     public String toString() {
