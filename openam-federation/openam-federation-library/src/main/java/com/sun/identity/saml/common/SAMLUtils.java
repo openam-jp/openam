@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2019-2026 OSSTech Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.common;
@@ -68,6 +69,7 @@ import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.encode.Base64;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -1353,15 +1355,25 @@ public class SAMLUtils  extends SAMLUtilsCommon {
                                                   String idAttribute, 
                                                   String issuer)
     {
+        return checkSignatureValid(xmlString, idAttribute, issuer,
+                (Map) SAMLServiceManager.getAttribute(SAMLConstants.PARTNER_URLS));
+    }
+
+    static boolean checkSignatureValid(String xmlString, String idAttribute, String issuer, Map entries) {
             String certAlias = null;
             boolean valid = true; 
-            Map entries = (Map) SAMLServiceManager.getAttribute(
-                                SAMLConstants.PARTNER_URLS);
         if (entries != null) {
             SAMLServiceManager.SOAPEntry srcSite =
                 (SAMLServiceManager.SOAPEntry) entries.get(issuer);
             if (srcSite != null) {
                 certAlias = srcSite.getCertAlias();
+                // Without the partner's own certificate any certificate in the keystore
+                // would be accepted for this issuer, including another partner's.
+                if (StringUtils.isEmpty(certAlias)) {
+                    SAMLUtils.debug.error("SAMLUtils.checkSignatureValid: no certificate alias is"
+                            + " configured for the trusted partner of issuer {}", issuer);
+                    return false;
+                }
             }
         }
       
