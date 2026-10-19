@@ -21,7 +21,8 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                               
-   Portions copyright 2019 Open Source Solution Technology Corporation
+   Portions Copyrighted 2019-2026 OSSTech Corporation
+   Portions Copyrighted 2026 3A Systems, LLC.
 --%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -36,6 +37,8 @@
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
+<%@ page import="com.sun.identity.authentication.service.AuthD" %>
+<%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%
@@ -62,14 +65,18 @@
     if (logoutURL == null) {
         logoutURL = ServiceURI;
     } else {
+        // logoutURL is assigned to window.location, so the realm has to accept it as a goto URL as well.
+        String orgDN = AuthUtils.getDomainNameByRequest(request, AuthUtils.parseRequestParameters(request));
         boolean isValidURL = ESAPI.validator().
-                isValidInput("URLContext", logoutURL, "URL", 255, false);
+                isValidInput("URLContext", logoutURL, "URL", 255, false)
+                && AuthD.getAuth().isGotoUrlValid(logoutURL, orgDN);
         if (!isValidURL) {
-            OAuthUtil.debugError("OAuthPwd: wrong logoutURL URL attempted to be used "
-                    + "in the OAuthPwd page: " + logoutURL);
+            OAuthUtil.debugError("OAuthActivate: wrong logoutURL URL attempted to be used "
+                    + "in the OAuthActivate page: " + logoutURL);
             logoutURL = ServiceURI;
         }
     }
+    logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);
 
     String activationTitle = resources.getString("activationTitle");
     String emptyCode = ESAPI.encoder().encodeForHTML(resources.getString("emptyCode"));
