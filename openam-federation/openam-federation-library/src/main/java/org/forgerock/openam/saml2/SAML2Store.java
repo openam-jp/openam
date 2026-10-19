@@ -12,6 +12,8 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions copyright 2026 OSSTech Corporation
+* Portions copyright 2026 3A Systems, LLC.
 */
 package org.forgerock.openam.saml2;
 
@@ -45,6 +47,14 @@ public class SAML2Store {
      */
     public static Object getTokenFromStore(String key) {
         return localCache.getIfPresent(key);
+    }
+
+    /**
+     * Statically removes an object from the store.
+     * @param key Key indicating the value to remove from the map.
+     */
+    public static void removeToken(String key) {
+        localCache.invalidate(key);
     }
 
 }

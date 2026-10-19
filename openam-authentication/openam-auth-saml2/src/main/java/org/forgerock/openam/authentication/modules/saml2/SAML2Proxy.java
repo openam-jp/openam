@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -221,6 +223,25 @@ public final class SAML2Proxy {
             }
         } else {
             SAML2Store.saveTokenWithKey(key, data);
+        }
+
+        // This path never goes through SPACSUtils.processResponse, so the assertions have to be
+        // marked as consumed here. Done after the response is stored, so that a failure to store
+        // it does not spend the assertions.
+        try {
+            SPACSUtils.markAssertionAsConsumed(smap);
+        } catch (SAML2Exception se) {
+            DEBUG.error("SAML2Proxy: An error occurred while consuming the SAML assertion", se);
+            if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                try {
+                    SAML2FailoverUtils.deleteSAML2Token(key);
+                } catch (SAML2TokenRepositoryException e) {
+                    DEBUG.warning("SAML2Proxy: could not delete the response stored for a refused assertion", e);
+                }
+            } else {
+                SAML2Store.removeToken(key);
+            }
+            return getUrlWithError(request, SAML_VERIFY_RESPONSE_ERROR, se.getL10NMessage(request.getLocale()));
         }
 
         return getUrlWithKey(request, key);
