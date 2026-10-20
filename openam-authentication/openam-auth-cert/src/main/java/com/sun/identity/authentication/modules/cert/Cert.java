@@ -487,7 +487,9 @@ public class Cert extends AMLoginModule {
             }
             Vector crls = new Vector();
             for (X509Certificate cert : allCerts) {
-                X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
+                // allCerts passed the trust-chain check above, so a CRL issued by an intermediate
+                // in it can be verified and stored instead of refetched on every authentication.
+                X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, allCerts, amAuthCert_chkAttributesCRL);
                 if (crl != null) {
                     crls.add(crl);
                 }
