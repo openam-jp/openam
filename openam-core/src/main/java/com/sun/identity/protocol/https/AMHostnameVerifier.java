@@ -24,6 +24,7 @@
  *
  * $Id: AMHostnameVerifier.java,v 1.2 2008/06/25 05:43:54 qcheng Exp $
  *
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.protocol.https;
@@ -31,18 +32,16 @@ package com.sun.identity.protocol.https;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.X500Name;
-
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.shared.debug.Debug;
 
 
@@ -89,20 +88,18 @@ public class AMHostnameVerifier implements HostnameVerifier {
     }
 
     public boolean verify(String hostname, SSLSession session) {
-    	if (trustAllServerCerts) {
+        if (trustAllServerCerts) {
             return true;
         }
 
-        boolean approve = true;
-    	X509Certificate peercert =  null;
-	String cn = null;
+        X509Certificate peercert = null;
+        String cn = null;
 
         try {
             X509Certificate[] peercerts = 
                    (X509Certificate[]) session.getPeerCertificates();
-	    peercert =  peercerts[0];
-            String subjectDN = peercert.getSubjectDN().getName();
-            cn = new X500Name(subjectDN).getCommonName();
+            peercert =  peercerts[0];
+            cn = CertUtils.getAttributeValue(peercerts[0].getSubjectX500Principal(), "CN");
         } catch (Exception ex) {
             debug.error("AMHostnameVerifier:"+ex.toString());
         }
@@ -118,46 +115,65 @@ public class AMHostnameVerifier implements HostnameVerifier {
 
         if (resolveIPAddress) {
             try {
-                approve = InetAddress.getByName(cn).getHostAddress().equals(
-                             InetAddress.getByName(hostname).getHostAddress());
+                if (InetAddress.getByName(cn).getHostAddress().equals(
+                        InetAddress.getByName(hostname).getHostAddress())) {
+                    return true;
+                }
             }
             catch (UnknownHostException ex) {
                 if (debug.messageEnabled()) {
                     debug.message("AMHostnameVerifier:", ex);
                 }
-                approve = false;
             }
-        } else {
-            approve = false;
         }
         
-        if (checkSubjectAltName && !approve) {
+        if (checkSubjectAltName) {
             try {
-                Iterator i = 
-                    (Iterator) peercert.getSubjectAlternativeNames().iterator();
-                for (; !approve && i.hasNext();) {
-                    approve = compareHosts((GeneralName) i.next(), hostname);
+                Collection<List<?>> subjectAltNames = peercert.getSubjectAlternativeNames();
+                if (subjectAltNames == null || subjectAltNames.isEmpty()) {
+                    debug.message("AMHostnameVerifier: subjectAltNames is null or empty");
+                    return false;
+                }
+                for (List<?> generalName : subjectAltNames) {
+                    if (compareHosts(generalName, hostname)) {
+                        return true;
+                    }
                 }
             } catch (Exception ex) {
-                return false;
+                debug.message("AMHostnameVerifier: Failed to verify with Subject Alternative Name", ex);
             }
         }
         
-        return approve;
+        return false;
     }
 
-    private boolean compareHosts(GeneralName generalName, String hostname) {
+    private boolean compareHosts(List<?> generalName, String hostname) {
+        if (generalName == null) {
+            debug.message("AMHostnameVerifier.compareHosts: generalName is null");
+            return false;
+        }
+
+        // generalName contains at least 2 elements.
+        // The first element is an Integer representing the name type.
+        // The second element is a String or a byte array and represents the name value.
+        // The following if statement checks whether the name type is DNSName(2).
+        if ((Integer) generalName.get(0) != 2) {
+            return false;
+        }
+
+        // get the DNSName value
+        Object name = generalName.get(1);
+        if (!(name instanceof String)) {
+            debug.message("AMHostnameVerifier.compareHosts: DNSName value is not String, type: {}",
+                    name.getClass().getName());
+            return false;
+        }
+
         try {
-            if (generalName.getType() == GeneralNameInterface.NAME_DNS) {
-                String name = generalName.toString();
-    	        name = name.substring(name.indexOf(':')+1).trim();
-                return InetAddress.getByName(name).equals(
-                        InetAddress.getByName(hostname));
-            }
+            return InetAddress.getByName((String) name).equals(
+                    InetAddress.getByName(hostname));
         } catch (UnknownHostException e) {
-	    if (debug.messageEnabled()) {
-	        debug.message(e.toString());
-	    }
+            debug.message("AMHostnameVerifier.compareHosts: {}", e.toString());
         }
 
         return false;

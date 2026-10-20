@@ -817,6 +817,15 @@ Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
 Version: backgrid.min-0.3.5-min.js
 Copyright: Copyright (c) 2012 Jimmy Yuen Ho Wong
 
+Version: bcpkix-jdk18on-1.84.jar
+Copyright: Copyright (c) 2000-2023 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
+
+Version: bcprov-jdk18on-1.84.jar
+Copyright: Copyright (c) 2000-2023 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
+
+Version: bcutil-jdk18on-1.84.jar
+Copyright: Copyright (c) 2000-2023 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
+
 Version: bootstrap-3.4.1-openam-jp.js
 Copyright: Copyright 2011-2019 Twitter, Inc.
 
