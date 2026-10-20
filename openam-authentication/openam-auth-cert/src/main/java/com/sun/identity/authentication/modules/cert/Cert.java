@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.authentication.modules.cert;
@@ -41,17 +42,10 @@ import com.sun.identity.security.cert.AMCertStore;
 import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.CertificateExtensions;
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.OtherName;
-import sun.security.x509.RFC822Name;
-import sun.security.x509.SubjectAlternativeNameExtension;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
+
+import jp.co.osstech.openam.shared.cert.BouncyCastleUtils;
+import jp.co.osstech.openam.shared.cert.GeneralName;
+import jp.co.osstech.openam.shared.cert.GeneralNameType;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -59,6 +53,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -563,47 +558,37 @@ public class Cert extends AMLoginModule {
     private void getTokenFromSubjectAltExt(X509Certificate cert)
         throws AuthLoginException {
         try {
-            X509CertImpl certImpl = 
-                new X509CertImpl(cert.getEncoded());
-            X509CertInfo cinfo = 
-                new X509CertInfo(certImpl.getTBSCertificate());
-            CertificateExtensions exts = (CertificateExtensions) 
-                            cinfo.get(X509CertInfo.EXTENSIONS);
-            SubjectAlternativeNameExtension altNameExt = 
-                (SubjectAlternativeNameExtension)
-                    exts.get(SubjectAlternativeNameExtension.NAME);
-
-            if (altNameExt != null) {
-                GeneralNames names = (GeneralNames) altNameExt.get
-                    (SubjectAlternativeNameExtension.SUBJECT_NAME);
-        
-                GeneralName generalname = null;  
-                ObjectIdentifier upnoid = new ObjectIdentifier(UPNOID); 
-                Iterator itr = (Iterator) names.iterator();
-                while ((userTokenId == null) && itr.hasNext()) {
-                    generalname = (GeneralName) itr.next(); 
-                    if (generalname != null) {
-                        if (amAuthCert_subjectAltExtMapper.
-                        	equalsIgnoreCase("UPN") && 
-                        	(generalname.getType() == 
-                	        GeneralNameInterface.NAME_ANY)) {
-                            OtherName othername = 
-                                (OtherName)generalname.getName(); 
-                            if (upnoid.equals((Object)(othername.getOID()))) {
-                                byte[] nval = othername.getNameValue(); 
-                                DerValue derValue = new DerValue(nval); 
-                                userTokenId = 
-                                    derValue.getData().getUTF8String(); 
-                            } 
-                        }else if (amAuthCert_subjectAltExtMapper.
-                            equalsIgnoreCase("RFC822Name") && 
-                            (generalname.getType() == 
-                	        GeneralNameInterface.NAME_RFC822)) {
-                            RFC822Name email = 
-                                (RFC822Name) generalname.getName(); 
-                            userTokenId = email.getName(); 
+            // Parse Subject Alternative Name using BouncyCastleUtils
+            Collection<GeneralName> subjectAltName =
+                    BouncyCastleUtils.getSubjectAlternativeNameAsCollection(cert);
+            if (subjectAltName.isEmpty()) {
+                debug.message("Cert.getTokenFromSubjectAltExt: Subject Alternative Name extension not found");
+                return;
+            }
+            for (GeneralName generalName : subjectAltName) {
+                if (amAuthCert_subjectAltExtMapper.equalsIgnoreCase("UPN") &&
+                        generalName.getNameType() == GeneralNameType.OTHER_NAME) {
+                    String oid = generalName.getOtherNameTypeId();
+                    if (oid != null && UPNOID.equals(oid)) {
+                        String otherNameValue = generalName.getOtherNameValueAsString();
+                        if (otherNameValue == null) {
+                            debug.message("Cert.getTokenFromSubjectAltExt: Failed to get UPN value as String, " +
+                                    "generalName: {}", generalName);
+                            continue;
                         }
+                        userTokenId = otherNameValue;
+                        return;
                     }
+                } else if (amAuthCert_subjectAltExtMapper.equalsIgnoreCase("RFC822Name") &&
+                        generalName.getNameType() == GeneralNameType.RFC822_NAME) {
+                    String nameValue = generalName.getNameValueAsString();
+                    if (nameValue == null) {
+                        debug.message("Cert.getTokenFromSubjectAltExt: Failed to get RFC822Name value as String, " +
+                                "generalName: {}", generalName);
+                        continue;
+                    }
+                    userTokenId = nameValue;
+                    return;
                 }
             }
         } catch (Exception e) {
