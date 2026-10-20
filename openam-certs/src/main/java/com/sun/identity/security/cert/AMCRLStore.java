@@ -25,6 +25,7 @@
  * $Id: AMCRLStore.java,v 1.7 2009/01/28 05:35:12 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.security.cert;
 
@@ -32,14 +33,11 @@ import static org.forgerock.openam.utils.Time.*;
 
 import com.forgerock.opendj.ldap.controls.TransactionIdControl;
 import com.iplanet.security.x509.CertUtils;
-import com.iplanet.security.x509.IssuingDistributionPointExtension;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.encode.URLEncDec;
-import sun.security.x509.CRLDistributionPointsExtension;
-import sun.security.x509.DistributionPoint;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.PKIXExtensions;
-import sun.security.x509.X509CertImpl;
+
+import jp.co.osstech.openam.shared.cert.BouncyCastleUtils;
+import jp.co.osstech.openam.shared.cert.GeneralName;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -52,13 +50,14 @@ import java.security.GeneralSecurityException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.StringTokenizer;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.lang.ArrayUtils;
+
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.ldap.LDAPRequests;
@@ -166,28 +165,31 @@ public class AMCRLStore extends AMCertStore {
                 }
 
                 X509CRL tmpcrl = null;
-                IssuingDistributionPointExtension crlIDPExt = null;
-                try {
-                    if (crl != null) {
-                        crlIDPExt = getCRLIDPExt(crl);
+
+                // Attempt to retrieve an X509CRL from distribution point in the X509CRL
+                if (crl != null) {
+                    // Get full name included in the Issuing Distribution Point extension
+                    Collection<GeneralName> issuingDistPointFullNames =
+                            BouncyCastleUtils.getIssuingDistributionPointFullNameAsCollection(crl);
+                    if (!issuingDistPointFullNames.isEmpty()) {
+                        // Retrieve an X509CRL from the full name
+                        tmpcrl = getCRLFromFullNames(issuingDistPointFullNames);
+                    } else {
+                        debug.message("AMCRLStore.getCRL: issuingDistPointFullNames is empty");
                     }
-                } catch (Exception e) {
-                    debug.message("AMCRLStore.getCRL: crlIDPExt is null");
                 }
 
-                CRLDistributionPointsExtension crlDPExt = null;
-                try {
-                    crlDPExt = getCRLDPExt(certificate);
-                } catch (Exception e) {
-                    debug.message("AMCRLStore.getCRL: crlDPExt is null");
-                }
-
-                if ((tmpcrl == null) && (crlIDPExt != null)) {
-                    tmpcrl = getUpdateCRLFromCrlIDP(crlIDPExt);
-                }
-
-                if ((tmpcrl == null) && (crlDPExt != null)) {
-                    tmpcrl = getUpdateCRLFromCrlDP(crlDPExt);
+                // Attempt to retrieve an X509CRL from distribution points in the X509Certificate
+                if (tmpcrl == null && certificate != null) {
+                    // Get full names included in the CRL Distribution Points extension
+                    Collection<GeneralName> crlDistPointFullNames =
+                            BouncyCastleUtils.getCRLDistributionPointsFullNamesAsCollection(certificate);
+                    if (!crlDistPointFullNames.isEmpty()) {
+                        // Retrieve an X509CRL from the full names
+                        tmpcrl = getCRLFromFullNames(crlDistPointFullNames);
+                    } else {
+                        debug.message("AMCRLStore.getCRL: crlDistPointFullNames is empty");
+                    }
                 }
 
                 if (tmpcrl != null) {
@@ -306,147 +308,53 @@ public class AMCRLStore extends AMCertStore {
     }
 
     /**
-     * It checks whether the certificate has CRLDistributionPointsExtension
-     * or not. If there is, it returns the extension.
+     * Retrieves an X509CRL from the provided full names.
      *
-     * @param certificate
+     * @param fullNames {@code Collection} containing {@code GeneralName} objects representing full names
+     *         included in DistributionPointNames.
+     * @return an X509CRL object if successfully retrieved, or null if an error occurs or no CRL is retrieved.
      */
-    private CRLDistributionPointsExtension getCRLDPExt(X509Certificate certificate) {
-        CRLDistributionPointsExtension dpExt = null;
-
-        try {
-            X509CertImpl certImpl = new X509CertImpl(certificate.getEncoded());
-            dpExt = certImpl.getCRLDistributionPointsExtension();
-        } catch (Exception e) {
-            debug.error("Error finding CRL distribution Point configured: ", e);
-        }
-
-        return dpExt;
-    }
-
-
-    /**
-     * It checks whether the crl has IssuingDistributionPointExtension
-     * or not. If there is, it returns the extension.
-     *
-     * @param crl
-     */
-    private IssuingDistributionPointExtension getCRLIDPExt(X509CRL crl) {
-        IssuingDistributionPointExtension idpExt = null;
-
-        if (crl == null) {
-            return null;
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("AMCRLStore.getCRLIDPExt: crl = " + crl);
-        }
-        try {
-            byte[] ext =
-                    crl.getExtensionValue(
-                            PKIXExtensions.IssuingDistributionPoint_Id.toString());
-            if (ext != null) {
-                idpExt = new IssuingDistributionPointExtension(ext);
-            }
-        } catch (Exception e) {
-            debug.error("Error finding CRL distribution Point configured: ", e);
-        }
-
-        return idpExt;
-    }
-
-    /**
-     * It updates CRL under the dn in the directory server.
-     * It retrieves CRL distribution points from the parameter
-     * CRLDistributionPointsExtension dpExt.
-     *
-     * @param dpExt
-     */
-    private synchronized X509CRL
-    getUpdateCRLFromCrlDP(CRLDistributionPointsExtension dpExt) {
-        // Get CRL Distribution points
-        if (dpExt == null) {
-            return null;
-        }
-
-        List dps = null;
-        try {
-            dps = (List) dpExt.get(CRLDistributionPointsExtension.POINTS);
-        } catch (IOException ioex) {
-            if (debug.warningEnabled()) {
-                debug.warning("AMCRLStore.getUpdateCRLFromCrlDP: ", ioex);
-            }
-        }
-
-        if (dps == null || dps.isEmpty()) {
-            return null;
-        }
-
-        for (Object dp1 : dps) {
-            DistributionPoint dp = (DistributionPoint) dp1;
-            GeneralNames gName = dp.getFullName();
-            if (debug.messageEnabled()) {
-                debug.message("AMCRLStore.getUpdateCRLFromCrlDP: DP = " +
-                        gName);
-            }
-
-            byte[] Crls = getCRLsFromGeneralNames(gName);
-            if (Crls != null && Crls.length > 0) {
-                try {
-                    return (X509CRL) cf.generateCRL(
-                            new ByteArrayInputStream(Crls));
-                } catch (Exception ex) {
-                    if (debug.warningEnabled()) {
-                        debug.warning("AMCRLStore.getUpdateCRLFromCrlDP: " +
-                                "Error in generating X509CRL", ex);
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * It updates CRL under the dn in the directory server.
-     * It retrieves CRL distribution points from the parameter
-     * CRLDistributionPointsExtension dpExt.
-     *
-     * @param idpExt
-     */
-    private synchronized X509CRL getUpdateCRLFromCrlIDP(IssuingDistributionPointExtension idpExt) {
-
-        GeneralNames gName = idpExt.getFullName();
-        if (gName == null) {
-            return null;
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("AMCRLStore.getUpdateCRLFromCrlIDP: gName = " + gName);
-        }
-        byte[] Crls = getCRLsFromGeneralNames(gName);
+    private synchronized X509CRL getCRLFromFullNames(Collection<GeneralName> fullNames) {
+        debug.message("AMCRLStore.getCRLFromFullNames: fullNames = {}", fullNames);
 
         X509CRL crl = null;
-        if (Crls != null) {
+        byte[] crlBytes = getCRLBytesFromFullNames(fullNames);
+        if (crlBytes != null) {
             try {
-                crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(Crls));
+                crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(crlBytes));
             } catch (Exception e) {
-                debug.error("Error in generating X509CRL" + e.toString());
+                debug.error("AMCRLStore.getCRLFromFullNames: Error in generating X509CRL", e);
             }
         }
-
         return crl;
     }
 
-    private byte[] getCRLsFromGeneralNames(GeneralNames gName) {
-        byte[] Crls = null;
-        if (debug.messageEnabled()) {
-            debug.message("AMCRLStore.getCRLsFromGeneralNames: gNames.size = " +
-                    gName.size());
-        }
-        int idx = 0;
-        do {
-            String uri = gName.get(idx++).toString().trim();
+    /**
+     * Retrieves CRL {@code byte}s from the provided full names.
+     *
+     * @param fullNames {@code Collection} containing {@code GeneralName} objects representing full names
+     *         included in DistributionPointNames.
+     * @return first successfully retrieved {@code byte} array of CRL, or null if an error occurs or no CRL is located.
+     */
+    private byte[] getCRLBytesFromFullNames(Collection<GeneralName> fullNames) {
+        debug.message("AMCRLStore.getCRLBytesFromFullNames: fullNames.size() = {}", fullNames.size());
+
+        byte[] crlBytes = null;
+        for (GeneralName fullName : fullNames) {
+            String nameValue;
+            try {
+                nameValue = fullName.getNameValueAsString();
+            } catch (Exception e) {
+                debug.message("AMCRLStore.getCRLBytesFromFullNames: failed to get name value as String", e);
+                continue;
+            }
+            if (nameValue == null) {
+                debug.message("AMCRLStore.getCRLBytesFromFullNames: "
+                        + "failed to get name value as String, fullName: {}", fullName);
+                continue;
+            }
+
+            String uri = nameValue.trim();
             String protocol = uri.toLowerCase();
             int proto_pos;
             if ((proto_pos = protocol.indexOf("http")) == -1) {
@@ -463,10 +371,13 @@ public class AMCRLStore extends AMCertStore {
             if (debug.messageEnabled()) {
                 debug.message("DP Name : " + uri);
             }
-            Crls = getCRLByURI(uri);
-        } while ((Crls != null) && (idx < gName.size()));
+            crlBytes = getCRLByURI(uri);
+            if (crlBytes != null) {
+                break;
+            }
+        }
 
-        return Crls;
+        return crlBytes;
     }
 
     /**
