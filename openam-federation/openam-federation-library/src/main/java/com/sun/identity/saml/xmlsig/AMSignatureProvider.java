@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
  * Portions Copyrighted 2026 OSSTech Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -36,6 +37,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Iterator;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
@@ -156,9 +158,8 @@ public class AMSignatureProvider implements SignatureProvider {
             SAMLUtilsCommon.debug.error("Key Provider is null"); 
         } else {
             keystore = keyProvider;
-            if (keystore instanceof JKSKeyProvider) {
-                isJKSKeyStore=true;
-            }
+            // the default provider loaded by init() may have set this already
+            isJKSKeyStore = keystore instanceof JKSKeyProvider;
         }
     }
     
@@ -1248,7 +1249,8 @@ public class AMSignatureProvider implements SignatureProvider {
      * @param element XML Element whose signature to be verified
      * @param certAlias certAlias alias for Signer's certificate, this is used
                         to search signer's public certificate if it is not
-                        presented in ds:KeyInfo
+                        presented in ds:KeyInfo; if it is presented, it must
+                        be this certificate
      * @return true if the xml signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -1260,11 +1262,12 @@ public class AMSignatureProvider implements SignatureProvider {
 
     /**
      * Verify the signature of the xml document 
-     * @param element XML Element whose signature to be verified 
+     * @param element XML Element whose signature to be verified
      * @param idAttrName Attribute name for the id attribute
-     * @param certAlias certAlias alias for Signer's certificate, this is used 
-                        to search signer's public certificate if it is not 
-                        presented in ds:KeyInfo
+     * @param certAlias certAlias alias for Signer's certificate, this is used
+                        to search signer's public certificate if it is not
+                        presented in ds:KeyInfo; if it is presented, it must
+                        be this certificate
      * @return true if the xml signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -1326,10 +1329,11 @@ public class AMSignatureProvider implements SignatureProvider {
             
     /**
      * Verify the signature of the xml string 
-     * @param xmlString XML string whose signature to be verified 
-     * @param certAlias certAlias alias for Signer's certificate, this is used 
-                        to search signer's public certificate if it is not 
-                        presented in ds:KeyInfo
+     * @param xmlString XML string whose signature to be verified
+     * @param certAlias certAlias alias for Signer's certificate, this is used
+                        to search signer's public certificate if it is not
+                        presented in ds:KeyInfo; if it is presented, it must
+                        be this certificate
      * @return true if the xml signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -1342,10 +1346,11 @@ public class AMSignatureProvider implements SignatureProvider {
     /**
      * Verify the signature of the xml string
      * @param xmlString XML string whose signature to be verified
-     * @param idAttrName Attribute name for the id attribute 
+     * @param idAttrName Attribute name for the id attribute
      * @param certAlias certAlias alias for Signer's certificate, this is used
                         to search signer's public certificate if it is not
-                        presented in ds:KeyInfo
+                        presented in ds:KeyInfo; if it is presented, it must
+                        be this certificate
      * @return true if the xml signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -1377,7 +1382,8 @@ public class AMSignatureProvider implements SignatureProvider {
      * @param idAttrName Attribute name for the id attribute 
      * @param certAlias certAlias alias for Signer's certificate, this is used
                         to search signer's public certificate if it is not
-                        presented in ds:KeyInfo
+                        presented in ds:KeyInfo; if it is presented, it must
+                        be this certificate
      * @return true if the xml signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -1410,6 +1416,9 @@ public class AMSignatureProvider implements SignatureProvider {
             KeyInfo ki = signature.getKeyInfo();
             PublicKey pk = this.getX509PublicKey(doc, ki);
             if (pk!=null) {
+                if (!isKeyOfCertAlias(pk, certAlias)) {
+                    return false;
+                }
                 // verify using public key
                 if (signature.checkSignatureValue (pk)) {
                     return true;
@@ -1455,6 +1464,34 @@ public class AMSignatureProvider implements SignatureProvider {
             SAMLUtilsCommon.debug.error("verifyXMLSignature Exception: ", ex);
             throw new XMLSignatureException(ex.getMessage());
         }
+    }
+
+    /**
+     * Checks that a key taken from ds:KeyInfo belongs to the signer the caller expects.
+     * Keystore membership alone is not enough: every trusted partner's certificate is in the
+     * keystore, so any of them could otherwise sign a message on behalf of another.
+     *
+     * @param keyInfoKey the public key resolved from the message's ds:KeyInfo
+     * @param certAlias alias of the expected signer's certificate, or empty when the caller
+     *        does not know the signer
+     * @return true if no signer is expected or the key is the one of {@code certAlias}
+     */
+    private boolean isKeyOfCertAlias(PublicKey keyInfoKey, String certAlias) {
+        if (StringUtils.isEmpty(certAlias)) {
+            return true;
+        }
+        X509Certificate expectedCert = keystore.getX509Certificate(certAlias);
+        PublicKey expectedKey = expectedCert != null ? expectedCert.getPublicKey() : keystore.getPublicKey(certAlias);
+        if (expectedKey == null) {
+            SAMLUtilsCommon.debug.error("verifyXMLSignature: no public key for certAlias {}", certAlias);
+            return false;
+        }
+        if (!MessageDigest.isEqual(expectedKey.getEncoded(), keyInfoKey.getEncoded())) {
+            SAMLUtilsCommon.debug.error("verifyXMLSignature: the KeyInfo certificate is not the one of certAlias {}",
+                    certAlias);
+            return false;
+        }
+        return true;
     }
    
     /**
