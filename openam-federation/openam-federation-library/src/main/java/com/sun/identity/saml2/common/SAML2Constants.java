@@ -25,7 +25,8 @@
  * $Id: SAML2Constants.java,v 1.44 2009/11/24 21:53:02 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2019 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2019-2026 OSSTech Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.saml2.common;
 
@@ -1642,6 +1643,14 @@ public interface SAML2Constants {
      * Property to determine whether SAML SP Decryption Debug mode has been enabled.
      */
     String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
+
+    /**
+     * Key under which <code>SAML2Utils.verifyResponse</code> reports the bearer assertions it
+     * accepted, as a map of assertion id to the instant in milliseconds until which it is
+     * accepted. <code>SPACSUtils.markAssertionAsConsumed</code> marks every one of them as
+     * consumed.
+     */
+    String BEARER_ASSERTION_IDS = "BearerAssertionIDs";
 
     /**
      * Property name used to store the remote IdP's SAML response as an attribute of the HttpServletRequest.

@@ -12,17 +12,22 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 OSSTech Corporation
  */
 
 package com.sun.identity.saml2.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.shared.encode.URLEncDec;
 import org.apache.commons.lang.RandomStringUtils;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -73,5 +78,34 @@ public class SAML2UtilsTest {
         assertThat(mappedAttributes).containsEntry("name3", "\"static cn=value\"");
         assertThat(mappedAttributes).containsEntry("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:mace:dir:attribute-def:name4", "value");
         assertThat(mappedAttributes).containsEntry("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|name5", "\"static value\"");
+    }
+
+    @Test
+    public void ecpRejectsUnsignedAssertion() {
+        List<Assertion> assertions = Arrays.asList(assertion(true), assertion(false));
+
+        assertThat(SAML2Utils.isEcpAssertionSignatureMissing(SAML2Constants.PAOS, assertions)).isTrue();
+    }
+
+    @Test
+    public void ecpAcceptsSignedAssertions() {
+        List<Assertion> assertions = Arrays.asList(assertion(true), assertion(true));
+
+        assertThat(SAML2Utils.isEcpAssertionSignatureMissing(SAML2Constants.PAOS, assertions)).isFalse();
+    }
+
+    @Test
+    public void otherBindingsAreNotSubjectToEcpRule() {
+        List<Assertion> assertions = Arrays.asList(assertion(false));
+
+        assertThat(SAML2Utils.isEcpAssertionSignatureMissing(SAML2Constants.HTTP_POST, assertions)).isFalse();
+        assertThat(SAML2Utils.isEcpAssertionSignatureMissing(SAML2Constants.HTTP_ARTIFACT, assertions)).isFalse();
+        assertThat(SAML2Utils.isEcpAssertionSignatureMissing(null, assertions)).isFalse();
+    }
+
+    private static Assertion assertion(boolean signed) {
+        Assertion assertion = mock(Assertion.class);
+        when(assertion.isSigned()).thenReturn(signed);
+        return assertion;
     }
 }
