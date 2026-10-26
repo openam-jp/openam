@@ -16,6 +16,7 @@
 
 package jp.co.osstech.openam.shared.cert;
 
+import java.math.BigInteger;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509CRL;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.CRLNumber;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.Extension;
@@ -218,6 +220,124 @@ public final class BouncyCastleUtils {
             return convertDistPointFullNameToCollection(distPointName);
         } catch (Exception e) {
             throw new CRLException("Failed to parse Issuing Distribution Point extension", e);
+        }
+    }
+
+    /**
+     * Returns whether the provided X.509 CRL declares itself an <em>indirect</em> CRL, that is, a
+     * CRL whose entries may have been issued by a CRL issuer other than the issuer of the
+     * certificate being checked (RFC 5280 section 5.2.5).
+     * <p>
+     * The flag is the {@code indirectCRL} field of the Issuing Distribution Point extension
+     * (OID = 2.5.29.28), which defaults to FALSE when the field or the extension is absent.
+     *
+     * @param crl the X.509 CRL to inspect. Must not be {@code null}.
+     * @return {@code true} if the CRL carries an Issuing Distribution Point extension whose
+     *         {@code indirectCRL} field is set, {@code false} otherwise, including when the
+     *         extension is not present.
+     * @throws IllegalArgumentException if the {@code crl} argument is {@code null}.
+     * @throws CRLException if an error occurs while parsing the CRL or the extension.
+     */
+    public static boolean isIndirectCRL(X509CRL crl) throws IllegalArgumentException, CRLException {
+        if (crl == null) {
+            throw new IllegalArgumentException("crl must not be null");
+        }
+        DEBUG.message("isIndirectCRL: crl = {}", crl);
+        IssuingDistributionPoint issuingDistPoint = getIssuingDistributionPoint(crl);
+        return issuingDistPoint != null && issuingDistPoint.isIndirectCRL();
+    }
+
+    /**
+     * Gets the value of the CRL Number extension (OID = 2.5.29.20) of the provided X.509 CRL.
+     * <p>
+     * The ASN.1 definition of the CRL Number extension is:
+     * <pre>
+     * CRLNumber ::= INTEGER (0..MAX)
+     * </pre>
+     * The value is a monotonically increasing sequence number the CRL issuer assigns to each CRL
+     * it publishes (RFC 5280 section 5.2.3), which is what lets a caller tell a newer CRL from one
+     * that has been superseded.
+     *
+     * @param crl the X.509 CRL from which to extract the CRL Number extension. Must not be
+     *         {@code null}.
+     * @return the CRL number, or {@code null} if the extension is not present.
+     * @throws IllegalArgumentException if the {@code crl} argument is {@code null}.
+     * @throws CRLException if an error occurs while parsing the CRL or the extension.
+     */
+    public static BigInteger getCRLNumber(X509CRL crl) throws IllegalArgumentException, CRLException {
+        if (crl == null) {
+            throw new IllegalArgumentException("crl must not be null");
+        }
+        DEBUG.message("getCRLNumber: crl = {}", crl);
+        try {
+            // Convert X509CRL to Bouncy Castle's X509CRLHolder
+            X509CRLHolder crlHolder = new JcaX509CRLHolder(crl);
+            Extension crlNumberExt = crlHolder.getExtension(Extension.cRLNumber);
+            if (crlNumberExt == null) {
+                DEBUG.message("getCRLNumber: CRL Number extension not found");
+                return null;
+            }
+
+            // Parse CRLNumber from the CRL Number extension
+            return CRLNumber.getInstance(crlNumberExt.getParsedValue()).getCRLNumber();
+        } catch (Exception e) {
+            throw new CRLException("Failed to parse CRL Number extension", e);
+        }
+    }
+
+    /**
+     * Gets an immutable {@code Collection} representing the cRLIssuer names of every
+     * DistributionPoint in the CRL Distribution Points extension (OID = 2.5.29.31) of the provided
+     * X.509 certificate.
+     * <p>
+     * A cRLIssuer names the delegated CRL signer the certificate's issuer authorised to publish
+     * CRLs on its behalf; see {@link #getCRLDistributionPointsFullNamesAsCollection} for the ASN.1
+     * definition of the extension. The names of every distribution point are returned as one
+     * {@code Collection}: the only question asked of them is whether the certificate names a given
+     * CRL issuer at all, so which distribution point named it does not change the answer.
+     * <p>
+     * If the certificate does not contain the CRL Distribution Points extension, or no distribution
+     * point in it carries a cRLIssuer, an empty {@code Collection} is returned.
+     *
+     * @param certificate the X.509 certificate from which to extract the cRLIssuer names. Must not
+     *         be {@code null}.
+     * @return an immutable {@code Collection} of the cRLIssuer names included in the CRL
+     *         Distribution Points extension, or an empty {@code Collection} if the extension is not
+     *         present or contains no cRLIssuer.
+     * @throws IllegalArgumentException if the {@code certificate} argument is {@code null}.
+     * @throws CertificateParsingException if an error occurs while parsing the certificate or the
+     *         extension.
+     */
+    public static Collection<jp.co.osstech.openam.shared.cert.GeneralName>
+            getCRLDistributionPointsCRLIssuersAsCollection(X509Certificate certificate)
+            throws IllegalArgumentException, CertificateParsingException {
+        if (certificate == null) {
+            throw new IllegalArgumentException("certificate must not be null");
+        }
+        DEBUG.message("getCRLDistributionPointsCRLIssuersAsCollection: certificate = {}", certificate);
+        CRLDistPoint crlDistPoint = getCRLDistributionPoints(certificate);
+        if (crlDistPoint == null) {
+            return Collections.emptySet();
+        }
+        try {
+            DistributionPoint[] distPoints = crlDistPoint.getDistributionPoints();
+            if (distPoints == null || distPoints.length == 0) {
+                DEBUG.message("getCRLDistributionPointsCRLIssuersAsCollection: distPoints is null or empty");
+                return Collections.emptySet();
+            }
+            Collection<jp.co.osstech.openam.shared.cert.GeneralName> result = new ArrayList<>();
+            for (DistributionPoint distPoint : distPoints) {
+                GeneralNames crlIssuer = distPoint.getCRLIssuer();
+                if (crlIssuer == null) {
+                    DEBUG.message("getCRLDistributionPointsCRLIssuersAsCollection: "
+                            + "cRLIssuer is not contained");
+                    continue;
+                }
+                result.addAll(convertGeneralNamesToCollection(crlIssuer));
+            }
+            return Collections.unmodifiableCollection(result);
+        } catch (Exception e) {
+            throw new CertificateParsingException("Failed to parse CRL Distribution Points extension", e);
         }
     }
 
