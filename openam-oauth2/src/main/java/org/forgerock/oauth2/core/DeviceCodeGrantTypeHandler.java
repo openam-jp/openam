@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -87,6 +88,15 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
                 !clientId.equals(deviceCode.getClientId()) ||
                 !request.getParameter(REALM).equals(deviceCode.getRealm())) {
             throw new AuthorizationDeclinedException();
+        }
+
+        // RFC 7636 4.6: a device code issued with a code_challenge is only redeemable with the matching
+        // code_verifier. Checked on every poll and before the expiry, polling and decision handling below, so
+        // that a request without the verifier neither learns whether the user has decided, nor counts as the
+        // client's poll, nor deletes a code that the legitimate client could still redeem.
+        if (PkceVerifier.hasChallenge(deviceCode.getCodeChallenge())) {
+            PkceVerifier.verify(deviceCode.getCodeChallenge(), deviceCode.getCodeChallengeMethod(),
+                    request.<String>getParameter(OAuth2Constants.Custom.CODE_VERIFIER));
         }
 
         try {
