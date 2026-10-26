@@ -24,6 +24,8 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 3A Systems, LLC.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.saml2.common;
 
@@ -125,6 +127,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -178,6 +181,7 @@ public class SAML2Utils extends SAML2SDKUtils {
     private static final char EQUALS = '=';
     private static final char SEMI_COLON = ';';
     private static final char DOUBLE_QUOTE = '"';
+    private static final String BEARER_ACCEPTED_UNTIL = "BearerAcceptedUntil";
 
     private static String bufferLen = (String)
             ((SAML2ConfigService.getAttribute(SAML2ConfigService.SAML2_BUFFER_LENGTH) == null)
@@ -490,6 +494,16 @@ public class SAML2Utils extends SAML2SDKUtils {
             throw new SAML2Exception(SAML2Utils.bundle.getString("missingAssertion"));
         }
 
+        // The ECP profile requires each assertion to be signed in its own right.
+        // SPACSUtils.getResponseFromPostECP enforces that for the cleartext assertions only,
+        // so the assertions decrypted above have to be checked here.
+        if (isEcpAssertionSignatureMissing(profileBinding, assertions)) {
+            debug.error(method + "an assertion delivered over ECP/PAOS is not signed.");
+            String[] data = { idpEntityId == null ? "" : idpEntityId };
+            LogUtil.error(Level.INFO, LogUtil.ECP_ASSERTION_NOT_SIGNED, data, null);
+            throw new SAML2Exception(bundle.getString("assertionNotSigned"));
+        }
+
         boolean wantAssertionsSigned = spDesc.isWantAssertionsSigned();
         if (debug.messageEnabled()) {
             debug.message(method + "wantAssertionsSigned is :" + wantAssertionsSigned);
@@ -501,6 +515,9 @@ public class SAML2Utils extends SAML2SDKUtils {
         IDPSSODescriptorElement idp = null;
         Set<X509Certificate> verificationCerts = null;
         boolean allAssertionsSigned = true;
+        // Every bearer assertion is checked against the one-time cache below, so every one of
+        // them has to be marked as consumed once the response is accepted.
+        Map<String, Long> bearerAssertionIDs = new LinkedHashMap<>();
         for (Assertion assertion : assertions) {
             String assertionID = assertion.getID();
             Issuer issuer = assertion.getIssuer();
@@ -597,6 +614,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 checkAudience(assertion.getConditions(),
                         hostEntityId,
                         assertionID);
+                bearerAssertionIDs.put(assertionID, (Long) bearerMap.get(BEARER_ACCEPTED_UNTIL));
                 if (smap == null) {
                     smap = fillMap(authnStmts,
                             subject,
@@ -617,6 +635,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.error("No Authentication Assertion in Response.");
             throw new SAML2Exception(bundle.getString("missingAuthnAssertion"));
         }
+        smap.put(SAML2Constants.BEARER_ASSERTION_IDS, bearerAssertionIDs);
         // 5.3 signature inheritance -  assertion can be considered to inherit the signature from
         // the enclosing element
         if (wantAssertionsSigned && !(responseIsSigned || allAssertionsSigned)){
@@ -652,6 +671,26 @@ public class SAML2Utils extends SAML2SDKUtils {
         return smap;
     }
 
+    /**
+     * Tells whether an assertion delivered over ECP/PAOS is missing the signature that profile
+     * requires of it. The ECP profile requires each assertion to be signed in its own right, so a
+     * signed <code>Response</code> does not cover an unsigned assertion here.
+     *
+     * @param profileBinding the binding the response arrived on.
+     * @param assertions the assertions of the response, the decrypted ones included.
+     * @return <code>true</code> if the response has to be rejected.
+     */
+    static boolean isEcpAssertionSignatureMissing(String profileBinding, List<Assertion> assertions) {
+        if (!SAML2Constants.PAOS.equals(profileBinding)) {
+            return false;
+        }
+        for (Assertion assertion : assertions) {
+            if (!assertion.isSigned()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static Map isBearerSubjectConfirmation(final List subjectConfirms,
                                                    final String inRespToResponse,
@@ -721,6 +760,9 @@ public class SAML2Utils extends SAML2SDKUtils {
                         "invalidTimeOnSubjectConfirmationData"));
             }
             retMap.put(SAML2Constants.NOTONORAFTER, notOnOrAfter);
+            // The assertion is accepted until NotOnOrAfter plus the time skew, so its one-time
+            // marker has to last that long as well.
+            retMap.put(BEARER_ACCEPTED_UNTIL, Long.valueOf(notOnOrAfter.getTime() + timeskew * 1000L));
 
             Date notBefore = subjectConfData.getNotBefore();
             if (notBefore != null) {

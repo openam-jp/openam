@@ -25,6 +25,8 @@
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.saml2.profile;
 
@@ -709,12 +711,13 @@ public class SPACSUtils {
                 SAML2Utils.bundle.getString("invalidStatusCode"));
         } 
 
+        Response res;
         try {
-            return ProtocolFactory.getInstance().createResponse(
+            res = ProtocolFactory.getInstance().createResponse(
                                 artiResp.getAny());
         } catch (SAML2Exception se) {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message(method 
+                SAML2Utils.debug.message(method
                     + "couldn't instantiate Response:", se);
             }
             String[] data = {idpEntityID};
@@ -722,11 +725,67 @@ public class SPACSUtils {
                         LogUtil.CANNOT_INSTANTIATE_RESPONSE_ARTIFACT,
                         data,
                         null);
-            SAMLUtils.sendError(request, response, 
-                response.SC_INTERNAL_SERVER_ERROR, 
+            SAMLUtils.sendError(request, response,
+                response.SC_INTERNAL_SERVER_ERROR,
                 "failedToCreateResponse", se.getMessage());
             throw se;
         }
+
+        // The ArtifactResponse is bound to the IDP the artifact was resolved against, but the
+        // Response inside it names its own Issuer, which verifyResponse only checks for
+        // membership of the circle of trust. Bind the Response to the resolving IDP as well,
+        // so that one trusted IDP cannot assert as another.
+        if (!isArtifactResponseBoundTo(idpEntityID, res)) {
+            SAML2Utils.debug.error(method + "the Response resolved from the artifact "
+                + "is not issued by " + idpEntityID + ", which resolved it.");
+            String[] data = {hostEntityId, orgName, res.getID()};
+            LogUtil.error(Level.INFO,
+                        LogUtil.INVALID_ISSUER_RESPONSE,
+                        data,
+                        null);
+            SAMLUtils.sendError(request, response,
+                response.SC_INTERNAL_SERVER_ERROR, "invalidIssuerInResponse",
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
+        }
+        return res;
+    }
+
+    /**
+     * Tells whether a <code>Response</code> resolved from an artifact is issued by the IDP the
+     * artifact was resolved against.
+     *
+     * <p>The <code>Issuer</code> of the <code>Response</code> is optional. When it is present it
+     * has to name the resolving IDP. When it is absent, <code>verifyResponse</code> takes the IDP
+     * from the <code>Issuer</code> of the first assertion, so every assertion has to name the
+     * resolving IDP instead. An encrypted assertion cannot be checked here, but the
+     * <code>Issuer</code> of the <code>Response</code> is mandatory when one is present
+     * (SAML Profiles 4.1.4.2), so its absence is rejected in that case.
+     *
+     * @param idpEntityID the entity id of the IDP the artifact was resolved against.
+     * @param res the <code>Response</code> resolved from the artifact.
+     * @return <code>true</code> if the <code>Response</code> is bound to that IDP.
+     */
+    static boolean isArtifactResponseBoundTo(String idpEntityID, Response res) {
+        Issuer resIssuer = res.getIssuer();
+        if (resIssuer != null) {
+            return idpEntityID.equals(resIssuer.getValue());
+        }
+        List encAssertions = res.getEncryptedAssertion();
+        if (encAssertions != null && !encAssertions.isEmpty()) {
+            return false;
+        }
+        List assertions = res.getAssertion();
+        if (assertions != null) {
+            for (Iterator iter = assertions.iterator(); iter.hasNext(); ) {
+                Issuer issuer = ((Assertion) iter.next()).getIssuer();
+                if (issuer == null || !idpEntityID.equals(issuer.getValue())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -1227,6 +1286,17 @@ public class SPACSUtils {
             throw new SAML2Exception(SAML2Utils.bundle.getString("noUserMapping"));
         }
 
+        // Mark the assertions as consumed on every binding, before the session is created.
+        // Not before the account mapping: a response that fails with noUserMapping is presented
+        // again after a local login, and must not be refused as a replay then.
+        try {
+            markAssertionAsConsumed(smap);
+        } catch (SAML2Exception se) {
+            invokeSPAdapterForSSOFailure(hostEntityId, realm, request, response, smap, respInfo,
+                SAML2ServiceProviderAdapter.INVALID_RESPONSE, se);
+            throw se;
+        }
+
         boolean writeFedInfo = isNewAccountLink && shouldPersistNameID;
 
         if (SAML2Utils.debug.messageEnabled()) {
@@ -1393,26 +1463,62 @@ public class SPACSUtils {
                 SAML2Utils.debug.warning("SPSingleLogout.processResp", ex);
             }
         }
-     
-        String assertionID=authnAssertion.getID();
-        if (respInfo.getProfileBinding().equals(SAML2Constants.HTTP_POST)) {
-            SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
-            try {
-                if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
-                    SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(
-                            assertionID,
-                            SAML2Constants.ONETIME,
-                            ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue() / 1000);
+
+        respInfo.setAssertion(authnAssertion);
+
+        return session;
+    }
+
+    /**
+     * Marks every bearer assertion accepted by <code>SAML2Utils.verifyResponse</code> as
+     * consumed, so that it cannot be presented again.
+     *
+     * <p>The marking is all or nothing: if one of the assertions has already been consumed, the
+     * ones this call marked are released again and the response is rejected, so that a fresh
+     * assertion paired with a consumed one is not spent on the way out.
+     *
+     * @param smap the map returned by <code>SAML2Utils.verifyResponse</code>.
+     * @throws SAML2Exception if the map reports no bearer assertion, or if one of them has
+     *                        already been consumed.
+     */
+    public static void markAssertionAsConsumed(Map smap) throws SAML2Exception {
+        String classMethod = "SPACSUtils.markAssertionAsConsumed: ";
+        Map<String, Long> bearerAssertions = (Map<String, Long>) smap.get(SAML2Constants.BEARER_ASSERTION_IDS);
+        if (bearerAssertions == null || bearerAssertions.isEmpty()) {
+            SAML2Utils.debug.error(classMethod + "no bearer assertion to mark as consumed.");
+            throw new SAML2Exception(SAML2Utils.bundle.getString("missingAuthnAssertion"));
+        }
+        List<String> marked = new ArrayList<>(bearerAssertions.size());
+        for (String assertionID : bearerAssertions.keySet()) {
+            if (SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME) != null) {
+                SAML2Utils.debug.error(classMethod + "Bearer Assertion is one time use only!");
+                for (String markedID : marked) {
+                    SPCache.assertionByIDCache.remove(markedID);
                 }
+                throw new SAML2Exception(SAML2Utils.bundle.getString("usedBearAssertion"));
+            }
+            marked.add(assertionID);
+        }
+        if (!SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+            return;
+        }
+        for (Map.Entry<String, Long> bearerAssertion : bearerAssertions.entrySet()) {
+            String assertionID = bearerAssertion.getKey();
+            Long acceptedUntil = bearerAssertion.getValue();
+            if (acceptedUntil == null) {
+                continue;
+            }
+            try {
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(
+                        assertionID,
+                        SAML2Constants.ONETIME,
+                        acceptedUntil.longValue() / 1000);
             } catch (SAML2TokenRepositoryException se) {
                 SAML2Utils.debug.error(classMethod +
                         "There was a problem saving the assertionID to the SAML2 Token Repository for assertionID:"
                         + assertionID, se);
             }
         }
-        respInfo.setAssertion(authnAssertion);
- 
-        return session;
     }
 
     private static boolean getNeedNameIDEncrypted(boolean needAssertionEncrypted, SPSSOConfigElement spssoconfig) {
