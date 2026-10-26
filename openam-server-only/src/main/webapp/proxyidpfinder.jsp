@@ -20,6 +20,9 @@
   with the fields enclosed by brackets [] replaced by
   your own identifying information:
   "Portions Copyrighted [year] [name of copyright owner]"
+
+  Portions Copyrighted 2026 3A Systems, LLC.
+  Portions Copyrighted 2026 OSSTech Corporation
 --%>
 
 <%@ page import="com.sun.identity.shared.encode.Base64" %>
@@ -76,8 +79,10 @@
             }
 
             String spRequester = (String) hts.getAttribute("_SPREQUESTER_");
-            if (spRequester == null) response.sendRedirect(errorURL);
-            if (spRequester.isEmpty()) response.sendRedirect(errorURL);
+            if (spRequester == null || spRequester.isEmpty()) {
+                response.sendRedirect(errorURL);
+                return;
+            }
 
             samlIdP = request.getParameter("_saml_idp");
             if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + samlIdP, samlIdP,
@@ -97,12 +102,15 @@
                     relayState += "&";
                 }
                 response.sendRedirect(relayState + "_saml_idp=" + samlIdP);
+                return;
             }
 
         %>
         <h2>Welcome to the Federation Broker</h2>
-        <p>You are here because you initiated a request in the Service Provider <b><%= spRequester %></b> and
-            <br>You asked for the <%= requestedAuthnContext == null ? "<b>default</b> " : "" %>Assurance level <b><%= requestedAuthnContext != null ? StringUtils.join(requestedAuthnContext, " ") : "" %></b>:
+        <%-- The requested authentication context comes from the incoming AuthnRequest, so encode what is shown. --%>
+        <p>You are here because you initiated a request in the Service Provider <b><%= ESAPI.encoder().encodeForHTML(spRequester) %></b> and
+            <br>You asked for the <%= requestedAuthnContext == null ? "<b>default</b> " : "" %>Assurance level <b><%= requestedAuthnContext != null
+                ? ESAPI.encoder().encodeForHTML(StringUtils.join(requestedAuthnContext, " ")) : "" %></b>:
         </p>
         <p>Please select your preferred IdP:</p>
         <form action="" method="POST">
@@ -111,7 +119,7 @@
                         for(String  preferredIDP : lista) {
                           String preferredIDPB64 = Base64.encode(preferredIDP.getBytes());
                    %>
-                   <input type="radio" name="_saml_idp" value="<%= preferredIDPB64 %>"> <%= preferredIDP %>
+                   <input type="radio" name="_saml_idp" value="<%= preferredIDPB64 %>"> <%= ESAPI.encoder().encodeForHTML(preferredIDP) %>
                    <br>
                    <%
                         }

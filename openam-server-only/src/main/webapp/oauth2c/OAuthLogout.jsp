@@ -21,9 +21,7 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
---%>
-<%--
-   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyrighted 2012-2026 OSSTech Corporation
 --%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -43,6 +41,8 @@
 <%@ page import="com.iplanet.sso.SSOToken" %>
 <%@ page import="com.sun.identity.authentication.service.AuthD" %>
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
+<%@ page import="java.net.URI" %>
+<%@ page import="java.net.URISyntaxException" %>
 <%
    // Internationalization stuff. You can use any internationalization framework
    String lang = request.getParameter("lang");
@@ -86,8 +86,10 @@
    try {
        SSOToken ssoToken = manager.createSSOToken(request);
        String realm = ssoToken.getProperty("Organization");
+       // Validator.HTTPURI accepts "//attacker.example.com", which a browser reads as another host.
        boolean isValidGotoUrl = AuthD.getAuth().isGotoUrlValid(gotoURL, realm)
-               && ESAPI.validator().isValidInput("URLContext", gotoURL, "HTTPURI", 2000, false);
+               && ESAPI.validator().isValidInput("URLContext", gotoURL, "HTTPURI", 2000, false)
+               && !gotoURL.startsWith("//");
        if (!isValidGotoUrl) {
            OAuthUtil.debugError("OAuthLogout: invalid or empty goto URL ignored on Logout page: " + gotoURL);
            gotoURL = ServiceURI + "/UI/Logout";
@@ -103,15 +105,24 @@
       logoutURL = "";
    } else {
        boolean isValidURL = ESAPI.validator().
-               isValidInput("URLContext", logoutURL, "URL", 255, false); 
-       if (!isValidURL) {   
+               isValidInput("URLContext", logoutURL, "URL", 255, false);
+       if (isValidURL) {
+           // Read the host through java.net.URI: scanning for "/" after "//" threw on a URL without a path.
+           try {
+               URI logoutURI = new URI(logoutURL);
+               OAuth2IdP = logoutURI.getHost() != null ? logoutURI.getHost() : logoutURI.getRawAuthority();
+           } catch (URISyntaxException e) {
+               OAuth2IdP = null;
+           }
+           isValidURL = OAuth2IdP != null && OAuth2IdP.length() != 0;
+       }
+       if (!isValidURL) {
            OAuthUtil.debugError("OAuthLogout: wrong logoutURL URL attempted to be used "
                    + "in the Logout page: " + logoutURL);
            logoutURL = "wronglogoutURL";
+           OAuth2IdP = "";
        } else {
-           int loc1 = logoutURL.indexOf("//") + 2;
-           OAuth2IdP = logoutURL.substring(loc1, logoutURL.indexOf("/", loc1));
-           doYouWantToLogout = doYouWantToLogout.replace("#IDP#", OAuth2IdP);
+           doYouWantToLogout = doYouWantToLogout.replace("#IDP#", ESAPI.encoder().encodeForHTML(OAuth2IdP));
        }
    }
    logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);
