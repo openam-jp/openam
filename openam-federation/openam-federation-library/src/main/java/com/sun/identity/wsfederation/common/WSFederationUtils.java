@@ -25,6 +25,7 @@
  * $Id: WSFederationUtils.java,v 1.6 2009/10/28 23:58:58 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 package com.sun.identity.wsfederation.common;
 
@@ -57,6 +58,9 @@ import com.sun.identity.saml.assertion.Assertion;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager; 
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.xmlsig.SigManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.whitelist.URLPatternMatcher;
 import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 import com.sun.identity.wsfederation.key.KeyUtil;
 import com.sun.identity.wsfederation.logging.LogUtil;
@@ -67,7 +71,11 @@ import com.sun.identity.wsfederation.plugins.IDPAttributeMapper;
 import com.sun.identity.wsfederation.plugins.whitelist.ValidWReplyExtractor;
 import com.sun.identity.wsfederation.profile.SAML11RequestedSecurityToken;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +86,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.StringUtils;
+import org.owasp.esapi.ESAPI;
 
 /**
  * Utility methods for WS-Federation implementation.
@@ -489,6 +498,74 @@ public class WSFederationUtils {
                 throw new WSFederationException(WSFederationUtils.bundle.getString("invalidWReplyUrl"));
             }
         }
+    }
+
+    /**
+     * Tells whether a wreply URL received as a request parameter may be used in a redirect.
+     *
+     * <p>Unlike {@link #validateWReplyURL(String, String, String, String)}, a hosted entity with no
+     * <code>wreplyList</code> - the default - does not allow every URL: a URL on another host is only accepted when it
+     * matches a configured <code>wreplyList</code>. URLs pointing at this server are always accepted.
+     *
+     * @param request The request being processed, used to establish the host of this server.
+     * @param realm The realm of the hosted entity, may be <code>null</code>.
+     * @param entityId The entity ID of the hosted entity, may be <code>null</code>.
+     * @param wreply The URL to validate.
+     * @param roles The roles of the hosted entity whose <code>wreplyList</code> is consulted.
+     * @return <code>true</code> if the wreply URL may be used in a redirect.
+     */
+    public static boolean isWReplyURLAllowed(HttpServletRequest request, String realm, String entityId,
+            String wreply, String... roles) {
+        if (StringUtils.isEmpty(wreply)
+                || !ESAPI.validator().isValidInput("HTTP URL: " + wreply, wreply, "URL", 2000, false)) {
+            return false;
+        }
+
+        URI uri;
+        try {
+            uri = new URI(wreply);
+        } catch (URISyntaxException urise) {
+            return false;
+        }
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
+        if (host == null || uri.getRawUserInfo() != null
+                || !("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))) {
+            return false;
+        }
+
+        host = host.toLowerCase(java.util.Locale.ROOT);
+        String serverHost = SystemPropertiesManager.get(Constants.AM_SERVER_HOST);
+        if (host.equals(request.getServerName().toLowerCase(java.util.Locale.ROOT))
+                || (serverHost != null && host.equals(serverHost.toLowerCase(java.util.Locale.ROOT)))) {
+            return true;
+        }
+
+        if (StringUtils.isEmpty(realm) || StringUtils.isEmpty(entityId)) {
+            return false;
+        }
+        ValidWReplyExtractor extractor = new ValidWReplyExtractor();
+        for (String role : roles) {
+            Collection<String> patterns = extractor.extractValidDomains(
+                    ValidWReplyExtractor.WSFederationEntityInfo.from(realm, entityId, role));
+            // Matched here rather than through WREPLY_VALIDATOR, which accepts every URL when no wreplyList is
+            // configured.
+            if (patterns == null || patterns.isEmpty()) {
+                continue;
+            }
+            try {
+                if (new URLPatternMatcher().match(wreply, patterns, true)) {
+                    return true;
+                }
+            } catch (MalformedURLException murle) {
+                debug.warning("WSFederationUtils.isWReplyURLAllowed: cannot match the wreply URL", murle);
+                return false;
+            }
+        }
+        if (debug.messageEnabled()) {
+            debug.message("WSFederationUtils.isWReplyURLAllowed: wreply " + wreply + " is not allowed");
+        }
+        return false;
     }
 
     /**

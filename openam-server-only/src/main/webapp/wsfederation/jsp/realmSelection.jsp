@@ -24,12 +24,13 @@
 
    $Id: realmSelection.jsp,v 1.10 2009/10/29 00:00:00 exu Exp $
 
-    Portions Copyrighted 2013-2016 ForgeRock AS.
-    Portions Copyrighted 2019 Open Source Solution Technology Corporation
+   Portions Copyrighted 2013-2016 ForgeRock AS.
+   Portions Copyrighted 2019-2026 OSSTech Corporation
 --%>
 
 <%@page
     import="java.util.*"
+    import="com.sun.identity.saml2.common.SAML2Constants"
     import="com.sun.identity.shared.debug.Debug"
     import="com.sun.identity.wsfederation.common.WSFederationConstants"
     import="com.sun.identity.wsfederation.common.WSFederationUtils"
@@ -75,6 +76,15 @@
         metaManager.getSPSSOConfig(spRealm,spEntityId));
     String accountRealmCookieName =
         spConfig.get(WSFederationConstants.ACCOUNT_REALM_COOKIE_NAME).get(0);
+
+    // wreply ends up in a redirect, so accept only URLs pointing at this server, or matching the wreplyList of
+    // the hosted RP. A rejected wreply is treated as one failing the check above.
+    if (!WSFederationUtils.isWReplyURLAllowed(request, spRealm, spEntityId, wreply, SAML2Constants.SP_ROLE)) {
+        if (wreply != null && wreply.length() != 0) {
+            debug.warning(jspFile + "the wreply URL is not allowed and is ignored");
+        }
+        wreply = "";
+    }
 
     String selectedRealm = (String)request.getParameter("realm_list");
     if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + selectedRealm,
