@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
+ * Portions copyright 2026 OSSTech Corporation
  */
 package org.forgerock.oauth2.restlet;
 
@@ -145,7 +147,12 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         addRequestParamsFromDeviceCode(restletRequest, deviceCode);
 
         try {
-            final String decision = request.getParameter("decision");
+            // Read from the body alone. getParameter would give the query string priority, and the consent page
+            // posts back to the URL it was served from - ConsentRequiredResource.getDataModel builds the form's
+            // target out of the path plus that query string. A link to ?user_code=...&decision=allow would then
+            // override a "Deny" the resource owner clicked, and &save_consent=on would record the grant
+            // permanently. The consent page sends both as form fields, and a direct POST sends them with --data.
+            final String decision = request.getBodyParameter("decision");
             if (StringUtils.isNotEmpty(decision)) {
 
                 if (csrfProtection.isCsrfAttack(request)) {
@@ -154,7 +161,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                 }
 
                 final boolean consentGiven = "allow".equalsIgnoreCase(decision);
-                final boolean saveConsent = "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
+                final boolean saveConsent = "on".equalsIgnoreCase(request.getBodyParameter("save_consent"));
                 if (saveConsent) {
                     saveConsent(request);
                 }
