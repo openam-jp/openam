@@ -146,7 +146,7 @@ class ScopeDescriptionClientProvider implements Provider<Client> {
                 return addresses;
             }
             for (InetAddress address : addresses) {
-                if (SsrfUrlValidator.isBlockedAddress(address)) {
+                if (SsrfUrlValidator.isBlockedAddress(address, false)) {
                     DEBUG.warning("Not connecting to the scope description host " + host + ": it resolves to "
                             + address.getHostAddress() + ", a private, loopback or link-local address.");
                     throw new UnknownHostException(host + " resolves to a blocked address");
