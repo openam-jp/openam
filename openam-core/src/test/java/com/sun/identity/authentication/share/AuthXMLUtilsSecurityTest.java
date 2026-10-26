@@ -26,11 +26,13 @@ import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import jp.co.osstech.openam.utils.ObjectInputFilterSupport;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -117,6 +119,40 @@ public class AuthXMLUtilsSecurityTest {
                 .as("a rejected class must not complete deserialization").isFalse();
     }
 
+    @Test
+    public void subjectFilterRejectsOversizedGraph() throws Exception {
+        // Only allowlisted classes, but an array longer than the size limit
+        // (GHSA-x7wr-5gxg-v833).
+        Throwable thrown = null;
+        try {
+            deserializeWithSubjectFilter(serialize(new Object[10001]));
+        } catch (Throwable t) {
+            thrown = t;
+        }
+
+        assertThat(thrown).isInstanceOf(InvalidClassException.class);
+    }
+
+    @Test
+    public void subjectFilterRejectsDeeplyNestedGraph() throws Exception {
+        Object[] nested = new Object[1];
+        Object[] current = nested;
+        for (int i = 0; i < 30; i++) {
+            Object[] next = new Object[1];
+            current[0] = next;
+            current = next;
+        }
+
+        Throwable thrown = null;
+        try {
+            deserializeWithSubjectFilter(serialize(nested));
+        } catch (Throwable t) {
+            thrown = t;
+        }
+
+        assertThat(thrown).isInstanceOf(InvalidClassException.class);
+    }
+
     private static byte[] serialize(Serializable object) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
@@ -125,12 +161,19 @@ public class AuthXMLUtilsSecurityTest {
         return bos.toByteArray();
     }
 
-    /** Reaches the production stream so the test exercises the real allowlist. */
     private static Object deserializeWithSubjectFilter(byte[] bytes) throws Exception {
-        try (ObjectInputStream ois =
-                new AuthXMLUtils.SubjectObjectInputStream(new ByteArrayInputStream(bytes))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
+            assertThat(ObjectInputFilterSupport.setObjectInputFilter(ois, subjectDeserialisationFilter()))
+                    .as("the JVM must provide a deserialization filter API").isTrue();
             return ois.readObject();
         }
+    }
+
+    /** Reaches the production filter so the test exercises the real allowlist. */
+    private static ObjectInputFilterSupport.Filter subjectDeserialisationFilter() throws Exception {
+        Field field = AuthXMLUtils.class.getDeclaredField("SUBJECT_DESERIALISATION_FILTER");
+        field.setAccessible(true);
+        return (ObjectInputFilterSupport.Filter) field.get(null);
     }
 
     // ---- fixtures -----------------------------------------------------------
