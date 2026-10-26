@@ -25,6 +25,7 @@
  * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package com.sun.identity.setup;
@@ -1640,7 +1641,7 @@ public class AMSetupServlet extends HttpServlet {
         attributes.put("sn", CollectionUtils.asSet("demo"));
         attributes.put("cn", CollectionUtils.asSet("demo"));
         attributes.put("userpassword", CollectionUtils.asSet("changeit"));
-        attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
+        attributes.put("inetuserstatus", CollectionUtils.asSet("Inactive"));
         try {
             AMIdentityRepository amir = new AMIdentityRepository(getAdminSSOToken(), "/");
             amir.createIdentity(IdType.USER, "demo", attributes);
